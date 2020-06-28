@@ -3,7 +3,7 @@ import { action } from '@storybook/addon-actions';
 
 import DraftsIcon from "@material-ui/icons/Drafts";
 import SendIcon from "@material-ui/icons/Send";
-import MenuGroup from "../widgets/MenuGroup";
+import MenuItemGroup from "../widgets/MenuItemGroup";
 import { actionsData } from "./MenuItem.stories";
 
 export const menuGroupData = {
@@ -26,11 +26,11 @@ const menuGroupActionsData = {
 };
 
 export default {
-    component: MenuGroup,
-    title: "MenuGroup",
+    component: MenuItemGroup,
+    title: "MenuItemGroup",
     excludeStories: /.*Data$/,
 };
 
-export const Default = () => <MenuGroup menuGroup={ menuGroupData } { ...menuGroupActionsData }/>;
+export const Default = () => <MenuItemGroup menuGroup={ menuGroupData } { ...menuGroupActionsData }/>;
 
-export const Collapsed = () => <MenuGroup menuGroup={{ ...menuGroupData, isCollapsed: true }} { ...menuGroupActionsData } />;
+export const Collapsed = () => <MenuItemGroup menuGroup={{ ...menuGroupData, isCollapsed: true }} { ...menuGroupActionsData } />;

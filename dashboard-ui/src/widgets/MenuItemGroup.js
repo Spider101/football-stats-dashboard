@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function MenuGroup({ menuGroup: { id, menuItems, groupTitle, isCollapsed }, onCollapseMenuItemGroup}) {
+export default function MenuItemGroup({ menuGroup: { id, menuItems, groupTitle, isCollapsed },
+                                          onCollapseMenuItemGroup}) {
     const classes = useStyles();
 
     return (
@@ -38,7 +39,7 @@ export default function MenuGroup({ menuGroup: { id, menuItems, groupTitle, isCo
     );
 }
 
-MenuGroup.propTypes = {
+MenuItemGroup.propTypes = {
   menuGroup: PropTypes.shape({
       id: PropTypes.string,
       menuItems: PropTypes.arrayOf(PropTypes.shape(MenuItem.propTypes)),

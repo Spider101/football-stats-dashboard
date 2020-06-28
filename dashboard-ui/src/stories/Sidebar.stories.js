@@ -1,7 +1,7 @@
 import React from "react";
 
 import Sidebar from "../widgets/Sidebar";
-import { menuGroupData } from "./MenuGroup.stories";
+import { menuGroupData } from "./MenuItemGroup.stories";
 import { menuItemData} from "./MenuItem.stories";
 
 const sideBarData = [{

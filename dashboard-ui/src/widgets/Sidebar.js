@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 
-import MenuGroup from "./MenuGroup";
+import MenuItemGroup from "./MenuItemGroup";
 import MenuItem from "../components/MenuItem";
 import Divider from "@material-ui/core/Divider";
 import { makeStyles } from "@material-ui/core/styles";
@@ -100,7 +100,7 @@ export default function Sidebar({ sideBarItems: initialSideBarItems }) {
                 </div>
                 <Divider />
                 { sideBarItems.map(sideBarItem => (sideBarItem.isGroup ?
-                    <MenuGroup menuGroup={ sideBarItem.listItem } onCollapseTask={ handleMenuGroupToggle }/> :
+                    <MenuItemGroup menuGroup={ sideBarItem.listItem } onCollapseTask={ handleMenuGroupToggle }/> :
                     <MenuItem { ...sideBarItem.item }/> )) }
                 <Divider />
                 <List className={ classes.settingsRoot }>
