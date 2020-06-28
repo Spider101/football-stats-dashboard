@@ -1,4 +1,6 @@
 import React from "react";
+import PropTypes from "prop-types";
+
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
@@ -96,3 +98,10 @@ export default function AppBarMenu({ menu: { title, teamColor }}) {
         </AppBar>
     );
 }
+
+AppBarMenu.propTypes = {
+    menu: PropTypes.shape({
+        title: PropTypes.string,
+        teamColor: PropTypes.string
+    })
+};
