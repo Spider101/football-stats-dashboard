@@ -4,12 +4,12 @@ import { action } from '@storybook/addon-actions';
 import MenuItem from "../components/MenuItem";
 import SendIcon from "@material-ui/icons/Send";
 
-export const taskData = {
-    onSelectTask: action("onSelectData")
+export const actionsData = {
+    onSelectMenuItem: action("onSelectMenuItem")
 };
 
-const menuItemData = {
-    text: "Menu Item",
+export const menuItemData = {
+    text: "Menu Item Solo",
     icon: <SendIcon />
 };
 
@@ -19,4 +19,4 @@ export default {
     excludeStories: /.*Data$/,
 }
 
-export const Default = () => <MenuItem { ...menuItemData }  { ...taskData }/>;
+export const Default = () => <MenuItem { ...menuItemData }  { ...actionsData }/>;
