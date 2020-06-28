@@ -1,23 +1,28 @@
 import React from "react";
+import { action } from '@storybook/addon-actions';
 
 import DraftsIcon from "@material-ui/icons/Drafts";
 import SendIcon from "@material-ui/icons/Send";
 import MenuGroup from "../widgets/MenuGroup";
-import { taskData } from "./MenuItem.stories";
+import { actionsData } from "./MenuItem.stories";
 
 export const menuGroupData = {
+    id: "id1",
     groupTitle: "Menu Group Title",
     menuItems: [{
-        ...taskData,
+        ...actionsData,
         text: "Menu Item A",
         icon: <SendIcon />
     }, {
-        ...taskData,
+        ...actionsData,
         text: "Menu Item B",
-        icon: <DraftsIcon />,
-        onSelectTask: taskData.onSelectTask
+        icon: <DraftsIcon />
     }],
     isCollapsed: false
+};
+
+const menuGroupActionsData = {
+    onCollapseMenuItemGroup: action("onCollapseMenuItemGroup")
 };
 
 export default {
@@ -26,6 +31,6 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-export const Default = () => <MenuGroup menuGroup={{ ...menuGroupData }} { ...taskData }/>;
+export const Default = () => <MenuGroup menuGroup={ menuGroupData } { ...menuGroupActionsData }/>;
 
-export const Collapsed = () => <MenuGroup menuGroup={{ ...menuGroupData, isCollapsed: true }} />;
+export const Collapsed = () => <MenuGroup menuGroup={{ ...menuGroupData, isCollapsed: true }} { ...menuGroupActionsData } />;

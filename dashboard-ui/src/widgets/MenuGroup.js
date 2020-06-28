@@ -11,28 +11,27 @@ import ExpandMore from '@material-ui/icons/ExpandMore';
 import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
-    root: {
+    listGroupRoot: {
         width: "100%",
-        maxWidth: 360,
         backgroundColor: theme.palette.background.paper
     },
-    nested: {
+    nestedListItems: {
         paddingLeft: theme.spacing(4),
     },
 }));
 
-export default function MenuGroup({ menuGroup: { menuItems, groupTitle, isCollapsed }, onCollapseTask}) {
+export default function MenuGroup({ menuGroup: { id, menuItems, groupTitle, isCollapsed }, onCollapseMenuItemGroup}) {
     const classes = useStyles();
 
     return (
-      <List className={ classes.root } component="nav">
-          <ListItem button>
+      <List key={ id } className={ classes.listGroupRoot } component="nav">
+          <ListItem button onClick={ () => onCollapseMenuItemGroup(id) }>
               <ListItemText primary={ groupTitle }/>
               { isCollapsed ? <ExpandLess /> : <ExpandMore />}
           </ListItem>
           <Collapse in={ !isCollapsed } timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-                { menuItems.map(menuItem => <MenuItem { ...menuItem }  clsName={ classes.nested } /> ) }
+                { menuItems.map(menuItem => <MenuItem { ...menuItem }  clsName={ classes.nestedListItems } /> ) }
             </List>
           </Collapse>
       </List>
@@ -41,6 +40,7 @@ export default function MenuGroup({ menuGroup: { menuItems, groupTitle, isCollap
 
 MenuGroup.propTypes = {
   menuGroup: PropTypes.shape({
+      id: PropTypes.string,
       menuItems: PropTypes.arrayOf(PropTypes.shape(MenuItem.propTypes)),
       groupTitle: PropTypes.string,
       isCollapsed: PropTypes.bool,
