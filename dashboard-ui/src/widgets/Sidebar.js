@@ -100,8 +100,10 @@ export default function Sidebar({ sideBarItems: initialSideBarItems }) {
                 </div>
                 <Divider />
                 { sideBarItems.map(sideBarItem => (sideBarItem.isGroup ?
-                    <MenuItemGroup menuGroup={ sideBarItem.listItem } onCollapseTask={ handleMenuGroupToggle }/> :
-                    <MenuItem { ...sideBarItem.item }/> )) }
+                    <MenuItemGroup
+                        menuGroup={ sideBarItem.listItem }
+                        onCollapseMenuItemGroup={ handleMenuGroupToggle }
+                    /> : <MenuItem { ...sideBarItem.item }/> )) }
                 <Divider />
                 <List className={ classes.settingsRoot }>
                     <ListItem button>
