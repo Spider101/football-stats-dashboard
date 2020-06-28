@@ -21,8 +21,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function MenuGroup({ menuGroup: { menuItems, groupTitle, isCollapsed }}) {
+export default function MenuGroup({ menuGroup: { menuItems, groupTitle, isCollapsed }, onCollapseTask}) {
     const classes = useStyles();
+
     return (
       <List className={ classes.root } component="nav">
           <ListItem button>
@@ -31,8 +32,7 @@ export default function MenuGroup({ menuGroup: { menuItems, groupTitle, isCollap
           </ListItem>
           <Collapse in={ !isCollapsed } timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-                { menuItems.map(menuItem =>
-                    <MenuItem clsName={ classes.nested } text={ menuItem.text } icon={ menuItem.icon }/> ) }
+                { menuItems.map(menuItem => <MenuItem { ...menuItem }  clsName={ classes.nested } /> ) }
             </List>
           </Collapse>
       </List>
@@ -43,6 +43,7 @@ MenuGroup.propTypes = {
   menuGroup: PropTypes.shape({
       menuItems: PropTypes.arrayOf(PropTypes.shape(MenuItem.propTypes)),
       groupTitle: PropTypes.string,
-      isCollapsed: PropTypes.bool
-  })
+      isCollapsed: PropTypes.bool,
+  }),
+  onSelectTask: PropTypes.func
 };
