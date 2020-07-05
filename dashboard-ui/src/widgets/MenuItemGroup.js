@@ -9,6 +9,7 @@ import Collapse from '@material-ui/core/Collapse';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import { makeStyles } from '@material-ui/core/styles';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 
 const useStyles = makeStyles((theme) => ({
     listGroupRoot: {
@@ -20,14 +21,15 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function MenuItemGroup({ menuGroup: { id, menuItems, groupTitle, isCollapsed },
-    onCollapseMenuItemGroup}) {
+export default function MenuItemGroup({ menuGroup: { id, menuItems, groupTitle, groupIcon, isCollapsed,
+    isItemTextWrapped = true }, onCollapseMenuItemGroup}) {
     const classes = useStyles();
-
+    const whiteSpaceStyle = !isItemTextWrapped ? 'nowrap' : 'normal';
     return (
         <List key={ id } className={ classes.listGroupRoot } component="nav">
             <ListItem button onClick={ () => onCollapseMenuItemGroup(id) }>
-                <ListItemText primary={ groupTitle }/>
+                <ListItemIcon> { groupIcon } </ListItemIcon>
+                <ListItemText primary={ groupTitle } style={{ whiteSpace: whiteSpaceStyle }}/>
                 { isCollapsed ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
             <Collapse in={ !isCollapsed } timeout="auto" unmountOnExit>
@@ -45,7 +47,9 @@ MenuItemGroup.propTypes = {
         id: PropTypes.string,
         menuItems: PropTypes.arrayOf(PropTypes.shape(MenuItem.propTypes)),
         groupTitle: PropTypes.string,
+        groupIcon: PropTypes.elementType,
         isCollapsed: PropTypes.bool,
+        isItemTextWrapped: PropTypes.bool,
     }),
     onCollapseMenuItemGroup: PropTypes.func
 };
