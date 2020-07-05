@@ -1,37 +1,37 @@
-import React from "react";
-import PropTypes from "prop-types";
-import clsx from "clsx";
+import React from 'react';
+import PropTypes from 'prop-types';
+import clsx from 'clsx';
 
-import MenuItemGroup from "./MenuItemGroup";
-import MenuItem from "../components/MenuItem";
-import Divider from "@material-ui/core/Divider";
-import { makeStyles } from "@material-ui/core/styles";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import List from "@material-ui/core/List";
-import Drawer from "@material-ui/core/Drawer";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import IconButton from "@material-ui/core/IconButton";
+import MenuItemGroup from './MenuItemGroup';
+import MenuItem from '../components/MenuItem';
+import Divider from '@material-ui/core/Divider';
+import { makeStyles } from '@material-ui/core/styles';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
+import List from '@material-ui/core/List';
+import Drawer from '@material-ui/core/Drawer';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import IconButton from '@material-ui/core/IconButton';
 import SettingsIcon from '@material-ui/icons/Settings';
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     settingsRoot: {
-        display: "flex"
+        display: 'flex'
     },
     toolbar: {
         padding: theme.spacing(0, 1),
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "flex-end"
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end'
     },
     drawer: {
         width: drawerWidth,
         flexShrink: 0,
-        whiteSpace: "nowrap"
+        whiteSpace: 'nowrap'
     },
     drawerOpen: {
         width: drawerWidth,

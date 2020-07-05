@@ -1,9 +1,9 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemText from '@material-ui/core/ListItemText';
 
 export default function MenuItem({ text, icon, clsName = null, onSelectMenuItem }) {
     return (
@@ -19,5 +19,6 @@ export default function MenuItem({ text, icon, clsName = null, onSelectMenuItem 
 MenuItem.propTypes = {
     text: PropTypes.string,
     icon: PropTypes.elementType,
-    onSelectTask: PropTypes.func
+    clsName: PropTypes.string,
+    onSelectMenuItem: PropTypes.func
 };

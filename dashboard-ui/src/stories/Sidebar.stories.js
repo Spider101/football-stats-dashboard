@@ -1,8 +1,8 @@
-import React from "react";
+import React from 'react';
 
-import Sidebar from "../widgets/Sidebar";
-import { menuGroupData } from "./MenuItemGroup.stories";
-import { menuItemData} from "./MenuItem.stories";
+import Sidebar from '../widgets/Sidebar';
+import { menuGroupData } from './MenuItemGroup.stories';
+import { menuItemData} from './MenuItem.stories';
 
 const sideBarData = [{
     isGroup: true,
@@ -14,8 +14,8 @@ const sideBarData = [{
 
 export default {
     component: Sidebar,
-    title: "Sidebar",
+    title: 'Sidebar',
     excludeStories: /.*Data$/,
-}
+};
 
 export const Default = () => <Sidebar sideBarItems={ sideBarData } />;
