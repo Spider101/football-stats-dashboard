@@ -2,7 +2,7 @@ import React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import MenuItem from '../components/MenuItem';
-import SendIcon from '@material-ui/icons/Send';
+import Commute from '@material-ui/icons/Commute';
 
 export const actionsData = {
     onSelectMenuItem: action('onSelectMenuItem')
@@ -10,7 +10,7 @@ export const actionsData = {
 
 export const menuItemData = {
     text: 'Menu Item Solo',
-    icon: <SendIcon />
+    icon: <Commute />
 };
 
 export default {
