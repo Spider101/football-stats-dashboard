@@ -58,14 +58,19 @@ export default function Sidebar({ sideBarItems: initialSideBarItems }) {
     const [ sideBarItems, updateSideBarItems ] = React.useState(initialSideBarItems);
     const [ open, setOpen ] = React.useState(true);
 
-    const handleMenuGroupToggle = (id, shouldCollapseAll = false) => {
+    const handleMenuGroupToggle = (id, shouldToggleAll = false) => {
         const updatedSideBarItems = sideBarItems.map(sideBarItem => {
-            return sideBarItem.isGroup && (shouldCollapseAll || sideBarItem.listItem.id === id) ?
+            return sideBarItem.isGroup && (shouldToggleAll || sideBarItem.listItem.id === id) ?
                 {
                     ...sideBarItem,
                     listItem: {
                         ...sideBarItem.listItem,
-                        isCollapsed: !sideBarItem.listItem.isCollapsed
+                        isCollapsed: !sideBarItem.listItem.isCollapsed,
+                        // the shouldToggleAll flag indicates if this method is being called from the child (false) or
+                        // parent (false) component. If it is called from the child component, the `open` flag has
+                        // already been set so we can use it's value directly, otherwise toggle it to reflect the value
+                        // it is going to be
+                        isItemTextWrapped: shouldToggleAll === !open
                     }
                 } : sideBarItem;
         });
@@ -103,7 +108,7 @@ export default function Sidebar({ sideBarItems: initialSideBarItems }) {
                     <MenuItemGroup
                         menuGroup={ sideBarItem.listItem }
                         onCollapseMenuItemGroup={ handleMenuGroupToggle }
-                    /> : <MenuItem { ...sideBarItem.item }/> )) }
+                    /> : <MenuItem { ...sideBarItem.listItem }/> )) }
                 <Divider />
                 <List className={ classes.settingsRoot }>
                     <ListItem button>
