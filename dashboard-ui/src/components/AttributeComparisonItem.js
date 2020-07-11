@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function AttributeComparisonItem({ item: { series, label }, isHighlighted }) {
+export default function AttributeComparisonItem({ attrComparisonItem: { attrValues, label }, isHighlighted }) {
     const classes = useStyles();
     return (
         <ListItem className={ clsx(classes.attr, {
@@ -60,7 +60,7 @@ export default function AttributeComparisonItem({ item: { series, label }, isHig
                         categories: [ label ]
                     }
                 }}
-                series={ series }
+                series={ attrValues }
                 type='bar'
                 width='500'
                 height='100'
@@ -70,8 +70,8 @@ export default function AttributeComparisonItem({ item: { series, label }, isHig
 }
 
 AttributeComparisonItem.propTypes = {
-    item: PropTypes.shape({
-        series: PropTypes.arrayOf(PropTypes.shape({
+    attrComparisonItem: PropTypes.shape({
+        attrValues: PropTypes.arrayOf(PropTypes.shape({
             name: PropTypes.string,
             data: PropTypes.array
         })),

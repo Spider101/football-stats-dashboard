@@ -38,30 +38,28 @@ const StyledTableRow = withStyles((theme) => ({
 
 export default function AttributeComparisonTable({ headers, rows }) {
     return (
-        <div>
-            <TableContainer>
-                <Table>
-                    <TableHead >
-                        <TableRow>
-                            { headers.map((header, idx) => (
-                                <StyledTableCell key={ idx }> { header }</StyledTableCell>
-                            ))}
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        { rows.map((row, idx) => (
-                            <StyledTableRow key={ idx }>
-                                { row.map((cell, idx) => (
-                                    <StyledTableCell component='th' scope='row' key={ idx }>
-                                        { cell != null ? <AttributeComparisonItem { ...cell } /> : null }
-                                    </StyledTableCell>
-                                ))}
-                            </StyledTableRow>
+        <TableContainer>
+            <Table>
+                <TableHead >
+                    <TableRow>
+                        { headers.map((header, idx) => (
+                            <StyledTableCell key={ idx }> { header }</StyledTableCell>
                         ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </div>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    { rows.map((row, idx) => (
+                        <StyledTableRow key={ idx }>
+                            { row.map((cell, idx) => (
+                                <StyledTableCell component='th' scope='row' key={ idx }>
+                                    { cell != null ? <AttributeComparisonItem { ...cell } /> : null }
+                                </StyledTableCell>
+                            ))}
+                        </StyledTableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 }
 
