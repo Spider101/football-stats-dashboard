@@ -22,18 +22,27 @@ const options = {
 };
 
 export default function AttributeComparisonPolarPlot({ playerAttributes }) {
+    const series = playerAttributes.map(player => ({
+        name: player.name,
+        data: player.attributes.map(attrGroup =>
+            Math.round(attrGroup.groupAttrValues.reduce((a, b) => a + b, 0) / attrGroup.groupAttrValues.length))
+    }));
+
     return (
-      <ReactApexChart
-          options={ options }
-          series={ playerAttributes }
-          type='radar'
-      />
+        <ReactApexChart
+            options={ options }
+            series={ series }
+            type='radar'
+        />
     );
-};
+}
 
 AttributeComparisonPolarPlot.propTypes = {
     playerAttributes: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
-        data: PropTypes.array
+        attributes: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
+            groupName: PropTypes.string,
+            groupAttrValues: PropTypes.array
+        })))
     }))
 };
