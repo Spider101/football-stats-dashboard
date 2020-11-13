@@ -8,7 +8,7 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-const attrGroupData = (numGroups) => (
+const getAttrGroupData = (numGroups) => (
     [ ...Array(numGroups) ].map(() => ({
         groupName: '',
         groupAttrValues: [ ...Array(10) ].map(() => Math.round(Math.random() * 19) + 1)
@@ -18,10 +18,10 @@ const attrGroupData = (numGroups) => (
 const polarPlotData = {
     playerAttributes: [{
         name: faker.name.lastName(1),
-        attributes: attrGroupData(5)
+        attributes: getAttrGroupData(5)
     }, {
         name: faker.name.lastName(1),
-        attributes: attrGroupData(5)
+        attributes: getAttrGroupData(5)
     }]
 };
 

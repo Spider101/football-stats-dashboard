@@ -9,16 +9,16 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-const attrComparisonTableMetaDataFn = (numGroups) => ({
+const getAttrComparisonTableMetaData = (numGroups) => ({
     groups: [ ...Array(numGroups) ].map(() => ({
         name: faker.lorem.word(),
         numAttr: Math.round(Math.random() * 9) + 1
     }))
 });
 
-const attributeComparisonTableDataFn = (shouldHighlightAttr = false) => {
+const getAttributeComparisonTableData = (shouldHighlightAttr = false) => {
     const numGroups = 3;
-    const attributeComparisonTableMetadata = attrComparisonTableMetaDataFn(numGroups);
+    const attributeComparisonTableMetadata = getAttrComparisonTableMetaData(numGroups);
     const maxRows = Math.max(
         ...attributeComparisonTableMetadata.groups.map(group => group.numAttr)
     );
@@ -36,6 +36,6 @@ const attributeComparisonTableDataFn = (shouldHighlightAttr = false) => {
     };
 };
 
-export const Default = () => <AttributeComparisonTable { ...attributeComparisonTableDataFn() } />;
+export const Default = () => <AttributeComparisonTable { ...getAttributeComparisonTableData() } />;
 
-export const Highlighted = () => <AttributeComparisonTable { ...attributeComparisonTableDataFn(true) } />;
+export const Highlighted = () => <AttributeComparisonTable { ...getAttributeComparisonTableData(true) } />;

@@ -2,7 +2,7 @@ import React from 'react';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import faker from 'faker';
 
-export const attrComparisonItemData = () => ({
+export const getAttrComparisonItemData = () => ({
     attrComparisonItem: {
         attrValues: [{
             name: faker.name.lastName(1),
@@ -22,6 +22,6 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-export const Default = () => <AttributeComparisonItem { ...attrComparisonItemData() } />;
+export const Default = () => <AttributeComparisonItem { ...getAttrComparisonItemData() } />;
 
-export const Highlighted = () => <AttributeComparisonItem { ...attrComparisonItemData() } isHighlighted={ true }/>;
+export const Highlighted = () => <AttributeComparisonItem { ...getAttrComparisonItemData() } isHighlighted={ true }/>;
