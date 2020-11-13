@@ -6,27 +6,25 @@ import Paper from '@material-ui/core/Paper';
 
 import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
 
-const createAttributeComparisonData = (attr1, attr2, playerNames) => {
+const createAttributeComparisonData = (attributeGroupList1, attributeGroupList2, playerNames) => {
 
-    const maxRows = Math.max(
-        ...Object.values(attr1).map(attr => attr.length)
-    );
+    const maxRows = Math.max( ...attributeGroupList1.map(attrGroup => attrGroup.attributesInGroup.length));
 
-    const attrData1 = Object.values(attr1);
-    const attrData2 = Object.values(attr2);
+    let tabularAttributeData = [ ...Array(maxRows) ].map((_, i) => (
+        [ ...Array(attributeGroupList1.length) ].map((_, j) => {
+            const currentAttributeGroup1 = attributeGroupList1[j].attributesInGroup;
+            const currentAttributeGroup2 = attributeGroupList2[j].attributesInGroup;
 
-    let matr = [ ...Array(maxRows) ].map((_, i) => (
-        [ ...Array(Object.keys(attr1).length) ].map((_, j) => {
-            return i <= attrData1[j].length ? {
+            return i <= currentAttributeGroup1.length ? {
                 attrComparisonItem: {
                     attrValues: [{
-                        name: playerNames[0],
-                        data: attrData1[j][i]['attr']
+                        name: playerNames[0].split(' ')[1],
+                        data: [ -1 * currentAttributeGroup1[i]['value'] ]
                     }, {
-                        name: playerNames[1],
-                        data: attrData2[j][i]['attr']
+                        name: playerNames[1].split(' ')[1],
+                        data: [ currentAttributeGroup2[i]['value'] ]
                     }],
-                    label: attrData1[j][i]['attr']
+                    label: currentAttributeGroup1[i]['name']
                 },
                 isHighlighted: false
             } : null;
@@ -34,8 +32,8 @@ const createAttributeComparisonData = (attr1, attr2, playerNames) => {
     ));
 
     return {
-        headers: Object.keys(attr1),
-        rows: matr
+        headers: attributeGroupList1.map(attrGroup => attrGroup.groupName),
+        rows: tabularAttributeData
     };
 };
 
@@ -75,26 +73,17 @@ PlayerComparisonView.propTypes = {
                 name: PropTypes.string,
                 image: PropTypes.string,
             }),
-            playerAttributes: PropTypes.shape({
-                physical: PropTypes.arrayOf(
-                    PropTypes.shape({
-                        name: PropTypes.string,
-                        data: PropTypes.number
-                    })
-                ),
-                technical: PropTypes.arrayOf(
-                    PropTypes.shape({
-                        name: PropTypes.string,
-                        data: PropTypes.number
-                    })
-                ),
-                mental: PropTypes.arrayOf(
-                    PropTypes.shape({
-                        name: PropTypes.string,
-                        attr: PropTypes.number
-                    })
-                )
-            })
+            playerAttributes: PropTypes.arrayOf(
+                PropTypes.shape({
+                    groupName: PropTypes.string,
+                    attributesInGroup: PropTypes.arrayOf(
+                        PropTypes.shape({
+                            name: PropTypes.string,
+                            value: PropTypes.number
+                        })
+                    )
+                })
+            )
         })
     )
 };

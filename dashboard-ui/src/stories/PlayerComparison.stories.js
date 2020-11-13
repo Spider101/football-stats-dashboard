@@ -8,15 +8,32 @@ export default {
     excludeStories: /.*Data$/
 };
 
+const MAX_ATTR_VALUE = 20;
+
+const getAttributesInGroup = (numAttributes) => {
+    let attributesInGroup = [];
+    for (let i=0; i<numAttributes; i++) {
+        attributesInGroup.push({ name: faker.hacker.noun(), value: Math.round(Math.random() * MAX_ATTR_VALUE) });
+    }
+    return attributesInGroup;
+};
+
+const  getPlayerAttributeData = () => ([
+    {
+        groupName: 'Technical',
+        attributesInGroup: getAttributesInGroup(10)
+    }, {
+        groupName: 'Physical',
+        attributesInGroup: getAttributesInGroup(10)
+    }, {
+        groupName: 'Mental',
+        attributesInGroup: getAttributesInGroup(10)
+    }
+]);
+
 const getPlayerMetadata = () => ({
     name: faker.name.findName(),
     photo: faker.image.imageUrl()
-});
-
-const getPlayerAttributeData = () => ({
-    technical: [ ...Array(10)].map((_, idx) => ({ name: faker.name.lastName(1), attr: Math.round(Math.random() * 20) })),
-    physical:  [ ...Array(10)].map((_, idx) => ({ name: faker.name.lastName(1), attr: Math.round(Math.random() * 20) })),
-    mental:  [ ...Array(10)].map((_, idx) => ({ name: faker.name.lastName(1), attr: Math.round(Math.random() * 20) })),
 });
 
 const playerData = {
