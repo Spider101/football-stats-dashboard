@@ -3,8 +3,19 @@ import PropTypes from 'prop-types';
 
 import Grid from '@material-ui/core/Grid';
 
+import Typography from '@material-ui/core/Typography';
+import Card from '@material-ui/core/Card';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardContent from '@material-ui/core/CardContent';
+import Avatar from '@material-ui/core/Avatar';
+import Box from '@material-ui/core/Box';
+import AppBar from '@material-ui/core/AppBar';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
+
+import { makeStyles } from '@material-ui/core/styles';
+
 import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
-import { Card, Typography, CardContent, CardMedia, makeStyles, Avatar, Box, AppBar, Tabs, Tab } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
     root: {
