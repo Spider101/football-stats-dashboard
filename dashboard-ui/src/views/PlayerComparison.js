@@ -4,9 +4,9 @@ import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 
 import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
-import { Card, Typography, CardContent, CardMedia, makeStyles, Avatar } from '@material-ui/core';
+import { Card, Typography, CardContent, CardMedia, makeStyles, Avatar, Box, AppBar, Tabs, Tab } from '@material-ui/core';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles((theme) => ({
     root: {
         display: 'flex'
     },
@@ -26,7 +26,11 @@ const useStyles = makeStyles({
     media: {
         minWidth: 151,
     },
-});
+    attrComparisonTabs: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.paper,
+    }
+}));
 
 const createAttributeComparisonData = (attributeGroupList1, attributeGroupList2, playerNames) => {
 
@@ -59,8 +63,39 @@ const createAttributeComparisonData = (attributeGroupList1, attributeGroupList2,
     };
 };
 
+const TabPanel = ({ children, value, index, ...other }) => {
+    return (
+        <div
+            role="tabpanel"
+            hidden={value !== index}
+            id={`simple-tabpanel-${index}`}
+            aria-labelledby={`simple-tab-${index}`}
+            {...other}
+        >
+            {value === index && (
+                <Box p={3}>
+                    { children }
+                </Box>
+            )}
+        </div>
+    );
+};
+
+TabPanel.propTypes = {
+    children: PropTypes.node,
+    index: PropTypes.any.isRequired,
+    value: PropTypes.any.isRequired,
+};
+
 export default function PlayerComparisonView({ players }) {
     const classes = useStyles();
+
+    const [ value, setValue ] = React.useState(0);
+
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+
     const playerA = players.find(player => player.isSelected && player.orientation == 'LEFT');
     
     const playerB = players.find(player => player.isSelected && player.orientation == 'RIGHT');
@@ -131,7 +166,25 @@ export default function PlayerComparisonView({ players }) {
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    <AttributeComparisonTable { ...attributeComparisonData } />
+                    <AppBar position="static">
+                        <Tabs
+                            value={ value }
+                            onChange={ handleChange }
+                            aria-label="player attributes comparison tabs"
+                            variant="fullWidth"
+                        >
+                            <Tab label="Overview" { ...a11yProps(0) } />
+                            <Tab label="Attributes" { ...a11yProps(1) } />
+                        </Tabs>
+                    </AppBar>
+                    <TabPanel value={ value } index={0}>
+                        <Typography variant="h2" component="h2">
+                            Work in Progress
+                        </Typography>
+                    </TabPanel>
+                    <TabPanel value={ value }  index={1}>
+                        <AttributeComparisonTable { ...attributeComparisonData } />
+                    </TabPanel>
                 </Grid>
             </Grid>
         </div>
@@ -168,6 +221,10 @@ PlayerComparisonView.propTypes = {
     )
 };
 
-function renderPlayerDOB(playerMetadata) {
-    return playerMetadata.dob.toJSON().slice(0, 10).split`-`.join`/` + playerMetadata.age;
-}
+const a11yProps = (index) => ({
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+});
+
+const renderPlayerDOB = (playerMetadata) =>
+    playerMetadata.dob.toJSON().slice(0, 10).split`-`.join`/` + playerMetadata.age;
