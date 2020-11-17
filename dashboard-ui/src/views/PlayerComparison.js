@@ -44,25 +44,25 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const createAttributeComparisonData = (attributeGroupList1, attributeGroupList2, playerNames) => {
+const createAttributeComparisonData = (attributeCategoryList1, attributeCategoryList2, playerNames) => {
 
-    const maxRows = Math.max( ...attributeGroupList1.map(attrGroup => attrGroup.attributesInGroup.length));
+    const maxRows = Math.max( ...attributeCategoryList1.map(attrCategory => attrCategory.attributesInCategory.length));
 
     let tabularAttributeData = [ ...Array(maxRows) ].map((_, i) => (
-        [ ...Array(attributeGroupList1.length) ].map((_, j) => {
-            const currentAttributeGroup1 = attributeGroupList1[j].attributesInGroup;
-            const currentAttributeGroup2 = attributeGroupList2[j].attributesInGroup;
+        [ ...Array(attributeCategoryList1.length) ].map((_, j) => {
+            const currentAttributeCategory1 = attributeCategoryList1[j].attributesInCategory;
+            const currentAttributeCategory2 = attributeCategoryList2[j].attributesInCategory;
 
-            return i <= currentAttributeGroup1.length ? {
+            return i <= currentAttributeCategory1.length ? {
                 attrComparisonItem: {
                     attrValues: [{
                         name: playerNames[0].split(' ')[1],
-                        data: [ -1 * currentAttributeGroup1[i]['value'] ]
+                        data: [ -1 * currentAttributeCategory1[i]['value'] ]
                     }, {
                         name: playerNames[1].split(' ')[1],
-                        data: [ currentAttributeGroup2[i]['value'] ]
+                        data: [ currentAttributeCategory2[i]['value'] ]
                     }],
-                    label: currentAttributeGroup1[i]['name']
+                    label: currentAttributeCategory1[i]['name']
                 },
                 isHighlighted: false
             } : null;
@@ -70,7 +70,7 @@ const createAttributeComparisonData = (attributeGroupList1, attributeGroupList2,
     ));
 
     return {
-        headers: attributeGroupList1.map(attrGroup => attrGroup.groupName),
+        headers: attributeCategoryList1.map(attrCategory => attrCategory.categoryName),
         rows: tabularAttributeData
     };
 };
@@ -112,7 +112,8 @@ export default function PlayerComparisonView({ players }) {
     
     const playerB = players.find(player => player.isSelected && player.orientation == 'RIGHT');
 
-    const attributeComparisonData = createAttributeComparisonData(playerA.playerAttributes, playerB.playerAttributes,
+    // eslint-disable-next-line max-len
+    const attributeComparisonData = createAttributeComparisonData(playerA.playerAttributes.attributeCategories,             playerB.playerAttributes.attributeCategories,
         [ playerA.playerMetadata.name, playerB.playerMetadata.name ]);
 
     const attributePolarPlotData = {

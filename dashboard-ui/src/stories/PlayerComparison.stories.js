@@ -10,24 +10,43 @@ export default {
 
 const MAX_ATTR_VALUE = 20;
 
-const getAttributesInGroup = (numAttributes) => {
-    let attributesInGroup = [];
+const getAttributesInCategory = (numAttributes) => {
+    let attributesInCategory = [];
     for (let i=0; i<numAttributes; i++) {
-        attributesInGroup.push({ name: faker.hacker.noun(), value: Math.round(Math.random() * MAX_ATTR_VALUE) });
+        attributesInCategory.push({ name: faker.hacker.noun(), value: Math.round(Math.random() * MAX_ATTR_VALUE) });
     }
-    return attributesInGroup;
+    return attributesInCategory;
 };
 
-const  getPlayerAttributeData = () => ([
+const  getPlayerAttributeCategoryData = () => ([
     {
-        groupName: 'Technical',
-        attributesInGroup: getAttributesInGroup(10)
+        categoryName: 'Technical',
+        attributesInCategory: getAttributesInCategory(10)
     }, {
-        groupName: 'Physical',
-        attributesInGroup: getAttributesInGroup(10)
+        categoryName: 'Physical',
+        attributesInCategory: getAttributesInCategory(10)
     }, {
-        groupName: 'Mental',
-        attributesInGroup: getAttributesInGroup(10)
+        categoryName: 'Mental',
+        attributesInCategory: getAttributesInCategory(10)
+    }
+]);
+
+const getPlayerAttributeGroupData = (numAttributes) => ([
+    {
+        groupName: 'Defending',
+        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+    }, {
+        groupName: 'Speed',
+        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+    }, {
+        groupName: 'Vision',
+        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+    }, {
+        groupName: 'Attacking',
+        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+    }, {
+        groupName: 'Aerial',
+        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
     }
 ]);
 
@@ -47,12 +66,18 @@ const playerData = {
         isSelected: true,
         orientation: 'LEFT',
         playerMetadata: getPlayerMetadata(),
-        playerAttributes: getPlayerAttributeData()
+        playerAttributes: {
+            attributeCategories: getPlayerAttributeCategoryData(),
+            attributeGroups: getPlayerAttributeGroupData(10)
+        }
     }, {
         isSelected: true,
         orientation: 'RIGHT',
         playerMetadata: getPlayerMetadata(),
-        playerAttributes: getPlayerAttributeData()
+        playerAttributes: {
+            attributeCategories: getPlayerAttributeCategoryData(),
+            attributeGroups: getPlayerAttributeGroupData(10)
+        }
     }]
 };
 
