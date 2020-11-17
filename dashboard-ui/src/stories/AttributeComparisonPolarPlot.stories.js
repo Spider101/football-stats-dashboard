@@ -11,7 +11,7 @@ export default {
 const getAttrGroupData = (numGroups) => (
     [ ...Array(numGroups) ].map(() => ({
         groupName: '',
-        groupAttrValues: [ ...Array(10) ].map(() => Math.round(Math.random() * 19) + 1)
+        attributesInGroup: [ ...Array(10) ].map(() => Math.round(Math.random() * 19) + 1)
     }))
 );
 
