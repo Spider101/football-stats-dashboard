@@ -16,6 +16,7 @@ import Tab from '@material-ui/core/Tab';
 import { makeStyles } from '@material-ui/core/styles';
 
 import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
+import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -114,6 +115,16 @@ export default function PlayerComparisonView({ players }) {
     const attributeComparisonData = createAttributeComparisonData(playerA.playerAttributes, playerB.playerAttributes,
         [ playerA.playerMetadata.name, playerB.playerMetadata.name ]);
 
+    const attributePolarPlotData = {
+        playerAttributes: [{
+            name: playerA.playerMetadata.name,
+            attributes: playerA.playerAttributes.attributeGroups
+        }, {
+            name: playerB.playerMetadata.name,
+            attributes: playerB.playerAttributes.attributeGroups
+        }]
+    };
+
     return (
         <div>
             <Grid container spacing={2}>
@@ -189,9 +200,7 @@ export default function PlayerComparisonView({ players }) {
                         </Tabs>
                     </AppBar>
                     <TabPanel value={ value } index={0}>
-                        <Typography variant="h2" component="h2">
-                            Work in Progress
-                        </Typography>
+                        <AttributeComparisonPolarPlot { ...attributePolarPlotData } />
                     </TabPanel>
                     <TabPanel value={ value }  index={1}>
                         <AttributeComparisonTable { ...attributeComparisonData } />
@@ -217,17 +226,23 @@ PlayerComparisonView.propTypes = {
                 countryLogo: PropTypes.string,
                 image: PropTypes.string,
             }),
-            playerAttributes: PropTypes.arrayOf(
-                PropTypes.shape({
+            playerAttributes: PropTypes.shape({
+                attributeCategories: PropTypes.arrayOf(
+                    PropTypes.shape({
+                        categoryName: PropTypes.string,
+                        attributesInCategory: PropTypes.arrayOf(
+                            PropTypes.shape({
+                                name: PropTypes.string,
+                                value: PropTypes.number
+                            })
+                        )
+                    })
+                ),
+                attributeGroups: PropTypes.arrayOf(PropTypes.shape({
                     groupName: PropTypes.string,
-                    attributesInGroup: PropTypes.arrayOf(
-                        PropTypes.shape({
-                            name: PropTypes.string,
-                            value: PropTypes.number
-                        })
-                    )
-                })
-            )
+                    attributesInGroup: PropTypes.array
+                }))
+            })
         })
     )
 };
