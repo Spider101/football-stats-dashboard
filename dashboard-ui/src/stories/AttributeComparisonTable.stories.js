@@ -1,6 +1,6 @@
 import React from 'react';
 import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
-import { attrComparisonItemData } from './AttributeComparisonItem.stories';
+import { getAttrComparisonItemData } from './AttributeComparisonItem.stories';
 import faker from 'faker';
 
 export default {
@@ -28,7 +28,7 @@ const getAttributeComparisonTableData = (shouldHighlightAttr = false) => {
             [ ...Array(numGroups) ].map((_, j) => {
                 const currGroup = attributeComparisonTableMetadata.groups[j];
                 return i > currGroup.numAttr ? null : {
-                    ...attrComparisonItemData(),
+                    ...getAttrComparisonItemData(),
                     isHighlighted: shouldHighlightAttr && Math.random() >= 0.5
                 };
             })
