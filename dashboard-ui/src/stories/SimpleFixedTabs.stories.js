@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions';
 
 export default {
     component: SimpleFixedTabs,
-    title: 'Composites | PlayerComparisonView/SimpleFixedTabs',
+    title: 'Components/PlayerComparisonView/SimpleFixedTabs',
     excludeStories: /.*Data$/
 };
 

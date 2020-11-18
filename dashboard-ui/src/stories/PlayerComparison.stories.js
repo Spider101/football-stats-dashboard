@@ -6,7 +6,7 @@ import { getPlayerMetadata } from './PlayerBioCard.stories';
 
 export default {
     component: PlayerComparisonView,
-    title: 'Views | PlayerComparisonView/PlayerComparisonView',
+    title: 'Views/PlayerComparisonView/PlayerComparisonView',
     excludeStories: /.*Data$/
 };
 
