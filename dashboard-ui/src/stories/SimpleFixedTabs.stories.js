@@ -12,4 +12,4 @@ export const Default = () => (
     <SimpleFixedTabs tabValue={0} onTabChange={ action('Tab Change Handler') }>
         <div>Nothing to see here. Move alongg!</div>
     </SimpleFixedTabs>
-)
+);
