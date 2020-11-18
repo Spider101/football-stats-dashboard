@@ -2,6 +2,8 @@ import React from 'react';
 import PlayerComparisonView from '../views/PlayerComparison';
 import faker from 'faker';
 
+import { getPlayerMetadata } from './PlayerBioCard.stories';
+
 export default {
     component: PlayerComparisonView,
     title: 'PlayerComparisonView',
@@ -10,13 +12,11 @@ export default {
 
 const MAX_ATTR_VALUE = 20;
 
-const getAttributesInCategory = (numAttributes) => {
-    let attributesInCategory = [];
-    for (let i=0; i<numAttributes; i++) {
-        attributesInCategory.push({ name: faker.hacker.noun(), value: Math.round(Math.random() * MAX_ATTR_VALUE) });
-    }
-    return attributesInCategory;
-};
+const getAttributesInCategory = (numAttributes) => (
+    [ ...Array(numAttributes)].map(() => (
+        { name: faker.hacker.noun(), value: Math.round(Math.random() * MAX_ATTR_VALUE) }
+    ))
+);
 
 const  getPlayerAttributeCategoryData = () => ([
     {
@@ -49,17 +49,6 @@ const getPlayerAttributeGroupData = (numAttributes) => ([
         attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
     }
 ]);
-
-const getPlayerMetadata = () => ({
-    name: faker.name.findName(),
-    dob: faker.date.past(),
-    club: faker.company.companyName(),
-    country: faker.address.country(),
-    photo: `${faker.image.people()}?random=${Math.round(Math.random() * 20)}`,
-    clubLogo: `${faker.image.abstract()}?random=${Math.round(Math.random() * 20)}`,
-    countryLogo: `${faker.image.avatar()}?random=${Math.round(Math.random() * 20)}`,
-    age:  ' (' + faker.random.number({ 'min': 16, 'max': 35 }) + ' years old)'
-});
 
 const playerData = {
     players: [{
