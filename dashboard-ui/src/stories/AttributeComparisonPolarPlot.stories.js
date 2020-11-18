@@ -4,7 +4,7 @@ import faker from 'faker';
 
 export default {
     component: AttributeComparisonPolarPlot,
-    title: 'AttributeComparisonPolarPlot',
+    title: 'Components | PlayerComparisonView/AttributeComparisonPolarPlot',
     excludeStories: /.*Data$/,
 };
 

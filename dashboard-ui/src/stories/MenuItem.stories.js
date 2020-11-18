@@ -15,7 +15,7 @@ export const menuItemData = {
 
 export default {
     component: MenuItem,
-    title: 'MenuItem',
+    title: 'Components | Globals/MenuItem',
     excludeStories: /.*Data$/,
 };
 

@@ -4,7 +4,7 @@ import faker from 'faker';
 
 export default {
     component: PlayerBioCard,
-    title: 'PlayerBioCard',
+    title: 'Components | PlayerComparisonView/PlayerBioCard',
     excludeStories: /.*data$/
 };
 

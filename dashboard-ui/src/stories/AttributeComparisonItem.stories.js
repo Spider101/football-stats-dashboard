@@ -18,7 +18,7 @@ export const getAttrComparisonItemData = () => ({
 
 export default {
     component: AttributeComparisonItem,
-    title: 'AttributeComparisonItem',
+    title: 'Components | PlayerComparisonView/AttributeComparisonTable/AttributeComparisonItem',
     excludeStories: /.*Data$/,
 };
 
