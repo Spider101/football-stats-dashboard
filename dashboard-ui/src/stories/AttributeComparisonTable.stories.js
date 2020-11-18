@@ -5,7 +5,7 @@ import faker from 'faker';
 
 export default {
     component: AttributeComparisonTable,
-    title: 'Widgets | PlayerComparisonView/AttributeComparisonTable',
+    title: 'Widgets/PlayerComparisonView/AttributeComparisonTable',
     excludeStories: /.*Data$/,
 };
 

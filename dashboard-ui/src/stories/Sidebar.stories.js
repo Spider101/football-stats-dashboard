@@ -29,7 +29,7 @@ const sideBarData = {
 
 export default {
     component: Sidebar,
-    title: 'Widgets | Globals/Sidebar',
+    title: 'Widgets/Globals/Sidebar',
     excludeStories: /.*Data$/,
 };
 
