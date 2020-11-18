@@ -25,7 +25,7 @@ export default function AttributeComparisonPolarPlot({ playerAttributes }) {
     const series = playerAttributes.map(player => ({
         name: player.name,
         data: player.attributes.map(attrGroup =>
-            Math.round(attrGroup.groupAttrValues.reduce((a, b) => a + b, 0) / attrGroup.groupAttrValues.length))
+            Math.round(attrGroup.attributesInGroup.reduce((a, b) => a + b, 0) / attrGroup.attributesInGroup.length))
     }));
 
     return (
@@ -40,9 +40,9 @@ export default function AttributeComparisonPolarPlot({ playerAttributes }) {
 AttributeComparisonPolarPlot.propTypes = {
     playerAttributes: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
-        attributes: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.shape({
+        attributes: PropTypes.arrayOf(PropTypes.shape({
             groupName: PropTypes.string,
-            groupAttrValues: PropTypes.array
-        })))
+            attributesInGroup: PropTypes.array
+        }))
     }))
 };

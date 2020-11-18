@@ -29,7 +29,7 @@ const menuGroupActionsData = {
 
 export default {
     component: MenuItemGroup,
-    title: 'MenuItemGroup',
+    title: 'Widgets | Globals/MenuItemGroup',
     excludeStories: /.*Data$/,
 };
 

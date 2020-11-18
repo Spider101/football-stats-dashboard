@@ -4,24 +4,24 @@ import faker from 'faker';
 
 export default {
     component: AttributeComparisonPolarPlot,
-    title: 'AttributeComparisonPolarPlot',
+    title: 'Components | PlayerComparisonView/AttributeComparisonPolarPlot',
     excludeStories: /.*Data$/,
 };
 
-const attrGroupData = (numGroups) => (
+const getAttrGroupData = (numGroups) => (
     [ ...Array(numGroups) ].map(() => ({
         groupName: '',
-        groupAttrValues: [ ...Array(10) ].map(() => Math.round(Math.random() * 19) + 1)
+        attributesInGroup: [ ...Array(10) ].map(() => Math.round(Math.random() * 19) + 1)
     }))
 );
 
 const polarPlotData = {
     playerAttributes: [{
         name: faker.name.lastName(1),
-        attributes: attrGroupData(5)
+        attributes: getAttrGroupData(5)
     }, {
         name: faker.name.lastName(1),
-        attributes: attrGroupData(5)
+        attributes: getAttrGroupData(5)
     }]
 };
 

@@ -10,7 +10,7 @@ export const menuData = {
 
 export default {
     component: AppBarMenu,
-    title: 'AppBarMenu',
+    title: 'Components |  Globals/AppBarMenu',
     excludeStories: /.*Data$/,
 };
 

@@ -1,24 +1,24 @@
 import React from 'react';
 import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
-import { attrComparisonItemData } from './AttributeComparisonItem.stories';
+import { getAttrComparisonItemData } from './AttributeComparisonItem.stories';
 import faker from 'faker';
 
 export default {
     component: AttributeComparisonTable,
-    title: 'AttributeComparisonTable',
+    title: 'Widgets | PlayerComparisonView/AttributeComparisonTable',
     excludeStories: /.*Data$/,
 };
 
-const attrComparisonTableMetaDataFn = (numGroups) => ({
+const getAttrComparisonTableMetaData = (numGroups) => ({
     groups: [ ...Array(numGroups) ].map(() => ({
         name: faker.lorem.word(),
         numAttr: Math.round(Math.random() * 9) + 1
     }))
 });
 
-const attributeComparisonTableDataFn = (shouldHighlightAttr = false) => {
+const getAttributeComparisonTableData = (shouldHighlightAttr = false) => {
     const numGroups = 3;
-    const attributeComparisonTableMetadata = attrComparisonTableMetaDataFn(numGroups);
+    const attributeComparisonTableMetadata = getAttrComparisonTableMetaData(numGroups);
     const maxRows = Math.max(
         ...attributeComparisonTableMetadata.groups.map(group => group.numAttr)
     );
@@ -28,7 +28,7 @@ const attributeComparisonTableDataFn = (shouldHighlightAttr = false) => {
             [ ...Array(numGroups) ].map((_, j) => {
                 const currGroup = attributeComparisonTableMetadata.groups[j];
                 return i > currGroup.numAttr ? null : {
-                    ...attrComparisonItemData(),
+                    ...getAttrComparisonItemData(),
                     isHighlighted: shouldHighlightAttr && Math.random() >= 0.5
                 };
             })
@@ -36,6 +36,6 @@ const attributeComparisonTableDataFn = (shouldHighlightAttr = false) => {
     };
 };
 
-export const Default = () => <AttributeComparisonTable { ...attributeComparisonTableDataFn() } />;
+export const Default = () => <AttributeComparisonTable { ...getAttributeComparisonTableData() } />;
 
-export const Highlighted = () => <AttributeComparisonTable { ...attributeComparisonTableDataFn(true) } />;
+export const Highlighted = () => <AttributeComparisonTable { ...getAttributeComparisonTableData(true) } />;
