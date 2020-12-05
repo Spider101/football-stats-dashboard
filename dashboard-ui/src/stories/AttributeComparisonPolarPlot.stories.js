@@ -2,18 +2,13 @@ import React from 'react';
 import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
 import faker from 'faker';
 
+import { getAttrGroupData } from './utils/storyDataGenerators';
+
 export default {
     component: AttributeComparisonPolarPlot,
     title: 'Components/PlayerComparisonView/AttributeComparisonPolarPlot',
     excludeStories: /.*Data$/,
 };
-
-const getAttrGroupData = (numGroups) => (
-    [ ...Array(numGroups) ].map(() => ({
-        groupName: '',
-        attributesInGroup: [ ...Array(10) ].map(() => Math.round(Math.random() * 19) + 1)
-    }))
-);
 
 const polarPlotData = {
     playerAttributes: [{
