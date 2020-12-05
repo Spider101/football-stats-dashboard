@@ -36,7 +36,7 @@ const StyledTableRow = withStyles((theme) => ({
     },
 }))(TableRow);
 
-export default function AttributeComparisonTable({ headers, rows }) {
+export default function AttributeComparisonTable({ headers, rows, children }) {
     return (
         <TableContainer>
             <Table>
@@ -50,11 +50,22 @@ export default function AttributeComparisonTable({ headers, rows }) {
                 <TableBody>
                     { rows.map((row, idx) => (
                         <StyledTableRow key={ idx }>
-                            { row.map((cell, idx) => (
-                                <StyledTableCell component='th' scope='row' key={ idx }>
-                                    { cell != null ? <AttributeComparisonItem { ...cell } /> : null }
-                                </StyledTableCell>
-                            ))}
+                            { row.map((cell, idx) => {
+
+                                // inject props from current scope into the child component
+                                const childrenWithProps = React.Children.map(children, child => {
+                                    if (React.isValidElement(child)) {
+                                        return React.cloneElement(child, { ...cell });
+                                    }
+                                    return child;
+                                });
+
+                                return (
+                                    <StyledTableCell component='th' scope='row' key={ idx }>
+                                       { cell != null ? childrenWithProps : null }
+                                    </StyledTableCell>
+                                );
+                            })}
                         </StyledTableRow>
                     ))}
                 </TableBody>
@@ -65,5 +76,6 @@ export default function AttributeComparisonTable({ headers, rows }) {
 
 AttributeComparisonTable.propTypes = {
     headers: PropTypes.arrayOf(PropTypes.string),
-    rows: PropTypes.arrayOf(PropTypes.arrayOf(AttributeComparisonItem.propTypes))
+    rows: PropTypes.arrayOf(PropTypes.arrayOf(AttributeComparisonItem.propTypes)),
+    children: PropTypes.node
 };
