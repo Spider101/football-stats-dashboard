@@ -1,5 +1,6 @@
 import React from 'react';
 import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
+import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import { getAttrComparisonItemData } from './AttributeComparisonItem.stories';
 import faker from 'faker';
 
@@ -16,7 +17,7 @@ const getAttrComparisonTableMetaData = (numGroups) => ({
     }))
 });
 
-const getAttributeComparisonTableData = (shouldHighlightAttr = false) => {
+export const getAttributeComparisonTableData = (getAttrItemData, shouldHighlightAttr = false) => {
     const numGroups = 3;
     const attributeComparisonTableMetadata = getAttrComparisonTableMetaData(numGroups);
     const maxRows = Math.max(
@@ -28,7 +29,7 @@ const getAttributeComparisonTableData = (shouldHighlightAttr = false) => {
             [ ...Array(numGroups) ].map((_, j) => {
                 const currGroup = attributeComparisonTableMetadata.groups[j];
                 return i > currGroup.numAttr ? null : {
-                    ...getAttrComparisonItemData(),
+                    ...getAttrItemData(),
                     isHighlighted: shouldHighlightAttr && Math.random() >= 0.5
                 };
             })
@@ -36,6 +37,14 @@ const getAttributeComparisonTableData = (shouldHighlightAttr = false) => {
     };
 };
 
-export const Default = () => <AttributeComparisonTable { ...getAttributeComparisonTableData() } />;
+export const Default = () => (
+    <AttributeComparisonTable { ...getAttributeComparisonTableData(getAttrComparisonItemData) }>
+        <AttributeComparisonItem />
+    </AttributeComparisonTable>
+);
 
-export const Highlighted = () => <AttributeComparisonTable { ...getAttributeComparisonTableData(true) } />;
+export const Highlighted = () => (
+    <AttributeComparisonTable { ...getAttributeComparisonTableData(getAttrComparisonItemData,true) }>
+        <AttributeComparisonItem />
+    </AttributeComparisonTable>
+);
