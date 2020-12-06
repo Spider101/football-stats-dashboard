@@ -1,9 +1,12 @@
 import faker from 'faker';
 
+const growthIndicatorList = ['up', 'flat', 'down'];
+
 export const getAttributeItemData = (isHighlighted = false) => ({
     attributeName: faker.hacker.noun(),
     attributeValue: Math.round(Math.random() * 20),
-    isHighlighted
+    isHighlighted,
+    growthIndicator: growthIndicatorList[Math.floor(Math.random() * 3)]
 });
 
 export const getAttrComparisonItemData = () => ({

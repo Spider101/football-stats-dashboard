@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import TableContainer from '@material-ui/core/TableContainer';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -76,6 +75,6 @@ export default function AttributeComparisonTable({ headers, rows, children }) {
 
 AttributeComparisonTable.propTypes = {
     headers: PropTypes.arrayOf(PropTypes.string),
-    rows: PropTypes.arrayOf(PropTypes.arrayOf(AttributeComparisonItem.propTypes)),
+    rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.object)),
     children: PropTypes.node
 };
