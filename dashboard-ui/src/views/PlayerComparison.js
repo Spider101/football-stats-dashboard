@@ -4,9 +4,10 @@ import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 
 import PlayerBioCard from '../components/PlayerBioCard';
-import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
+import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
 import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
 import SimpleFixedTabs, { TabPanel } from '../components/SimpleFixedTabs';
+import AttributeComparisonItem from '../components/AttributeComparisonItem';
 
 const createAttributeComparisonData = (attributeCategoryList1, attributeCategoryList2, playerNames) => {
 
@@ -82,7 +83,9 @@ export default function PlayerComparisonView({ players }) {
                             <AttributeComparisonPolarPlot { ...attributePolarPlotData } />
                         </TabPanel>
                         <TabPanel value={ tabValue }  index={1}>
-                            <AttributeComparisonTable { ...attributeComparisonData } />
+                            <PlayerAttributesTable { ...attributeComparisonData }>
+                                <AttributeComparisonItem />
+                            </PlayerAttributesTable>
                         </TabPanel>
                     </SimpleFixedTabs>
                 </Grid>

@@ -35,7 +35,7 @@ const StyledTableRow = withStyles((theme) => ({
     },
 }))(TableRow);
 
-export default function AttributeComparisonTable({ headers, rows, children }) {
+export default function PlayerAttributesTable({ headers, rows, children }) {
     return (
         <TableContainer>
             <Table>
@@ -73,7 +73,7 @@ export default function AttributeComparisonTable({ headers, rows, children }) {
     );
 }
 
-AttributeComparisonTable.propTypes = {
+PlayerAttributesTable.propTypes = {
     headers: PropTypes.arrayOf(PropTypes.string),
     rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.object)),
     children: PropTypes.node

@@ -1,23 +1,23 @@
 import React from 'react';
-import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
+import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 
 import { getAttrComparisonItemData, getAttributeComparisonTableData } from './utils/storyDataGenerators';
 
 export default {
-    component: AttributeComparisonTable,
+    component: PlayerAttributesTable,
     title: 'Widgets/PlayerComparisonView/AttributeComparisonTable',
     excludeStories: /.*Data$/,
 };
 
 export const Default = () => (
-    <AttributeComparisonTable { ...getAttributeComparisonTableData(getAttrComparisonItemData) }>
+    <PlayerAttributesTable { ...getAttributeComparisonTableData(getAttrComparisonItemData) }>
         <AttributeComparisonItem />
-    </AttributeComparisonTable>
+    </PlayerAttributesTable>
 );
 
 export const Highlighted = () => (
-    <AttributeComparisonTable { ...getAttributeComparisonTableData(getAttrComparisonItemData,true) }>
+    <PlayerAttributesTable { ...getAttributeComparisonTableData(getAttrComparisonItemData,true) }>
         <AttributeComparisonItem />
-    </AttributeComparisonTable>
+    </PlayerAttributesTable>
 );
