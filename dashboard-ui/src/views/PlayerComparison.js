@@ -9,7 +9,8 @@ import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolar
 import SimpleFixedTabs, { TabPanel } from '../components/SimpleFixedTabs';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 
-const createAttributeComparisonData = (attributeCategoryList1, attributeCategoryList2, playerRoles1, playerRoles2, playerNames) => {
+const createAttributeComparisonData = (attributeCategoryList1, attributeCategoryList2, playerRoles1, playerRoles2,
+    playerNames) => {
 
     const maxRows = Math.max( ...attributeCategoryList1.map(attrCategory => attrCategory.attributesInCategory.length));
 

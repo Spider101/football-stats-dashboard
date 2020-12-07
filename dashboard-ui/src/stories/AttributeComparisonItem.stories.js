@@ -14,4 +14,5 @@ const highlightedAttribute = faker.hacker.noun();
 
 export const Default = () => <AttributeComparisonItem { ...getAttrComparisonItemData(faker.hacker.noun()) } />;
 
-export const Highlighted = () => <AttributeComparisonItem { ...getAttrComparisonItemData(highlightedAttribute, [ highlightedAttribute ]) } />;
+export const Highlighted = () => <AttributeComparisonItem { ...getAttrComparisonItemData(highlightedAttribute,
+    [ highlightedAttribute ]) } />;

@@ -32,10 +32,11 @@ const getAttrComparisonTableMetaData = (numGroups) => ({
     }))
 });
 
-const getAttributeNamesList = (totalNumOfAttributes) => [ ...Array(totalNumOfAttributes) ].map(() => faker.hacker.noun());
+const getAttributeNamesList = (totalNumOfAttributes) =>
+    [ ...Array(totalNumOfAttributes) ].map(() => faker.hacker.noun());
 
 const getPlayerRolesMap = (numOfRoles, attributeList) => {
-    const roles = faker.lorem.words(numOfRoles).split(" ");
+    const roles = faker.lorem.words(numOfRoles).split(' ');
     let roleAttributeMap = {};
     roles.forEach(role => {
         roleAttributeMap[role] = _.sampleSize(attributeList, 6);
@@ -151,5 +152,5 @@ export const getPlayerData = () => {
                 attributeGroups: getPlayerAttributeGroupData(10)
             }
         }]
-    }
+    };
 };

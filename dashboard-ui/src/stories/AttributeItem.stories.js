@@ -14,4 +14,5 @@ const highlightedAttribute = faker.hacker.noun();
 
 export const Default = () => <AttributeItem { ...getAttributeItemData(faker.hacker.noun()) } />;
 
-export const Highlighted = () => <AttributeItem { ...getAttributeItemData(highlightedAttribute, [ highlightedAttribute ]) } />
+export const Highlighted = () => <AttributeItem { ...getAttributeItemData(highlightedAttribute,
+    [ highlightedAttribute ]) } />;

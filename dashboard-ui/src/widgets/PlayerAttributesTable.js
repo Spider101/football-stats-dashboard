@@ -71,51 +71,51 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
                         onChange={ handleChange }
                     >
                         <MenuItem value={ 'None' }> <em>None</em> </MenuItem>
-                        { Object.keys(roles).map(role => (
-                            <MenuItem value={ role }> { role }</MenuItem>
+                        { Object.keys(roles).map((role, _idx) => (
+                            <MenuItem key={ _idx } value={ role }> { role }</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
             </div>
             <TableContainer>
-            <Table>
-                <TableHead >
-                    <TableRow>
-                        { headers.map((header, idx) => (
-                            <StyledTableCell key={ idx }> { header }</StyledTableCell>
-                        ))}
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    { rows.map((row, idx) => (
-                        <StyledTableRow key={ idx }>
-                            { row.map((cell, idx) => {
-                                // inject props from current scope into the child component
-                                const childrenWithProps = React.Children.map(children, child => {
-                                    if (React.isValidElement(child)) {
-                                        const highlightedAttributes = roles[role] || [];
-                                        return React.cloneElement(child, { ...cell, highlightedAttributes });
-                                    }
-                                    return child;
-                                });
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            { headers.map((header, idx) => (
+                                <StyledTableCell key={ idx }> { header }</StyledTableCell>
+                            ))}
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        { rows.map((row, _idx) => (
+                            <StyledTableRow key={ _idx }>
+                                { row.map((cell, _idx) => {
+                                    // inject props from current scope into the child component
+                                    const childrenWithProps = React.Children.map(children, child => {
+                                        if (React.isValidElement(child)) {
+                                            const highlightedAttributes = roles[role] || [];
+                                            return React.cloneElement(child, { ...cell, highlightedAttributes });
+                                        }
+                                        return child;
+                                    });
 
-                                return (
-                                    <StyledTableCell component='th' scope='row' key={ idx }>
-                                       { cell != null ? childrenWithProps : null }
-                                    </StyledTableCell>
-                                );
-                            })}
-                        </StyledTableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                                    return (
+                                        <StyledTableCell component='th' scope='row' key={ _idx }>
+                                            { cell != null ? childrenWithProps : null }
+                                        </StyledTableCell>
+                                    );
+                                })}
+                            </StyledTableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
     );
 }
 
 PlayerAttributesTable.propTypes = {
-    roles: PropTypes.arrayOf(PropTypes.string),
+    roles: PropTypes.object,
     headers: PropTypes.arrayOf(PropTypes.string),
     rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.object)),
     children: PropTypes.node
