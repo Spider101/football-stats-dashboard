@@ -45,8 +45,9 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function AttributeComparisonItem({ attrComparisonItem: { attrValues, label }, isHighlighted }) {
+export default function AttributeComparisonItem({ attrComparisonItem: { attrValues, label }, highlightedAttributes }) {
     const classes = useStyles();
+    const isHighlighted = highlightedAttributes.includes(label);
     return (
         <ListItem className={ clsx(classes.attr, {
             [classes.highlighted]: isHighlighted
@@ -77,6 +78,6 @@ AttributeComparisonItem.propTypes = {
         })),
         label: PropTypes.string
     }),
-    isHighlighted: PropTypes.bool
+    highlightedAttributes: PropTypes.arrayOf(PropTypes.string)
 };
 

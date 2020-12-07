@@ -2,19 +2,7 @@ import React from 'react';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import faker from 'faker';
 
-export const getAttrComparisonItemData = () => ({
-    attrComparisonItem: {
-        attrValues: [{
-            name: faker.name.lastName(1),
-            data: [ Math.round(Math.random() * 20) ]
-        }, {
-            name: faker.name.lastName(1),
-            data: [ -1 * Math.round(Math.random() * 20) ]
-        }],
-        label: faker.hacker.noun()
-    },
-    isHighlighted: false
-});
+import { getAttrComparisonItemData } from './utils/storyDataGenerators';
 
 export default {
     component: AttributeComparisonItem,
@@ -22,6 +10,9 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-export const Default = () => <AttributeComparisonItem { ...getAttrComparisonItemData() } />;
+const highlightedAttribute = faker.hacker.noun();
 
-export const Highlighted = () => <AttributeComparisonItem { ...getAttrComparisonItemData() } isHighlighted={ true }/>;
+export const Default = () => <AttributeComparisonItem { ...getAttrComparisonItemData(faker.hacker.noun()) } />;
+
+export const Highlighted = () => <AttributeComparisonItem { ...getAttrComparisonItemData(highlightedAttribute,
+    [ highlightedAttribute ]) } />;

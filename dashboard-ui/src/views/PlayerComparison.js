@@ -4,15 +4,17 @@ import PropTypes from 'prop-types';
 import Grid from '@material-ui/core/Grid';
 
 import PlayerBioCard from '../components/PlayerBioCard';
-import AttributeComparisonTable from '../widgets/AttributeComparisonTable';
+import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
 import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
 import SimpleFixedTabs, { TabPanel } from '../components/SimpleFixedTabs';
+import AttributeComparisonItem from '../components/AttributeComparisonItem';
 
-const createAttributeComparisonData = (attributeCategoryList1, attributeCategoryList2, playerNames) => {
+const createAttributeComparisonData = (attributeCategoryList1, attributeCategoryList2, playerRoles1, playerRoles2,
+    playerNames) => {
 
     const maxRows = Math.max( ...attributeCategoryList1.map(attrCategory => attrCategory.attributesInCategory.length));
 
-    let tabularAttributeData = [ ...Array(maxRows) ].map((_, i) => (
+    const tabularAttributeData = [ ...Array(maxRows) ].map((_, i) => (
         [ ...Array(attributeCategoryList1.length) ].map((_, j) => {
             const currentAttributeCategory1 = attributeCategoryList1[j].attributesInCategory;
             const currentAttributeCategory2 = attributeCategoryList2[j].attributesInCategory;
@@ -27,13 +29,13 @@ const createAttributeComparisonData = (attributeCategoryList1, attributeCategory
                         data: [ currentAttributeCategory2[i]['value'] ]
                     }],
                     label: currentAttributeCategory1[i]['name']
-                },
-                isHighlighted: false
+                }
             } : null;
         })
     ));
 
     return {
+        roles: { ...playerRoles1, ...playerRoles2 },
         headers: attributeCategoryList1.map(attrCategory => attrCategory.categoryName),
         rows: tabularAttributeData
     };
@@ -52,7 +54,7 @@ export default function PlayerComparisonView({ players }) {
     const playerOnRight = players.find(player => player.isSelected && player.orientation == 'RIGHT');
 
     const attributeComparisonData = createAttributeComparisonData(playerOnLeft.playerAttributes.attributeCategories,
-        playerOnRight.playerAttributes.attributeCategories,
+        playerOnRight.playerAttributes.attributeCategories, playerOnLeft.playerRoles, playerOnRight.playerRoles,
         [ playerOnLeft.playerMetadata.name, playerOnRight.playerMetadata.name ]);
 
     const attributePolarPlotData = {
@@ -82,7 +84,9 @@ export default function PlayerComparisonView({ players }) {
                             <AttributeComparisonPolarPlot { ...attributePolarPlotData } />
                         </TabPanel>
                         <TabPanel value={ tabValue }  index={1}>
-                            <AttributeComparisonTable { ...attributeComparisonData } />
+                            <PlayerAttributesTable { ...attributeComparisonData }>
+                                <AttributeComparisonItem />
+                            </PlayerAttributesTable>
                         </TabPanel>
                     </SimpleFixedTabs>
                 </Grid>
@@ -97,6 +101,7 @@ PlayerComparisonView.propTypes = {
             isSelected: PropTypes.bool,
             orientation: PropTypes.string,
             playerMetadata: PropTypes.shape(PlayerBioCard.propTypes),
+            playerRoles: PropTypes.object,
             playerAttributes: PropTypes.shape({
                 attributeCategories: PropTypes.arrayOf(
                     PropTypes.shape({
