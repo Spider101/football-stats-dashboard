@@ -34,8 +34,9 @@ const growthIndicatorMap = {
     'down': <TrendingDownIcon />
 };
 
-export default function AttributeItem({ attributeName, attributeValue, isHighlighted, growthIndicator }) {
+export default function AttributeItem({ attributeName, attributeValue, highlightedAttributes, growthIndicator }) {
     const classes = useStyles();
+    const isHighlighted = highlightedAttributes.includes(attributeName);
     return (
         <div className={ clsx(classes.root, {
             [classes.highlighted]: isHighlighted
@@ -50,6 +51,6 @@ export default function AttributeItem({ attributeName, attributeValue, isHighlig
 AttributeItem.propTypes = {
     attributeName: PropTypes.string,
     attributeValue: PropTypes.number,
-    isHighlighted: PropTypes.bool,
+    highlightedAttributes: PropTypes.arrayOf(PropTypes.string),
     growthIndicator: PropTypes.string
 };
