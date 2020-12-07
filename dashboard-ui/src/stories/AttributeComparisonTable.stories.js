@@ -17,7 +17,7 @@ export const Default = () => (
 );
 
 export const Highlighted = () => (
-    <PlayerAttributesTable { ...getAttributeComparisonTableData(getAttrComparisonItemData,true) }>
+    <PlayerAttributesTable { ...getAttributeComparisonTableData(getAttrComparisonItemData, true) }>
         <AttributeComparisonItem />
     </PlayerAttributesTable>
 );

@@ -7,7 +7,13 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableRow from '@material-ui/core/TableRow';
 import TableHead from '@material-ui/core/TableHead';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from '@material-ui/core/InputLabel';
+
 import withStyles from '@material-ui/core/styles/withStyles';
+import { makeStyles } from '@material-ui/core';
 
 const StyledTableCell = withStyles((theme) => ({
     root: {
@@ -35,9 +41,43 @@ const StyledTableRow = withStyles((theme) => ({
     },
 }))(TableRow);
 
-export default function PlayerAttributesTable({ headers, rows, children }) {
+
+const useStyles = makeStyles((theme) => ({
+    dropdown: {
+        display: 'flex',
+        flexDirection: 'row-reverse'
+    },
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 120
+    }
+}));
+
+export default function PlayerAttributesTable({ roles, headers, rows, children }) {
+    const classes = useStyles();
+    const [ role, changeRole ] = React.useState('None');
+
+    const handleChange = (evt) => {
+        changeRole(evt.target.value);
+    };
+
     return (
-        <TableContainer>
+        <div>
+            <div className={ classes.dropdown }>
+                <FormControl className={ classes.formControl }>
+                    <InputLabel  id="demo-simple-select-label">Player Role</InputLabel>
+                    <Select id="demo-simple-select-label"
+                        value={ role }
+                        onChange={ handleChange }
+                    >
+                        <MenuItem value={ 'None' }> <em>None</em> </MenuItem>
+                        { Object.keys(roles).map(role => (
+                            <MenuItem value={ role }> { role }</MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
+            </div>
+            <TableContainer>
             <Table>
                 <TableHead >
                     <TableRow>
@@ -50,11 +90,11 @@ export default function PlayerAttributesTable({ headers, rows, children }) {
                     { rows.map((row, idx) => (
                         <StyledTableRow key={ idx }>
                             { row.map((cell, idx) => {
-
                                 // inject props from current scope into the child component
                                 const childrenWithProps = React.Children.map(children, child => {
                                     if (React.isValidElement(child)) {
-                                        return React.cloneElement(child, { ...cell });
+                                        const highlightedAttributes = roles[role] || [];
+                                        return React.cloneElement(child, { ...cell, highlightedAttributes });
                                     }
                                     return child;
                                 });
@@ -70,10 +110,12 @@ export default function PlayerAttributesTable({ headers, rows, children }) {
                 </TableBody>
             </Table>
         </TableContainer>
+        </div>
     );
 }
 
 PlayerAttributesTable.propTypes = {
+    roles: PropTypes.arrayOf(PropTypes.string),
     headers: PropTypes.arrayOf(PropTypes.string),
     rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.object)),
     children: PropTypes.node
