@@ -154,3 +154,10 @@ export const getPlayerData = () => {
         }]
     };
 };
+
+export const getAttributeLineData = (numAttributes) => ({
+    attributeData: [ ...Array(numAttributes) ].map(() => ({
+        name: faker.hacker.noun(),
+        data: [ ...Array(6) ].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+    }))
+});

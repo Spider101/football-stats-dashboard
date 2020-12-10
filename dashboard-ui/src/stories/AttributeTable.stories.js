@@ -6,7 +6,7 @@ import { getAttributeItemData, getAttributeComparisonTableData } from './utils/s
 
 export default {
     component: PlayerAttributesTable,
-    title: 'Widgets/PlayerSummaryView/AttributesTable',
+    title: 'Widgets/PlayerProgressionView/AttributesTable',
     excludeStories: /.*Data$/,
 };
 
