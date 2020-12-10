@@ -32,7 +32,7 @@ const getAttrComparisonTableMetaData = (numGroups) => ({
     }))
 });
 
-const getAttributeNamesList = (totalNumOfAttributes) =>
+export const getAttributeNamesList = (totalNumOfAttributes) =>
     [ ...Array(totalNumOfAttributes) ].map(() => faker.hacker.noun());
 
 const getPlayerRolesMap = (numOfRoles, attributeList) => {
@@ -129,29 +129,16 @@ const getPlayerAttributeGroupData = (numAttributes) => ([
     }
 ]);
 
-export const getPlayerData = () => {
-    const attributeNamesList = getAttributeNamesList(3 * 10);
-
+export const getPlayerData = (attributeNamesList, orientation) => {
     return {
-        players: [{
-            isSelected: true,
-            orientation: 'LEFT',
-            playerMetadata: getPlayerMetadata(),
-            playerRoles: getPlayerRolesMap(3, attributeNamesList),
-            playerAttributes: {
-                attributeCategories: getPlayerAttributeCategoryData(attributeNamesList),
-                attributeGroups: getPlayerAttributeGroupData(10)
-            }
-        }, {
-            isSelected: true,
-            orientation: 'RIGHT',
-            playerMetadata: getPlayerMetadata(),
-            playerRoles: getPlayerRolesMap(3, attributeNamesList),
-            playerAttributes: {
-                attributeCategories: getPlayerAttributeCategoryData(attributeNamesList),
-                attributeGroups: getPlayerAttributeGroupData(10)
-            }
-        }]
+        isSelected: true,
+        orientation: orientation,
+        playerMetadata: getPlayerMetadata(),
+        playerRoles: getPlayerRolesMap(3, attributeNamesList),
+        playerAttributes: {
+            attributeCategories: getPlayerAttributeCategoryData(attributeNamesList),
+            attributeGroups: getPlayerAttributeGroupData(10)
+        }
     };
 };
 
