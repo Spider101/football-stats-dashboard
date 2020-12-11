@@ -49,9 +49,9 @@ export default function PlayerComparisonView({ players }) {
         setTabValue(newTabValue);
     };
 
-    const playerOnLeft = players.find(player => player.isSelected && player.orientation == 'LEFT');
+    const playerOnLeft = players.find(player => player.isSelected && player.orientation === 'LEFT');
     
-    const playerOnRight = players.find(player => player.isSelected && player.orientation == 'RIGHT');
+    const playerOnRight = players.find(player => player.isSelected && player.orientation === 'RIGHT');
 
     const attributeComparisonData = createAttributeComparisonData(playerOnLeft.playerAttributes.attributeCategories,
         playerOnRight.playerAttributes.attributeCategories, playerOnLeft.playerRoles, playerOnRight.playerRoles,
