@@ -91,22 +91,36 @@ export const getPlayerMetadata = () => ({
 });
 
 
-const getAttributesInCategory = (numAttributes, attributesList) => (
-    [ ...Array(numAttributes)].map((_, i) => (
-        { name: attributesList[i], value: Math.round(Math.random() * MAX_ATTR_VALUE) }
-    ))
+const getAttributesInCategory = (numAttributes, attributesList, hasHistory) => (
+    [ ...Array(numAttributes)].map((_, i) => {
+        let attributeMap = {
+            name: attributesList[i],
+            value: Math.round(Math.random() * MAX_ATTR_VALUE)
+        };
+
+        if (hasHistory) {
+            const numMonths = 6;
+            const attributeHistory = [ ...Array(numMonths -1) ].map(() => Math.round(Math.random() * MAX_ATTR_VALUE));
+            attributeMap = {
+                ...attributeMap,
+                history: [ ...attributeHistory, attributeMap.value ]
+            };
+        }
+
+        return attributeMap;
+    })
 );
 
-const  getPlayerAttributeCategoryData = (attributeNamesList) => ([
+const  getPlayerAttributeCategoryData = (attributeNamesList, hasHistory) => ([
     {
         categoryName: 'Technical',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(0, 10))
+        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(0, 10), hasHistory)
     }, {
         categoryName: 'Physical',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(10, 20))
+        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(10, 20), hasHistory)
     }, {
         categoryName: 'Mental',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(20, 30))
+        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(20, 30), hasHistory)
     }
 ]);
 
@@ -129,14 +143,14 @@ const getPlayerAttributeGroupData = (numAttributes) => ([
     }
 ]);
 
-export const getPlayerData = (attributeNamesList, orientation) => {
+export const getPlayerData = (attributeNamesList, hasHistory = false, orientation = '') => {
     return {
         isSelected: true,
         orientation: orientation,
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
         playerAttributes: {
-            attributeCategories: getPlayerAttributeCategoryData(attributeNamesList),
+            attributeCategories: getPlayerAttributeCategoryData(attributeNamesList, hasHistory),
             attributeGroups: getPlayerAttributeGroupData(10)
         }
     };
