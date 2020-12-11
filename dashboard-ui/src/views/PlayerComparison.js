@@ -6,8 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import PlayerBioCard from '../components/PlayerBioCard';
 import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
 import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
-import SimpleFixedTabs, { TabPanel } from '../components/SimpleFixedTabs';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
+import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
 
 const createAttributeComparisonData = (attributeCategoryList1, attributeCategoryList2, playerRoles1, playerRoles2,
     playerNames) => {
@@ -79,7 +79,13 @@ export default function PlayerComparisonView({ players }) {
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    <SimpleFixedTabs onTabChange={ handleTabChange } tabValue={ tabValue }>
+                    <CustomizableTabs
+                        onTabChange={ handleTabChange }
+                        tabValue={ tabValue }
+                        isFullWidth={ true }
+                        ariaLabel="Player Attributes Comparison Tabs"
+                        tabLabels={['Overview', 'Attributes']}
+                    >
                         <TabPanel value={ tabValue } index={0}>
                             <AttributeComparisonPolarPlot { ...attributePolarPlotData } />
                         </TabPanel>
@@ -88,7 +94,7 @@ export default function PlayerComparisonView({ players }) {
                                 <AttributeComparisonItem />
                             </PlayerAttributesTable>
                         </TabPanel>
-                    </SimpleFixedTabs>
+                    </CustomizableTabs>
                 </Grid>
             </Grid>
         </div>

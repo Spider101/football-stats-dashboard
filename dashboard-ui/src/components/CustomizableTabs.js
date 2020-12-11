@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import Box from '@material-ui/core/Box';
-import AppBar from '@material-ui/core/AppBar';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
@@ -35,27 +34,31 @@ const a11yProps = (index) => ({
     'aria-controls': `simple-tabpanel-${index}`,
 });
 
-export default function SimpleFixedTabs({ children, onTabChange, tabValue }) {
+export default function CustomizableTabs({ children, onTabChange, tabValue, isFullWidth, ariaLabel, tabLabels }) {
     return (
         <div>
-            <AppBar position="static">
-                <Tabs
-                    value={ tabValue }
-                    onChange={ onTabChange }
-                    aria-label="player attributes comparison tabs"
-                    variant="fullWidth"
-                >
-                    <Tab label="Overview" { ...a11yProps(0) } />
-                    <Tab label="Attributes" { ...a11yProps(1) } />
-                </Tabs>
-            </AppBar>
+            <Tabs
+                value={ tabValue }
+                onChange={ onTabChange }
+                aria-label={ ariaLabel }
+                variant={ isFullWidth ? 'fullWidth' : 'standard' }
+            >
+                {
+                    tabLabels.map((tabLabel, _idx) => (
+                        <Tab label={ tabLabel } key={ _idx } { ...a11yProps(_idx)} />
+                    ))
+                }
+            </Tabs>
             { children }
         </div>
     );
 }
 
-SimpleFixedTabs.propTypes = {
+CustomizableTabs.propTypes = {
     children: PropTypes.arrayOf(PropTypes.node),
     onTabChange: PropTypes.func,
-    tabValue: PropTypes.number
+    tabValue: PropTypes.number,
+    isFullWidth: PropTypes.bool,
+    ariaLabel: PropTypes.string,
+    tabLabels: PropTypes.arrayOf(PropTypes.string)
 };
