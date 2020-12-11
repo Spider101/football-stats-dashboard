@@ -143,7 +143,7 @@ const getPlayerAttributeGroupData = (numAttributes) => ([
     }
 ]);
 
-export const getPlayerData = (attributeNamesList, hasHistory = false, orientation = '') => {
+export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory = false) => {
     return {
         isSelected: true,
         orientation: orientation,

@@ -9,6 +9,6 @@ export default {
     excludeStories: /.*Data$/
 };
 
-const playerData = getPlayerData(getAttributeNamesList(3 * 10), true);
+const playerData = getPlayerData(getAttributeNamesList(3 * 10), null, true);
 
 export const Default = () => <PlayerProgressionView { ...playerData } />;
