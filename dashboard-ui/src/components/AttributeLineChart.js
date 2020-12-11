@@ -20,7 +20,8 @@ export default function AttributeLineChart({ attributeData }) {
             options={ getOptions(chartTitle) }
             series={ attributeData }
             type='line'
-            height={ 300 }
+            height={ 500 }
+            width={ 1050 }
         />
     );
 }
