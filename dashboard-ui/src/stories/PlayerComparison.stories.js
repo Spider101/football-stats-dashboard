@@ -4,7 +4,7 @@ import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerator
 
 export default {
     component: PlayerComparisonView,
-    title: 'Views/PlayerComparisonView/PlayerComparisonView',
+    title: 'Views/PlayerComparisonView',
     excludeStories: /.*Data$/
 };
 
