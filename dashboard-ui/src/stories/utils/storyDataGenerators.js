@@ -2,7 +2,9 @@ import faker from 'faker';
 import _ from 'lodash';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
-const MAX_ATTR_VALUE = 20;
+export const MAX_ATTR_VALUE = 20;
+export const MAX_OVERALL_VALUE = 100;
+const NUM_MONTHS = 6;
 
 export const getAttributeItemData = (attributeName, highlightedAttributes = []) => ({
     attributeName,
@@ -99,8 +101,7 @@ const getAttributesInCategory = (numAttributes, attributesList, hasHistory) => (
         };
 
         if (hasHistory) {
-            const numMonths = 6;
-            const attributeHistory = [ ...Array(numMonths -1) ].map(() => Math.round(Math.random() * MAX_ATTR_VALUE));
+            const attributeHistory = [ ...Array(NUM_MONTHS -1) ].map(() => Math.round(Math.random() * MAX_ATTR_VALUE));
             attributeMap = {
                 ...attributeMap,
                 history: [ ...attributeHistory, attributeMap.value ]
@@ -144,11 +145,19 @@ const getPlayerAttributeGroupData = (numAttributes) => ([
 ]);
 
 export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory = false) => {
+    const currentPlayerOverall = Math.round(Math.random() * MAX_OVERALL_VALUE);
+    const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => Math.round(Math.random() * MAX_OVERALL_VALUE));
+
     return {
         isSelected: true,
         orientation: orientation,
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
+        playerOverall: {
+            // TODO: refactor all occurrences of this snippet as a generic random number generator within a range
+            currentValue: currentPlayerOverall,
+            history: [ ...playerOverallHistory, currentPlayerOverall ],
+        },
         playerAttributes: {
             attributeCategories: getPlayerAttributeCategoryData(attributeNamesList, hasHistory),
             attributeGroups: getPlayerAttributeGroupData(10)
@@ -156,9 +165,9 @@ export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory 
     };
 };
 
-export const getAttributeLineData = (numAttributes) => ({
-    attributeData: [ ...Array(numAttributes) ].map(() => ({
-        name: faker.hacker.noun(),
-        data: [ ...Array(6) ].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
-    }))
-});
+export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
+    return [ ...Array(numAttributes) ].map(() => ({
+        name: keyName || faker.hacker.noun(),
+        data: [ ...Array(6) ].map(() => Math.round(Math.random() * maxValue))
+    }));
+};
