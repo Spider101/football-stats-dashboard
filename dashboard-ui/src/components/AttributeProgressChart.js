@@ -12,7 +12,8 @@ const getOptions = (chartTitle) => ({
     }
 });
 
-export default function AttributeLineChart({ attributeData }) {
+// TODO: pass in the line chart title
+export default function AttributeProgressChart({ attributeData }) {
     const chartTitle = 'Player Attribute Progression over last 6 months';
 
     return (
@@ -26,7 +27,7 @@ export default function AttributeLineChart({ attributeData }) {
     );
 }
 
-AttributeLineChart.propTypes = {
+AttributeProgressChart.propTypes = {
     attributeData: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         data: PropTypes.arrayOf(PropTypes.number)

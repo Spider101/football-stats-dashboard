@@ -5,7 +5,7 @@ import Grid from '@material-ui/core/Grid';
 
 import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
 import AttributeItem from '../components/AttributeItem';
-import AttributeLineChart from '../components/AttributeLineChart';
+import AttributeProgressChart from '../components/AttributeProgressChart';
 import PlayerBioCard from '../components/PlayerBioCard';
 
 const getGrowthIndicator = ({ value, history }) => {
@@ -44,11 +44,11 @@ const buildAttributeTableData = (attributeCategoryData) => {
     };
 };
 
-const buildAttributeLineChartData = (attributeCategoryData) => {
-    const attributeLineChartData = attributeCategoryData.map(category => category.attributesInCategory)
+const buildAttributeProgressChartData = (attributeCategoryData) => {
+    const attributeProgressChartData = attributeCategoryData.map(category => category.attributesInCategory)
         .flat()
         .map(attributeData => ({ name: attributeData.name, data: attributeData.history }));
-    return { attributeData: attributeLineChartData };
+    return { attributeData: attributeProgressChartData };
 
 };
 
@@ -69,7 +69,7 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles,
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs spacing={2}>
-                    <AttributeLineChart { ...buildAttributeLineChartData(attributeCategories) } />
+                    <AttributeProgressChart { ...buildAttributeProgressChartData(attributeCategories) } />
                 </Grid>
             </Grid>
             <Grid container spacing={2}>
