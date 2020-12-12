@@ -14,7 +14,7 @@ const getOptions = (chartTitle) => ({
     }
 });
 
-export default function OverallProgressChart({ attributeData: overallData }) {
+export default function OverallProgressChart({ overallData }) {
     const chartTitle = 'Player Overall Progression over last 6 months';
 
     return (
@@ -29,7 +29,7 @@ export default function OverallProgressChart({ attributeData: overallData }) {
 }
 
 OverallProgressChart.propTypes = {
-    attributeData: PropTypes.arrayOf(PropTypes.shape({
+    overallData: PropTypes.arrayOf(PropTypes.shape({
         name: PropTypes.string,
         data: PropTypes.arrayOf(PropTypes.number)
     }))

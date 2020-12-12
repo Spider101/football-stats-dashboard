@@ -1,6 +1,6 @@
 import React from 'react';
 import OverallProgressChart from '../components/OverallProgressChart';
-import { getAttributeLineData } from './utils/storyDataGenerators';
+import { getPlayerProgressionData, MAX_OVERALL_VALUE } from './utils/storyDataGenerators';
 
 export default {
     component: OverallProgressChart,
@@ -17,5 +17,5 @@ export default {
 export const Default = (args) => <OverallProgressChart { ...args } />;
 
 Default.args = {
-    ...getAttributeLineData(1)
+    overallData: getPlayerProgressionData(1, 'Player Ability', MAX_OVERALL_VALUE)
 };

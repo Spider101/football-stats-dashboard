@@ -1,7 +1,7 @@
 import React from 'react';
 import AttributeProgressChart from '../components/AttributeProgressChart';
 
-import { getAttributeLineData } from './utils/storyDataGenerators';
+import { getPlayerProgressionData, MAX_ATTR_VALUE } from './utils/storyDataGenerators';
 
 export default {
     component: AttributeProgressChart,
@@ -18,5 +18,5 @@ export default {
 export const Default = (args) => <AttributeProgressChart { ...args } />;
 
 Default.args = {
-    ...getAttributeLineData(10)
+    attributeData: getPlayerProgressionData(10, null, MAX_ATTR_VALUE)
 };

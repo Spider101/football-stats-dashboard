@@ -1,6 +1,6 @@
 import React from 'react';
 import PlayerProgressionCharts from '../widgets/PlayerProgressionCharts';
-import { getAttributeLineData } from './utils/storyDataGenerators';
+import { getPlayerProgressionData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './utils/storyDataGenerators';
 
 export default {
     component: PlayerProgressionCharts,
@@ -19,11 +19,16 @@ export default {
 };
 
 const playerProgressionChartsData = {
-    playerAttributeProgressData: getAttributeLineData(10),
-    playerOverallProgressData: getAttributeLineData(1)
+    playerAttributeProgressData: {
+        attributeData: getPlayerProgressionData(10, null, MAX_ATTR_VALUE)
+    },
+    playerOverallProgressData: {
+        overallData: getPlayerProgressionData(1, 'Player Ability', MAX_OVERALL_VALUE)
+    }
 };
 
 export const Default = (args) => <PlayerProgressionCharts { ...args } />;
+
 Default.args = {
     ...playerProgressionChartsData
 }

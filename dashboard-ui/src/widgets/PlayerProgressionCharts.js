@@ -33,5 +33,5 @@ export default function PlayerProgressionCharts({ playerAttributeProgressData, p
 
 PlayerProgressionCharts.propTypes = {
     playerAttributeProgressData: AttributeProgressChart.propTypes.attributeData,
-    playerOverallProgressData: AttributeProgressChart.propTypes.attributeData
+    playerOverallProgressData: OverallProgressChart.propTypes.overallData
 };
