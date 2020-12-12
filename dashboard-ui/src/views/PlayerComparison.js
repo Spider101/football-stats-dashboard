@@ -108,6 +108,10 @@ PlayerComparisonView.propTypes = {
             orientation: PropTypes.string,
             playerMetadata: PropTypes.shape(PlayerBioCard.propTypes),
             playerRoles: PropTypes.object,
+            playerOverall: PropTypes.shape({
+                currentValue: PropTypes.number,
+                history: PropTypes.arrayOf(PropTypes.number)
+            }),
             playerAttributes: PropTypes.shape({
                 attributeCategories: PropTypes.arrayOf(
                     PropTypes.shape({

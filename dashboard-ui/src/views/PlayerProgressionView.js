@@ -7,6 +7,7 @@ import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
 import AttributeItem from '../components/AttributeItem';
 import AttributeProgressChart from '../components/AttributeProgressChart';
 import PlayerBioCard from '../components/PlayerBioCard';
+import PlayerProgressionCharts from '../widgets/PlayerProgressionCharts';
 
 const getGrowthIndicator = ({ value, history }) => {
     const penultimateValue = history[history.length - 2];
@@ -52,12 +53,21 @@ const buildAttributeProgressChartData = (attributeCategoryData) => {
 
 };
 
-export default function PlayerProgressionView({ playerMetadata, playerRoles, 
+const buildOverProgressChartData = ({ history: overallHistory }) => ({
+    overallData: [{ name: 'Player Ability', data: overallHistory }]
+});
+
+export default function PlayerProgressionView({ playerMetadata, playerRoles, playerOverall,
     playerAttributes: { attributeCategories } }) {
 
     const attributeTableData = {
         ...buildAttributeTableData(attributeCategories),
         roles: playerRoles
+    };
+
+    const playerProgressionChartData = {
+        playerAttributeProgressData: buildAttributeProgressChartData(attributeCategories),
+        playerOverallProgressData: buildOverProgressChartData(playerOverall)
     };
 
     return (
@@ -69,7 +79,7 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles,
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs spacing={2}>
-                    <AttributeProgressChart { ...buildAttributeProgressChartData(attributeCategories) } />
+                    <PlayerProgressionCharts { ...playerProgressionChartData } />
                 </Grid>
             </Grid>
             <Grid container spacing={2}>
@@ -87,6 +97,10 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles,
 PlayerProgressionView.propTypes = {
     playerMetadata: PropTypes.shape(PlayerBioCard.propTypes),
     playerRoles: PropTypes.object,
+    playerOverall: PropTypes.shape({
+        currentValue: PropTypes.number,
+        history: PropTypes.arrayOf(PropTypes.number)
+    }),
     playerAttributes: PropTypes.shape({
         attributeCategories: PropTypes.arrayOf(
             PropTypes.shape({
