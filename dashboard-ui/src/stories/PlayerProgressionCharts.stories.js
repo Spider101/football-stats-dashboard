@@ -31,4 +31,4 @@ export const Default = (args) => <PlayerProgressionCharts { ...args } />;
 
 Default.args = {
     ...playerProgressionChartsData
-}
+};

@@ -5,7 +5,6 @@ import Grid from '@material-ui/core/Grid';
 
 import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
 import AttributeItem from '../components/AttributeItem';
-import AttributeProgressChart from '../components/AttributeProgressChart';
 import PlayerBioCard from '../components/PlayerBioCard';
 import PlayerProgressionCharts from '../widgets/PlayerProgressionCharts';
 
