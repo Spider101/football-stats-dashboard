@@ -31,7 +31,7 @@ const useStyles = makeStyles({
     }
 });
 
-const renderPlayerDOB = (dob, age) => dob.toJSON().slice(0, 10).split`-`.join`/` + age;
+const renderPlayerDOB = (dob, age) => dob.slice(0, 10).split`-`.join`/` + age;
 
 export default function PlayerBioCard({  name, club, clubLogo, dob, age, country, countryLogo, photo }) {
     const classes = useStyles();
@@ -71,7 +71,7 @@ PlayerBioCard.propTypes = {
     club: PropTypes.string,
     clubLogo: PropTypes.string,
     dob: PropTypes.string,
-    age: PropTypes.number,
+    age: PropTypes.string,
     country:  PropTypes.string,
     countryLogo: PropTypes.string,
     photo: PropTypes.string

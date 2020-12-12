@@ -1,11 +1,18 @@
 import React from 'react';
 import PlayerComparisonView from '../views/PlayerComparison';
-import { getPlayerData } from './utils/storyDataGenerators';
+import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerators';
 
 export default {
     component: PlayerComparisonView,
-    title: 'Views/PlayerComparisonView/PlayerComparisonView',
+    title: 'Views/PlayerComparisonView',
     excludeStories: /.*Data$/
 };
 
-export const Default = () => <PlayerComparisonView  { ...getPlayerData() } />;
+const playerData = {
+    players: [
+        getPlayerData(getAttributeNamesList(3 * 10), 'LEFT'),
+        getPlayerData(getAttributeNamesList(3 * 10), 'RIGHT')
+    ]
+};
+
+export const Default = () => <PlayerComparisonView  { ...playerData } />;

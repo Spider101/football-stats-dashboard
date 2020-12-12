@@ -2,7 +2,9 @@ import faker from 'faker';
 import _ from 'lodash';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
-const MAX_ATTR_VALUE = 20;
+export const MAX_ATTR_VALUE = 20;
+export const MAX_OVERALL_VALUE = 100;
+const NUM_MONTHS = 6;
 
 export const getAttributeItemData = (attributeName, highlightedAttributes = []) => ({
     attributeName,
@@ -32,7 +34,7 @@ const getAttrComparisonTableMetaData = (numGroups) => ({
     }))
 });
 
-const getAttributeNamesList = (totalNumOfAttributes) =>
+export const getAttributeNamesList = (totalNumOfAttributes) =>
     [ ...Array(totalNumOfAttributes) ].map(() => faker.hacker.noun());
 
 const getPlayerRolesMap = (numOfRoles, attributeList) => {
@@ -81,7 +83,7 @@ export const getAttrGroupData = (numGroups) => (
 
 export const getPlayerMetadata = () => ({
     name: faker.name.findName(),
-    dob: faker.date.past(),
+    dob: faker.date.past().toJSON(),
     club: faker.company.companyName(),
     country: faker.address.country(),
     photo: `${faker.image.people()}?random=${Math.round(Math.random() * 20)}`,
@@ -91,22 +93,35 @@ export const getPlayerMetadata = () => ({
 });
 
 
-const getAttributesInCategory = (numAttributes, attributesList) => (
-    [ ...Array(numAttributes)].map((_, i) => (
-        { name: attributesList[i], value: Math.round(Math.random() * MAX_ATTR_VALUE) }
-    ))
+const getAttributesInCategory = (numAttributes, attributesList, hasHistory) => (
+    [ ...Array(numAttributes)].map((_, i) => {
+        let attributeMap = {
+            name: attributesList[i],
+            value: Math.round(Math.random() * MAX_ATTR_VALUE)
+        };
+
+        if (hasHistory) {
+            const attributeHistory = [ ...Array(NUM_MONTHS -1) ].map(() => Math.round(Math.random() * MAX_ATTR_VALUE));
+            attributeMap = {
+                ...attributeMap,
+                history: [ ...attributeHistory, attributeMap.value ]
+            };
+        }
+
+        return attributeMap;
+    })
 );
 
-const  getPlayerAttributeCategoryData = (attributeNamesList) => ([
+const  getPlayerAttributeCategoryData = (attributeNamesList, hasHistory) => ([
     {
         categoryName: 'Technical',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(0, 10))
+        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(0, 10), hasHistory)
     }, {
         categoryName: 'Physical',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(10, 20))
+        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(10, 20), hasHistory)
     }, {
         categoryName: 'Mental',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(20, 30))
+        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(20, 30), hasHistory)
     }
 ]);
 
@@ -129,28 +144,30 @@ const getPlayerAttributeGroupData = (numAttributes) => ([
     }
 ]);
 
-export const getPlayerData = () => {
-    const attributeNamesList = getAttributeNamesList(3 * 10);
+export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory = false) => {
+    const currentPlayerOverall = Math.round(Math.random() * MAX_OVERALL_VALUE);
+    const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => Math.round(Math.random() * MAX_OVERALL_VALUE));
 
     return {
-        players: [{
-            isSelected: true,
-            orientation: 'LEFT',
-            playerMetadata: getPlayerMetadata(),
-            playerRoles: getPlayerRolesMap(3, attributeNamesList),
-            playerAttributes: {
-                attributeCategories: getPlayerAttributeCategoryData(attributeNamesList),
-                attributeGroups: getPlayerAttributeGroupData(10)
-            }
-        }, {
-            isSelected: true,
-            orientation: 'RIGHT',
-            playerMetadata: getPlayerMetadata(),
-            playerRoles: getPlayerRolesMap(3, attributeNamesList),
-            playerAttributes: {
-                attributeCategories: getPlayerAttributeCategoryData(attributeNamesList),
-                attributeGroups: getPlayerAttributeGroupData(10)
-            }
-        }]
+        isSelected: true,
+        orientation: orientation,
+        playerMetadata: getPlayerMetadata(),
+        playerRoles: getPlayerRolesMap(3, attributeNamesList),
+        playerOverall: {
+            // TODO: refactor all occurrences of this snippet as a generic random number generator within a range
+            currentValue: currentPlayerOverall,
+            history: [ ...playerOverallHistory, currentPlayerOverall ],
+        },
+        playerAttributes: {
+            attributeCategories: getPlayerAttributeCategoryData(attributeNamesList, hasHistory),
+            attributeGroups: getPlayerAttributeGroupData(10)
+        }
     };
+};
+
+export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
+    return [ ...Array(numAttributes) ].map(() => ({
+        name: keyName || faker.hacker.noun(),
+        data: [ ...Array(6) ].map(() => Math.round(Math.random() * maxValue))
+    }));
 };
