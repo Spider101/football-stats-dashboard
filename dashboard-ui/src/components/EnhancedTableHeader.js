@@ -6,9 +6,11 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, withStyles } from '@material-ui/core/styles';
 
-const useStyles = makeStyles({
+import { StyledTableCell } from '../widgets/PlayerAttributesTable';
+
+const useStyles = makeStyles((theme) => ({
     visuallyHidden: {
         border: 0,
         clip: 'rect(0 0 0 0)',
@@ -19,8 +21,21 @@ const useStyles = makeStyles({
         position: 'absolute',
         top: 20,
         width: 1
+    },
+}));
+
+const StyledTableSortLabel = withStyles((theme) => ({
+    root: {
+        color: theme.palette.common.white,
+        '&$active': {
+            color: theme.palette.common.white
+        }
+    },
+    active: {},
+    icon: {
+        color: 'inherit !important'
     }
-});
+}))(TableSortLabel);
 
 export default function EnhancedTableHeader({ headerCells, order, orderBy, onRequestSort }) {
     const classes = useStyles();
@@ -34,13 +49,13 @@ export default function EnhancedTableHeader({ headerCells, order, orderBy, onReq
             <TableRow>
                 {
                     headerCells.map((headerCell) => (
-                        <TableCell
+                        <StyledTableCell
                             key={ headerCell.id }
                             align={ headerCell.alignment }
                             padding='default'
                             sortDirection={ orderBy === headerCell.id ? order : false }
                         >
-                            <TableSortLabel
+                            <StyledTableSortLabel
                                 active={ orderBy === headerCell.id }
                                 direction={ orderBy === headerCell.id ? order : 'asc' }
                                 onClick={ createSortHandler(headerCell.id) }
@@ -51,8 +66,8 @@ export default function EnhancedTableHeader({ headerCells, order, orderBy, onReq
                                         { order === 'desc' ? 'sorted descending' : 'sorted ascending' }
                                     </span>
                                 ) : null }
-                            </TableSortLabel>
-                        </TableCell>
+                            </StyledTableSortLabel>
+                        </StyledTableCell>
 
                     ))
                 }
