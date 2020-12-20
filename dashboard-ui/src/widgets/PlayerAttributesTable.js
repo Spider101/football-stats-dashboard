@@ -15,7 +15,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { makeStyles } from '@material-ui/core';
 
-const StyledTableCell = withStyles((theme) => ({
+export const StyledTableCell = withStyles((theme) => ({
     root: {
         borderRight: '4px solid',
         borderRightColor: theme.palette.action.hover,
