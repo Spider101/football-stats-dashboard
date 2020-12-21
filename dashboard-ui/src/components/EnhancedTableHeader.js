@@ -3,14 +3,13 @@ import PropTypes from 'prop-types';
 
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
 import TableSortLabel from '@material-ui/core/TableSortLabel';
 
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 
 import { StyledTableCell } from '../widgets/PlayerAttributesTable';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
     visuallyHidden: {
         border: 0,
         clip: 'rect(0 0 0 0)',
@@ -22,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
         top: 20,
         width: 1
     },
-}));
+});
 
 const StyledTableSortLabel = withStyles((theme) => ({
     root: {

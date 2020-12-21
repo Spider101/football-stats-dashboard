@@ -10,61 +10,23 @@ import TableCell from '@material-ui/core/TableCell';
 import { makeStyles } from '@material-ui/core';
 
 import EnhancedTableHeader from '../components/EnhancedTableHeader';
+import { capitalizeLabel, getComparator, stableSortList } from '../utils';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles({
     root: {
         width: '100%'
     },
     table: {
         minWidth: 750
     }
-}));
-
-// TODO: move this into a common utils file
-const capitalizeLabel = (label) => {
-    return label.split(' ')
-        .map(word => word[0].toUpperCase() + word.slice(1))
-        .join(' ')
-};
+});
 
 const transformHeaderCells = (headerCells) => {
     return headerCells.map(headerCell => ({
         id: headerCell.id,
         label: capitalizeLabel(headerCell.id),
         alignment: headerCell.type === 'number' ? 'right' : 'left'
-    }))
-};
-
-const ascComparator = (a, b, propName) => {
-    const x = a.find(el => el.id === propName);
-    const y = b.find(el => el.id === propName);
-
-    return x.data < y.data ? -1 : x.data > y.data ? 1 : 0;
-}
-
-// TODO: move this into a common utils file
-const getComparator = (order, orderBy) => {
-    return order === 'asc'
-        ? (a, b) => ascComparator(a, b, orderBy)
-        : (a, b) => -ascComparator(a, b, orderBy)
-};
-
-// TODO: move this into a common utils file
-const stableSortList = (array, comparator) => {
-    const orderedArray = array.map((el, _idx) => [ el, _idx]);
-
-    orderedArray.sort((a, b) => {
-        const order = comparator(a[0], b[0]);
-
-        // if the elements are not equal, return if one was bigger than the other
-        if (order !== 0) return order;
-
-        // if they are equal, use the position/order to sort the elements
-        return a[1] - b[1]
-    });
-
-    // return the array with the order information
-    return orderedArray.map(([el, _]) => el)
+    }));
 };
 
 export default function SquadHubTable({ headers, rows }) {
@@ -101,7 +63,7 @@ export default function SquadHubTable({ headers, rows }) {
                                     key={_idx}
                                 >
                                     { row.map((cell, _idx) => (
-                                        <TableCell align={ cell.type === 'number' ? 'right' : 'left' }>
+                                        <TableCell key={ _idx} align={ cell.type === 'number' ? 'right' : 'left' }>
                                             { cell.data }
                                         </TableCell>
                                     ))}
