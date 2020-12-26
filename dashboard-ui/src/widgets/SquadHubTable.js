@@ -48,16 +48,28 @@ export default function SquadHubTable({ headers, rows }) {
 
     const [ order, setOrder ] = React.useState('asc');
     const [orderBy, setOrderBy ] = React.useState(headers[0].id);
+    const [ sortedRows, setSortedRows ] = React.useState([]);
+
+    React.useEffect(() => {
+        const newStartingColumn = headers[0].id;
+        const initialOrder = 'asc';
+
+        setSortedRows(stableSortList(rows, initialOrder, newStartingColumn));
+        setOrder(initialOrder);
+        setOrderBy(newStartingColumn);
+    }, [headers, rows]);
 
     const handleRequestSort = (event, property) => {
         // check if selected column is currently in ascending order and if so flip the order
         const isCurrentlyAsc = orderBy === property && order === 'asc';
-        setOrder(isCurrentlyAsc ? 'desc' : 'asc');
+        const newOrder = isCurrentlyAsc ? 'desc' : 'asc';
+        setOrder(newOrder);
 
         // if some other column has been selected, we switch the orderBy to it ('asc' is default order)
         // if not, we just reinforce the orderBy to the currently selected column
         setOrderBy(property);
 
+        setSortedRows(stableSortList(rows, newOrder, property));
     };
 
     // define how the charts in the table should look like
@@ -80,40 +92,44 @@ export default function SquadHubTable({ headers, rows }) {
                 />
                 <TableBody>
                     {
-                        stableSortList(rows, order, orderBy)
-                            .map((row, _idx) => (
-                                <TableRow key={_idx}>
-                                    {
-                                        row.map((cell, _idx) => {
-                                            let tableCell;
+                        sortedRows.map((row, _idx) => (
+                            <TableRow key={_idx}>
+                                {
+                                    row.map((cell, _idx) => {
+                                        let tableCell;
 
-                                            if (cell.type === 'image') {
-                                                tableCell = <img src={ cell.data } className={ classes.flag }/>;
-                                            } else if (cell.type === 'chart') {
-                                                chartData = {
-                                                    ...chartData,
-                                                    type: cell.data.type,
-                                                    series: cell.data.series
-                                                };
-
-                                                tableCell = <ReactApexChart { ...chartData } />;
-                                            } else {
-                                                tableCell = cell.data;
-                                            }
-
-                                            return (
-                                                <TableCell
-                                                    className={ classes.tableCell }
-                                                    key={ _idx}
-                                                    align={ cell.type === 'number' ? 'right' : 'left' }
-                                                >
-                                                    { tableCell }
-                                                </TableCell>
+                                        if (cell.type === 'image') {
+                                            tableCell = (
+                                                <img src={ cell.data }
+                                                    className={ classes.flag }
+                                                    alt={ cell.metadata.sortValue }
+                                                />
                                             );
-                                        })
-                                    }
-                                </TableRow>
-                            ))
+                                        } else if (cell.type === 'chart') {
+                                            chartData = {
+                                                ...chartData,
+                                                type: cell.data.type,
+                                                series: cell.data.series
+                                            };
+
+                                            tableCell = <ReactApexChart { ...chartData } />;
+                                        } else {
+                                            tableCell = cell.data;
+                                        }
+
+                                        return (
+                                            <TableCell
+                                                className={ classes.tableCell }
+                                                key={ _idx}
+                                                align={ cell.type === 'number' ? 'right' : 'left' }
+                                            >
+                                                { tableCell }
+                                            </TableCell>
+                                        );
+                                    })
+                                }
+                            </TableRow>
+                        ))
                     }
                 </TableBody>
             </Table>
