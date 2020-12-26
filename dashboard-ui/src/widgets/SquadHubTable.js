@@ -10,7 +10,13 @@ import TableCell from '@material-ui/core/TableCell';
 import { makeStyles } from '@material-ui/core';
 
 import EnhancedTableHeader from '../components/EnhancedTableHeader';
-import { capitalizeLabel, getComparator, stableSortList } from '../utils';
+import { capitalizeLabel, stableSortList } from '../utils';
+import ReactApexChart from 'react-apexcharts';
+
+
+// constants
+const TABLE_CELL_CHART_HEIGHT = 40;
+const TABLE_CELL_CHART_WIDTH = 80;
 
 const useStyles = makeStyles({
     root: {
@@ -18,6 +24,14 @@ const useStyles = makeStyles({
     },
     table: {
         minWidth: 750
+    },
+    tableCell: {
+        maxHeight: 40
+    },
+    flag: {
+        width: 40,
+        height: 'auto',
+        display: 'table-cell'
     }
 });
 
@@ -46,6 +60,15 @@ export default function SquadHubTable({ headers, rows }) {
 
     };
 
+    // define how the charts in the table should look like
+    let chartData = {
+        options: {
+            chart: { sparkline: { enabled : true } }
+        },
+        height: TABLE_CELL_CHART_HEIGHT,
+        width: TABLE_CELL_CHART_WIDTH
+    };
+
     return (
         <TableContainer>
             <Table className={classes.table}>
@@ -57,16 +80,38 @@ export default function SquadHubTable({ headers, rows }) {
                 />
                 <TableBody>
                     {
-                        stableSortList(rows, getComparator(order, orderBy))
+                        stableSortList(rows, order, orderBy)
                             .map((row, _idx) => (
-                                <TableRow
-                                    key={_idx}
-                                >
-                                    { row.map((cell, _idx) => (
-                                        <TableCell key={ _idx} align={ cell.type === 'number' ? 'right' : 'left' }>
-                                            { cell.data }
-                                        </TableCell>
-                                    ))}
+                                <TableRow key={_idx}>
+                                    {
+                                        row.map((cell, _idx) => {
+                                            let tableCell;
+
+                                            if (cell.type === 'image') {
+                                                tableCell = <img src={ cell.data } className={ classes.flag }/>;
+                                            } else if (cell.type === 'chart') {
+                                                chartData = {
+                                                    ...chartData,
+                                                    type: cell.data.type,
+                                                    series: cell.data.series
+                                                };
+
+                                                tableCell = <ReactApexChart { ...chartData } />;
+                                            } else {
+                                                tableCell = cell.data;
+                                            }
+
+                                            return (
+                                                <TableCell
+                                                    className={ classes.tableCell }
+                                                    key={ _idx}
+                                                    align={ cell.type === 'number' ? 'right' : 'left' }
+                                                >
+                                                    { tableCell }
+                                                </TableCell>
+                                            );
+                                        })
+                                    }
                                 </TableRow>
                             ))
                     }
@@ -84,7 +129,10 @@ SquadHubTable.propTypes = {
     rows: PropTypes.arrayOf(
         PropTypes.arrayOf(PropTypes.shape({
             type: PropTypes.string,
-            data: PropTypes.any
+            data: PropTypes.any,
+            metadata: PropTypes.shape({
+                sortValue: PropTypes.string
+            })
         }))
     )
 };
