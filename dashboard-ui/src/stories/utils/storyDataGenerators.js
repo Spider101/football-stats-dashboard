@@ -194,7 +194,21 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
             { id: 'wages', type: 'string', data: '$' + getRandomNumberInRange(1000, 100) + 'K'},
             { id: 'form', type: 'chart', data: chartData, metadata: { sortValue: getRandomNumberInRange(10, 1) } },
             { id: 'morale', type: 'icon', data: moraleEntity.icon, metadata: { sortValue: moraleEntity.morale } },
-            { id: 'current ability', type: 'number', data: getRandomNumberInRange(100, 1) }
+            { id: 'current_ability', type: 'number', data: getRandomNumberInRange(MAX_OVERALL_VALUE, 1) }
         ];
     })
 });
+
+export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
+    return {
+        players: [ ...Array(numPlayers) ].map(() => ({
+            name: faker.name.findName(),
+            nationality: _.sample(nationsList),
+            role: faker.hacker.noun(),
+            wages: getRandomNumberInRange(1000, 100),
+            form: [ ...Array(5) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE)),
+            morale: _.sample(moraleList),
+            current_ability: getRandomNumberInRange(MAX_OVERALL_VALUE, 1)
+        }))
+    };
+};
