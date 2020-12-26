@@ -1,5 +1,6 @@
 import faker from 'faker';
 import _ from 'lodash';
+import { allSquadHubTableHeaders } from '../../utils';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
@@ -174,15 +175,7 @@ export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
 };
 
 export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap) => ({
-    headers: [
-        { id: 'name', type: 'string' },
-        { id: 'nationality', type: 'image' },
-        { id: 'role', type: 'string' },
-        { id: 'wages', type: 'string' },
-        { id: 'form', type: 'chart' },
-        { id: 'morale', type: 'icon' },
-        { id: 'current ability', type: 'number' }
-    ],
+    headers: allSquadHubTableHeaders,
     rows: [ ...Array(numRows) ].map(() => {
         const country = _.sample(nationalityFlagMap);
         const moraleEntity = _.sample(moraleIconsMap);

@@ -1,3 +1,31 @@
+import React from 'react';
+import MoodIcon from '@material-ui/icons/Mood';
+import MoodBadIcon from '@material-ui/icons/MoodBad';
+
+// TODO: this will be returned from the service in future; remove this then
+export const allSquadHubTableHeaders = [
+    { id: 'name', type: 'string' },
+    { id: 'nationality', type: 'image' },
+    { id: 'role', type: 'string' },
+    { id: 'wages', type: 'string' },
+    { id: 'form', type: 'chart' },
+    { id: 'morale', type: 'icon' },
+    { id: 'current_ability', type: 'number' }
+];
+
+export const nationalityFlagMap = [
+    { nationality: 'France', flag: 'https://upload.wikimedia.org/wikipedia/commons/6/62/Flag_of_France.png' },
+    { nationality: 'Germany', flag: 'https://freepngimg.com/thumb/germany_flag/1-2-germany-flag-picture.png' },
+    { nationality: 'Spain', flag: 'https://freepngimg.com/thumb/spain/5-2-spain-flag-picture.png' },
+    { nationality: 'Netherlands', flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/'
+        + 'Flag_of_the_Netherlands.svg/125px-Flag_of_the_Netherlands.svg.png' },
+];
+
+export const moraleIconsMap = [
+    { morale: 'Angry', icon: <MoodBadIcon /> },
+    { morale: 'Happy', icon: <MoodIcon /> }
+];
+
 export const capitalizeLabel = (label) => {
     return label.split(' ')
         .map(word => word[0].toUpperCase() + word.slice(1))
