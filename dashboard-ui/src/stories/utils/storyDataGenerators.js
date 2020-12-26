@@ -152,7 +152,7 @@ export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory 
     const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_OVERALL_VALUE));
 
     return {
-        isSelected: true,
+        isSelected: true, // TODO: figure out what this is for
         orientation: orientation,
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
@@ -182,7 +182,7 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
         const chartData = {
             type: 'bar',
             series: [{
-                name: 'form',
+                name: 'Match Rating',
                 data: [ ...Array(5) ].map(() => (Math.random() * 10).toFixed(2) + 1)
             }]
         };

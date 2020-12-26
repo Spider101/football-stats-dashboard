@@ -13,7 +13,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 
 import withStyles from '@material-ui/core/styles/withStyles';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 export const StyledTableCell = withStyles((theme) => ({
     root: {
@@ -65,6 +65,7 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
         <div>
             <div className={ classes.dropdown }>
                 <FormControl className={ classes.formControl }>
+                    {/* TODO: change the id labels */}
                     <InputLabel  id="demo-simple-select-label">Player Role</InputLabel>
                     <Select id="demo-simple-select-label"
                         value={ role }

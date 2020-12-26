@@ -27,11 +27,12 @@ export const moraleIconsMap = [
 ];
 
 export const capitalizeLabel = (label) => {
-    return label.split(' ')
+    return label.split('_')
         .map(word => word[0].toUpperCase() + word.slice(1))
         .join(' ');
 };
 
+// TODO: update this to remove redundant code
 const iconMetadataComparator = (x, y) =>
     x.metadata.sortValue < y.metadata.sortValue ? -1 : x.metadata.sortValue > y.metadata.sortValue ? 1 : 0;
 const imageMetadataComparator = (x, y) =>
@@ -66,6 +67,11 @@ const compare = (row1, row2, sortOrder, cellLabel) => {
 };
 
 export const stableSortList = (array, sortOrder, columnNameToOrderBy) => {
+    // no need to sort if no column has been chosen to sort on
+    if (columnNameToOrderBy === '') {
+        return array;
+    }
+
     const orderedArray = array.map((el, _idx) => [ el, _idx]);
 
     orderedArray.sort((a, b) => {
