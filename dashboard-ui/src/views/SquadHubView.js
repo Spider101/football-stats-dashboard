@@ -166,7 +166,7 @@ export default function SquadHubView({ players }) {
                 </FormControl>
             </Grid>
             <Grid item xs={6}>
-                <FormControl className={ classes.formControl }>
+                <FormControl className={ classes.formControl } style={{ float: 'right' }}>
                     <InputLabel id="filter-rows-input-label">Filter Players</InputLabel>
                     <Select
                         labelId="filter-rows-select-label"
