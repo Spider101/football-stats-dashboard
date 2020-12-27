@@ -118,8 +118,8 @@ export default function SquadHubView({ players }) {
         }
     };
 
-    // TODO: memoize or put it in a onLoad type hook so it is computed only once per load
-    const rowData = buildRowDataForSquadTable(players);
+    // we just need to calculate this once when the component is mounted
+    const rowData = React.useMemo(() => buildRowDataForSquadTable(players), [players]);
 
     const filteredRowData = filterRowsByRole(rowData, playerRoles);
 

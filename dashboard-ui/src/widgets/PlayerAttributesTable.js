@@ -65,9 +65,8 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
         <div>
             <div className={ classes.dropdown }>
                 <FormControl className={ classes.formControl }>
-                    {/* TODO: change the id labels */}
-                    <InputLabel  id="demo-simple-select-label">Player Role</InputLabel>
-                    <Select id="demo-simple-select-label"
+                    <InputLabel  id="player-role-input-label">Player Role</InputLabel>
+                    <Select id="player-role-select-label"
                         value={ role }
                         onChange={ handleChange }
                     >
