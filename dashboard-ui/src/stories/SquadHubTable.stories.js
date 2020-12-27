@@ -11,4 +11,18 @@ export default {
     excludeStories: /.*Data$/
 };
 
-export const Default = () => <SquadHubTable { ...getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap) } />;
+const defaultSquadHubTableData = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap);
+const squadHubTableDataWithNoRows = {
+    headers: defaultSquadHubTableData.headers,
+    rows: []
+};
+const squadHubTableDataWithNoData = {
+    headers: [],
+    rows: []
+};
+
+export const Default = () => <SquadHubTable { ...defaultSquadHubTableData } />;
+
+export const EmptyRows = () => <SquadHubTable { ...squadHubTableDataWithNoRows } />;
+
+export const EmptyTable = () => <SquadHubTable { ...squadHubTableDataWithNoData } />;

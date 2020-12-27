@@ -6,13 +6,14 @@ import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
+import Container from '@material-ui/core/Container';
+import Typography from '@material-ui/core/Typography';
 
 import { makeStyles } from '@material-ui/core';
 
 import EnhancedTableHeader from '../components/EnhancedTableHeader';
 import { capitalizeLabel, stableSortList } from '../utils';
 import ReactApexChart from 'react-apexcharts';
-
 
 // constants
 const TABLE_CELL_CHART_HEIGHT = 40;
@@ -47,16 +48,16 @@ export default function SquadHubTable({ headers, rows }) {
     const classes = useStyles();
 
     const [ order, setOrder ] = React.useState('asc');
-    const [orderBy, setOrderBy ] = React.useState(headers[0].id);
+    const [orderBy, setOrderBy ] = React.useState(getStartingColumnName(headers));
     const [ sortedRows, setSortedRows ] = React.useState([]);
 
     React.useEffect(() => {
-        const newStartingColumn = headers[0].id;
+        const newStartingColumnName = getStartingColumnName(headers);
         const initialOrder = 'asc';
 
-        setSortedRows(stableSortList(rows, initialOrder, newStartingColumn));
+        setSortedRows(stableSortList(rows, initialOrder, newStartingColumnName));
         setOrder(initialOrder);
-        setOrderBy(newStartingColumn);
+        setOrderBy(newStartingColumnName);
     }, [headers, rows]);
 
     const handleRequestSort = (event, property) => {
@@ -82,58 +83,74 @@ export default function SquadHubTable({ headers, rows }) {
     };
 
     return (
-        <TableContainer>
-            <Table className={classes.table}>
-                <EnhancedTableHeader
-                    headerCells= { transformHeaderCells(headers) }
-                    order={ order }
-                    orderBy={ orderBy }
-                    onRequestSort={ handleRequestSort }
-                />
-                <TableBody>
-                    {
-                        sortedRows.map((row, _idx) => (
-                            <TableRow key={_idx}>
-                                {
-                                    row.map((cell, _idx) => {
-                                        let tableCell;
+        headers.length === 0 && sortedRows.length === 0
+            ? <Container maxWidth='lg'>
+                <Typography component='div'  variant='h5' style={{ textAlign: 'center', padding: '5%' }}>
+                    No Data is available for display. Please select one or more columns!
+                </Typography>
+            </Container>
+            : <TableContainer>
+                <Table className={classes.table}>
+                    <EnhancedTableHeader
+                        headerCells= { transformHeaderCells(headers) }
+                        order={ order }
+                        orderBy={ orderBy }
+                        onRequestSort={ handleRequestSort }
+                    />
+                    <TableBody>
+                        {
+                            sortedRows.map((row, _idx) => (
+                                <TableRow key={_idx}>
+                                    {
+                                        row.map((cell, _idx) => {
+                                            let tableCell;
 
-                                        if (cell.type === 'image') {
-                                            tableCell = (
-                                                <img src={ cell.data }
-                                                    className={ classes.flag }
-                                                    alt={ cell.metadata.sortValue }
-                                                />
+                                            if (cell.type === 'image') {
+                                                tableCell = (
+                                                    <img src={ cell.data }
+                                                        className={ classes.flag }
+                                                        alt={ cell.metadata.sortValue }
+                                                    />
+                                                );
+                                            } else if (cell.type === 'chart') {
+                                                chartData = {
+                                                    ...chartData,
+                                                    type: cell.data.type,
+                                                    series: cell.data.series
+                                                };
+
+                                                tableCell = <ReactApexChart { ...chartData } />;
+                                            } else {
+                                                tableCell = cell.data;
+                                            }
+
+                                            return (
+                                                <TableCell
+                                                    className={ classes.tableCell }
+                                                    key={ _idx}
+                                                    align={ cell.type === 'number' ? 'right' : 'left' }
+                                                >
+                                                    { tableCell }
+                                                </TableCell>
                                             );
-                                        } else if (cell.type === 'chart') {
-                                            chartData = {
-                                                ...chartData,
-                                                type: cell.data.type,
-                                                series: cell.data.series
-                                            };
-
-                                            tableCell = <ReactApexChart { ...chartData } />;
-                                        } else {
-                                            tableCell = cell.data;
-                                        }
-
-                                        return (
-                                            <TableCell
-                                                className={ classes.tableCell }
-                                                key={ _idx}
-                                                align={ cell.type === 'number' ? 'right' : 'left' }
-                                            >
-                                                { tableCell }
-                                            </TableCell>
-                                        );
-                                    })
-                                }
-                            </TableRow>
-                        ))
-                    }
-                </TableBody>
-            </Table>
-        </TableContainer>
+                                        })
+                                    }
+                                </TableRow>
+                            ))
+                        }
+                    </TableBody>
+                </Table>
+                {
+                    headers.length !== 0 && sortedRows.length === 0 &&
+                    (
+                        <Container maxWidth='lg'>
+                            <Typography component='div' variant='h5' style={{ textAlign: 'center', padding: '5%' }}>
+                                No Data is available for display. Please select one or more rows!
+                            </Typography>
+                        </Container>
+                    )
+                }
+            </TableContainer>
     );
 }
 
@@ -152,3 +169,7 @@ SquadHubTable.propTypes = {
         }))
     )
 };
+
+function getStartingColumnName(headers) {
+    return headers[0] !== undefined ? headers[0].id : '';
+}
