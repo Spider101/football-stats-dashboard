@@ -20,9 +20,6 @@ const TABLE_CELL_CHART_HEIGHT = 40;
 const TABLE_CELL_CHART_WIDTH = 80;
 
 const useStyles = makeStyles({
-    root: {
-        width: '100%'
-    },
     table: {
         minWidth: 750
     },
@@ -35,6 +32,8 @@ const useStyles = makeStyles({
         display: 'table-cell'
     }
 });
+
+const getStartingColumnName = (headers) => headers[0] !== undefined ? headers[0].id : '';
 
 const transformHeaderCells = (headerCells) => {
     return headerCells.map(headerCell => ({
@@ -164,12 +163,8 @@ SquadHubTable.propTypes = {
             type: PropTypes.string,
             data: PropTypes.any,
             metadata: PropTypes.shape({
-                sortValue: PropTypes.string
+                sortValue: PropTypes.any
             })
         }))
     )
 };
-
-function getStartingColumnName(headers) {
-    return headers[0] !== undefined ? headers[0].id : '';
-}
