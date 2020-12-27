@@ -1,12 +1,12 @@
 import React from 'react';
 
-import SquadHubTable from '../widgets/SquadHubTable';
+import SortableTable from '../widgets/SortableTable';
 
 import { getSquadHubTableData } from './utils/storyDataGenerators';
 import { moraleIconsMap, nationalityFlagMap } from '../utils';
 
 export default {
-    component: SquadHubTable,
+    component: SortableTable,
     title: 'Widgets/SquadHubView/SquadHubTable',
     excludeStories: /.*Data$/
 };
@@ -21,8 +21,8 @@ const squadHubTableDataWithNoData = {
     rows: []
 };
 
-export const Default = () => <SquadHubTable { ...defaultSquadHubTableData } />;
+export const Default = () => <SortableTable { ...defaultSquadHubTableData } />;
 
-export const EmptyRows = () => <SquadHubTable { ...squadHubTableDataWithNoRows } />;
+export const EmptyRows = () => <SortableTable { ...squadHubTableDataWithNoRows } />;
 
-export const EmptyTable = () => <SquadHubTable { ...squadHubTableDataWithNoData } />;
+export const EmptyTable = () => <SortableTable { ...squadHubTableDataWithNoData } />;

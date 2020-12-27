@@ -15,7 +15,7 @@ import Chip from '@material-ui/core/Chip';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { capitalizeLabel, allSquadHubTableHeaders, moraleIconsMap, nationalityFlagMap } from '../utils';
-import SquadHubTable from '../widgets/SquadHubTable';
+import SortableTable from '../widgets/SortableTable';
 
 // TODO: define a more appropriate method for this
 const getSortValueForForm = (matchRatingsList) => matchRatingsList[0];
@@ -166,7 +166,7 @@ export default function SquadHubView({ players }) {
                 </FormControl>
             </Grid>
             <Grid item xs={6}>
-                <FormControl className={ classes.formControl }>
+                <FormControl className={ classes.formControl } style={{ float: 'right' }}>
                     <InputLabel id="filter-rows-input-label">Filter Players</InputLabel>
                     <Select
                         labelId="filter-rows-select-label"
@@ -206,7 +206,7 @@ export default function SquadHubView({ players }) {
                 </FormControl>
             </Grid>
             <Grid item xs={12}>
-                <SquadHubTable { ...filterColumns(allSquadHubTableHeaders, filteredRowData, columnNames) } />
+                <SortableTable { ...filterColumns(allSquadHubTableHeaders, filteredRowData, columnNames) } />
             </Grid>
         </Grid>
     );
