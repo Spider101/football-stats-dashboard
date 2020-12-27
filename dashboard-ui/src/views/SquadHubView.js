@@ -82,16 +82,22 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const filterColumns = (originalHeaders, originalRowData, selectedColumns) => {
+const filterColumns = (originalHeaders, filteredRowData, selectedColumns) => {
     const headers = originalHeaders.filter(header => selectedColumns.includes(header.id));
-    const rows = originalRowData.map(rowData =>
+    const updatedRows = filteredRowData.map(rowData =>
         rowData.filter(cellData => selectedColumns.includes(cellData.id)));
 
     return {
         headers,
-        rows
+        // return empty list if all rows are just empty lists themselves
+        rows: updatedRows.every(row => row.length === 0) ? [] : updatedRows
     };
 };
+
+const filterRowsByRole = (originalRowData, roles) => originalRowData.filter(rowData => {
+    const roleData = rowData.find(cell => cell.id === 'role');
+    return roles.includes(roleData.data);
+});
 
 export default function SquadHubView({ players }) {
     const classes = useStyles();
@@ -99,22 +105,32 @@ export default function SquadHubView({ players }) {
 
     const [columnNames, setColumnNames] = React.useState(allSquadHubTableHeaderNames);
 
+    // get all the distinct player roles in the dataset
+    const allPlayerRoles = [ ...new Set(players.map(player => player.role)) ];
+    const [playerRoles, setPlayerRoles] = React.useState(allPlayerRoles);
+
     const handleChange = (event) => {
-        setColumnNames(event.target.value);
+        const selectedValues = event.target.value;
+        if (selectedValues.every(selectedValue => allPlayerRoles.includes(selectedValue))){
+            setPlayerRoles(event.target.value);
+        } else {
+            setColumnNames(event.target.value);
+        }
     };
 
     // TODO: memoize or put it in a onLoad type hook so it is computed only once per load
     const rowData = buildRowDataForSquadTable(players);
 
+    const filteredRowData = filterRowsByRole(rowData, playerRoles);
+
     return (
         <Grid container spacing={2}>
-            <Grid item xs={12}>
+            <Grid item xs={6}>
                 <FormControl className={ classes.formControl }>
-                    {/* TODO: change the id labels */}
-                    <InputLabel id="demo-mutiple-checkbox-label">Configure Columns</InputLabel>
+                    <InputLabel id="configure-columns-input-label">Configure Columns</InputLabel>
                     <Select
-                        labelId="demo-mutiple-checkbox-label"
-                        id="demo-mutiple-checkbox"
+                        labelId="configure-columns-select-label"
+                        id="configure-columns-checkbox"
                         multiple
                         value={columnNames}
                         onChange={ handleChange }
@@ -140,9 +156,48 @@ export default function SquadHubView({ players }) {
                             allSquadHubTableHeaders.map(header => (
                                 <MenuItem key={ header.id } value={ header.id }>
                                     <Checkbox
-                                        // disabled={ columnNames.length === 1 && columnNames.includes(header.id) }
                                         checked={ columnNames.indexOf(header.id) > -1 } />
-                                    <ListItemText primary={ header.id } />
+                                    <ListItemText primary={ capitalizeLabel(header.id) } />
+                                </MenuItem>
+                            ))
+                        }
+                    </Select>
+
+                </FormControl>
+            </Grid>
+            <Grid item xs={6}>
+                <FormControl className={ classes.formControl }>
+                    <InputLabel id="filter-rows-input-label">Filter Players</InputLabel>
+                    <Select
+                        labelId="filter-rows-select-label"
+                        id="filter-rows-checkbox"
+                        multiple
+                        value={playerRoles}
+                        onChange={ handleChange }
+                        input={ <Input /> }
+                        renderValue={ (selected) => {
+                            let renderedValue = null;
+                            if (_.isEqual(selected, allPlayerRoles)) {
+                                renderedValue =
+                                    <Chip key='All Players' label='All Players' className={ classes.chip } />;
+                            } else {
+                                renderedValue = selected.map((value) => (
+                                    <Chip key={ value } label={ capitalizeLabel(value) } className={ classes.chip } />
+                                ));
+                            }
+                            return (
+                                <div className={classes.chips}>
+                                    { renderedValue }
+                                </div>
+                            );
+                        }}
+                    >
+                        {
+                            allPlayerRoles.map(role => (
+                                <MenuItem key={ role } value={ role }>
+                                    <Checkbox
+                                        checked={ playerRoles.indexOf(role) > -1 } />
+                                    <ListItemText primary={ capitalizeLabel(role) } />
                                 </MenuItem>
                             ))
                         }
@@ -151,7 +206,7 @@ export default function SquadHubView({ players }) {
                 </FormControl>
             </Grid>
             <Grid item xs={12}>
-                <SquadHubTable { ...filterColumns(allSquadHubTableHeaders, rowData, columnNames) } />
+                <SquadHubTable { ...filterColumns(allSquadHubTableHeaders, filteredRowData, columnNames) } />
             </Grid>
         </Grid>
     );
