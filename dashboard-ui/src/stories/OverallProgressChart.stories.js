@@ -4,7 +4,7 @@ import { getPlayerProgressionData, MAX_OVERALL_VALUE } from './utils/storyDataGe
 
 export default {
     component: OverallProgressChart,
-    title: 'Components/PlayerProgressionView/OverallProgressnChart',
+    title: 'Components/PlayerProgressionView/OverallProgressChart',
     excludeStories: /.*Data$/,
     argTypes: {
         attributeData: {
