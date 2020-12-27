@@ -22,7 +22,6 @@ export default function AttributeProgressChart({ attributeData }) {
             series={ attributeData }
             type='line'
             height={ 500 }
-            width={ 1050 }
         />
     );
 }

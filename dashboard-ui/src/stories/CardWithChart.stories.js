@@ -52,4 +52,4 @@ export const BarChart = () => (
     <CardWithChart { ...barChartData }>
         <ReactApexChart />
     </CardWithChart>
-)
+);

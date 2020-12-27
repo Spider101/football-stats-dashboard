@@ -23,7 +23,6 @@ export default function OverallProgressChart({ overallData }) {
             series={ overallData }
             type='bar'
             height={ 500 }
-            width={ 1050 }    
         />
     );
 }

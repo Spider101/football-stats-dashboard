@@ -14,9 +14,7 @@ export default function CardWithChart({ cardTitle, chartData, dataTransformer, c
 
     return (
         <Card>
-            <CardHeader
-                title={ cardTitle }
-            />
+            <CardHeader title={ cardTitle }/>
             <CardContent>
                 {
                     React.Children.map(children, child => {
