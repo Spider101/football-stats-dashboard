@@ -1,26 +1,29 @@
 import faker from 'faker';
 import _ from 'lodash';
+import { allSquadHubTableHeaders } from '../../utils';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
 const NUM_MONTHS = 6;
 
+const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * upper) + lower;
+
 export const getAttributeItemData = (attributeName, highlightedAttributes = []) => ({
     attributeName,
-    attributeValue: Math.round(Math.random() * 20),
+    attributeValue: getRandomNumberInRange(MAX_ATTR_VALUE),
     highlightedAttributes,
-    growthIndicator: GROWTH_INDICATOR_LIST[Math.floor(Math.random() * 3)]
+    growthIndicator: _.sample(GROWTH_INDICATOR_LIST)
 });
 
 export const getAttrComparisonItemData = (attributeName, highlightedAttributes = []) => ({
     attrComparisonItem: {
         attrValues: [{
             name: faker.name.lastName(1),
-            data: [ Math.round(Math.random() * 20) ]
+            data: [ getRandomNumberInRange(MAX_ATTR_VALUE) ]
         }, {
             name: faker.name.lastName(1),
-            data: [ -1 * Math.round(Math.random() * 20) ]
+            data: [ -1 * getRandomNumberInRange(MAX_ATTR_VALUE) ]
         }],
         label: attributeName
     },
@@ -30,7 +33,7 @@ export const getAttrComparisonItemData = (attributeName, highlightedAttributes =
 const getAttrComparisonTableMetaData = (numGroups) => ({
     groups: [ ...Array(numGroups) ].map(() => ({
         name: faker.lorem.word(),
-        numAttr: Math.round(Math.random() * 9) + 1
+        numAttr: getRandomNumberInRange(9, 1)
     }))
 });
 
@@ -77,7 +80,7 @@ export const getAttributeComparisonTableData = (getAttrItemData) => {
 export const getAttrGroupData = (numGroups) => (
     [ ...Array(numGroups) ].map(() => ({
         groupName: '',
-        attributesInGroup: [ ...Array(10) ].map(() => Math.round(Math.random() * 19) + 1)
+        attributesInGroup: [ ...Array(10) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
     }))
 );
 
@@ -86,9 +89,9 @@ export const getPlayerMetadata = () => ({
     dob: faker.date.past().toJSON(),
     club: faker.company.companyName(),
     country: faker.address.country(),
-    photo: `${faker.image.people()}?random=${Math.round(Math.random() * 20)}`,
-    clubLogo: `${faker.image.abstract()}?random=${Math.round(Math.random() * 20)}`,
-    countryLogo: `${faker.image.avatar()}?random=${Math.round(Math.random() * 20)}`,
+    photo: `${faker.image.people()}?random=${getRandomNumberInRange(20)}`,
+    clubLogo: `${faker.image.abstract()}?random=${getRandomNumberInRange(20)}`,
+    countryLogo: `${faker.image.avatar()}?random=${getRandomNumberInRange(20)}`,
     age:  ' (' + faker.random.number({ 'min': 16, 'max': 35 }) + ' years old)'
 });
 
@@ -97,11 +100,11 @@ const getAttributesInCategory = (numAttributes, attributesList, hasHistory) => (
     [ ...Array(numAttributes)].map((_, i) => {
         let attributeMap = {
             name: attributesList[i],
-            value: Math.round(Math.random() * MAX_ATTR_VALUE)
+            value: getRandomNumberInRange(MAX_ATTR_VALUE)
         };
 
         if (hasHistory) {
-            const attributeHistory = [ ...Array(NUM_MONTHS -1) ].map(() => Math.round(Math.random() * MAX_ATTR_VALUE));
+            const attributeHistory = [ ...Array(NUM_MONTHS -1) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE));
             attributeMap = {
                 ...attributeMap,
                 history: [ ...attributeHistory, attributeMap.value ]
@@ -128,33 +131,32 @@ const  getPlayerAttributeCategoryData = (attributeNamesList, hasHistory) => ([
 const getPlayerAttributeGroupData = (numAttributes) => ([
     {
         groupName: 'Defending',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
     }, {
         groupName: 'Speed',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
     }, {
         groupName: 'Vision',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
     }, {
         groupName: 'Attacking',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
     }, {
         groupName: 'Aerial',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => Math.round(Math.random() * MAX_ATTR_VALUE))
+        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
     }
 ]);
 
 export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory = false) => {
-    const currentPlayerOverall = Math.round(Math.random() * MAX_OVERALL_VALUE);
-    const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => Math.round(Math.random() * MAX_OVERALL_VALUE));
+    const currentPlayerOverall = getRandomNumberInRange(MAX_OVERALL_VALUE);
+    const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_OVERALL_VALUE));
 
     return {
-        isSelected: true,
+        isSelected: true, // TODO: figure out what this is for
         orientation: orientation,
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
         playerOverall: {
-            // TODO: refactor all occurrences of this snippet as a generic random number generator within a range
             currentValue: currentPlayerOverall,
             history: [ ...playerOverallHistory, currentPlayerOverall ],
         },
@@ -168,6 +170,45 @@ export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory 
 export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
     return [ ...Array(numAttributes) ].map(() => ({
         name: keyName || faker.hacker.noun(),
-        data: [ ...Array(6) ].map(() => Math.round(Math.random() * maxValue))
+        data: [ ...Array(6) ].map(() => getRandomNumberInRange(maxValue))
     }));
+};
+
+export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap) => ({
+    headers: allSquadHubTableHeaders,
+    rows: [ ...Array(numRows) ].map(() => {
+        const country = _.sample(nationalityFlagMap);
+        const moraleEntity = _.sample(moraleIconsMap);
+        const chartData = {
+            type: 'bar',
+            series: [{
+                name: 'Match Rating',
+                data: [ ...Array(5) ].map(() => (Math.random() * 10).toFixed(2) + 1)
+            }]
+        };
+
+        return [
+            { id: 'name', type: 'string', data: faker.name.findName() },
+            { id: 'nationality', type: 'image', data: country.flag, metadata: { sortValue: country.nationality } },
+            { id: 'role', type: 'string', data: faker.hacker.noun() },
+            { id: 'wages', type: 'string', data: '$' + getRandomNumberInRange(1000, 100) + 'K'},
+            { id: 'form', type: 'chart', data: chartData, metadata: { sortValue: getRandomNumberInRange(10, 1) } },
+            { id: 'morale', type: 'icon', data: moraleEntity.icon, metadata: { sortValue: moraleEntity.morale } },
+            { id: 'current_ability', type: 'number', data: getRandomNumberInRange(MAX_OVERALL_VALUE, 1) }
+        ];
+    })
+});
+
+export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
+    return {
+        players: [ ...Array(numPlayers) ].map(() => ({
+            name: faker.name.findName(),
+            nationality: _.sample(nationsList),
+            role: faker.hacker.noun(),
+            wages: getRandomNumberInRange(1000, 100),
+            form: [ ...Array(5) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE)),
+            morale: _.sample(moraleList),
+            current_ability: getRandomNumberInRange(MAX_OVERALL_VALUE, 1)
+        }))
+    };
 };

@@ -13,9 +13,9 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from '@material-ui/core/InputLabel';
 
 import withStyles from '@material-ui/core/styles/withStyles';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
-const StyledTableCell = withStyles((theme) => ({
+export const StyledTableCell = withStyles((theme) => ({
     root: {
         borderRight: '4px solid',
         borderRightColor: theme.palette.action.hover,
@@ -65,8 +65,8 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
         <div>
             <div className={ classes.dropdown }>
                 <FormControl className={ classes.formControl }>
-                    <InputLabel  id="demo-simple-select-label">Player Role</InputLabel>
-                    <Select id="demo-simple-select-label"
+                    <InputLabel  id="player-role-input-label">Player Role</InputLabel>
+                    <Select id="player-role-select-label"
                         value={ role }
                         onChange={ handleChange }
                     >
