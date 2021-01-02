@@ -1,6 +1,6 @@
 import faker from 'faker';
 import _ from 'lodash';
-import { allSquadHubTableHeaders } from '../../utils';
+import { allMatchPerformanceTableHeaders, allSquadHubTableHeaders } from '../../utils';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
@@ -195,6 +195,27 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
             { id: 'form', type: 'chart', data: chartData, metadata: { sortValue: getRandomNumberInRange(10, 1) } },
             { id: 'morale', type: 'icon', data: moraleEntity.icon, metadata: { sortValue: moraleEntity.morale } },
             { id: 'current_ability', type: 'number', data: getRandomNumberInRange(MAX_OVERALL_VALUE, 1) }
+        ];
+    })
+});
+
+export const getMatchPerformanceTableData = (numCompetitions) => ({
+    headers: allMatchPerformanceTableHeaders,
+    rows: [ ...Array(numCompetitions) ].map(() => {
+        return [
+            { id: 'competition', type: 'string', data: faker.hacker.noun() },
+            { id: 'apps', type: 'number', data: getRandomNumberInRange(30) },
+            { id: 'goals', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'pens', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'assts', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'pom', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'yel', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'red', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'tck', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'pas%', type: 'string', data: getRandomNumberInRange(25) + '%' },
+            { id: 'drb', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'fouls', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'avr', type: 'number', data: getRandomNumberInRange(25) }
         ];
     })
 });
