@@ -30,7 +30,8 @@ export default function TableFilterControl({ currentValues, handleChangeFn, allP
                 input={ <Input /> }
                 renderValue={ (selected) => {
                     let renderedValue = null;
-                    if (_.isEqual(selected, allPossibleValues)) {
+                    // check if the selected values are the same as all the possible values (ignoring order)
+                    if (_.isEqual(_.sortBy(selected), _.sortBy(allPossibleValues))) {
                         renderedValue = (
                             <Chip key={ allValuesSelectedLabel }
                                 label={ allValuesSelectedLabel }
