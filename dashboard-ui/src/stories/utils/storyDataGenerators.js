@@ -199,6 +199,7 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
     })
 });
 
+// TODO: simplify this to match what we are sending into the actual table
 export const getMatchPerformanceTableData = (numCompetitions) => ({
     headers: allMatchPerformanceTableHeaders,
     rows: [ ...Array(numCompetitions) ].map(() => {
@@ -233,3 +234,30 @@ export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
         }))
     };
 };
+
+export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) => ({
+    competitions: [ ...Array(numCompetitions) ].map(() => {
+        let competitionData = {
+            id: faker.hacker.noun(),
+            appearances: getRandomNumberInRange(30),
+            goals: getRandomNumberInRange(30),
+            penalties: getRandomNumberInRange(25),
+            assists: getRandomNumberInRange(25),
+            playerOfTheMatch: getRandomNumberInRange(10),
+            yellowCards: getRandomNumberInRange(25),
+            redCards: getRandomNumberInRange(25),
+            tackles: getRandomNumberInRange(25),
+            passCompletionRate: getRandomNumberInRange(25),
+            dribbles: getRandomNumberInRange(25),
+            fouls: getRandomNumberInRange(25)
+        };
+
+        return numMatches === 0 ? {
+            ...competitionData,
+            averageRating: getRandomNumberInRange(10),
+        } : {
+            ...competitionData,
+            matchRatingHistory: [ ...Array(numMatches) ].map(() => getRandomNumberInRange(10)),
+        };
+    })
+});
