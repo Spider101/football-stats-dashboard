@@ -16,18 +16,18 @@ export const allSquadHubTableHeaders = [
 // TODO: this will be returned from the service in future; remove this then
 export const allMatchPerformanceTableHeaders = [
     { id: 'competition', type: 'string' },
-    { id: 'apps', type: 'number' },
+    { id: 'appearances', type: 'number' },
     { id: 'goals', type: 'number' },
-    { id: 'pens', type: 'number' },
-    { id: 'assts', type: 'number' },
-    { id: 'pom', type: 'number' },
-    { id: 'yel', type: 'number' },
-    { id: 'red', type: 'number' },
-    { id: 'tck', type: 'number' },
-    { id: 'pas%', type: 'string' },
-    { id: 'drb', type: 'number' },
+    { id: 'penalties', type: 'number' },
+    { id: 'assists', type: 'number' },
+    { id: 'player_of_the_match', type: 'number' },
+    { id: 'yellow_cards', type: 'number' },
+    { id: 'red_cards', type: 'number' },
+    { id: 'tackles', type: 'number' },
+    { id: 'pass_completion_rate', type: 'string' },
+    { id: 'dribbles', type: 'number' },
     { id: 'fouls', type: 'number' },
-    { id: 'avr', type: 'number' }
+    { id: 'average_rating', type: 'number' }
 ];
 
 export const nationalityFlagMap = [
