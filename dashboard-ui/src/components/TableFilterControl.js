@@ -10,16 +10,33 @@ import Input from '@material-ui/core/Input';
 import Checkbox from '@material-ui/core/Checkbox';
 import ListItemText from '@material-ui/core/ListItemText';
 import Chip from '@material-ui/core/Chip';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { capitalizeLabel } from '../utils';
 
+const useStyles = makeStyles((theme) => ({
+    formControl: {
+        margin: theme.spacing(1),
+        minWidth: 150,
+        maxWidth: 300
+    },
+    chips: {
+        display: 'flex',
+        flexWrap: 'wrap'
+    },
+    chip: {
+        margin: 2
+    }
+}));
+
 export default function TableFilterControl({ currentValues, handleChangeFn, allPossibleValues, allValuesSelectedLabel,
-    inputLabelText, labelIdFragment, customStyles, customClasses }) {
+    inputLabelText, labelIdFragment, customStyles }) {
+    const classes = useStyles();
     const selectLabelId = `${labelIdFragment}-select-label`;
     const checkboxId = `${labelIdFragment}-checkbox`;
 
     return (
-        <FormControl className={ customClasses.formControl } style={ customStyles }>
+        <FormControl className={ classes.formControl } style={ customStyles }>
             <InputLabel id={ selectLabelId }>{ inputLabelText }</InputLabel>
             <Select
                 labelId={ selectLabelId }
@@ -35,16 +52,16 @@ export default function TableFilterControl({ currentValues, handleChangeFn, allP
                         renderedValue = (
                             <Chip key={ allValuesSelectedLabel }
                                 label={ allValuesSelectedLabel }
-                                className={ customClasses.chip }
+                                className={ classes.chip }
                             />
                         );
                     } else {
                         renderedValue = selected.map((value) => (
-                            <Chip key={ value } label={ capitalizeLabel(value) } className={ customClasses.chip } />
+                            <Chip key={ value } label={ capitalizeLabel(value) } className={ classes.chip } />
                         ));
                     }
                     return (
-                        <div className={customClasses.chips}>
+                        <div className={classes.chips}>
                             { renderedValue }
                         </div>
                     );
@@ -72,6 +89,5 @@ TableFilterControl.propTypes = {
     allValuesSelectedLabel: PropTypes.string,
     inputLabelText: PropTypes.string,
     labelIdFragment: PropTypes.string,
-    customStyles: PropTypes.object,
-    customClasses: PropTypes.arrayOf(PropTypes.string)
+    customStyles: PropTypes.object
 };

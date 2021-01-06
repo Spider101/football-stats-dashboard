@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 
 import Grid from '@material-ui/core/Grid';
 
-import { makeStyles } from '@material-ui/core/styles';
-
 import { allSquadHubTableHeaders, moraleIconsMap, nationalityFlagMap } from '../utils';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
@@ -59,21 +57,6 @@ const buildRowDataForSquadTable = (players) => {
     });
 };
 
-const useStyles = makeStyles((theme) => ({
-    formControl: {
-        margin: theme.spacing(1),
-        minWidth: 150,
-        maxWidth: 300
-    },
-    chips: {
-        display: 'flex',
-        flexWrap: 'wrap'
-    },
-    chip: {
-        margin: 2
-    }
-}));
-
 const filterColumns = (originalHeaders, filteredRowData, selectedColumns) => {
     const headers = originalHeaders.filter(header => selectedColumns.includes(header.id));
     const updatedRows = filteredRowData.map(rowData =>
@@ -92,7 +75,6 @@ const filterRowsByRole = (originalRowData, roles) => originalRowData.filter(rowD
 });
 
 export default function SquadHubView({ players }) {
-    const classes = useStyles();
     const allSquadHubTableHeaderNames = allSquadHubTableHeaders.map(header => header.id);
 
     const [columnNames, setColumnNames] = React.useState(allSquadHubTableHeaderNames);
@@ -118,7 +100,6 @@ export default function SquadHubView({ players }) {
                     allValuesSelectedLabel='All Columns'
                     inputLabelText='Configure Columns'
                     labelIdFragment='configure-columns'
-                    customClasses={ classes }
                 />
             </Grid>
             <Grid item xs={6}>
@@ -129,7 +110,6 @@ export default function SquadHubView({ players }) {
                     allValuesSelectedLabel='All Players'
                     inputLabelText='Filter Players'
                     labelIdFragment='filter-rows'
-                    customClasses={ classes }
                     customStyles={{ float: 'right' }}
                 />
             </Grid>
