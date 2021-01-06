@@ -8,24 +8,24 @@ import ReactApexChart from 'react-apexcharts';
 import { allMatchPerformanceTableHeaders } from '../utils';
 
 const convertCamelCaseToSnakeCase = (camelCaseString) =>
-    camelCaseString.replace(/([a-z])([A-Z])/g, '$1 $2')
-        .split(' ')
-        .map(str => str[0].toLowerCase() + str.slice(1))
-        .join('_');
+    camelCaseString.replace(/([a-z])([A-Z])/g, '$1_$2')
+        .toLowerCase();
 
-const buildMatchPerformanceData = competitionPerformance => {
-    return Object.entries(competitionPerformance).map(([key, value]) => {
-        const label = key === 'id' ? 'competition' : key === 'matchRatingHistory' ? 'averageRating' : key;
+const buildMatchPerformanceData = competitionData => {
+    return competitionData.map(competitionPerformance => {
+        return Object.entries(competitionPerformance).map(([key, value]) => {
+            const label = key === 'id' ? 'competition' : key === 'matchRatingHistory' ? 'averageRating' : key;
 
-        const data = key === 'matchRatingHistory'
-            ? value.reduce((a, b) => a + b, 0) / value.length
-            : key.includes('percentage') ? (value/100).toFixed(2) : value;
+            const data = key === 'matchRatingHistory'
+                ? value.reduce((a, b) => a + b, 0) / value.length
+                : key.includes('percentage') ? (value/100).toFixed(2) : value;
 
-        return {
-            id: convertCamelCaseToSnakeCase(label),
-            type: 'number',
-            data
-        };
+            return {
+                id: convertCamelCaseToSnakeCase(label),
+                type: 'number',
+                data
+            };
+        });
     });
 };
 
@@ -39,7 +39,7 @@ const getOptions = chartTitle => ({
     }
 });
 
-export default function MatchPerformanceView({ playerPerformance }) {
+export default function MatchPerformanceView({ playerPerformance: { competitions } }) {
     const chartTitle = 'Player Performance over last 10 matches';
 
     const matchPerformanceData = {
