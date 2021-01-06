@@ -6,6 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import SortableTable from '../widgets/SortableTable';
 import ReactApexChart from 'react-apexcharts';
 import { allMatchPerformanceTableHeaders } from '../utils';
+import TableFilterControl from '../components/TableFilterControl';
 
 const convertCamelCaseToSnakeCase = (camelCaseString) =>
     camelCaseString.replace(/([a-z])([A-Z])/g, '$1_$2')
@@ -29,6 +30,18 @@ const buildMatchPerformanceData = competitionData => {
     });
 };
 
+const filterMatchRatingsByCompetitions = (competitionData, competitionsList) =>
+    competitionData
+        .filter(competition => competitionsList.includes(competition.id))
+        .map(competition => competition.matchRatingHistory)
+        .flat();
+
+const filterMatchPerformancesByCompetitions = (matchPerformances, competitionNames) =>
+    matchPerformances.filter(matchPerformance => {
+        const competitionData = matchPerformance.find(entity => entity.id === 'competition');
+        return competitionNames.includes(competitionData.data);
+    });
+
 const getOptions = chartTitle => ({
     dataLabels: { enabled: false },
     title: { text: chartTitle, align: 'left', style: { fontFamily: 'Roboto' } },
@@ -42,19 +55,36 @@ const getOptions = chartTitle => ({
 export default function MatchPerformanceView({ playerPerformance: { competitions } }) {
     const chartTitle = 'Player Performance over last 10 matches';
 
+    const allCompetitionNames = competitions.map(competition => competition.id).flat();
+
+    const [competitionNames, setCompetitionNames] = React.useState(allCompetitionNames);
+
+    const handleChange = (event) => setCompetitionNames(event.target.value);
+
+    const rowData = React.useMemo(() => buildMatchPerformanceData(competitions), [competitions]);
+
     const matchPerformanceData = {
         headers: allMatchPerformanceTableHeaders,
-        rows: playerPerformance.competitions
-            .map(competition => buildMatchPerformanceData(competition))
+        rows: filterMatchPerformancesByCompetitions(rowData, competitionNames)
     };
 
     const chartData = [{
         name: 'Match Rating',
-        data: playerPerformance.competitions.map(competition => competition.matchRatingHistory).flat()
+        data: filterMatchRatingsByCompetitions(competitions, competitionNames)
     }];
 
     return (
         <Grid container spacing={2}>
+            <Grid item xs={6}>
+                <TableFilterControl
+                    currentValues={ competitionNames }
+                    handleChangeFn={ handleChange }
+                    allPossibleValues={ allCompetitionNames }
+                    allValuesSelectedLabel='All Competitions'
+                    inputLabelText='Filter Competitions'
+                    labelIdFragment='filter-competitions'
+                />
+            </Grid>
             <Grid item xs={12}>
                 <ReactApexChart
                     options={ getOptions(chartTitle) }
