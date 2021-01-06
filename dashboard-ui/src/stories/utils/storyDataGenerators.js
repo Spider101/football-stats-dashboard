@@ -1,6 +1,6 @@
 import faker from 'faker';
 import _ from 'lodash';
-import { allSquadHubTableHeaders } from '../../utils';
+import { allMatchPerformanceTableHeaders, allSquadHubTableHeaders } from '../../utils';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
@@ -199,6 +199,28 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
     })
 });
 
+// TODO: simplify this to match what we are sending into the actual table
+export const getMatchPerformanceTableData = (numCompetitions) => ({
+    headers: allMatchPerformanceTableHeaders,
+    rows: [ ...Array(numCompetitions) ].map(() => {
+        return [
+            { id: 'competition', type: 'string', data: faker.hacker.noun() },
+            { id: 'apps', type: 'number', data: getRandomNumberInRange(30) },
+            { id: 'goals', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'pens', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'assts', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'pom', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'yel', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'red', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'tck', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'pas%', type: 'string', data: getRandomNumberInRange(25) + '%' },
+            { id: 'drb', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'fouls', type: 'number', data: getRandomNumberInRange(25) },
+            { id: 'avr', type: 'number', data: getRandomNumberInRange(25) }
+        ];
+    })
+});
+
 export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
     return {
         players: [ ...Array(numPlayers) ].map(() => ({
@@ -212,3 +234,30 @@ export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
         }))
     };
 };
+
+export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) => ({
+    competitions: [ ...Array(numCompetitions) ].map(() => {
+        let competitionData = {
+            id: faker.hacker.noun(),
+            appearances: getRandomNumberInRange(30),
+            goals: getRandomNumberInRange(30),
+            penalties: getRandomNumberInRange(25),
+            assists: getRandomNumberInRange(25),
+            playerOfTheMatch: getRandomNumberInRange(10),
+            yellowCards: getRandomNumberInRange(25),
+            redCards: getRandomNumberInRange(25),
+            tackles: getRandomNumberInRange(25),
+            passCompletionRate: getRandomNumberInRange(25),
+            dribbles: getRandomNumberInRange(25),
+            fouls: getRandomNumberInRange(25)
+        };
+
+        return numMatches === 0 ? {
+            ...competitionData,
+            averageRating: getRandomNumberInRange(10),
+        } : {
+            ...competitionData,
+            matchRatingHistory: [ ...Array(numMatches) ].map(() => getRandomNumberInRange(10)),
+        };
+    })
+});

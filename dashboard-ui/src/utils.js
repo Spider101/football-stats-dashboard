@@ -13,6 +13,23 @@ export const allSquadHubTableHeaders = [
     { id: 'current_ability', type: 'number' }
 ];
 
+// TODO: this will be returned from the service in future; remove this then
+export const allMatchPerformanceTableHeaders = [
+    { id: 'competition', type: 'string' },
+    { id: 'appearances', type: 'number' },
+    { id: 'goals', type: 'number' },
+    { id: 'penalties', type: 'number' },
+    { id: 'assists', type: 'number' },
+    { id: 'player_of_the_match', type: 'number' },
+    { id: 'yellow_cards', type: 'number' },
+    { id: 'red_cards', type: 'number' },
+    { id: 'tackles', type: 'number' },
+    { id: 'pass_completion_rate', type: 'string' },
+    { id: 'dribbles', type: 'number' },
+    { id: 'fouls', type: 'number' },
+    { id: 'average_rating', type: 'number' }
+];
+
 export const nationalityFlagMap = [
     { nationality: 'France', flag: 'https://upload.wikimedia.org/wikipedia/commons/6/62/Flag_of_France.png' },
     { nationality: 'Germany', flag: 'https://freepngimg.com/thumb/germany_flag/1-2-germany-flag-picture.png' },
