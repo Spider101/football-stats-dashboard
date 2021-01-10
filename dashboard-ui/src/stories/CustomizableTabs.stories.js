@@ -14,6 +14,7 @@ export const Default = () => (
         onTabChange={ action('Tab Change Handler') }
         ariaLabel="Basic Tab"
         isFullWidth={ false }
+        tabLabels={['Basic Tab']}
     >
         <TabPanel value={0} index={0}>
             Item 1
@@ -25,8 +26,9 @@ export const FixedWidth = () => (
     <CustomizableTabs
         tabValue={0}
         onTabChange={ action('Tab Change Handler') }
-        ariaLabel="Simple Fixed Width Tabs"
+        ariaLabel="Simple Fixed Width Tab"
         isFullWidth={ true }
+        tabLabels={['Simple Fixed Width Tab']}
     >
         <TabPanel value={0} index={0}>
             Item 1
