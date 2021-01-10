@@ -1,8 +1,14 @@
 import React from 'react';
+import { BrowserRouter as Router, Link } from 'react-router-dom';
+
 import { action } from '@storybook/addon-actions';
 
 import MenuItem from '../components/MenuItem';
 import Commute from '@material-ui/icons/Commute';
+
+function StubComponent() {
+    return <div>Dummy Component</div>;
+}
 
 export const actionsData = {
     onSelectMenuItem: action('onSelectMenuItem')
@@ -13,6 +19,16 @@ export const menuItemData = {
     icon: <Commute />
 };
 
+const menuItemDataWithRouting = {
+    ...menuItemData,
+    componentType: Link,
+    routeComponent: StubComponent
+};
+
+const actionsDataWithRouting = {
+    onSelectMenuItem: action('onSelectMenuItem for React Router')
+};
+
 export default {
     component: MenuItem,
     title: 'Components/Globals/MenuItem',
@@ -20,3 +36,9 @@ export default {
 };
 
 export const Default = () => <MenuItem { ...menuItemData }  { ...actionsData }/>;
+
+export const WithReactRouter = () => (
+    <Router>
+        <MenuItem {...menuItemDataWithRouting } { ...actionsDataWithRouting } />
+    </Router>
+);
