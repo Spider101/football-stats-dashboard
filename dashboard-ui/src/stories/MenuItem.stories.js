@@ -6,10 +6,6 @@ import { action } from '@storybook/addon-actions';
 import MenuItem from '../components/MenuItem';
 import Commute from '@material-ui/icons/Commute';
 
-function StubComponent() {
-    return <div>Dummy Component</div>;
-}
-
 export const actionsData = {
     onSelectMenuItem: action('onSelectMenuItem')
 };
@@ -22,7 +18,7 @@ export const menuItemData = {
 const menuItemDataWithRouting = {
     ...menuItemData,
     componentType: Link,
-    routeComponent: StubComponent
+    routePath: '/dummyRoute'
 };
 
 const actionsDataWithRouting = {
