@@ -10,19 +10,21 @@ export const actionsData = {
     onSelectMenuItem: action('onSelectMenuItem')
 };
 
-export const menuItemData = {
+export const selectedMenuItemData = {
     text: 'Menu Item Solo',
+    menuItemIndex: 0,
     icon: <Commute />
 };
 
-const menuItemDataWithRouting = {
-    ...menuItemData,
-    componentType: Link,
-    routePath: '/dummyRoute'
+const unselectedMenuItemData = {
+    ...selectedMenuItemData,
+    menuItemIndex: 1
 };
 
-const actionsDataWithRouting = {
-    onSelectMenuItem: action('onSelectMenuItem for React Router')
+const selectedMenuItemDataWithRouting = {
+    ...selectedMenuItemData,
+    componentType: Link,
+    routePath: '/dummyRoute'
 };
 
 export default {
@@ -31,10 +33,13 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-export const Default = () => <MenuItem { ...menuItemData }  { ...actionsData }/>;
+
+export const Selected = () => <MenuItem { ...selectedMenuItemData } />;
+
+export const Unselected = () => <MenuItem { ...unselectedMenuItemData } />;
 
 export const WithReactRouter = () => (
     <Router>
-        <MenuItem {...menuItemDataWithRouting } { ...actionsDataWithRouting } />
+        <MenuItem {...selectedMenuItemDataWithRouting }  />
     </Router>
 );
