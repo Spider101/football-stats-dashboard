@@ -6,12 +6,8 @@ import MenuItemGroup from './MenuItemGroup';
 import MenuItem from '../components/MenuItem';
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import List from '@material-ui/core/List';
 import Drawer from '@material-ui/core/Drawer';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import IconButton from '@material-ui/core/IconButton';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
@@ -20,7 +16,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 const drawerWidth = 240;
 const useStyles = makeStyles((theme) => ({
     settingsRoot: {
-        display: 'flex'
+        marginTop: 'auto'
     },
     toolbar: {
         padding: theme.spacing(0, 1),
@@ -82,9 +78,15 @@ export default function Sidebar({ sideBarItems: initialSideBarItems }) {
         handleMenuGroupToggle(null, true);
     };
 
+    const settingsMenuItemData = {
+        text: 'Settings',
+        icon: <SettingsIcon />,
+        onSelectMenuItem: x => x
+        // TODO: add router specific props when settings page is ready
+    };
+
     return (
         <div className={ classes.settingsRoot }>
-            <CssBaseline />
             <Drawer
                 variant="permanent"
                 className={ clsx(classes.drawer, {
@@ -104,20 +106,24 @@ export default function Sidebar({ sideBarItems: initialSideBarItems }) {
                     </IconButton>
                 </div>
                 <Divider />
-                { sideBarItems.map(sideBarItem => (sideBarItem.isGroup ?
-                    <MenuItemGroup
-                        menuGroup={ sideBarItem.listItem }
-                        onCollapseMenuItemGroup={ handleMenuGroupToggle }
-                    /> : <MenuItem { ...sideBarItem.listItem }/> )) }
-                <Divider />
-                <List className={ classes.settingsRoot }>
-                    <ListItem button>
-                        <ListItemIcon>
-                            <SettingsIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Settings"/>
-                    </ListItem>
+                <List>
+                    {
+                        sideBarItems.map((sideBarItem, _idx) => (sideBarItem.isGroup
+                            ? <MenuItemGroup
+                                key={ _idx }
+                                menuGroup={ sideBarItem.listItem }
+                                onCollapseMenuItemGroup={ handleMenuGroupToggle }
+                            />
+                            : <MenuItem key={ _idx } { ...sideBarItem.listItem }/> )
+                        )
+                    }
                 </List>
+                <div className={ classes.settingsRoot }>
+                    <Divider />
+                    <List>
+                        <MenuItem { ...settingsMenuItemData } />
+                    </List>
+                </div>
             </Drawer>
         </div>
     );
