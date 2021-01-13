@@ -2,7 +2,7 @@ import React from 'react';
 
 import Sidebar from '../widgets/Sidebar';
 import { menuGroupData } from './MenuItemGroup.stories';
-import { actionsData, menuItemData } from './MenuItem.stories';
+import { actionsData, selectedMenuItemData as menuItemData } from './MenuItem.stories';
 
 const defaultSideBarData = [{
     isGroup: true,
