@@ -8,14 +8,9 @@ import React from 'react';
 //     deepOrange
 // } from '@material-ui/core/colors';
 
-// import AppbarMenu from './components/AppBarMenu';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-
-import { HomeRoute, SquadHubRoute } from './routes';
-import Home from './pages/Home';
-import SquadHub from './pages/SquadHub';
-import Navigator from './Navigator';
+import Layout from './Layout';
 
 function App() {
     // const [darkState, setDarkState] = React.useState(false);
@@ -38,11 +33,7 @@ function App() {
     return (
         <div className="App">
             <Router>
-                <Navigator />
-                <Switch>
-                    <Route exact path={ HomeRoute } component={ Home }/>
-                    <Route path={ SquadHubRoute} component={ SquadHub } />
-                </Switch>
+                <Layout />
             </Router>
         </div>
     );
