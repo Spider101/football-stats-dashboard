@@ -30,6 +30,8 @@ export const allMatchPerformanceTableHeaders = [
     { id: 'average_rating', type: 'number' }
 ];
 
+export const DRAWER_WIDTH = 240;
+
 export const nationalityFlagMap = [
     { nationality: 'France', flag: 'https://upload.wikimedia.org/wikipedia/commons/6/62/Flag_of_France.png' },
     { nationality: 'Germany', flag: 'https://freepngimg.com/thumb/germany_flag/1-2-germany-flag-picture.png' },
