@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import clsx from 'clsx';
 
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
@@ -9,10 +10,29 @@ import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
 import { fade, makeStyles } from '@material-ui/core/styles';
+import { DRAWER_WIDTH } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
     grow: {
         flexGrow: 1
+    },
+    appBar: {
+        zIndex: theme.zIndex.drawer + 1,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        })
+    },
+    appBarShift: {
+        marginLeft: DRAWER_WIDTH,
+        width: `calc(100% - ${DRAWER_WIDTH}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        })
+    },
+    hide: {
+        display: 'none'
     },
     menuButton: {
         marginRight: theme.spacing(2),
@@ -62,7 +82,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function AppBarMenu({ menu: { title, teamColor }}) {
+export default function AppBarMenu({ menu: { title, teamColor }, onClickHandler, isOpen }) {
     const classes = useStyles();
 
     const teamStyle = {
@@ -70,12 +90,24 @@ export default function AppBarMenu({ menu: { title, teamColor }}) {
     };
 
     return (
-        <AppBar style={teamStyle} className={classes.grow} position="static">
+        <AppBar
+            style={teamStyle}
+            className={
+                clsx(classes.appBar, {
+                    [classes.appBarShift]: isOpen
+                })
+            }
+            position="fixed"
+        >
             <Toolbar>
                 <IconButton
                     edge="start"
-                    className={classes.menuButton}
+                    className={
+                        clsx(classes.menuButton, {
+                            [classes.hide]: isOpen
+                        })}
                     color="inherit"
+                    onClick={  onClickHandler }
                 >
                     <MenuIcon/>
                 </IconButton>
@@ -103,5 +135,7 @@ AppBarMenu.propTypes = {
     menu: PropTypes.shape({
         title: PropTypes.string,
         teamColor: PropTypes.string
-    })
+    }),
+    onClickHandler: PropTypes.func,
+    isOpen: PropTypes.bool
 };
