@@ -55,6 +55,11 @@ const useStyles = makeStyles((theme) => ({
 export default function Sidebar({ sideBarItems: initialSideBarItems, onClickHandler, isOpen }) {
     const classes = useStyles();
     const [ sideBarItems, updateSideBarItems ] = React.useState(initialSideBarItems);
+    const [selectedItem, setSelectedItem] = React.useState(-1);
+
+    const handleClick = (event, itemIndex) => {
+        setSelectedItem(itemIndex);
+    };
 
     const handleMenuGroupToggle = (id, shouldToggleAll = false) => {
         const updatedSideBarItems = sideBarItems.map(sideBarItem => {
@@ -78,7 +83,9 @@ export default function Sidebar({ sideBarItems: initialSideBarItems, onClickHand
     const settingsMenuItemData = {
         text: 'Settings',
         icon: <SettingsIcon />,
-        onSelectMenuItem: x => x
+        selectedItem,
+        handleMenuItemClick: handleClick,
+        menuItemIndex: sideBarItems.length
         // TODO: add router specific props when settings page is ready
     };
 
@@ -110,7 +117,12 @@ export default function Sidebar({ sideBarItems: initialSideBarItems, onClickHand
                             menuGroup={ sideBarItem.listItem }
                             onCollapseMenuItemGroup={ handleMenuGroupToggle }
                         />
-                        : <MenuItem key={ _idx } { ...sideBarItem.listItem }/> )
+                        : <MenuItem
+                            key={ _idx }
+                            selectedItem={ selectedItem }
+                            handleMenuItemClick={ handleClick }
+                            { ...sideBarItem.listItem }
+                        />)
                     )
                 }
             </List>

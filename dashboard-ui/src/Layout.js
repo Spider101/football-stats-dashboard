@@ -39,11 +39,12 @@ export default function Layout() {
         setOpen(false);
     };
 
-    const sideBarItems = sideBarData.map(sidebarItemData => ({
+    const sideBarItems = sideBarData.map((sidebarItemData, _idx) => ({
         isGroup: false,
         listItem: {
             text: sidebarItemData.text,
             icon: sidebarItemData.icon,
+            menuItemIndex: _idx,
             componentType: Link,
             routePath: sidebarItemData.routePath
         }
