@@ -12,13 +12,15 @@ export const actionsData = {
 
 export const selectedMenuItemData = {
     text: 'Menu Item Solo',
+    selectedItem: 0,
     menuItemIndex: 0,
     icon: <Commute />
 };
 
 const unselectedMenuItemData = {
     ...selectedMenuItemData,
-    menuItemIndex: 1
+    selectedItem: 1,
+    menuItemIndex: 0
 };
 
 const selectedMenuItemDataWithRouting = {
