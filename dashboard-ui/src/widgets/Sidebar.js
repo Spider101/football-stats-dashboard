@@ -6,35 +6,34 @@ import MenuItemGroup from './MenuItemGroup';
 import MenuItem from '../components/MenuItem';
 import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import List from '@material-ui/core/List';
 import Drawer from '@material-ui/core/Drawer';
-import CssBaseline from '@material-ui/core/CssBaseline';
 import IconButton from '@material-ui/core/IconButton';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
-const drawerWidth = 240;
+import { DRAWER_WIDTH } from '../utils';
+
 const useStyles = makeStyles((theme) => ({
     settingsRoot: {
-        display: 'flex'
+        marginTop: 'auto'
     },
     toolbar: {
-        padding: theme.spacing(0, 1),
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
+        padding: theme.spacing(0, 1),
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar
     },
     drawer: {
-        width: drawerWidth,
+        width: DRAWER_WIDTH,
         flexShrink: 0,
         whiteSpace: 'nowrap'
     },
     drawerOpen: {
-        width: drawerWidth,
+        width: DRAWER_WIDTH,
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
@@ -53,10 +52,14 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function Sidebar({ sideBarItems: initialSideBarItems }) {
+export default function Sidebar({ sideBarItems: initialSideBarItems, onClickHandler, isOpen }) {
     const classes = useStyles();
     const [ sideBarItems, updateSideBarItems ] = React.useState(initialSideBarItems);
-    const [ open, setOpen ] = React.useState(true);
+    const [selectedItem, setSelectedItem] = React.useState(-1);
+
+    const handleClick = (event, itemIndex) => {
+        setSelectedItem(itemIndex);
+    };
 
     const handleMenuGroupToggle = (id, shouldToggleAll = false) => {
         const updatedSideBarItems = sideBarItems.map(sideBarItem => {
@@ -70,56 +73,66 @@ export default function Sidebar({ sideBarItems: initialSideBarItems }) {
                         // parent (false) component. If it is called from the child component, the `open` flag has
                         // already been set so we can use it's value directly, otherwise toggle it to reflect the value
                         // it is going to be
-                        isItemTextWrapped: shouldToggleAll === !open
+                        isItemTextWrapped: shouldToggleAll === !isOpen
                     }
                 } : sideBarItem;
         });
         updateSideBarItems(updatedSideBarItems);
     };
 
-    const handleDrawerToggle = () => {
-        setOpen(!open);
-        handleMenuGroupToggle(null, true);
+    const settingsMenuItemData = {
+        text: 'Settings',
+        icon: <SettingsIcon />,
+        selectedItem,
+        handleMenuItemClick: handleClick,
+        menuItemIndex: sideBarItems.length
+        // TODO: add router specific props when settings page is ready
     };
 
     return (
-        <div className={ classes.settingsRoot }>
-            <CssBaseline />
-            <Drawer
-                variant="permanent"
-                className={ clsx(classes.drawer, {
-                    [classes.drawerOpen]: open,
-                    [classes.drawerClose]: !open
-                })}
-                classes={{
-                    paper: clsx({
-                        [classes.drawerOpen]: open,
-                        [classes.drawerClose]: !open
-                    })
-                }}
-            >
-                <div className={classes.toolbar}>
-                    <IconButton onClick={ () => handleDrawerToggle() }>
-                        { !open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                    </IconButton>
-                </div>
+        <Drawer
+            variant="permanent"
+            className={ clsx(classes.drawer, {
+                [classes.drawerOpen]: isOpen,
+                [classes.drawerClose]: !isOpen
+            })}
+            classes={{
+                paper: clsx({
+                    [classes.drawerOpen]: isOpen,
+                    [classes.drawerClose]: !isOpen
+                })
+            }}
+        >
+            <div className={classes.toolbar}>
+                <IconButton onClick={ onClickHandler }>
+                    { !isOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                </IconButton>
+            </div>
+            <Divider />
+            <List>
+                {
+                    sideBarItems.map((sideBarItem, _idx) => (sideBarItem.isGroup
+                        ? <MenuItemGroup
+                            key={ _idx }
+                            menuGroup={ sideBarItem.listItem }
+                            onCollapseMenuItemGroup={ handleMenuGroupToggle }
+                        />
+                        : <MenuItem
+                            key={ _idx }
+                            selectedItem={ selectedItem }
+                            handleMenuItemClick={ handleClick }
+                            { ...sideBarItem.listItem }
+                        />)
+                    )
+                }
+            </List>
+            <div className={ classes.settingsRoot }>
                 <Divider />
-                { sideBarItems.map(sideBarItem => (sideBarItem.isGroup ?
-                    <MenuItemGroup
-                        menuGroup={ sideBarItem.listItem }
-                        onCollapseMenuItemGroup={ handleMenuGroupToggle }
-                    /> : <MenuItem { ...sideBarItem.listItem }/> )) }
-                <Divider />
-                <List className={ classes.settingsRoot }>
-                    <ListItem button>
-                        <ListItemIcon>
-                            <SettingsIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Settings"/>
-                    </ListItem>
+                <List>
+                    <MenuItem { ...settingsMenuItemData } />
                 </List>
-            </Drawer>
-        </div>
+            </div>
+        </Drawer>
     );
 }
 
@@ -127,5 +140,7 @@ Sidebar.propTypes = {
     sideBarItems: PropTypes.arrayOf(PropTypes.shape({
         isGroup: PropTypes.bool,
         listItem: PropTypes.object
-    }))
+    })),
+    onClickHandler: PropTypes.func,
+    isOpen: PropTypes.bool
 };

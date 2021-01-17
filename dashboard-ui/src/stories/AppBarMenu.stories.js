@@ -1,11 +1,16 @@
 import React from 'react';
-// import { action } from "@storybook/addon-actions";
+import { action } from '@storybook/addon-actions';
 
 import AppBarMenu from '../components/AppBarMenu';
 
-export const menuData = {
-    title: 'Manchester United',
-    teamColor: 'red'
+// TODO: add storybook controls to dynamically change the isOpen prop
+const menuData = {
+    menu: {
+        title: 'Manchester United',
+        teamColor: 'red',
+    },
+    onClickHandler: action('open-menu'),
+    isOpen: false
 };
 
 export default {
@@ -14,5 +19,6 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-export const Default = () => <AppBarMenu menu={{...menuData}}/>;
+export const Default = () => <AppBarMenu { ...menuData } />;
 
+export const MenuOpened = () => <AppBarMenu { ...{ ...menuData, isOpen: true } } />;

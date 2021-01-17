@@ -13,10 +13,14 @@ export const menuGroupData = {
     groupIcon: <Assessment />,
     menuItems: [{
         ...actionsData,
+        selectedItem: -1,
+        menuItemIndex: 0,
         text: 'Menu Item A',
         icon: <Ballot />
     }, {
         ...actionsData,
+        selectedItem: -1,
+        menuItemIndex: 1,
         text: 'Menu Item B',
         icon: <Code />
     }],
@@ -24,7 +28,7 @@ export const menuGroupData = {
 };
 
 const menuGroupActionsData = {
-    onCollapseMenuItemGroup: action('onCollapseMenuItemGroup')
+    onCollapseMenuItemGroup: action('collapse-menu-group')
 };
 
 export default {

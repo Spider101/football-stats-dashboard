@@ -1,8 +1,9 @@
 import React from 'react';
+import { action } from '@storybook/addon-actions';
 
 import Sidebar from '../widgets/Sidebar';
 import { menuGroupData } from './MenuItemGroup.stories';
-import { actionsData, menuItemData } from './MenuItem.stories';
+import { actionsData, selectedMenuItemData as menuItemData } from './MenuItem.stories';
 
 const defaultSideBarData = [{
     isGroup: true,
@@ -33,6 +34,26 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-export const Default = () => <Sidebar sideBarItems={ sideBarData.default } />;
+export const Default = () => (
+    <Sidebar
+        sideBarItems={ sideBarData.default }
+        onClickHandler={ action('open-drawer') }
+        isOpen={ true }
+    />
+);
 
-export const LongMenuGroupTitle = () => <Sidebar sideBarItems={ sideBarData.longGroupTitle } />;
+export const ClosedDrawer = () => (
+    <Sidebar
+        sideBarItems={ sideBarData.default }
+        onClickHandler={ action('open-drawer') }
+        isOpen={ false }
+    />
+);
+
+export const LongMenuGroupTitle = () => (
+    <Sidebar
+        sideBarItems={ sideBarData.longGroupTitle }
+        onClickHandler={ action('open-drawer') }
+        isOpen={ true }
+    />
+);
