@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3)
+        padding: theme.spacing(10, 3)
     },
     view: {
         display: 'flex',
@@ -50,6 +50,7 @@ export default function Layout() {
         }
     }));
 
+    // TODO: this should be returned from backend; remove it when ready
     const menuData = {
         title: 'Dummy App Bar Menu Title',
         teamColor: 'red'
