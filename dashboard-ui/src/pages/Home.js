@@ -2,9 +2,9 @@ import React from 'react';
 
 const Home = () => {
     return (
-        <div>
-           Home Page
-        </div>
+        <>
+           <h2 style={{textAlign: 'center', width: '100%'}}>Home Page</h2>
+        </>
     );
 };
 
