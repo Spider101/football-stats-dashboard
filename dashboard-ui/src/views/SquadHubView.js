@@ -75,13 +75,19 @@ const filterRowsByRole = (originalRowData, roles) => originalRowData.filter(rowD
 });
 
 export default function SquadHubView({ players }) {
-    const allSquadHubTableHeaderNames = allSquadHubTableHeaders.map(header => header.id);
+    const [playerRoles, setPlayerRoles] = React.useState([]);
 
+    const allSquadHubTableHeaderNames = allSquadHubTableHeaders.map(header => header.id);
     const [columnNames, setColumnNames] = React.useState(allSquadHubTableHeaderNames);
 
-    // get all the distinct player roles in the dataset
-    const allPlayerRoles = [ ...new Set(players.map(player => player.role)) ];
-    const [playerRoles, setPlayerRoles] = React.useState(allPlayerRoles);
+    const allPlayerRoles = React.useRef([]);
+    React.useEffect(() => {
+        // get all the distinct player roles in the dataset
+        allPlayerRoles.current = [ ...new Set(players.map(player => player.role)) ];
+
+        setPlayerRoles(allPlayerRoles.current);
+    }, [players]);
+
 
     const handleChange = (changeHandler) => (event) => changeHandler(event.target.value);
 
@@ -89,7 +95,7 @@ export default function SquadHubView({ players }) {
     const rowData = React.useMemo(() => buildRowDataForSquadTable(players), [players]);
 
     const filteredRowData = filterRowsByRole(rowData, playerRoles);
-    
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -106,7 +112,7 @@ export default function SquadHubView({ players }) {
                 <TableFilterControl
                     currentValues={ playerRoles }
                     handleChangeFn={ handleChange(setPlayerRoles) }
-                    allPossibleValues={ allPlayerRoles }
+                    allPossibleValues={ allPlayerRoles.current }
                     allValuesSelectedLabel='All Players'
                     inputLabelText='Filter Players'
                     labelIdFragment='filter-rows'
