@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import Grid from '@material-ui/core/Grid';
 
@@ -12,7 +13,10 @@ const getSortValueForForm = (matchRatingsList) => matchRatingsList[0];
 
 const buildRowDataForSquadTable = (players) => {
     return players.map(player => {
-        return Object.entries(player).map(([key, value]) => {
+        const keys = Object.keys(player);
+        const playerId = player.playerId;
+        const keysToFocusOn = keys.filter(key => key != 'playerId');
+        return Object.entries(_.pick(player, keysToFocusOn)).map(([key, value]) => {
             let row = null;
             switch(key) {
             case 'wages':
@@ -47,6 +51,14 @@ const buildRowDataForSquadTable = (players) => {
                     },
                     metadata: { sortValue: getSortValueForForm(value) }
                 };
+                break;
+            case 'name':
+                row = {
+                    id: key,
+                    type: 'link',
+                    data: value,
+                    metadata: { playerId }
+                }
                 break;
             default:
                 row = { id: key, type: isNaN(value) ? 'string' : 'number', data: value };
@@ -128,6 +140,7 @@ export default function SquadHubView({ players }) {
 
 SquadHubView.propTypes = {
     players: PropTypes.arrayOf(PropTypes.shape({
+        playerId: PropTypes.number,
         name: PropTypes.string,
         nationality: PropTypes.string,
         role: PropTypes.string,
