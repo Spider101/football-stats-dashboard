@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import { useThemePreference } from './themePreferenceProvider';
 
 const ChartOptionsContext = React.createContext();
@@ -18,6 +20,10 @@ function ChartOptionsProvider({ children }) {
         </ChartOptionsContext.Provider>
     );
 }
+
+ChartOptionsProvider.propTypes = {
+    children: PropTypes.node
+};
 
 function useGlobalChartOptions() {
     const globalChartOptions = React.useContext(ChartOptionsContext);

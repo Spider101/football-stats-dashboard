@@ -1,4 +1,6 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 
 const ThemePreferenceContext = React.createContext();
@@ -12,6 +14,10 @@ function ThemePreferenceProvider({ children }) {
         </ThemePreferenceContext.Provider>
     );
 }
+
+ThemePreferenceProvider.propTypes = {
+    children: PropTypes.node
+};
 
 function useThemePreference() {
     const prefersDarkMode = React.useContext(ThemePreferenceContext);
