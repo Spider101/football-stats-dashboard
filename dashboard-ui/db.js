@@ -21,6 +21,7 @@ function getSquadHubPlayerData(numPlayers, nationsList, moraleList) {
         }
 
         const player = {
+            playerId: i,
             name: faker.name.findName(),
             nationality: _.sample(nationsList),
             role: faker.hacker.noun(),
