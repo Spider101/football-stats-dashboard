@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter as Router } from "react-router-dom";
 
 import SortableTable from '../widgets/SortableTable';
 
@@ -12,6 +13,7 @@ export default {
 };
 
 const defaultSquadHubTableData = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap);
+const squadHubTableDataWithRouterLink = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap, true);
 const squadHubTableDataWithNoRows = {
     headers: defaultSquadHubTableData.headers,
     rows: []
@@ -22,6 +24,12 @@ const squadHubTableDataWithNoData = {
 };
 
 export const Default = () => <SortableTable { ...defaultSquadHubTableData } />;
+
+export const WithRouterLink = () => (
+    <Router>
+        <SortableTable { ...squadHubTableDataWithRouterLink } />;
+    </Router>
+);
 
 export const EmptyRows = () => <SortableTable { ...squadHubTableDataWithNoRows } />;
 

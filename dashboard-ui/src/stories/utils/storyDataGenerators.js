@@ -174,9 +174,9 @@ export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
     }));
 };
 
-export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap) => ({
+export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap, withLink = false) => ({
     headers: allSquadHubTableHeaders,
-    rows: [ ...Array(numRows) ].map(() => {
+    rows: [ ...Array(numRows) ].map((_0, idx) => {
         const country = _.sample(nationalityFlagMap);
         const moraleEntity = _.sample(moraleIconsMap);
         const chartData = {
@@ -187,8 +187,7 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
             }]
         };
 
-        return [
-            { id: 'name', type: 'string', data: faker.name.findName() },
+        const tableData = [
             { id: 'nationality', type: 'image', data: country.flag, metadata: { sortValue: country.nationality } },
             { id: 'role', type: 'string', data: faker.hacker.noun() },
             { id: 'wages', type: 'string', data: '$' + getRandomNumberInRange(1000, 100) + 'K'},
@@ -196,6 +195,14 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
             { id: 'morale', type: 'icon', data: moraleEntity.icon, metadata: { sortValue: moraleEntity.morale } },
             { id: 'current_ability', type: 'number', data: getRandomNumberInRange(MAX_OVERALL_VALUE, 1) }
         ];
+        const nameColumnData = withLink
+            ? { id: 'name', type: 'link', data: faker.name.findName(), metadata: { playerId: idx} }
+            : { id: 'name', type: 'string', data: faker.name.findName() }
+
+        return [
+            nameColumnData,
+            ...tableData
+        ]
     })
 });
 
@@ -223,7 +230,8 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
 
 export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
     return {
-        players: [ ...Array(numPlayers) ].map(() => ({
+        players: [ ...Array(numPlayers) ].map((_0, idx) => ({
+            playerId: idx,
             name: faker.name.findName(),
             nationality: _.sample(nationsList),
             role: faker.hacker.noun(),
