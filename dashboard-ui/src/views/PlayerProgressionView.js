@@ -52,7 +52,7 @@ const buildAttributeProgressChartData = (attributeCategoryData) => {
 
 };
 
-const buildOverProgressChartData = ({ history: overallHistory }) => ({
+const buildOverallProgressChartData = ({ history: overallHistory }) => ({
     overallData: [{ name: 'Player Ability', data: overallHistory }]
 });
 
@@ -66,11 +66,11 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles, pla
 
     const playerProgressionChartData = {
         playerAttributeProgressData: buildAttributeProgressChartData(attributeCategories),
-        playerOverallProgressData: buildOverProgressChartData(playerOverall)
+        playerOverallProgressData: buildOverallProgressChartData(playerOverall)
     };
 
     return (
-        <div>
+        <>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     <PlayerBioCard { ...playerMetadata } />
@@ -88,7 +88,7 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles, pla
                     </PlayerAttributesTable>
                 </Grid>
             </Grid>
-        </div>
+        </>
         
     );
 }
