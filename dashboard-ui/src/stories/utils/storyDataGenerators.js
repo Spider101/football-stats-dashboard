@@ -197,12 +197,12 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
         ];
         const nameColumnData = withLink
             ? { id: 'name', type: 'link', data: faker.name.findName(), metadata: { playerId: idx} }
-            : { id: 'name', type: 'string', data: faker.name.findName() }
+            : { id: 'name', type: 'string', data: faker.name.findName() };
 
         return [
             nameColumnData,
             ...tableData
-        ]
+        ];
     })
 });
 

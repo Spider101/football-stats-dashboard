@@ -8,4 +8,4 @@ export const getSquadHubData = async () => {
     const res = await fetch(`${baseUrl}/players`);
 
     return await res.json();
-}
+};

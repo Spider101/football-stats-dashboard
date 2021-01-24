@@ -1,6 +1,6 @@
 import React from 'react';
-import SquadHubView from "../views/SquadHubView";
-import { getSquadHubData } from "../clients/DashboardClient";
+import SquadHubView from '../views/SquadHubView';
+import { getSquadHubData } from '../clients/DashboardClient';
 
 const SquadHub = () => {
     const [squadHubViewData, setSquadHubViewData] = React.useState({ players: []});
@@ -11,7 +11,7 @@ const SquadHub = () => {
             setSquadHubViewData({
                 players: squadHubData
             });
-        }
+        };
 
         getSquadHubViewData();
     }, []);

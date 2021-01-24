@@ -15,7 +15,7 @@ const buildRowDataForSquadTable = (players) => {
     return players.map(player => {
         const keys = Object.keys(player);
         const playerId = player.playerId;
-        const keysToFocusOn = keys.filter(key => key != 'playerId');
+        const keysToFocusOn = keys.filter(key => key !== 'playerId');
         return Object.entries(_.pick(player, keysToFocusOn)).map(([key, value]) => {
             let row = null;
             switch(key) {
@@ -58,7 +58,7 @@ const buildRowDataForSquadTable = (players) => {
                     type: 'link',
                     data: value,
                     metadata: { playerId }
-                }
+                };
                 break;
             default:
                 row = { id: key, type: isNaN(value) ? 'string' : 'number', data: value };
