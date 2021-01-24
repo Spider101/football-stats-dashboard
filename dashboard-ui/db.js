@@ -1,4 +1,3 @@
-const { formatMs } = require('@material-ui/core');
 var faker = require('faker');
 var _ = require('lodash');
 
@@ -7,40 +6,187 @@ const moraleList = ['Angry', 'Happy'];
 
 const MAX_ATTR_VALUE = 20;
 const MAX_OVERALL_VALUE = 100;
+const NUM_MONTHS = 6;
 
 function getRandomNumberInRange(upper, lower = 0) {
     return Math.round(Math.random() * upper) + lower;
 }
 
-function getSquadHubPlayerData(numPlayers, nationsList, moraleList) {
-    const playerData = [];
-    for (let i = 0; i < numPlayers; i++) {
+function getSquadHubPlayerData(playerData, numPlayersInSquad, moraleList) {
+    const playersInSquad = _.sampleSize(playerData, numPlayersInSquad);
+    const squadPlayerData = [];
+    for (let i = 0; i < numPlayersInSquad; i++) {
         const formList = [];
         for (let j = 0; j < 5; j++) {
             formList.push(getRandomNumberInRange(MAX_ATTR_VALUE));
         }
 
-        const player = {
-            playerId: i,
-            name: faker.name.findName(),
-            nationality: _.sample(nationsList),
+        const squadPlayer = {
+            playerId: playersInSquad[i].id,
+            name: playersInSquad[i].metadata.name,
+            nationality: playersInSquad[i].metadata.country,
             role: faker.hacker.noun(),
             wages: getRandomNumberInRange(1000, 100),
             form: formList,
             morale: _.sample(moraleList),
-            current_ability: getRandomNumberInRange(MAX_OVERALL_VALUE, 1)
+            current_ability: playersInSquad[i].ability.current
         }
+        squadPlayerData.push(squadPlayer);
+    }
+    return squadPlayerData;
+}
+
+function getPlayerAttributeGroupData(numAttributes) {
+    const attributeGroupData = [];
+
+    const defendingAttributes = [];
+    const speedAttributes = [];
+    const visionAttributes = [];
+    const attackingAttributes = [];
+    const aerialAttributes = [];
+
+    for (let i = 0; i < numAttributes; i++) {
+        defendingAttributes.push(getRandomNumberInRange(MAX_ATTR_VALUE));
+        speedAttributes.push(getRandomNumberInRange(MAX_ATTR_VALUE));
+        visionAttributes.push(getRandomNumberInRange(MAX_ATTR_VALUE));
+        attackingAttributes.push(getRandomNumberInRange(MAX_ATTR_VALUE));
+        aerialAttributes.push(getRandomNumberInRange(MAX_ATTR_VALUE));
+    }
+    attributeGroupData.push({
+        groupName: 'Defending',
+        attributesInGroup: defendingAttributes
+    }, {
+        groupName: 'Speed',
+        attributesInGroup: speedAttributes
+    }, {
+        groupName: 'Vision',
+        attributesInGroup: visionAttributes
+    }, {
+        groupName: 'Attacking',
+        attributesInGroup: attackingAttributes
+    }, {
+        groupName: 'Aerial',
+        attributesInGroup: aerialAttributes
+    });
+
+    return attributeGroupData;
+
+}
+
+function getPlayerAttributeCategoryData(attributeNamesList, hasHistory) {
+    const attributeCategoryData = [];
+
+    let technicalAttributes = [];
+    let physicalAttributes = [];
+    let mentalAttributes = [];
+
+    for (let i = 0; i < 3; i++) {
+        const attributeNamesSlice = attributeNamesList.slice(i * 10, (i + 1) * 10);
+
+        const attributeDataList = attributeNamesSlice.map(attributeName => {
+            const currentAttributeValue = getRandomNumberInRange(MAX_ATTR_VALUE);
+            const attributeValueHistory = [];
+
+            let attributeData = {
+                name: attributeName,
+                value: currentAttributeValue
+            };
+
+            if (hasHistory) {
+                for (let j = 0; j < NUM_MONTHS - 1; j++) {
+                    attributeValueHistory.push(getRandomNumberInRange(MAX_ATTR_VALUE));
+                }
+                attributeData = {
+                    ...attributeData,
+                    history: attributeValueHistory
+                };
+            }
+
+            return attributeData;
+        });
+
+        if (i == 1) {
+            technicalAttributes = attributeDataList;
+        } else if (i == 2) {
+            physicalAttributes = attributeDataList;
+        } else {
+            mentalAttributes = attributeDataList;
+        }
+    }
+
+    attributeCategoryData.push({
+        categoryName: 'Technical',
+        attributesInCategory: technicalAttributes
+    }, {
+        categoryName: 'Physical',
+        attributesInCategory: physicalAttributes,
+    }, {
+        categoryName: 'Mental',
+        attributesInCategory: mentalAttributes
+    });
+
+    return attributeCategoryData;
+}
+
+function getPlayerRoles(numRoles, attributeNamesList) {
+    const roles = faker.lorem.words(numRoles).split(' ');
+    let roleToAttributeMapping = {};
+
+    roles.forEach(role => {
+        roleToAttributeMapping[role] = _.sampleSize(attributeNamesList, 6);
+    });
+
+    return roleToAttributeMapping;
+}
+
+function getPlayerData(numPlayers, numAttributes, nationsList) {
+    const playerData = [];
+
+    const attributeNamesList = [];
+    for (let i = 0; i < numAttributes; i++) {
+        attributeNamesList.push(faker.hacker.noun())
+    }
+
+    for (let i = 0; i < numPlayers; i++) {
+        const currentAbility = getRandomNumberInRange(MAX_OVERALL_VALUE, 1);
+        const abilityHistory = [];
+        for (let j = 0; j < NUM_MONTHS - 1; j++) {
+            abilityHistory.push(getRandomNumberInRange(MAX_OVERALL_VALUE));
+        }
+        abilityHistory.push(currentAbility);
+
+        const player = {
+            id: i,
+            metadata: {
+                name: faker.name.findName(),
+                dob: faker.date.past().toJSON(),
+                club: faker.company.companyName(),
+                country: _.sample(nationsList),
+                photo: `${faker.image.people()}?random=${getRandomNumberInRange(20)}`,
+                clubLogo: `${faker.image.abstract()}?random=${getRandomNumberInRange(20)}`,
+                countryLogo: `${faker.image.avatar()}?random=${getRandomNumberInRange(20)}`,
+                age:  ' (' + faker.random.number({ 'min': 16, 'max': 35 }) + ' years old)'
+            },
+            roles: getPlayerRoles(3, attributeNamesList),
+            attributes: {
+                attributeGroups: getPlayerAttributeGroupData(10),
+                attributeCategories: getPlayerAttributeCategoryData(attributeNamesList, true)
+            },
+            ability: {
+                current: currentAbility,
+                history: abilityHistory
+            }
+
+        }
+
         playerData.push(player);
     }
     return playerData;
 }
 
 module.exports = () => {
-    const playerData = getSquadHubPlayerData(10, nations, moraleList)
-    const data = { users: [], players: playerData }
-    // Create 1000 users
-    for (let i = 0; i < 1000; i++) {
-        data.users.push({ id: i, name: faker.hacker.noun() })
-    }
+    const playerData = getPlayerData(100, 3 * 10, nations);
+    const squadPlayerData = getSquadHubPlayerData(playerData, 10, moraleList)
+    const data = { players: playerData, squadPlayers: squadPlayerData }
     return data
 }
