@@ -1,27 +1,29 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
-
-const options = {
-    chart: { type: 'radar', toolbar: { show: false } },
-    stroke: { width: 2 },
-    fill: { opacity: 0.2 },
-    legend: { show: false },
-    xaxis: {
-        labels: { style: { fontSize: '14px' } },
-        categories: [ 'Defense', 'Mental', 'Physical', 'Attack', 'Technical' ]
-    },
-    plotOptions: {
-        radar: {
-            polygons: {
-                strokeColors: '#e9e9e9',
-                fill: { colors: ['#f8f8f8', '#fff'] }
-            }
-        }
-    },
-};
+import { useGlobalChartOptions } from '../context/chartOptionsProvider';
 
 export default function AttributeComparisonPolarPlot({ playerAttributes }) {
+    const globalChartOptions = useGlobalChartOptions();
+
+    const options = {
+        ...globalChartOptions,
+        chart: { type: 'radar', toolbar: { show: false } },
+        fill: { opacity: 0.2 },
+        xaxis: {
+            labels: { style: { fontSize: '14px' } },
+            categories: [ 'Defense', 'Mental', 'Physical', 'Attack', 'Technical' ]
+        },
+        plotOptions: {
+            radar: {
+                polygons: {
+                    strokeColors: '#e9e9e9',
+                    fill: { colors: ['#f8f8f8', '#fff'] }
+                }
+            }
+        }
+    };
+
     const series = playerAttributes.map(player => ({
         name: player.name,
         data: player.attributes.map(attrGroup =>
