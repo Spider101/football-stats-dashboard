@@ -22,7 +22,7 @@ const sideBarData = [{
     isExact: false,
     showInSidebar: true
 }, {
-    routePath: '/player/:id',
+    routePath: '/player/:playerId',
     component: Player,
     isExact: false,
     showInSidebar: false
