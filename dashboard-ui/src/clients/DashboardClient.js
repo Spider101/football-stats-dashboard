@@ -1,7 +1,7 @@
 // import fetch from 'fetch';
 
 // TODO: change this when backend is ready
-const baseUrl = 'http://localhost:3001';
+const baseUrl = 'http://localhost:4000';
 
 
 export const getSquadHubData = async () => {
