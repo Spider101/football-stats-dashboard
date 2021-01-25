@@ -25,7 +25,8 @@
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",
-    "lint": "./node_modules/.bin/eslint --ext js src"
+    "lint": "./node_modules/.bin/eslint --ext js src",
+    "start-mock-server": "npx json-server --watch db.js --port 4000"
   },
   "eslintConfig": {
     "extends": "react-app"
