@@ -77,12 +77,12 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles, pla
                 </Grid>
             </Grid>
             <Grid container spacing={2}>
-                <Grid item xs spacing={2}>
+                <Grid item xs>
                     <PlayerProgressionCharts { ...playerProgressionChartData } />
                 </Grid>
             </Grid>
             <Grid container spacing={2}>
-                <Grid item xs spacing={2}>
+                <Grid item xs>
                     <PlayerAttributesTable { ...attributeTableData } >
                         <AttributeItem />
                     </PlayerAttributesTable>
