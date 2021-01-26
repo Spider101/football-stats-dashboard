@@ -184,9 +184,49 @@ function getPlayerData(numPlayers, numAttributes, nationsList) {
     return playerData;
 }
 
+function getPlayerPerformanceData(playerData, numCompetitions, numMatches) {
+    // set the competition names
+    const competitions = [];
+    for (let i = 0; i < numCompetitions; i++) {
+        competitions.push(faker.hacker.noun());
+    }
+
+    const performanceData = [];
+    for (let i = 0; i < playerData.length; i++) {
+        for (let j = 0; j < numCompetitions; j++) {
+
+            const matchRatingHistory = [];
+            for (let k = 0; k < numMatches; k++) {
+                matchRatingHistory.push(getRandomNumberInRange(10));
+            }
+
+            performanceData.push({
+                id: (i+j),
+                competitionId: competitions[j],
+                playerId: playerData[i].id,
+                appearances: getRandomNumberInRange(30),
+                goals: getRandomNumberInRange(30),
+                penalties: getRandomNumberInRange(25),
+                assists: getRandomNumberInRange(25),
+                playerOfTheMatch: getRandomNumberInRange(10),
+                yellowCards: getRandomNumberInRange(25),
+                redCards: getRandomNumberInRange(25),
+                tackles: getRandomNumberInRange(25),
+                passCompletionRate: getRandomNumberInRange(25),
+                dribbles: getRandomNumberInRange(25),
+                fouls: getRandomNumberInRange(25),
+                matchRatingHistory: matchRatingHistory
+            });
+        }
+    }
+
+    return performanceData;
+}
+
 module.exports = () => {
     const playerData = getPlayerData(100, 3 * 10, nations);
-    const squadPlayerData = getSquadHubPlayerData(playerData, 10, moraleList)
-    const data = { players: playerData, squadPlayers: squadPlayerData }
-    return data
+    const squadPlayerData = getSquadHubPlayerData(playerData, 10, moraleList);
+    const playerPerformanceData = getPlayerPerformanceData(playerData, 5, 10);
+    const data = { players: playerData, squadPlayers: squadPlayerData, performance: playerPerformanceData };
+    return data;
 }
