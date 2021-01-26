@@ -6,8 +6,9 @@ import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import { fade, makeStyles } from '@material-ui/core/styles';
 
-import { getPlayerData } from '../clients/DashboardClient';
+import { getPlayerData, getPlayerPerformanceData } from '../clients/DashboardClient';
 import PlayerProgressionView from '../views/PlayerProgressionView';
+import MatchPerformanceView from '../views/MatchPerformanceView';
 
 const useStyles = makeStyles((theme) => ({
     loadingCircle: {
@@ -28,37 +29,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const PAGE_STATUS = {
+    LOADING: 'loading',
+    READY: 'ready'
+};
+
 export default function Player() {
     const classes = useStyles();
     const { playerId } = useParams();
     const { path, url } = useRouteMatch();
-
-    console.log(playerId, path, url);
-
-    const [pageStatus, setPageStatus] = React.useState('loading');
-    const [playerViewData, setPlayerViewData] = React.useState({});
-
-    React.useEffect(() => {
-        const getPlayerViewData = async () => {
-            const { metadata, roles, ability, attributes } = await getPlayerData(playerId);
-
-            setPlayerViewData({
-                isSelected: true,
-                orientation: '',
-                playerMetadata: metadata,
-                playerRoles: roles,
-                playerOverall: {
-                    currentValue: ability.current,
-                    history: ability.history
-                },
-                playerAttributes: attributes
-            });
-
-            setPageStatus('ready');
-        };
-
-        getPlayerViewData();
-    }, [playerId]);
 
     return (
         <>
@@ -79,13 +58,79 @@ export default function Player() {
                     </Link>
                 </Grid>
             </Grid>
-            { pageStatus === 'loading' && <CircularProgress className={ classes.loadingCircle }/> }
 
             <Switch>
                 <Route exact path={ path }>
-                    { pageStatus === 'ready' && <PlayerProgressionView { ...playerViewData } /> }
+                    <PlayerProgressionContainer playerId={ playerId } classes={ classes } />
+                </Route>
+                <Route path={ `${path}/performance` }>
+                    <PlayerPerformanceContainer playerId={ playerId } classes={ classes } />
                 </Route>
             </Switch>
         </>
     );
 }
+
+const PlayerProgressionContainer = ({ playerId, classes }) => {
+    const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
+    const [playerProgressViewData, setPlayerProgressViewData] = React.useState({});
+
+    React.useEffect(() => {
+        const getPlayerViewData = async () => {
+            const { metadata, roles, ability, attributes } = await getPlayerData(playerId);
+
+            setPlayerProgressViewData({
+                isSelected: true,
+                orientation: '',
+                playerMetadata: metadata,
+                playerRoles: roles,
+                playerOverall: {
+                    currentValue: ability.current,
+                    history: ability.history
+                },
+                playerAttributes: attributes
+            });
+
+            setPageStatus(PAGE_STATUS.READY);
+        };
+
+        getPlayerViewData();
+    }, [playerId]);
+
+    return (
+        <>
+        { pageStatus === PAGE_STATUS.LOADING &&
+                <CircularProgress className={ classes.loadingCircle }/> }
+        {   pageStatus === PAGE_STATUS.READY && <PlayerProgressionView { ...playerProgressViewData } /> }
+        </>
+    );
+}
+
+const PlayerPerformanceContainer = ({ playerId, classes }) => {
+    const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
+    const [playerPerformanceViewData, setPlayerPerformanceViewData] = React.useState({});
+
+    React.useEffect(() => {
+        const getPlayerPerformanceViewData = async () => {
+            const playerPerformanceViewData = await getPlayerPerformanceData(playerId);
+
+            setPlayerPerformanceViewData({
+                playerPerformance: {
+                    competitions: playerPerformanceViewData
+                }
+            });
+
+            setPageStatus(PAGE_STATUS.READY);
+        };
+
+        getPlayerPerformanceViewData();
+    }, [playerId]);
+
+    return (
+        <>
+        { pageStatus === PAGE_STATUS.LOADING &&
+                <CircularProgress className={ classes.loadingCircle }/> }
+        { pageStatus === PAGE_STATUS.READY && <MatchPerformanceView { ...playerPerformanceViewData } /> }
+        </>
+    );
+};
