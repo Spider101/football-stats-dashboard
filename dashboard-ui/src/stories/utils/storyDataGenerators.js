@@ -49,7 +49,7 @@ const getPlayerRolesMap = (numOfRoles, attributeList) => {
     return roleAttributeMap;
 };
 
-export const getAttributeComparisonTableData = (getAttrItemData, numPlayers) => {
+export const getAttributeComparisonTableData = (getAttrItemData) => {
     const numGroups = 3;
     const attributeComparisonTableMetadata = getAttrComparisonTableMetaData(numGroups);
     const maxRows = Math.max(
