@@ -7,22 +7,13 @@ import { fade, makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
 const options = {
-    chart: { stacked: true, toolbar: { show: false } },
-    xaxis: {
-        labels: { show: false },
-        axisTicks: { show: false },
-        axisBorder: { show: false }
-    },
+    chart: { stacked: true, sparkline: { enabled: true } },
     plotOptions: {
         bar: { horizontal: true }
     },
-    dataLabels: { enabled: false },
-    grid: { show: false },
-    legend: { show: false },
     yaxis: {
         min: -20,
-        max: 20,
-        labels: { show: false }
+        max: 20
     },
     tooltip: {
         shared: false,
@@ -34,9 +25,6 @@ const options = {
 const useStyles = makeStyles((theme) => ({
     attr: {
         height: '60px'
-    },
-    attrLabel: {
-        maxWidth: '10%',
     },
     highlighted: {
         borderLeft: '2px solid',
@@ -52,19 +40,18 @@ export default function AttributeComparisonItem({ attrComparisonItem: { attrValu
         <ListItem className={ clsx(classes.attr, {
             [classes.highlighted]: isHighlighted
         })}>
-            <ListItemText className={ classes.attrLabel } primary={ label } />
+            <ListItemText primary={ label } />
             <ReactApexChart
                 options={{
                     ...options,
                     xaxis: {
-                        ...options.xaxis,
                         categories: [ label ]
                     }
                 }}
                 series={ attrValues }
                 type='bar'
-                width='500'
-                height='100'
+                width='400'
+                height='50'
             />
         </ListItem>
     );
