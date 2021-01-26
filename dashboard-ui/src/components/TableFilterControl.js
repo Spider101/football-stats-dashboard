@@ -85,7 +85,7 @@ export default function TableFilterControl({ currentValues, handleChangeFn, allP
 TableFilterControl.propTypes = {
     currentValues: PropTypes.arrayOf(PropTypes.string),
     handleChangeFn: PropTypes.func,
-    allPossibleValues: PropTypes.arrayOf(PropTypes.object),
+    allPossibleValues: PropTypes.arrayOf(PropTypes.string),
     allValuesSelectedLabel: PropTypes.string,
     inputLabelText: PropTypes.string,
     labelIdFragment: PropTypes.string,

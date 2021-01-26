@@ -260,6 +260,7 @@ export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) =>
             fouls: getRandomNumberInRange(25)
         };
 
+        // TODO: check if we need this logic or can use matchRatingHistory object directly
         return numMatches === 0 ? {
             ...competitionData,
             averageRating: getRandomNumberInRange(10),
