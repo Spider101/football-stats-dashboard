@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Link as RouterLink, Route, Switch, useParams, useRouteMatch  } from 'react-router-dom';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -99,12 +100,16 @@ const PlayerProgressionContainer = ({ playerId, classes }) => {
 
     return (
         <>
-        { pageStatus === PAGE_STATUS.LOADING &&
-                <CircularProgress className={ classes.loadingCircle }/> }
-        {   pageStatus === PAGE_STATUS.READY && <PlayerProgressionView { ...playerProgressViewData } /> }
+            {
+                pageStatus === PAGE_STATUS.LOADING
+                    ? <CircularProgress className={ classes.loadingCircle }/>
+                    : pageStatus === PAGE_STATUS.READY
+                        ? <PlayerProgressionView { ...playerProgressViewData } />
+                        : null
+            }
         </>
     );
-}
+};
 
 const PlayerPerformanceContainer = ({ playerId, classes }) => {
     const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
@@ -128,9 +133,22 @@ const PlayerPerformanceContainer = ({ playerId, classes }) => {
 
     return (
         <>
-        { pageStatus === PAGE_STATUS.LOADING &&
-                <CircularProgress className={ classes.loadingCircle }/> }
-        { pageStatus === PAGE_STATUS.READY && <MatchPerformanceView { ...playerPerformanceViewData } /> }
+            {
+                pageStatus === PAGE_STATUS.LOADING
+                    ? <CircularProgress className={ classes.loadingCircle }/>
+                    : pageStatus === PAGE_STATUS.READY
+                        ? <MatchPerformanceView { ...playerPerformanceViewData } />
+                        : null
+            }
         </>
     );
+};
+
+PlayerProgressionContainer.propTypes = {
+    playerId: PropTypes.number,
+    classes: PropTypes.object,
+};
+
+PlayerPerformanceContainer.propTypes = {
+    ...PlayerProgressionContainer.propTypes
 };

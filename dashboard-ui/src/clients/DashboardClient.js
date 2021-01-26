@@ -27,7 +27,7 @@ export const getPlayerPerformanceData = async (playerId) => {
 
     return playerPerformanceData;
 
-}
+};
 
 async function fetchDataFromEndpoint(endpointFragment) {
     const res = await fetch(`${baseUrl}${endpointFragment}`);
