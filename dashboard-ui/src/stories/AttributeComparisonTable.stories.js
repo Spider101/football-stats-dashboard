@@ -6,18 +6,27 @@ import { getAttrComparisonItemData, getAttributeComparisonTableData } from './ut
 
 export default {
     component: PlayerAttributesTable,
-    title: 'Widgets/PlayerComparisonView/AttributeComparisonTable',
-    excludeStories: /.*Data$/,
+    title: 'Widgets/PlayerComparisonView/AttributeComparisonTable'
 };
 
-export const Default = () => (
-    <PlayerAttributesTable { ...getAttributeComparisonTableData(getAttrComparisonItemData) }>
+const Template = args => (
+    <PlayerAttributesTable { ...args } >
         <AttributeComparisonItem />
     </PlayerAttributesTable>
 );
 
-export const Highlighted = () => (
-    <PlayerAttributesTable { ...getAttributeComparisonTableData(getAttrComparisonItemData, true) }>
-        <AttributeComparisonItem />
-    </PlayerAttributesTable>
-);
+export const Default = Template.bind({});
+export const Highlighted = Template.bind({});
+export const SinglePlayer = Template.bind({});
+
+Default.args = {
+    ...getAttributeComparisonTableData(getAttrComparisonItemData)
+};
+
+Highlighted.args = {
+    ...getAttributeComparisonTableData(getAttrComparisonItemData)
+};
+
+SinglePlayer.args = {
+    ...getAttributeComparisonTableData((attributeName) => getAttrComparisonItemData(attributeName, 1))
+};

@@ -16,18 +16,18 @@ export const getAttributeItemData = (attributeName, highlightedAttributes = []) 
     growthIndicator: _.sample(GROWTH_INDICATOR_LIST)
 });
 
-export const getAttrComparisonItemData = (attributeName, highlightedAttributes = []) => ({
+export const getAttrComparisonItemData = (attributeName, numPlayers = 2, isHighlighted = false) => ({
     attrComparisonItem: {
-        attrValues: [{
-            name: faker.name.lastName(1),
-            data: [ getRandomNumberInRange(MAX_ATTR_VALUE) ]
-        }, {
-            name: faker.name.lastName(1),
-            data: [ -1 * getRandomNumberInRange(MAX_ATTR_VALUE) ]
-        }],
+        attrValues: [ ...Array(numPlayers) ].map((_, idx) => {
+            const sign = idx % 2 === 0 ? -1 : 1;
+            return {
+                name: faker.name.lastName(1),
+                data: [ sign * getRandomNumberInRange(MAX_ATTR_VALUE) ]
+            };
+        }),
         label: attributeName
     },
-    highlightedAttributes
+    highlightedAttributes: isHighlighted ? [ attributeName ] : []
 });
 
 const getAttrComparisonTableMetaData = (numGroups) => ({
@@ -49,7 +49,7 @@ const getPlayerRolesMap = (numOfRoles, attributeList) => {
     return roleAttributeMap;
 };
 
-export const getAttributeComparisonTableData = (getAttrItemData) => {
+export const getAttributeComparisonTableData = (getAttrItemData, numPlayers) => {
     const numGroups = 3;
     const attributeComparisonTableMetadata = getAttrComparisonTableMetaData(numGroups);
     const maxRows = Math.max(
@@ -147,13 +147,11 @@ const getPlayerAttributeGroupData = (numAttributes) => ([
     }
 ]);
 
-export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory = false) => {
+export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     const currentPlayerOverall = getRandomNumberInRange(MAX_OVERALL_VALUE);
     const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_OVERALL_VALUE));
 
     return {
-        isSelected: true, // TODO: figure out what this is for
-        orientation: orientation,
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
         playerOverall: {

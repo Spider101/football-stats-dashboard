@@ -50,7 +50,7 @@ export default function AttributeComparisonItem({ attrComparisonItem: { attrValu
                 }}
                 series={ attrValues }
                 type='bar'
-                width='400'
+                width='350'
                 height='50'
             />
         </ListItem>
