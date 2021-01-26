@@ -1,12 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import ReactApexChart from 'react-apexcharts';
 import Grid from '@material-ui/core/Grid';
 
 import SortableTable from '../widgets/SortableTable';
-import ReactApexChart from 'react-apexcharts';
-import { allMatchPerformanceTableHeaders } from '../utils';
 import TableFilterControl from '../components/TableFilterControl';
+
+import { allMatchPerformanceTableHeaders } from '../utils';
+import { useGlobalChartOptions } from '../context/chartOptionsProvider';
 
 const convertCamelCaseToSnakeCase = (camelCaseString) =>
     camelCaseString.replace(/([a-z])([A-Z])/g, '$1_$2')
@@ -42,11 +44,14 @@ const filterMatchPerformancesByCompetitions = (matchPerformances, competitionNam
         return competitionNames.includes(competitionData.data);
     });
 
-const getOptions = chartTitle => ({
+const getOptions = (globalChartOptions, chartTitle) => ({
+    ...globalChartOptions,
     dataLabels: { enabled: false },
-    title: { text: chartTitle, align: 'left', style: { fontFamily: 'Roboto' } },
+    title: {
+        ...globalChartOptions.title,
+        text: chartTitle
+    },
     xaxis: {
-        legend: { show: false },
         title: { text: 'Matches', style: { fontFamily: 'Roboto' } },
         categories: [ ...Array(10) ].map((_, _idx) => _idx + 1)
     }
@@ -87,7 +92,7 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
             </Grid>
             <Grid item xs={12}>
                 <ReactApexChart
-                    options={ getOptions(chartTitle) }
+                    options={ getOptions(useGlobalChartOptions(), chartTitle) }
                     series={ chartData }
                     type='bar'
                     height={500}
