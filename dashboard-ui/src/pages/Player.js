@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import { fade, makeStyles } from '@material-ui/core/styles';
 
-import { getPlayerData, getPlayerPerformanceData } from '../clients/DashboardClient';
+import { fetchPlayerData, fetchPlayerPerformanceData } from '../clients/DashboardClient';
 import PlayerProgressionView from '../views/PlayerProgressionView';
 import MatchPerformanceView from '../views/MatchPerformanceView';
 import CardWithFilter from '../widgets/CardWithFilter';
@@ -44,6 +44,15 @@ export default function Player() {
     const { path, url } = useRouteMatch();
     const [playerData, setPlayerData] = React.useState({});
 
+    React.useEffect(() => {
+        const getPlayerData = async () => {
+            const playerData = await fetchPlayerData(playerId);
+            setPlayerData({ ...playerData });
+        };
+
+        getPlayerData();
+    }, [playerId]);
+
     return (
         <>
             <Grid container spacing={2} className={ classes.topMenu }>
@@ -67,9 +76,7 @@ export default function Player() {
             <Switch>
                 <Route exact path={ path }>
                     <PlayerProgressionContainer
-                        playerId={ playerId }
                         playerData={ playerData }
-                        setPlayerData={ setPlayerData }
                         classes={ classes }
                     />
                 </Route>
@@ -87,18 +94,12 @@ export default function Player() {
     );
 }
 
-const PlayerProgressionContainer = ({ playerId, playerData, setPlayerData, classes }) => {
+const PlayerProgressionContainer = ({ playerData, classes }) => {
     const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
 
     React.useEffect(() => {
-        const getPlayerViewData = async () => {
-            const playerData = await getPlayerData(playerId);
-            setPlayerData({ ...playerData });
-            setPageStatus(PAGE_STATUS.READY);
-        };
-
-        getPlayerViewData();
-    }, [playerId]);
+        !_.isEmpty(playerData) && setPageStatus(PAGE_STATUS.READY);
+    }, [playerData]);
 
     const playerProgressViewData = _.isEmpty(playerData) ? {} :
         {
@@ -130,7 +131,7 @@ const PlayerPerformanceContainer = ({ playerId, classes }) => {
 
     React.useEffect(() => {
         const getPlayerPerformanceViewData = async () => {
-            const playerPerformanceViewData = await getPlayerPerformanceData(playerId);
+            const playerPerformanceViewData = await fetchPlayerPerformanceData(playerId);
 
             setPlayerPerformanceViewData({
                 playerPerformance: {
@@ -159,7 +160,6 @@ const PlayerPerformanceContainer = ({ playerId, classes }) => {
 
 const PlayerComparisonContainer = ({ playerData, classes }) => {
     const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
-    const [playerComparisonViewData, setPlayerComparisonViewData] = React.useState({});
 
     const cardWithFilterProps = {
         currentValue: '',
@@ -175,24 +175,23 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
     );
 
     React.useEffect(() => {
-        if (!_.isEmpty(playerData)) {
-            setPlayerComparisonViewData({
-                basePlayer: {
-                    playerMetadata: playerData.metadata,
-                    playerRoles: playerData.roles,
-                    playerOverall: {
-                        currentValue: playerData.ability.current,
-                        history: playerData.ability.history
-                    },
-                    playerAttributes: playerData.attributes
-                },
-                comparedPlayer: null,
-                cardWithFilter
-            });
-
-            setPageStatus(PAGE_STATUS.READY);
-        }
+        !_.isEmpty(playerData) && setPageStatus(PAGE_STATUS.READY);
     }, [playerData]);
+
+    const playerComparisonViewData = _.isEmpty(playerData) ? {} :
+        {
+            basePlayer: {
+                playerMetadata: playerData.metadata,
+                playerRoles: playerData.roles,
+                playerOverall: {
+                    currentValue: playerData.ability.current,
+                    history: playerData.ability.history
+                },
+                playerAttributes: playerData.attributes
+            },
+            comparedPlayer: null,
+            cardWithFilter
+        };
 
     return (
         <>
@@ -208,15 +207,12 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
 };
 
 PlayerProgressionContainer.propTypes = {
-    playerId: PropTypes.number,
     playerData: PropTypes.object,
-    setPlayerData: PropTypes.func,
     classes: PropTypes.object
 };
 
 PlayerComparisonContainer.propTypes = {
-    playerData: PropTypes.object,
-    classes: PropTypes.object
+    ...PlayerProgressionContainer.propTypes
 };
 
 PlayerPerformanceContainer.propTypes = {
