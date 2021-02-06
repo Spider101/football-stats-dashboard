@@ -102,8 +102,6 @@ export default function PlayerComparison({ players }) {
 PlayerComparison.propTypes = {
     players: PropTypes.arrayOf(
         PropTypes.shape({
-            isSelected: PropTypes.bool,
-            orientation: PropTypes.string,
             playerMetadata: PropTypes.shape(PlayerBioCard.propTypes),
             playerRoles: PropTypes.object,
             playerOverall: PropTypes.shape({
