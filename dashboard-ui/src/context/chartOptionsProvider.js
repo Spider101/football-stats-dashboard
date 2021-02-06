@@ -15,7 +15,7 @@ function ChartOptionsProvider({ children }) {
     };
 
     return (
-        <ChartOptionsContext.Provider value= { globalChartOptions }>
+        <ChartOptionsContext.Provider value={ globalChartOptions }>
             { children }
         </ChartOptionsContext.Provider>
     );

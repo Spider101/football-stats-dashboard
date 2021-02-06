@@ -12,6 +12,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
         backgroundColor: theme.palette.grey[100],
         borderStyle: 'dashed',
+        height: '100%'
     }
 }));
 
