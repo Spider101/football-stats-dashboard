@@ -2,15 +2,15 @@
 const baseUrl = 'http://localhost:4000/';
 
 
-export const getSquadHubData = async () => {
+export const fetchSquadHubData = async () => {
     return await fetchDataFromEndpoint('squadPlayers');
 };
 
-export const getPlayerData = async (playerId) => {
+export const fetchPlayerData = async (playerId) => {
     return await fetchDataFromEndpoint(`players/${playerId}`);
 };
 
-export const getPlayerPerformanceData = async (playerId) => {
+export const fetchPlayerPerformanceData = async (playerId) => {
     let playerPerformanceData = await fetchDataFromEndpoint(`players/${playerId}/performance`);
 
     playerPerformanceData = playerPerformanceData.map(performanceData => {

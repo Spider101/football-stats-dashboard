@@ -1,13 +1,13 @@
 import React from 'react';
 import SquadHubView from '../views/SquadHubView';
-import { getSquadHubData } from '../clients/DashboardClient';
+import { fetchSquadHubData } from '../clients/DashboardClient';
 
 const SquadHub = () => {
     const [squadHubViewData, setSquadHubViewData] = React.useState({ players: []});
 
     React.useEffect(() => {
         const getSquadHubViewData = async () => {
-            const squadHubData = await getSquadHubData();
+            const squadHubData = await fetchSquadHubData();
             setSquadHubViewData({
                 players: squadHubData
             });
