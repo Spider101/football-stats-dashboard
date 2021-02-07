@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 
-import FilterControl from '../components/FilterControl';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
@@ -23,14 +22,12 @@ export default function CardWithFilter({ filterControl }) {
     return (
         <Card className={ classes.emptyCard } variant='outlined'>
             <CardContent>
-                <FilterControl { ...filterControl } />
+                { filterControl }
             </CardContent>
         </Card>
     );
 }
 
 CardWithFilter.propTypes = {
-    filterControl: PropTypes.shape({
-        ...FilterControl.propTypes
-    }), 
+    filterControl: PropTypes.node,
 };

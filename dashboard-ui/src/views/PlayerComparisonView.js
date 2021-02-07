@@ -5,8 +5,9 @@ import Grid from '@material-ui/core/Grid';
 
 import PlayerBioCard from '../components/PlayerBioCard';
 import PlayerComparison from '../widgets/PlayerComparison';
+import CardWithFilter from '../widgets/CardWithFilter';
 
-export default function PlayerComparisonView({ basePlayer, comparedPlayer, cardWithFilter }) {
+export default function PlayerComparisonView({ basePlayer, comparedPlayer, filterControl }) {
     // filter out any non-existent player data
     const playerData = {
         players: [ basePlayer, comparedPlayer ].filter(player => player !== null)
@@ -22,9 +23,9 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, cardW
                         </Grid>
                     ))
                 }
-                { cardWithFilter !== null && comparedPlayer === null &&
+                { filterControl !== null && comparedPlayer === null &&
                     <Grid item xs={6}>
-                        { cardWithFilter }
+                        <CardWithFilter filterControl={ filterControl } />
                     </Grid>
                 }
                 <PlayerComparison { ...playerData } />
@@ -41,5 +42,5 @@ PlayerComparisonView.propTypes = {
     comparedPlayer: PropTypes.shape({
         playerMetadata: PropTypes.shape(PlayerBioCard.propTypes)
     }),
-    cardWithFilter: PropTypes.object
+    filterControl: PropTypes.node,
 };

@@ -11,8 +11,8 @@ import { fade, makeStyles } from '@material-ui/core/styles';
 import { fetchPlayerData, fetchPlayerPerformanceData, fetchSquadHubData } from '../clients/DashboardClient';
 import PlayerProgressionView from '../views/PlayerProgressionView';
 import MatchPerformanceView from '../views/MatchPerformanceView';
-import CardWithFilter from '../widgets/CardWithFilter';
 import PlayerComparisonView from '../views/PlayerComparisonView';
+import FilterControl from '../components/FilterControl';
 
 const useStyles = makeStyles((theme) => ({
     loadingCircle: {
@@ -168,7 +168,7 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
         setCurrentPlayerId(event.target.value);
     };
 
-    const cardWithFilterProps = {
+    const filterControlProps = {
         currentValue: currentPlayerId,
         allPossibleValues: squadPlayers,
         handleChangeFn: handlePlayerChange,
@@ -177,16 +177,14 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
         helperText: 'Choose player to compare against'
     };
 
-    const cardWithFilter = (
-        <CardWithFilter filterControl={ cardWithFilterProps } />
-    );
+    const filterControl = <FilterControl { ...filterControlProps } />;
 
     React.useEffect(() => {
         const getSquadHubViewData = async () => {
             const squadHubData = await fetchSquadHubData();
             setSquadPlayers([
                 ...squadHubData.map(squadPlayer => ({ id: squadPlayer.playerId, text: squadPlayer.name }))
-            ])
+            ]);
         };
 
         if (!_.isEmpty(playerData)) {
@@ -206,7 +204,7 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
                     history: ability.history
                 },
                 playerAttributes: attributes
-            })
+            });
         };
 
         currentPlayerId !== -1 && getComparedPlayerData();
@@ -224,7 +222,7 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
                 playerAttributes: playerData.attributes
             },
             comparedPlayer,
-            cardWithFilter
+            filterControl
         };
 
     return (
