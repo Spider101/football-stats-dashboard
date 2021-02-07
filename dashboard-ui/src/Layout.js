@@ -5,7 +5,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import AppBarMenu from './components/AppBarMenu';
 import Sidebar from './widgets/Sidebar';
 
-import sideBarData from './sideBarData';
+import routingData from './routingData';
 import { Link, Route, Switch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
 
@@ -15,10 +15,11 @@ const useStyles = makeStyles((theme) => ({
     },
     content: {
         flexGrow: 1,
-        padding: theme.spacing(3)
+        padding: theme.spacing(10, 3)
     },
     view: {
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'flex-end',
         padding: theme.spacing(0, 1),
         // necessary for content to be below app bar
@@ -39,17 +40,19 @@ export default function Layout() {
         setOpen(false);
     };
 
-    const sideBarItems = sideBarData.map((sidebarItemData, _idx) => ({
-        isGroup: false,
-        listItem: {
-            text: sidebarItemData.text,
-            icon: sidebarItemData.icon,
-            menuItemIndex: _idx,
-            componentType: Link,
-            routePath: sidebarItemData.routePath
-        }
-    }));
+    const sideBarItems = routingData.filter(sidebarItem => sidebarItem.showInSidebar)
+        .map((sidebarItemData, _idx) => ({
+            isGroup: false,
+            listItem: {
+                text: sidebarItemData.text,
+                icon: sidebarItemData.icon,
+                menuItemIndex: _idx,
+                componentType: Link,
+                routePath: sidebarItemData.routePath
+            }
+        }));
 
+    // TODO: this should be returned from backend; remove it when ready
     const menuData = {
         title: 'Dummy App Bar Menu Title',
         teamColor: 'red'
@@ -72,8 +75,8 @@ export default function Layout() {
                 <div className={ classes.view }>
                     <Switch>
                         {
-                            sideBarData.map((sidebarItemData, _idx) => (
-                                <Route exact
+                            routingData.map((sidebarItemData, _idx) => (
+                                <Route exact={ sidebarItemData.isExact }
                                     key={ _idx }
                                     path={ sidebarItemData.routePath }
                                     component={ sidebarItemData.component }

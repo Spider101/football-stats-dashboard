@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
 import AttributeProgressChart from '../components/AttributeProgressChart';
@@ -32,6 +33,6 @@ export default function PlayerProgressionCharts({ playerAttributeProgressData, p
 }
 
 PlayerProgressionCharts.propTypes = {
-    playerAttributeProgressData: AttributeProgressChart.propTypes.attributeData,
-    playerOverallProgressData: OverallProgressChart.propTypes.overallData
+    playerAttributeProgressData: PropTypes.shape(AttributeProgressChart.propTypes.attributeData),
+    playerOverallProgressData: PropTypes.shape(OverallProgressChart.propTypes.overallData)
 };

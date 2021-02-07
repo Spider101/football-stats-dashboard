@@ -29,6 +29,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+// TODO: update class name to something more generic
 export default function TableFilterControl({ currentValues, handleChangeFn, allPossibleValues, allValuesSelectedLabel,
     inputLabelText, labelIdFragment, customStyles }) {
     const classes = useStyles();
@@ -85,7 +86,7 @@ export default function TableFilterControl({ currentValues, handleChangeFn, allP
 TableFilterControl.propTypes = {
     currentValues: PropTypes.arrayOf(PropTypes.string),
     handleChangeFn: PropTypes.func,
-    allPossibleValues: PropTypes.arrayOf(PropTypes.object),
+    allPossibleValues: PropTypes.arrayOf(PropTypes.string),
     allValuesSelectedLabel: PropTypes.string,
     inputLabelText: PropTypes.string,
     labelIdFragment: PropTypes.string,

@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import Grid from '@material-ui/core/Grid';
 
@@ -12,7 +13,10 @@ const getSortValueForForm = (matchRatingsList) => matchRatingsList[0];
 
 const buildRowDataForSquadTable = (players) => {
     return players.map(player => {
-        return Object.entries(player).map(([key, value]) => {
+        const keys = Object.keys(player);
+        const playerId = player.playerId;
+        const keysToFocusOn = keys.filter(key => key !== 'playerId');
+        return Object.entries(_.pick(player, keysToFocusOn)).map(([key, value]) => {
             let row = null;
             switch(key) {
             case 'wages':
@@ -48,6 +52,14 @@ const buildRowDataForSquadTable = (players) => {
                     metadata: { sortValue: getSortValueForForm(value) }
                 };
                 break;
+            case 'name':
+                row = {
+                    id: key,
+                    type: 'link',
+                    data: value,
+                    metadata: { playerId }
+                };
+                break;
             default:
                 row = { id: key, type: isNaN(value) ? 'string' : 'number', data: value };
                 break;
@@ -75,13 +87,19 @@ const filterRowsByRole = (originalRowData, roles) => originalRowData.filter(rowD
 });
 
 export default function SquadHubView({ players }) {
-    const allSquadHubTableHeaderNames = allSquadHubTableHeaders.map(header => header.id);
+    const [playerRoles, setPlayerRoles] = React.useState([]);
 
+    const allSquadHubTableHeaderNames = allSquadHubTableHeaders.map(header => header.id);
     const [columnNames, setColumnNames] = React.useState(allSquadHubTableHeaderNames);
 
-    // get all the distinct player roles in the dataset
-    const allPlayerRoles = [ ...new Set(players.map(player => player.role)) ];
-    const [playerRoles, setPlayerRoles] = React.useState(allPlayerRoles);
+    const allPlayerRoles = React.useRef([]);
+    React.useEffect(() => {
+        // get all the distinct player roles in the dataset
+        allPlayerRoles.current = [ ...new Set(players.map(player => player.role)) ];
+
+        setPlayerRoles(allPlayerRoles.current);
+    }, [players]);
+
 
     const handleChange = (changeHandler) => (event) => changeHandler(event.target.value);
 
@@ -89,7 +107,7 @@ export default function SquadHubView({ players }) {
     const rowData = React.useMemo(() => buildRowDataForSquadTable(players), [players]);
 
     const filteredRowData = filterRowsByRole(rowData, playerRoles);
-    
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -106,7 +124,7 @@ export default function SquadHubView({ players }) {
                 <TableFilterControl
                     currentValues={ playerRoles }
                     handleChangeFn={ handleChange(setPlayerRoles) }
-                    allPossibleValues={ allPlayerRoles }
+                    allPossibleValues={ allPlayerRoles.current }
                     allValuesSelectedLabel='All Players'
                     inputLabelText='Filter Players'
                     labelIdFragment='filter-rows'
@@ -122,6 +140,7 @@ export default function SquadHubView({ players }) {
 
 SquadHubView.propTypes = {
     players: PropTypes.arrayOf(PropTypes.shape({
+        playerId: PropTypes.number,
         name: PropTypes.string,
         nationality: PropTypes.string,
         role: PropTypes.string,

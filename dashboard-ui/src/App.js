@@ -5,20 +5,23 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import { BrowserRouter as Router } from 'react-router-dom';
 
 import Layout from './Layout';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { useThemePreference } from './context/themePreferenceProvider';
+import { ChartOptionsProvider } from './context/chartOptionsProvider';
 
 function App() {
-    const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+    const themePreference = useThemePreference();
     const theme = React.useMemo(() => createMuiTheme({
         palette: {
-            type: prefersDarkMode ? 'dark' : 'light'
+            type: themePreference
         }
-    }), [prefersDarkMode]);
+    }), [themePreference]);
 
     return (
         <Router>
             <ThemeProvider theme={ theme }>
-                <Layout />
+                <ChartOptionsProvider>
+                    <Layout />
+                </ChartOptionsProvider>
             </ThemeProvider>
         </Router>
     );

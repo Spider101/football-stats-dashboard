@@ -14,6 +14,7 @@ import { makeStyles } from '@material-ui/core';
 import EnhancedTableHeader from '../components/EnhancedTableHeader';
 import { capitalizeLabel, stableSortList } from '../utils';
 import ReactApexChart from 'react-apexcharts';
+import { Link } from 'react-router-dom';
 
 // constants
 const TABLE_CELL_CHART_HEIGHT = 40;
@@ -123,8 +124,12 @@ export default function SortableTable({ headers, rows }) {
                                                 tableCell = cell.data;
                                             }
 
+                                            const isWithLink = 'metadata' in cell && 'playerId' in cell.metadata;
+
                                             return (
                                                 <TableCell
+                                                    component={ isWithLink ? Link : 'td' }
+                                                    to={ isWithLink ? `/player/${cell.metadata.playerId}` : null }
                                                     className={ classes.tableCell }
                                                     key={ _idx}
                                                     align={ cell.type === 'number' ? 'right' : 'left' }

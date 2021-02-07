@@ -6,13 +6,23 @@ import { getAttrComparisonItemData } from './utils/storyDataGenerators';
 
 export default {
     component: AttributeComparisonItem,
-    title: 'Components/PlayerComparisonView/AttributeComparisonTable/AttributeComparisonItem',
-    excludeStories: /.*Data$/,
+    title: 'Components/PlayerComparisonView/AttributeComparisonTable/AttributeComparisonItem'
 };
 
-const highlightedAttribute = faker.hacker.noun();
+const Template = args => <AttributeComparisonItem { ...args } />;
 
-export const Default = () => <AttributeComparisonItem { ...getAttrComparisonItemData(faker.hacker.noun()) } />;
+export const Default = Template.bind({});
+export const Highlighted = Template.bind({});
+export const SingleAttribute = Template.bind({});
 
-export const Highlighted = () => <AttributeComparisonItem { ...getAttrComparisonItemData(highlightedAttribute,
-    [ highlightedAttribute ]) } />;
+Default.args = {
+    ...getAttrComparisonItemData(faker.hacker.noun())
+};
+
+Highlighted.args = {
+    ...getAttrComparisonItemData(faker.hacker.noun(), 2, true)
+};
+
+SingleAttribute.args = {
+    ...getAttrComparisonItemData(faker.hacker.noun(), 1)
+};

@@ -6,11 +6,15 @@ import { getAttrGroupData } from './utils/storyDataGenerators';
 
 export default {
     component: AttributeComparisonPolarPlot,
-    title: 'Components/PlayerComparisonView/AttributeComparisonPolarPlot',
-    excludeStories: /.*Data$/,
+    title: 'Components/PlayerComparisonView/AttributeComparisonPolarPlot'
 };
 
-const polarPlotData = {
+const Template = args => <AttributeComparisonPolarPlot { ...args } />;
+
+export const Default = Template.bind({});
+export const SinglePlayer = Template.bind({});
+
+Default.args = {
     playerAttributes: [{
         name: faker.name.lastName(1),
         attributes: getAttrGroupData(5)
@@ -20,4 +24,9 @@ const polarPlotData = {
     }]
 };
 
-export const Default = () => <AttributeComparisonPolarPlot { ...polarPlotData } />;
+SinglePlayer.args = {
+    playerAttributes: [{
+        name: faker.name.lastName(1),
+        attributes: getAttrGroupData(5)
+    }]
+};

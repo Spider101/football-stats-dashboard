@@ -1,5 +1,3 @@
-// export const HomeRoute = '/';
-// export const SquadHubRoute = '/squadHub';
 import React from 'react';
 
 import HomeIcon from '@material-ui/icons/Home';
@@ -7,17 +5,27 @@ import GroupIcon from '@material-ui/icons/Group';
 
 import SquadHub from './pages/SquadHub';
 import Home from './pages/Home';
+import Player from './pages/Player';
 
 const sideBarData = [{
     text: 'Home',
     icon: <HomeIcon />,
     routePath: '/',
-    component: Home
+    component: Home,
+    isExact: true,
+    showInSidebar: true
 }, {
     text: 'SquadHub',
     icon: <GroupIcon />,
     routePath: '/squadHub',
-    component: SquadHub
+    component: SquadHub,
+    isExact: false,
+    showInSidebar: true
+}, {
+    routePath: '/player/:playerId',
+    component: Player,
+    isExact: false,
+    showInSidebar: false
 }];
 
 export default sideBarData;

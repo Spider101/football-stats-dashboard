@@ -16,18 +16,18 @@ export const getAttributeItemData = (attributeName, highlightedAttributes = []) 
     growthIndicator: _.sample(GROWTH_INDICATOR_LIST)
 });
 
-export const getAttrComparisonItemData = (attributeName, highlightedAttributes = []) => ({
+export const getAttrComparisonItemData = (attributeName, numPlayers = 2, isHighlighted = false) => ({
     attrComparisonItem: {
-        attrValues: [{
-            name: faker.name.lastName(1),
-            data: [ getRandomNumberInRange(MAX_ATTR_VALUE) ]
-        }, {
-            name: faker.name.lastName(1),
-            data: [ -1 * getRandomNumberInRange(MAX_ATTR_VALUE) ]
-        }],
+        attrValues: [ ...Array(numPlayers) ].map((_, idx) => {
+            const sign = idx % 2 === 0 ? -1 : 1;
+            return {
+                name: faker.name.lastName(1),
+                data: [ sign * getRandomNumberInRange(MAX_ATTR_VALUE) ]
+            };
+        }),
         label: attributeName
     },
-    highlightedAttributes
+    highlightedAttributes: isHighlighted ? [ attributeName ] : []
 });
 
 const getAttrComparisonTableMetaData = (numGroups) => ({
@@ -147,13 +147,11 @@ const getPlayerAttributeGroupData = (numAttributes) => ([
     }
 ]);
 
-export const getPlayerData = (attributeNamesList, orientation = '',  hasHistory = false) => {
+export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     const currentPlayerOverall = getRandomNumberInRange(MAX_OVERALL_VALUE);
     const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_OVERALL_VALUE));
 
     return {
-        isSelected: true, // TODO: figure out what this is for
-        orientation: orientation,
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
         playerOverall: {
@@ -174,9 +172,9 @@ export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
     }));
 };
 
-export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap) => ({
+export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap, withLink = false) => ({
     headers: allSquadHubTableHeaders,
-    rows: [ ...Array(numRows) ].map(() => {
+    rows: [ ...Array(numRows) ].map((_0, idx) => {
         const country = _.sample(nationalityFlagMap);
         const moraleEntity = _.sample(moraleIconsMap);
         const chartData = {
@@ -187,14 +185,21 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
             }]
         };
 
-        return [
-            { id: 'name', type: 'string', data: faker.name.findName() },
+        const tableData = [
             { id: 'nationality', type: 'image', data: country.flag, metadata: { sortValue: country.nationality } },
             { id: 'role', type: 'string', data: faker.hacker.noun() },
             { id: 'wages', type: 'string', data: '$' + getRandomNumberInRange(1000, 100) + 'K'},
             { id: 'form', type: 'chart', data: chartData, metadata: { sortValue: getRandomNumberInRange(10, 1) } },
             { id: 'morale', type: 'icon', data: moraleEntity.icon, metadata: { sortValue: moraleEntity.morale } },
             { id: 'current_ability', type: 'number', data: getRandomNumberInRange(MAX_OVERALL_VALUE, 1) }
+        ];
+        const nameColumnData = withLink
+            ? { id: 'name', type: 'link', data: faker.name.findName(), metadata: { playerId: idx} }
+            : { id: 'name', type: 'string', data: faker.name.findName() };
+
+        return [
+            nameColumnData,
+            ...tableData
         ];
     })
 });
@@ -223,7 +228,8 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
 
 export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
     return {
-        players: [ ...Array(numPlayers) ].map(() => ({
+        players: [ ...Array(numPlayers) ].map((_0, idx) => ({
+            playerId: idx,
             name: faker.name.findName(),
             nationality: _.sample(nationsList),
             role: faker.hacker.noun(),
@@ -252,6 +258,7 @@ export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) =>
             fouls: getRandomNumberInRange(25)
         };
 
+        // TODO: check if we need this logic or can use matchRatingHistory object directly
         return numMatches === 0 ? {
             ...competitionData,
             averageRating: getRandomNumberInRange(10),

@@ -2,24 +2,31 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
 
-const getOptions = (chartTitle) => ({
-    stroke: { width: 2, curve: 'straight' },
-    plotOptions: { bar: { columnWidth: '15%' } },
-    dataLabels: { enabled: false },
-    legend: { show: false },
-    title: { text: chartTitle, align: 'left', style: { fontFamily: 'Roboto' } },
-    xaxis: {
-        title: { text: 'Months', style: { fontFamily: 'Roboto' } },
-        categories: [1, 2, 3, 4, 5, 6]
-    }
-});
+import { useGlobalChartOptions } from '../context/chartOptionsProvider';
 
 export default function OverallProgressChart({ overallData }) {
     const chartTitle = 'Player Overall Progression over last 6 months';
+    const globalChartOptions = useGlobalChartOptions();
 
     return (
         <ReactApexChart 
-            options={ getOptions(chartTitle) }
+            options={{
+                ...globalChartOptions,
+                stroke: {
+                    ...globalChartOptions.stroke,
+                    curve: 'straight'
+                },
+                dataLabels: { enabled: false },
+                plotOptions: { bar: { columnWidth: '15%' } },
+                title: {
+                    ...globalChartOptions.title,
+                    text: chartTitle
+                },
+                xaxis: {
+                    title: { text: 'Months', style: { fontFamily: 'Roboto' } },
+                    categories: [1, 2, 3, 4, 5, 6]
+                }
+            }}
             series={ overallData }
             type='bar'
             height={ 500 }
