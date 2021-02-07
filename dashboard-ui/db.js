@@ -30,7 +30,7 @@ function getSquadHubPlayerData(playerData, numPlayersInSquad, moraleList) {
             form: formList,
             morale: _.sample(moraleList),
             current_ability: playersInSquad[i].ability.current
-        }
+        };
         squadPlayerData.push(squadPlayer);
     }
     return squadPlayerData;
@@ -144,7 +144,7 @@ function getPlayerData(numPlayers, numAttributes, nationsList) {
 
     const attributeNamesList = [];
     for (let i = 0; i < numAttributes; i++) {
-        attributeNamesList.push(faker.hacker.noun())
+        attributeNamesList.push(faker.hacker.noun());
     }
 
     for (let i = 0; i < numPlayers; i++) {
