@@ -161,15 +161,15 @@ const PlayerPerformanceContainer = ({ playerId, classes }) => {
 const PlayerComparisonContainer = ({ playerData, classes }) => {
     const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
     const [squadPlayers, setSquadPlayers] = React.useState([]);
-    const [currentPlayer, setCurrentPlayer] = React.useState({});
+    const [currentPlayerId, setCurrentPlayerId] = React.useState(-1);
     const [comparedPlayer, setComparedPlayer] = React.useState(null);
 
     const handlePlayerChange = (event) => {
-        setCurrentPlayer(event.target.value);
+        setCurrentPlayerId(event.target.value);
     };
 
     const cardWithFilterProps = {
-        currentValue: currentPlayer,
+        currentValue: currentPlayerId,
         allPossibleValues: squadPlayers,
         handleChangeFn: handlePlayerChange,
         labelIdFragment: 'players',
@@ -197,7 +197,7 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
 
     React.useEffect(() => {
         const getComparedPlayerData = async () => {
-            const { metadata, roles, ability, attributes } = await fetchPlayerData(currentPlayer.id);
+            const { metadata, roles, ability, attributes } = await fetchPlayerData(currentPlayerId);
             setComparedPlayer({
                 playerMetadata: metadata,
                 playerRoles: roles,
@@ -209,8 +209,8 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
             })
         };
 
-        !_.isEmpty(currentPlayer) && getComparedPlayerData();
-    }, [currentPlayer]);
+        currentPlayerId !== -1 && getComparedPlayerData();
+    }, [currentPlayerId]);
 
     const playerComparisonViewData = _.isEmpty(playerData) ? {} :
         {
