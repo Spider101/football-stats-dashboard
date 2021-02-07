@@ -22,7 +22,7 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, cardW
                         </Grid>
                     ))
                 }
-                { cardWithFilter !== null &&
+                { cardWithFilter !== null && comparedPlayer === null &&
                     <Grid item xs={6}>
                         { cardWithFilter }
                     </Grid>
