@@ -1,14 +1,16 @@
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
-import { BrowserRouter as Router } from 'react-router-dom';
 
 import Layout from './Layout';
 import { useThemePreference } from './context/themePreferenceProvider';
 import { ChartOptionsProvider } from './context/chartOptionsProvider';
 
 function App() {
+    const queryClient = new QueryClient();
     const themePreference = useThemePreference();
     const theme = React.useMemo(() => createMuiTheme({
         palette: {
@@ -18,11 +20,13 @@ function App() {
 
     return (
         <Router>
-            <ThemeProvider theme={ theme }>
-                <ChartOptionsProvider>
-                    <Layout />
-                </ChartOptionsProvider>
-            </ThemeProvider>
+            <QueryClientProvider client={ queryClient }>
+                <ThemeProvider theme={ theme }>
+                    <ChartOptionsProvider>
+                        <Layout />
+                    </ChartOptionsProvider>
+                </ThemeProvider>
+            </QueryClientProvider>
         </Router>
     );
 }
