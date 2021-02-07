@@ -207,7 +207,7 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
             });
         };
 
-        currentPlayerId !== -1 && getComparedPlayerData();
+        currentPlayerId === -1 ? setComparedPlayer(null) : getComparedPlayerData();
     }, [currentPlayerId]);
 
     const playerComparisonViewData = _.isEmpty(playerData) ? {} :
