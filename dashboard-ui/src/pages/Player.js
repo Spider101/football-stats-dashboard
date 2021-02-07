@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Link as RouterLink, Route, Switch, useParams, useRouteMatch  } from 'react-router-dom';
+import { NavLink as RouterLink, Route, Switch, useParams, useRouteMatch  } from 'react-router-dom';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
@@ -26,10 +26,18 @@ const useStyles = makeStyles((theme) => ({
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         marginBottom: theme.spacing(2),
+        '& div': {
+            paddingLeft: '0px !important',
+            paddingRight: `${theme.spacing(2)}px !important`
+        },
         '& a': {
-            color: theme.palette.common.white,
-            textDecoration: 'none !important'
+            color: theme.palette.common.white
         }
+    },
+    selectedPage: {
+        borderBottomWidth: 1,
+        borderBottomStyle: 'solid',
+        padding: `${(theme.spacing(1) + 1)}px 0px`
     }
 }));
 
@@ -57,17 +65,33 @@ export default function Player() {
         <>
             <Grid container spacing={2} className={ classes.topMenu }>
                 <Grid item>
-                    <Link component={ RouterLink } to={ url }>
+                    <Link
+                        exact
+                        component={ RouterLink }
+                        to={ url }
+                        underline='none'
+                        activeClassName={ classes.selectedPage }
+                    >
                         Player Progress
                     </Link>
                 </Grid>
                 <Grid item>
-                    <Link component={ RouterLink } to={ `${url}/compare` }>
+                    <Link
+                        component={ RouterLink }
+                        to={ `${url}/compare` }
+                        underline='none'
+                        activeClassName={ classes.selectedPage }
+                    >
                         Player Comparison
                     </Link>
                 </Grid>
-                <Grid item >
-                    <Link component={ RouterLink } to={ `${url}/performance` }>
+                <Grid item>
+                    <Link
+                        component={ RouterLink }
+                        to={ `${url}/performance` }
+                        underline='none'
+                        activeClassName={ classes.selectedPage }
+                    >
                         Match Performance
                     </Link>
                 </Grid>
