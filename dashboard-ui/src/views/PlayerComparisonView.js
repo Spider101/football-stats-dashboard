@@ -15,6 +15,13 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
 
     return (
         <>
+            { comparedPlayer !== null &&
+            <Grid container spacing={2}>
+                <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    { filterControl }
+                </Grid>
+            </Grid>
+            }
             <Grid container spacing={2}>
                 {
                     playerData.players.map((player, _idx) => (
@@ -23,7 +30,7 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
                         </Grid>
                     ))
                 }
-                { filterControl !== null && comparedPlayer === null &&
+                { comparedPlayer === null &&
                     <Grid item xs={6}>
                         <CardWithFilter filterControl={ filterControl } />
                     </Grid>
