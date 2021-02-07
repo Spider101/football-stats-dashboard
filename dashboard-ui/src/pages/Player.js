@@ -8,7 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import { fade, makeStyles } from '@material-ui/core/styles';
 
-import { fetchPlayerData, fetchPlayerPerformanceData } from '../clients/DashboardClient';
+import { fetchPlayerData, fetchPlayerPerformanceData, fetchSquadHubData } from '../clients/DashboardClient';
 import PlayerProgressionView from '../views/PlayerProgressionView';
 import MatchPerformanceView from '../views/MatchPerformanceView';
 import CardWithFilter from '../widgets/CardWithFilter';
@@ -160,11 +160,18 @@ const PlayerPerformanceContainer = ({ playerId, classes }) => {
 
 const PlayerComparisonContainer = ({ playerData, classes }) => {
     const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
+    const [squadPlayers, setSquadPlayers] = React.useState([]);
+    const [currentPlayer, setCurrentPlayer] = React.useState({});
+    const [comparedPlayer, setComparedPlayer] = React.useState(null);
+
+    const handlePlayerChange = (event) => {
+        setCurrentPlayer(event.target.value);
+    };
 
     const cardWithFilterProps = {
-        currentValue: '',
-        allPossibleValues: [],
-        handleChangeFn: x => x,
+        currentValue: currentPlayer,
+        allPossibleValues: squadPlayers,
+        handleChangeFn: handlePlayerChange,
         labelIdFragment: 'players',
         inputLabelText: 'players',
         helperText: 'Choose player to compare against'
@@ -175,8 +182,35 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
     );
 
     React.useEffect(() => {
-        !_.isEmpty(playerData) && setPageStatus(PAGE_STATUS.READY);
+        const getSquadHubViewData = async () => {
+            const squadHubData = await fetchSquadHubData();
+            setSquadPlayers([
+                ...squadHubData.map(squadPlayer => ({ id: squadPlayer.playerId, text: squadPlayer.name }))
+            ])
+        };
+
+        if (!_.isEmpty(playerData)) {
+            setPageStatus(PAGE_STATUS.READY);
+            getSquadHubViewData();
+        }
     }, [playerData]);
+
+    React.useEffect(() => {
+        const getComparedPlayerData = async () => {
+            const { metadata, roles, ability, attributes } = await fetchPlayerData(currentPlayer.id);
+            setComparedPlayer({
+                playerMetadata: metadata,
+                playerRoles: roles,
+                playerOverall: {
+                    currentValue: ability.current,
+                    history: ability.history
+                },
+                playerAttributes: attributes
+            })
+        };
+
+        !_.isEmpty(currentPlayer) && getComparedPlayerData();
+    }, [currentPlayer]);
 
     const playerComparisonViewData = _.isEmpty(playerData) ? {} :
         {
@@ -189,7 +223,7 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
                 },
                 playerAttributes: playerData.attributes
             },
-            comparedPlayer: null,
+            comparedPlayer,
             cardWithFilter
         };
 
@@ -216,6 +250,6 @@ PlayerComparisonContainer.propTypes = {
 };
 
 PlayerPerformanceContainer.propTypes = {
-    playerId: PropTypes.number,
+    playerId: PropTypes.string,
     classes: PropTypes.object
 };
