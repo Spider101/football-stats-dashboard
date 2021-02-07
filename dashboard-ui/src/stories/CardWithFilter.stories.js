@@ -14,8 +14,8 @@ const Template = args => <CardWithFilter { ...args } />;
 export const Default = Template.bind({});
 Default.args = {
     filterControl: {
-        allPossibleValues: [ ...Array(10) ].map(() => faker.hacker.noun()),
-        currentValue: 'value not matching anything in dropdown',
+        allPossibleValues: [ ...Array(10) ].map((_, _idx) => ({ id: _idx, text: faker.hacker.noun()})),
+        currentValue: { id: -1, name: '' },
         handleChangeFn: x => x,
         labelIdFragment: 'players',
         inputLabelText: 'players',

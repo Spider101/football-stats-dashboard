@@ -27,13 +27,13 @@ export default function FilterControl({ currentValue, allPossibleValues, handleC
             <InputLabel id={ selectLabelId }>{ capitalizeLabel(inputLabelText) }</InputLabel>
             <Select
                 labelId={ selectLabelId }
-                value={ currentValue }
+                value={ currentValue.id }
                 onChange={ handleChangeFn }
             >
                 <MenuItem aria-label="None" value=""><em>None</em></MenuItem>
                 {
-                    allPossibleValues.map((valueText, _idx) => (
-                        <MenuItem key={ _idx } value={ valueText }>{ capitalizeLabel(valueText) }</MenuItem>
+                    allPossibleValues.map(value => (
+                        <MenuItem key={ value.id } value={ value.id }>{ capitalizeLabel(value.text) }</MenuItem>
                     ))
                 }
             </Select>
@@ -45,7 +45,10 @@ export default function FilterControl({ currentValue, allPossibleValues, handleC
 FilterControl.propTypes = {
     handleChangeFn: PropTypes.func,
     currentValue: PropTypes.string,
-    allPossibleValues: PropTypes.arrayOf(PropTypes.string),
+    allPossibleValues: PropTypes.arrayOf(PropTypes.shape({
+        id: PropTypes.number,
+        name: PropTypes.string,
+    })),
     inputLabelText: PropTypes.string,
     labelIdFragment: PropTypes.string,
     helperText: PropTypes.string
