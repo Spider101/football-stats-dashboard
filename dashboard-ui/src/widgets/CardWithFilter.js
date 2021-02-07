@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
@@ -10,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
     emptyCard: {
         display: 'flex',
         justifyContent: 'center',
-        backgroundColor: theme.palette.grey[100],
+        backgroundColor: theme.palette.action.selected,
         borderStyle: 'dashed',
         height: '100%'
     }
@@ -29,5 +30,7 @@ export default function CardWithFilter({ filterControl }) {
 }
 
 CardWithFilter.propTypes = {
-    filterControl: FilterControl.propTypes
+    filterControl: PropTypes.shape({
+        ...FilterControl.propTypes
+    }), 
 };
