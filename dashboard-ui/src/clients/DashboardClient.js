@@ -10,7 +10,8 @@ export const fetchPlayerData = async (playerId) => {
     return await fetchDataFromEndpoint(`players/${playerId}`);
 };
 
-export const fetchPlayerPerformanceData = async (playerId) => {
+export const fetchPlayerPerformanceData = async ({ queryKey }) => {
+    const [ _key, { playerId } ] = queryKey;
     let playerPerformanceData = await fetchDataFromEndpoint(`players/${playerId}/performance`);
 
     playerPerformanceData = playerPerformanceData.map(performanceData => {

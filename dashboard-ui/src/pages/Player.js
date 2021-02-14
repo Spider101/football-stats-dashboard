@@ -13,6 +13,7 @@ import PlayerProgressionView from '../views/PlayerProgressionView';
 import MatchPerformanceView from '../views/MatchPerformanceView';
 import PlayerComparisonView from '../views/PlayerComparisonView';
 import FilterControl from '../components/FilterControl';
+import { useQuery } from 'react-query';
 
 const useStyles = makeStyles((theme) => ({
     loadingCircle: {
@@ -150,33 +151,20 @@ const PlayerProgressionContainer = ({ playerData, classes }) => {
 };
 
 const PlayerPerformanceContainer = ({ playerId, classes }) => {
-    const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
-    const [playerPerformanceViewData, setPlayerPerformanceViewData] = React.useState({});
+    const { isLoading, data: playerPerformanceData } =
+        useQuery(['playerPerformance', { playerId }], fetchPlayerPerformanceData);
 
-    React.useEffect(() => {
-        const getPlayerPerformanceViewData = async () => {
-            const playerPerformanceViewData = await fetchPlayerPerformanceData(playerId);
-
-            setPlayerPerformanceViewData({
-                playerPerformance: {
-                    competitions: playerPerformanceViewData
-                }
-            });
-
-            setPageStatus(PAGE_STATUS.READY);
-        };
-
-        getPlayerPerformanceViewData();
-    }, [playerId]);
+    const playerPerformanceViewData = {
+        playerPerformance: {
+            competitions: playerPerformanceData
+        }
+    };
 
     return (
         <>
             {
-                pageStatus === PAGE_STATUS.LOADING
-                    ? <CircularProgress className={ classes.loadingCircle }/>
-                    : pageStatus === PAGE_STATUS.READY
-                        ? <MatchPerformanceView { ...playerPerformanceViewData } />
-                        : null
+                isLoading ? <CircularProgress className={ classes.loadingCircle }/>
+                    : <MatchPerformanceView { ...playerPerformanceViewData } />
             }
         </>
     );
