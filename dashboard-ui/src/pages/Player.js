@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import { NavLink as RouterLink, Route, Switch, useParams, useRouteMatch  } from 'react-router-dom';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -13,7 +12,7 @@ import PlayerProgressionView from '../views/PlayerProgressionView';
 import MatchPerformanceView from '../views/MatchPerformanceView';
 import PlayerComparisonView from '../views/PlayerComparisonView';
 import FilterControl from '../components/FilterControl';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 
 const useStyles = makeStyles((theme) => ({
     loadingCircle: {
@@ -42,25 +41,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const PAGE_STATUS = {
-    LOADING: 'loading',
-    READY: 'ready'
-};
-
 export default function Player() {
     const classes = useStyles();
     const { playerId } = useParams();
     const { path, url } = useRouteMatch();
-    const [playerData, setPlayerData] = React.useState({});
-
-    React.useEffect(() => {
-        const getPlayerData = async () => {
-            const playerData = await fetchPlayerData(playerId);
-            setPlayerData({ ...playerData });
-        };
-
-        getPlayerData();
-    }, [playerId]);
 
     return (
         <>
@@ -100,16 +84,10 @@ export default function Player() {
 
             <Switch>
                 <Route exact path={ path }>
-                    <PlayerProgressionContainer
-                        playerData={ playerData }
-                        classes={ classes }
-                    />
+                    <PlayerProgressionContainer playerId={ playerId } classes={ classes } />
                 </Route>
                 <Route path={ `${path}/compare` }>
-                    <PlayerComparisonContainer
-                        playerData={ playerData }
-                        classes={ classes }
-                    />
+                    <PlayerComparisonContainer playerId={ playerId } classes={ classes } />
                 </Route>
                 <Route path={ `${path}/performance` }>
                     <PlayerPerformanceContainer playerId={ playerId } classes={ classes } />
@@ -119,14 +97,10 @@ export default function Player() {
     );
 }
 
-const PlayerProgressionContainer = ({ playerData, classes }) => {
-    const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
+const PlayerProgressionContainer = ({ playerId, classes }) => {
+    const { isLoading, data: playerData } = useQuery(['player', { playerId }], fetchPlayerData);
 
-    React.useEffect(() => {
-        !_.isEmpty(playerData) && setPageStatus(PAGE_STATUS.READY);
-    }, [playerData]);
-
-    const playerProgressViewData = _.isEmpty(playerData) ? {} :
+    const playerProgressViewData = isLoading ? {} :
         {
             playerMetadata: playerData.metadata,
             playerRoles: playerData.roles,
@@ -140,11 +114,8 @@ const PlayerProgressionContainer = ({ playerData, classes }) => {
     return (
         <>
             {
-                pageStatus === PAGE_STATUS.LOADING
-                    ? <CircularProgress className={ classes.loadingCircle }/>
-                    : pageStatus === PAGE_STATUS.READY
-                        ? <PlayerProgressionView { ...playerProgressViewData } />
-                        : null
+                isLoading ? <CircularProgress className={ classes.loadingCircle }/>
+                    : <PlayerProgressionView { ...playerProgressViewData } />
             }
         </>
     );
@@ -170,68 +141,66 @@ const PlayerPerformanceContainer = ({ playerId, classes }) => {
     );
 };
 
-const PlayerComparisonContainer = ({ playerData, classes }) => {
-    const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
-    const [squadPlayers, setSquadPlayers] = React.useState([]);
-    const [currentPlayerId, setCurrentPlayerId] = React.useState(-1);
-    const [comparedPlayer, setComparedPlayer] = React.useState(null);
+const PlayerComparisonContainer = ({ playerId, classes }) => {
+    const [comparedPlayerId, setCurrentPlayerId] = React.useState(-1);
+    const queryClient = useQueryClient();
 
     const handlePlayerChange = (event) => {
         setCurrentPlayerId(event.target.value);
     };
 
+    // fetch the squad players data (from cache or the server)
+    // to populate the list of players that the current player can be compared against
+    const squadDataQuery = useQuery(
+        'squadData',
+        fetchSquadHubData, {
+            initialData: () => {
+                return queryClient.getQueryData('squadData')
+            },
+            staleTime: 60 * 1000,
+            initialDataUpdatedAt: queryClient.getQueryState('squadData')?.dataUpdatedAt
+        });
+    const squadPlayers = squadDataQuery.isLoading ? []
+        : squadDataQuery.data.filter(d => d.playerId !== playerId)
+            .map(d => ({ id: d.playerId, text: d.name }));
+
     const filterControlProps = {
-        currentValue: currentPlayerId,
+        currentValue: comparedPlayerId,
         allPossibleValues: squadPlayers,
         handleChangeFn: handlePlayerChange,
         labelIdFragment: 'players',
         inputLabelText: 'players',
         helperText: 'Choose player to compare against'
     };
-
     const filterControl = <FilterControl { ...filterControlProps } />;
 
-    React.useEffect(() => {
-        const getSquadHubViewData = async () => {
-            const squadHubData = await fetchSquadHubData();
-            setSquadPlayers([
-                ...squadHubData.map(squadPlayer => ({ id: squadPlayer.playerId, text: squadPlayer.name }))
-            ]);
-        };
+    // fetch the data for the player to be compared against
+    // (run the query only when the comparedPlayerId's value changes from the default of -1)
+    const comparedPlayerQuery = useQuery(['comparedPlayer', { playerId: comparedPlayerId }], fetchPlayerData, {
+        enabled: comparedPlayerId !== -1
+    });
+    const comparedPlayer = comparedPlayerQuery.isLoading || comparedPlayerQuery.isIdle ? null : {
+        playerMetadata: comparedPlayerQuery.data.metadata,
+        playerRoles: comparedPlayerQuery.data.roles,
+        playerOverall: {
+            currentValue: comparedPlayerQuery.data.ability.current,
+            history: comparedPlayerQuery.data.ability.history
+        },
+        playerAttributes: comparedPlayerQuery.data.attributes
+    };
 
-        if (!_.isEmpty(playerData)) {
-            setPageStatus(PAGE_STATUS.READY);
-            getSquadHubViewData();
-        }
-    }, [playerData]);
-
-    React.useEffect(() => {
-        const getComparedPlayerData = async () => {
-            const { metadata, roles, ability, attributes } = await fetchPlayerData(currentPlayerId);
-            setComparedPlayer({
-                playerMetadata: metadata,
-                playerRoles: roles,
-                playerOverall: {
-                    currentValue: ability.current,
-                    history: ability.history
-                },
-                playerAttributes: attributes
-            });
-        };
-
-        currentPlayerId === -1 ? setComparedPlayer(null) : getComparedPlayerData();
-    }, [currentPlayerId]);
-
-    const playerComparisonViewData = _.isEmpty(playerData) ? {} :
+    // fetch the data for the current player (from cache or server) to be passed into the player comparison view
+    const playerDataQuery = useQuery(['player', { playerId }], fetchPlayerData);
+    const playerComparisonViewData = playerDataQuery.isLoading ? {} :
         {
             basePlayer: {
-                playerMetadata: playerData.metadata,
-                playerRoles: playerData.roles,
+                playerMetadata: playerDataQuery.data.metadata,
+                playerRoles: playerDataQuery.data.roles,
                 playerOverall: {
-                    currentValue: playerData.ability.current,
-                    history: playerData.ability.history
+                    currentValue: playerDataQuery.data.ability.current,
+                    history: playerDataQuery.data.ability.history
                 },
-                playerAttributes: playerData.attributes
+                playerAttributes: playerDataQuery.data.attributes
             },
             comparedPlayer,
             filterControl
@@ -240,18 +209,16 @@ const PlayerComparisonContainer = ({ playerData, classes }) => {
     return (
         <>
             {
-                pageStatus === PAGE_STATUS.LOADING
-                    ? <CircularProgress className={ classes.loadingCircle }/>
-                    : pageStatus === PAGE_STATUS.READY
-                        ? <PlayerComparisonView { ...playerComparisonViewData } />
-                        : null
+                squadDataQuery.isLoading || playerDataQuery.isLoading
+                ? <CircularProgress className={ classes.loadingCircle }/>
+                    : <PlayerComparisonView { ...playerComparisonViewData } />
             }
         </>
     );
 };
 
 PlayerProgressionContainer.propTypes = {
-    playerData: PropTypes.object,
+    playerId: PropTypes.string,
     classes: PropTypes.object
 };
 
@@ -260,6 +227,5 @@ PlayerComparisonContainer.propTypes = {
 };
 
 PlayerPerformanceContainer.propTypes = {
-    playerId: PropTypes.string,
-    classes: PropTypes.object
+    ...PlayerProgressionContainer.propTypes
 };
