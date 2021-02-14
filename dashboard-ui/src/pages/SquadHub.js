@@ -1,11 +1,10 @@
 import React from 'react';
-import { useQuery } from 'react-query';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
 import SquadHubView from '../views/SquadHubView';
-import { fetchSquadHubData } from '../clients/DashboardClient';
+import useSquadHubData from '../hooks/useSquadHubData';
 
 const useStyles = makeStyles({
     loadingCircle: {
@@ -18,7 +17,7 @@ const useStyles = makeStyles({
 
 const SquadHub = () => {
     const classes = useStyles();
-    const { isLoading, data : squadHubData } = useQuery('squadData', fetchSquadHubData);
+    const { isLoading, data: squadHubData } = useSquadHubData();
 
     return (
         <>
