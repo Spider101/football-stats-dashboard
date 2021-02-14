@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
@@ -26,6 +27,7 @@ function App() {
                         <Layout />
                     </ChartOptionsProvider>
                 </ThemeProvider>
+                <ReactQueryDevtools initialIsOpen={false} />
             </QueryClientProvider>
         </Router>
     );
