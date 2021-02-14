@@ -2,6 +2,13 @@ import React from 'react';
 import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 
+export const queryKeys = {
+    SQUAD_DATA: 'squadData',
+    PLAYER_DATA: 'playerData',
+    COMPARED_PLAYER_DATA: 'comparedPlayerData',
+    PLAYER_PERFORMANCE_DATA: 'playerPerformance'
+};
+
 // TODO: this will be returned from the service in future; remove this then
 export const allSquadHubTableHeaders = [
     { id: 'name', type: 'string' },
