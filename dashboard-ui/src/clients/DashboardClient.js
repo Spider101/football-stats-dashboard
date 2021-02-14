@@ -6,7 +6,8 @@ export const fetchSquadHubData = async () => {
     return await fetchDataFromEndpoint('squadPlayers');
 };
 
-export const fetchPlayerData = async (playerId) => {
+export const fetchPlayerData = async ({ queryKey }) => {
+    const [ _key, { playerId } ] = queryKey;
     return await fetchDataFromEndpoint(`players/${playerId}`);
 };
 
