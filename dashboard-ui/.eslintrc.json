@@ -45,6 +45,12 @@
             {
                 "code": 120
             }
+        ],
+        "no-unused-vars": [
+            "error",
+            {
+                "varsIgnorePattern": "^_"
+            }
         ]
     }
 }

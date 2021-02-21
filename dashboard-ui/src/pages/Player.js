@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import _ from 'lodash';
 import { NavLink as RouterLink, Route, Switch, useParams, useRouteMatch  } from 'react-router-dom';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -8,11 +7,16 @@ import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import { fade, makeStyles } from '@material-ui/core/styles';
 
-import { fetchPlayerData, fetchPlayerPerformanceData, fetchSquadHubData } from '../clients/DashboardClient';
 import PlayerProgressionView from '../views/PlayerProgressionView';
 import MatchPerformanceView from '../views/MatchPerformanceView';
 import PlayerComparisonView from '../views/PlayerComparisonView';
+
 import FilterControl from '../components/FilterControl';
+
+import useSquadHub from '../hooks/useSquadHubData';
+import usePlayerData from '../hooks/usePlayerData';
+import usePlayerPerfData from '../hooks/usePlayerPerfData';
+import { queryKeys } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
     loadingCircle: {
@@ -41,25 +45,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const PAGE_STATUS = {
-    LOADING: 'loading',
-    READY: 'ready'
-};
-
 export default function Player() {
     const classes = useStyles();
     const { playerId } = useParams();
     const { path, url } = useRouteMatch();
-    const [playerData, setPlayerData] = React.useState({});
-
-    React.useEffect(() => {
-        const getPlayerData = async () => {
-            const playerData = await fetchPlayerData(playerId);
-            setPlayerData({ ...playerData });
-        };
-
-        getPlayerData();
-    }, [playerId]);
 
     return (
         <>
@@ -99,16 +88,10 @@ export default function Player() {
 
             <Switch>
                 <Route exact path={ path }>
-                    <PlayerProgressionContainer
-                        playerData={ playerData }
-                        classes={ classes }
-                    />
+                    <PlayerProgressionContainer playerId={ playerId } classes={ classes } />
                 </Route>
                 <Route path={ `${path}/compare` }>
-                    <PlayerComparisonContainer
-                        playerData={ playerData }
-                        classes={ classes }
-                    />
+                    <PlayerComparisonContainer playerId={ playerId } classes={ classes } />
                 </Route>
                 <Route path={ `${path}/performance` }>
                     <PlayerPerformanceContainer playerId={ playerId } classes={ classes } />
@@ -118,152 +101,83 @@ export default function Player() {
     );
 }
 
-const PlayerProgressionContainer = ({ playerData, classes }) => {
-    const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
-
-    React.useEffect(() => {
-        !_.isEmpty(playerData) && setPageStatus(PAGE_STATUS.READY);
-    }, [playerData]);
-
-    const playerProgressViewData = _.isEmpty(playerData) ? {} :
-        {
-            playerMetadata: playerData.metadata,
-            playerRoles: playerData.roles,
-            playerOverall: {
-                currentValue: playerData.ability.current,
-                history: playerData.ability.history
-            },
-            playerAttributes: playerData.attributes
-        };
+const PlayerProgressionContainer = ({ playerId, classes }) => {
+    const { isLoading, data: playerProgressViewData } = usePlayerData(queryKeys.PLAYER_DATA, playerId);
 
     return (
         <>
             {
-                pageStatus === PAGE_STATUS.LOADING
-                    ? <CircularProgress className={ classes.loadingCircle }/>
-                    : pageStatus === PAGE_STATUS.READY
-                        ? <PlayerProgressionView { ...playerProgressViewData } />
-                        : null
+                isLoading ? <CircularProgress className={ classes.loadingCircle }/>
+                    : <PlayerProgressionView { ...playerProgressViewData } />
             }
         </>
     );
 };
 
 const PlayerPerformanceContainer = ({ playerId, classes }) => {
-    const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
-    const [playerPerformanceViewData, setPlayerPerformanceViewData] = React.useState({});
+    const { isLoading, data: playerPerformanceData } = usePlayerPerfData(playerId);
 
-    React.useEffect(() => {
-        const getPlayerPerformanceViewData = async () => {
-            const playerPerformanceViewData = await fetchPlayerPerformanceData(playerId);
-
-            setPlayerPerformanceViewData({
-                playerPerformance: {
-                    competitions: playerPerformanceViewData
-                }
-            });
-
-            setPageStatus(PAGE_STATUS.READY);
-        };
-
-        getPlayerPerformanceViewData();
-    }, [playerId]);
+    const playerPerformanceViewData = {
+        playerPerformance: {
+            competitions: playerPerformanceData
+        }
+    };
 
     return (
         <>
             {
-                pageStatus === PAGE_STATUS.LOADING
-                    ? <CircularProgress className={ classes.loadingCircle }/>
-                    : pageStatus === PAGE_STATUS.READY
-                        ? <MatchPerformanceView { ...playerPerformanceViewData } />
-                        : null
+                isLoading ? <CircularProgress className={ classes.loadingCircle }/>
+                    : <MatchPerformanceView { ...playerPerformanceViewData } />
             }
         </>
     );
 };
 
-const PlayerComparisonContainer = ({ playerData, classes }) => {
-    const [pageStatus, setPageStatus] = React.useState(PAGE_STATUS.LOADING);
-    const [squadPlayers, setSquadPlayers] = React.useState([]);
-    const [currentPlayerId, setCurrentPlayerId] = React.useState(-1);
-    const [comparedPlayer, setComparedPlayer] = React.useState(null);
+const PlayerComparisonContainer = ({ playerId, classes }) => {
+    const [comparedPlayerId, setCurrentPlayerId] = React.useState(-1);
 
     const handlePlayerChange = (event) => {
         setCurrentPlayerId(event.target.value);
     };
 
+    const squadDataQuery = useSquadHub();
+    const squadPlayers = squadDataQuery.data.filter(d => d.playerId !== playerId)
+        .map(d => ({ id: d.playerId, text: d.name }));
+
     const filterControlProps = {
-        currentValue: currentPlayerId,
+        currentValue: comparedPlayerId,
         allPossibleValues: squadPlayers,
         handleChangeFn: handlePlayerChange,
         labelIdFragment: 'players',
         inputLabelText: 'players',
         helperText: 'Choose player to compare against'
     };
-
     const filterControl = <FilterControl { ...filterControlProps } />;
 
-    React.useEffect(() => {
-        const getSquadHubViewData = async () => {
-            const squadHubData = await fetchSquadHubData();
-            setSquadPlayers([
-                ...squadHubData.map(squadPlayer => ({ id: squadPlayer.playerId, text: squadPlayer.name }))
-            ]);
-        };
+    // fetch the data for the player to be compared against
+    const { data: comparedPlayer } = usePlayerData(queryKeys.COMPARED_PLAYER_DATA, comparedPlayerId);
 
-        if (!_.isEmpty(playerData)) {
-            setPageStatus(PAGE_STATUS.READY);
-            getSquadHubViewData();
-        }
-    }, [playerData]);
-
-    React.useEffect(() => {
-        const getComparedPlayerData = async () => {
-            const { metadata, roles, ability, attributes } = await fetchPlayerData(currentPlayerId);
-            setComparedPlayer({
-                playerMetadata: metadata,
-                playerRoles: roles,
-                playerOverall: {
-                    currentValue: ability.current,
-                    history: ability.history
-                },
-                playerAttributes: attributes
-            });
-        };
-
-        currentPlayerId === -1 ? setComparedPlayer(null) : getComparedPlayerData();
-    }, [currentPlayerId]);
-
-    const playerComparisonViewData = _.isEmpty(playerData) ? {} :
-        {
-            basePlayer: {
-                playerMetadata: playerData.metadata,
-                playerRoles: playerData.roles,
-                playerOverall: {
-                    currentValue: playerData.ability.current,
-                    history: playerData.ability.history
-                },
-                playerAttributes: playerData.attributes
-            },
-            comparedPlayer,
-            filterControl
-        };
+    // fetch the data for the current player (from cache or server) to be passed into the player comparison view
+    const basePlayerDataQuery = usePlayerData(queryKeys.PLAYER_DATA, playerId);
+    const playerComparisonViewData = {
+        basePlayer: basePlayerDataQuery.data,
+        comparedPlayer,
+        filterControl
+    };
 
     return (
         <>
             {
-                pageStatus === PAGE_STATUS.LOADING
+                squadDataQuery.isLoading || basePlayerDataQuery.isLoading
                     ? <CircularProgress className={ classes.loadingCircle }/>
-                    : pageStatus === PAGE_STATUS.READY
-                        ? <PlayerComparisonView { ...playerComparisonViewData } />
-                        : null
+                    : <PlayerComparisonView { ...playerComparisonViewData } />
             }
         </>
     );
 };
 
 PlayerProgressionContainer.propTypes = {
-    playerData: PropTypes.object,
+    playerId: PropTypes.string,
     classes: PropTypes.object
 };
 
@@ -272,6 +186,5 @@ PlayerComparisonContainer.propTypes = {
 };
 
 PlayerPerformanceContainer.propTypes = {
-    playerId: PropTypes.string,
-    classes: PropTypes.object
+    ...PlayerProgressionContainer.propTypes
 };

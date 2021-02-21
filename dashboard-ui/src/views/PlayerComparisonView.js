@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 
 import Grid from '@material-ui/core/Grid';
 
@@ -10,12 +11,12 @@ import CardWithFilter from '../widgets/CardWithFilter';
 export default function PlayerComparisonView({ basePlayer, comparedPlayer, filterControl }) {
     // filter out any non-existent player data
     const playerData = {
-        players: [ basePlayer, comparedPlayer ].filter(player => player !== null)
+        players: [ basePlayer, comparedPlayer ].filter(player => !_.isEmpty(player))
     };
 
     return (
         <>
-            { comparedPlayer !== null &&
+            { !_.isEmpty(comparedPlayer) &&
             <Grid container spacing={2}>
                 <Grid item xs={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
                     { filterControl }
@@ -30,7 +31,7 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
                         </Grid>
                     ))
                 }
-                { comparedPlayer === null &&
+                { _.isEmpty(comparedPlayer) &&
                     <Grid item xs={6}>
                         <CardWithFilter filterControl={ filterControl } />
                     </Grid>
