@@ -1,6 +1,18 @@
 // TODO: change this when backend is ready
 const baseUrl = 'http://localhost:4000/';
 
+export const savePlayerProgressData = async (updatedPlayerData) => {
+    const playerId = updatedPlayerData.id;
+    const res = await fetch(`${baseUrl}players/${playerId}`, {
+        method: 'PUT',
+        body: JSON.stringify(updatedPlayerData),
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    });
+
+    return await res.json();
+};
 
 export const fetchSquadHubData = async () => {
     return await fetchDataFromEndpoint('squadPlayers');
