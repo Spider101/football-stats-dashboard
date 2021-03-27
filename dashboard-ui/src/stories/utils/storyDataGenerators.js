@@ -266,3 +266,17 @@ export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) =>
         };
     })
 });
+
+export const getTransferActivityData = (numTransfers) => ({
+    transfers: [ ...Array(numTransfers) ].map(() => ({
+        name: faker.name.findName(),
+        role: faker.hacker.noun(),
+        currentAbility: getRandomNumberInRange(MAX_OVERALL_VALUE, MAX_OVERALL_VALUE / 2),
+        incomingClub: faker.company.companyName(),
+        outgoingClub: faker.company.companyName(),
+        transferType: _.sample(['Player Swap', 'Loan To Buy', 'Basic']),
+        swapPlayer: _.sample(['', faker.name.findName()]),
+        fee: getRandomNumberInRange(100000000, 1000000),
+        date: faker.date.past().toJSON()
+    }))
+});
