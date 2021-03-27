@@ -5,6 +5,8 @@ import { NavLink as RouterLink, Route, Switch, useParams, useRouteMatch  } from 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
+import Fab from '@material-ui/core/Fab';
+import EditIcon from '@material-ui/icons/Edit';
 import { fade, makeStyles } from '@material-ui/core/styles';
 
 import PlayerProgressionView from '../views/PlayerProgressionView';
@@ -17,6 +19,8 @@ import useSquadHub from '../hooks/useSquadHubData';
 import usePlayerData from '../hooks/usePlayerData';
 import usePlayerPerfData from '../hooks/usePlayerPerfData';
 import { queryKeys } from '../utils';
+import FormDialog from '../widgets/FormDialog';
+import useEditPlayerForm from '../hooks/useEditPlayerForm';
 
 const useStyles = makeStyles((theme) => ({
     loadingCircle: {
@@ -104,11 +108,34 @@ export default function Player() {
 const PlayerProgressionContainer = ({ playerId, classes }) => {
     const { isLoading, data: playerProgressViewData } = usePlayerData(queryKeys.PLAYER_DATA, playerId);
 
+    const [isFormOpen, setIsFormOpen] = React.useState(false);
+
+    const handleOpenForm = () => {
+        setIsFormOpen(true);
+    };
+
+    const handleCloseForm = () => {
+        setIsFormOpen(false);
+    };
+
     return (
         <>
             {
                 isLoading ? <CircularProgress className={ classes.loadingCircle }/>
-                    : <PlayerProgressionView { ...playerProgressViewData } />
+                    : (
+                    <>
+                        <PlayerProgressionView { ...playerProgressViewData } />
+                        <Fab color="secondary" aria-label="edit" onClick={ handleOpenForm }>
+                            <EditIcon />
+                        </Fab>
+                        <FormDialog open={ isFormOpen }
+                            handleClose={ handleCloseForm }
+                            dialogTitle='Edit Player Details'
+                            formData={ playerProgressViewData }
+                            useFormBuilder={ useEditPlayerForm }
+                        />
+                    </>
+                    )
             }
         </>
     );
