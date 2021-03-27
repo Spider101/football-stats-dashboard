@@ -9,7 +9,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 
 export default function FormDialog({ open, handleClose, dialogTitle, formData, useFormBuilder }) {
 
-    const { form, handleSubmit, formSubmitStatus } = useFormBuilder(formData);
+    const { form, handleSubmit } = useFormBuilder(formData);
     return (
         <>
             <Dialog open={ open } onClose={ handleClose } aria-labelledby="form-dialog-title">
@@ -18,16 +18,12 @@ export default function FormDialog({ open, handleClose, dialogTitle, formData, u
                     { form }
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={ handleClose } color="primary">
-                    Cancel
-                </Button>
-                <Button onClick={ handleSubmit } color="primary">
-                    Submit
-                </Button>
+                    <Button onClick={ handleClose } color="primary">Cancel</Button>
+                    <Button onClick={ handleSubmit } color="primary">Submit</Button>
                 </DialogActions>
             </Dialog>
         </>
-    )
+    );
 }
 
 FormDialog.propTypes = {
