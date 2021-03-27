@@ -29,7 +29,7 @@ function getSquadHubPlayerData(playerData, numPlayersInSquad, moraleList) {
             wages: getRandomNumberInRange(1000, 100),
             form: formList,
             morale: _.sample(moraleList),
-            current_ability: playersInSquad[i].ability.current
+            currentAbility: playersInSquad[i].ability.current
         };
         squadPlayerData.push(squadPlayer);
     }

@@ -226,20 +226,18 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
     })
 });
 
-export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
-    return {
-        players: [ ...Array(numPlayers) ].map((_0, idx) => ({
-            playerId: idx,
-            name: faker.name.findName(),
-            nationality: _.sample(nationsList),
-            role: faker.hacker.noun(),
-            wages: getRandomNumberInRange(1000, 100),
-            form: [ ...Array(5) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE)),
-            morale: _.sample(moraleList),
-            current_ability: getRandomNumberInRange(MAX_OVERALL_VALUE, 1)
-        }))
-    };
-};
+export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => ({
+    players: [ ...Array(numPlayers) ].map((_0, idx) => ({
+        playerId: idx,
+        name: faker.name.findName(),
+        nationality: _.sample(nationsList),
+        role: faker.hacker.noun(),
+        wages: getRandomNumberInRange(1000, 100),
+        form: [ ...Array(5) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE)),
+        morale: _.sample(moraleList),
+        currentAbility: getRandomNumberInRange(MAX_OVERALL_VALUE, 1)
+    }))
+});
 
 export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) => ({
     competitions: [ ...Array(numCompetitions) ].map(() => {

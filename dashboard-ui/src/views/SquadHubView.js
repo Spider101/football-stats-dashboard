@@ -23,14 +23,14 @@ const buildRowDataForSquadTable = (players) => {
         const playerId = player.playerId;
         const keysToFocusOn = keys.filter(key => key !== 'playerId');
         return Object.entries(_.pick(player, keysToFocusOn)).map(([key, value]) => {
-            let row = null;
+            let row = { id: convertCamelCaseToSnakeCase(key) };
             switch(key) {
             case 'wages':
-                row = { id: key, type: 'string', data: '$' + value + 'K'};
+                row = { ...row, type: 'string', data: '$' + value + 'K'};
                 break;
             case 'nationality':
                 row = {
-                    id: key,
+                    ...row,
                     type: 'image',
                     data: nationalityFlagMap.find(entity => entity.nationality === value).flag,
                     metadata: { sortValue: value }
@@ -38,7 +38,7 @@ const buildRowDataForSquadTable = (players) => {
                 break;
             case 'morale':
                 row = {
-                    id: key,
+                    ...row,
                     type: 'icon',
                     data: moraleIconsMap.find(entity => entity.morale === value).icon,
                     metadata: { sortValue: value }
@@ -46,7 +46,7 @@ const buildRowDataForSquadTable = (players) => {
                 break;
             case 'form':
                 row = {
-                    id: key,
+                    ...row,
                     type: 'chart',
                     data: {
                         type: 'bar',
@@ -60,14 +60,14 @@ const buildRowDataForSquadTable = (players) => {
                 break;
             case 'name':
                 row = {
-                    id: key,
+                    ...row,
                     type: 'link',
                     data: value,
                     metadata: { playerId }
                 };
                 break;
             default:
-                row = { id: key, type: isNaN(value) ? 'string' : 'number', data: value };
+                row = { ...row, type: isNaN(value) ? 'string' : 'number', data: value };
                 break;
             }
             return row;
