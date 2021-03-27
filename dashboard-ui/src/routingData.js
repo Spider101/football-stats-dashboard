@@ -26,6 +26,7 @@ const sideBarData = [{
 }, {
     text: 'Transfer Center',
     icon: <SwapHorizIcon />,
+    routePath: '/transfers',
     component: Transfers,
     isExact: true,
     showInSidebar: true
