@@ -26,7 +26,7 @@ const form = (
         />
     </>
 );
-const formBuilder = (...args) => ({
+const formBuilder = (_) => ({
     form,
     handleSubmit: action('submit'),
     formSubmitStatus: ''

@@ -30,6 +30,7 @@ export default function EditPlayerForm({ attributeCategories, handleChangeFn }) 
                                 attributeCategory.attributesInCategory.map((attribute, _attributeIdx) => {
                                     return (
                                         <TextField
+                                            key={ _attributeIdx }
                                             id="standard-number"
                                             label={ attribute.name }
                                             name={ attribute.name }
@@ -40,11 +41,11 @@ export default function EditPlayerForm({ attributeCategories, handleChangeFn }) 
                                             value={ attribute.value }
                                             onChange={ (e) => handleChangeFn(e, _categoryIdx, _attributeIdx) }
                                         />
-                                    )
+                                    );
                                 })
                             }
                         </div>
-                    )
+                    );
                 })
             }
         </form>

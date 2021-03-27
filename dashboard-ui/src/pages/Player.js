@@ -123,18 +123,18 @@ const PlayerProgressionContainer = ({ playerId, classes }) => {
             {
                 isLoading ? <CircularProgress className={ classes.loadingCircle }/>
                     : (
-                    <>
-                        <PlayerProgressionView { ...playerProgressViewData } />
-                        <Fab color="secondary" aria-label="edit" onClick={ handleOpenForm }>
-                            <EditIcon />
-                        </Fab>
-                        <FormDialog open={ isFormOpen }
-                            handleClose={ handleCloseForm }
-                            dialogTitle='Edit Player Details'
-                            formData={ playerProgressViewData }
-                            useFormBuilder={ useEditPlayerForm }
-                        />
-                    </>
+                        <>
+                            <PlayerProgressionView { ...playerProgressViewData } />
+                            <Fab color="secondary" aria-label="edit" onClick={ handleOpenForm }>
+                                <EditIcon />
+                            </Fab>
+                            <FormDialog open={ isFormOpen }
+                                handleClose={ handleCloseForm }
+                                dialogTitle='Edit Player Details'
+                                formData={ playerProgressViewData }
+                                useFormBuilder={ useEditPlayerForm }
+                            />
+                        </>
                     )
             }
         </>

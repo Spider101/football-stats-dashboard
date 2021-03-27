@@ -2,7 +2,6 @@ import React from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { useParams } from 'react-router';
 import { savePlayerProgressData } from '../clients/DashboardClient';
-import { queryKeys } from '../utils';
 
 import EditPlayerForm from '../components/EditPlayerForm';
 
@@ -10,7 +9,6 @@ const useSavePlayerData = () => {
     const queryClient = useQueryClient();
     return useMutation(updatedPlayerData => savePlayerProgressData(updatedPlayerData), {
         onSuccess: (savedPlayerData) => {
-            console.log(queryClient.getQueryCache().getAll());
             queryClient.invalidateQueries(['playerData', savedPlayerData.id]);
         }
     });
