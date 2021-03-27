@@ -9,8 +9,7 @@ import { getSquadHubPlayerData } from './utils/storyDataGenerators';
 
 export default {
     component: SquadHubView,
-    title: 'Views/SquadHubView',
-    excludeStories: /.*Data$/
+    title: 'Views/SquadHubView'
 };
 
 const nations = nationalityFlagMap.map(entity => entity.nationality);
