@@ -223,10 +223,35 @@ function getPlayerPerformanceData(playerData, numCompetitions, numMatches) {
     return performanceData;
 }
 
+function getTransferActivityData(playerData, numTransfers) {
+    const transferredPlayers = _.sampleSize(playerData, numTransfers);
+    const transferredPlayerData = [];
+    for(let i=0; i<numTransfers; i++) {
+        transferredPlayerData.push({
+            name: transferredPlayers[i].metadata.name,
+            role: _.sample(Object.keys(transferredPlayers[i].roles)),
+            currentAbility: transferredPlayers[i].ability.current,
+            incomingClub: transferredPlayers[i].metadata.club,
+            outgoingClub: faker.company.companyName(),
+            transferType: _.sample(['Player Swap', 'Loan To Buy', 'Basic']),
+            swapPlayer: _.sample(['', faker.name.findName()]),
+            fee: getRandomNumberInRange(100000000, 1000000),
+            date: faker.date.past().toJSON()
+        })
+    }
+
+    return transferredPlayerData;
+};
+
 module.exports = () => {
     const playerData = getPlayerData(100, 3 * 10, nations);
     const squadPlayerData = getSquadHubPlayerData(playerData, 10, moraleList);
     const playerPerformanceData = getPlayerPerformanceData(playerData, 5, 10);
-    const data = { players: playerData, squadPlayers: squadPlayerData, performance: playerPerformanceData };
-    return data;
+    const transferActivityData = getTransferActivityData(playerData, 10);
+    return {
+        players: playerData,
+        squadPlayers: squadPlayerData,
+        performance: playerPerformanceData,
+        transfers: transferActivityData
+    };
 }
