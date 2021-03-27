@@ -19,7 +19,7 @@ export const fetchSquadHubData = async () => {
 };
 
 export const fetchPlayerData = async ({ queryKey }) => {
-    const [ _key, { playerId } ] = queryKey;
+    const [ _key, playerId ] = queryKey;
     return await fetchDataFromEndpoint(`players/${playerId}`);
 };
 
