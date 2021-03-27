@@ -32,9 +32,9 @@ export default function FormDialog({ open, handleClose, dialogTitle, formData, u
 
 FormDialog.propTypes = {
     open: PropTypes.bool,
-    dialogTitle: PropTypes.string,
     handleClose: PropTypes.func,
-    handleSubmit: PropTypes.func,
-    form: PropTypes.object,
+    dialogTitle: PropTypes.string,
+    formData: PropTypes.object,
+    useFormBuilder: PropTypes.func,
 };
 
