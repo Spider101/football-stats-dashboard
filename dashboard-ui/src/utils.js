@@ -114,3 +114,11 @@ export const stableSortList = (array, sortOrder, columnNameToOrderBy) => {
     // eslint-disable-next-line no-unused-vars
     return orderedArray.map(([el, _]) => el);
 };
+
+export const convertCamelCaseToSnakeCase = camelCaseString =>
+    camelCaseString.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+
+export const filterRowsByRole = (originalRowData, roles) => originalRowData.filter(rowData => {
+    const roleData = rowData.find(cell => cell.id === 'role');
+    return roles.includes(roleData.data);
+});

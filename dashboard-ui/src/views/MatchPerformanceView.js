@@ -7,12 +7,8 @@ import Grid from '@material-ui/core/Grid';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
-import { allMatchPerformanceTableHeaders } from '../utils';
+import { allMatchPerformanceTableHeaders, convertCamelCaseToSnakeCase } from '../utils';
 import { useGlobalChartOptions } from '../context/chartOptionsProvider';
-
-const convertCamelCaseToSnakeCase = (camelCaseString) =>
-    camelCaseString.replace(/([a-z])([A-Z])/g, '$1_$2')
-        .toLowerCase();
 
 const buildMatchPerformanceData = competitionData => {
     return competitionData.map(competitionPerformance => {

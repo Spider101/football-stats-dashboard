@@ -4,7 +4,13 @@ import _ from 'lodash';
 
 import Grid from '@material-ui/core/Grid';
 
-import { allSquadHubTableHeaders, moraleIconsMap, nationalityFlagMap } from '../utils';
+import {
+    allSquadHubTableHeaders,
+    convertCamelCaseToSnakeCase,
+    moraleIconsMap,
+    nationalityFlagMap,
+    filterRowsByRole
+} from '../utils';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
@@ -80,11 +86,6 @@ const filterColumns = (originalHeaders, filteredRowData, selectedColumns) => {
         rows: updatedRows.every(row => row.length === 0) ? [] : updatedRows
     };
 };
-
-const filterRowsByRole = (originalRowData, roles) => originalRowData.filter(rowData => {
-    const roleData = rowData.find(cell => cell.id === 'role');
-    return roles.includes(roleData.data);
-});
 
 export default function SquadHubView({ players }) {
     const [playerRoles, setPlayerRoles] = React.useState([]);
