@@ -18,7 +18,7 @@ import usePlayerData from '../hooks/usePlayerData';
 import usePlayerPerfData from '../hooks/usePlayerPerfData';
 import { queryKeys } from '../utils';
 import useEditPlayerForm from '../hooks/useEditPlayerForm';
-import PageEditAction from '../components/PageEditAction';
+import PageAction from '../components/PageAction';
 
 const useStyles = makeStyles((theme) => ({
     loadingCircle: {
@@ -113,7 +113,8 @@ const PlayerProgressionContainer = ({ playerId, classes }) => {
                     : (
                         <>
                             <PlayerProgressionView { ...playerProgressViewData } />
-                            <PageEditAction
+                            <PageAction
+                                actionType='edit'
                                 dialogTitle='Edit Player Players'
                                 pageData={ playerProgressViewData }
                                 formBuilderHook={ useEditPlayerForm }
