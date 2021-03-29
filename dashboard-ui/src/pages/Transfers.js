@@ -28,17 +28,17 @@ const Transfers = () => {
             <Divider />
             {
                 isLoading ? <CircularProgress className={ classes.loadingCircle } />
-                : (
-                    <>
-                        <TransferActivityView transfers={ transfers } />
-                        <PageAction
-                            actionType='add'
-                            dialogTitle='Add Transfer Details'
-                            pageData={ transfers }
-                            formBuilderHook={ useAddTransferForm }
-                        />
-                    </>
-                )
+                    : (
+                        <>
+                            <TransferActivityView transfers={ transfers } />
+                            <PageAction
+                                actionType='add'
+                                dialogTitle='Add Transfer Details'
+                                pageData={ transfers }
+                                formBuilderHook={ useAddTransferForm }
+                            />
+                        </>
+                    )
             }
         </>
     );

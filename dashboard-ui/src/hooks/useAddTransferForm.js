@@ -48,7 +48,7 @@ export default function useAddTransferForm(transfers) {
     const handleSubmit = async () => {
         console.log(transfer);
         addTransferData(transfer);
-    }
+    };
 
     const addTransferForm =
         <AddTransferForm fields={ formFields } transfer={ transfer } handleChangeFn={ handleChange } />;
@@ -57,5 +57,5 @@ export default function useAddTransferForm(transfers) {
         form: addTransferForm,
         handleSubmit,
         formSubmitStatus: status
-    }
+    };
 }

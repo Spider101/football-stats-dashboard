@@ -22,7 +22,7 @@ const buildRowDataForTransfersTable = transfers =>
                         metadata: { sortValue: value }
                     };
                 } else {
-                    const roundedValue = Math.round((value / 100000), 1);
+                    const roundedValue = Math.round((value / 1000), 1);
                     row = {
                         ...row,
                         type: 'number',

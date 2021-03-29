@@ -59,7 +59,7 @@ export const fetchPlayerPerformanceData = async ({ queryKey }) => {
 // TODO: update this to fetch transfers by club
 export const fetchTransferActivityData = async () => {
     return await fetchDataFromEndpoint('transfers');
-}
+};
 
 async function fetchDataFromEndpoint(endpointFragment) {
     const res = await fetch(`${baseUrl}${endpointFragment}`);

@@ -50,7 +50,7 @@ export default function AddTransferForm({ fields, transfer, handleChangeFn }) {
                                     }
                                 </Select>
                             </FormControl>
-                        )
+                        );
                     } else {
                         formElement = (
                             <TextField
@@ -72,7 +72,7 @@ export default function AddTransferForm({ fields, transfer, handleChangeFn }) {
                 })
             }
         </form>
-    )
+    );
 }
 
 AddTransferForm.propTypes = {
