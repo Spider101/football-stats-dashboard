@@ -1,6 +1,7 @@
 import React from 'react'
 import Fab from '@material-ui/core/Fab';
 import EditIcon from '@material-ui/icons/Edit';
+import AddIcon from '@material-ui/icons/Add';
 import FormDialog from '../widgets/FormDialog';
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -33,7 +34,7 @@ export default function PageAction({ dialogTitle, pageData, formBuilderHook, act
                 onClick={ handleOpenForm }
                 className={ classes.actionButton }
             >
-                <EditIcon />
+                { actionType === 'edit' ? <EditIcon /> : <AddIcon /> }
             </Fab>
             <FormDialog open={ isFormOpen }
                 handleClose={ handleCloseForm }
