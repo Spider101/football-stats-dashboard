@@ -11,6 +11,13 @@ export const queryKeys = {
 };
 
 // TODO: this will be returned from the service in future; remove this then
+export const transferTypes = {
+    PLAYER_SWAP: 'Player Swap',
+    BASIC: 'Basic',
+    LOAN_TO_BUY: 'Loan To Buy'
+};
+
+// TODO: this will be returned from the service in future; remove this then
 export const allSquadHubTableHeaders = [
     { id: 'name', type: 'string' },
     { id: 'nationality', type: 'image' },

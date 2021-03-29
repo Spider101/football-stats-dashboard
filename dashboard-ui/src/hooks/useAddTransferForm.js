@@ -2,6 +2,7 @@ import React from 'react';
 import { useMutation } from 'react-query';
 import { addTransferData } from '../clients/DashboardClient';
 import AddTransferForm from '../components/AddTransferForm';
+import { transferTypes } from '../utils';
 
 const useAddTransferData = () => {
     return useMutation(newTransferData => addTransferData(newTransferData));
@@ -16,6 +17,13 @@ export default function useAddTransferForm(transfers) {
             return { name: field, type: 'number', defaultValue: 0 };
         case 'date':
             return { name: field, type: 'date', defaultValue: new Date() };
+        case 'transferType':
+            return {
+                name: field,
+                type: 'select',
+                defaultValue: transferTypes.BASIC,
+                availableValues: Object.values(transferTypes)
+            };
         default:
             return { name: field, type: 'text', defaultValue: '' };
         }
