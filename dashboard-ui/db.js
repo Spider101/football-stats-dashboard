@@ -228,6 +228,7 @@ function getTransferActivityData(playerData, numTransfers) {
     const transferredPlayerData = [];
     for(let i=0; i<numTransfers; i++) {
         transferredPlayerData.push({
+            id: i,
             name: transferredPlayers[i].metadata.name,
             role: _.sample(Object.keys(transferredPlayers[i].roles)),
             currentAbility: transferredPlayers[i].ability.current,
