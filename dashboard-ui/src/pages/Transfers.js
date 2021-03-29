@@ -4,6 +4,8 @@ import { CircularProgress, Divider, makeStyles, Typography } from '@material-ui/
 
 import useTransferCenterData from '../hooks/useTransferCenterData';
 import TransferActivityView from '../views/TransferActivityView';
+import PageAction from '../components/PageAction';
+import useAddTransferForm from '../hooks/useAddTransferForm';
 
 const useStyles = makeStyles({
     loadingCircle: {
@@ -17,15 +19,27 @@ const useStyles = makeStyles({
 const Transfers = () => {
     const classes = useStyles();
     const { isLoading, data: transfers } = useTransferCenterData();
-    console.log(isLoading, transfers);
+    // console.log(isLoading, transfers);
     return (
         <>
             <Typography variant='h4' >
                 Transfer Activity
             </Typography>
             <Divider />
-            { isLoading ? <CircularProgress className={ classes.loadingCircle } />
-                : <TransferActivityView transfers={ transfers } /> }
+            {
+                isLoading ? <CircularProgress className={ classes.loadingCircle } />
+                : (
+                    <>
+                        <TransferActivityView transfers={ transfers } />
+                        <PageAction
+                            actionType='add'
+                            dialogTitle='Add Transfer Details'
+                            pageData={ transfers }
+                            formBuilderHook={ useAddTransferForm }
+                        />
+                    </>
+                )
+            }
         </>
     );
 };
