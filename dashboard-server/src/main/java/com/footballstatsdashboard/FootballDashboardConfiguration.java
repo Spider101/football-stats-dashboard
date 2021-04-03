@@ -1,4 +1,4 @@
-package com.football-stats-dashboard;
+package com.footballstatsdashboard;
 
 import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;

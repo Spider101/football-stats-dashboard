@@ -17,7 +17,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <dropwizard.version>2.0.20</dropwizard.version>
-        <mainClass>com.football-stats-dashboard.FootballDashboardApplication</mainClass>
+        <mainClass>com.footballstatsdashboard.FootballDashboardApplication</mainClass>
     </properties>
 
     <dependencyManagement>
@@ -138,7 +138,6 @@
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                     <dependencyDetailsEnabled>false</dependencyDetailsEnabled>
                 </configuration>
             </plugin>

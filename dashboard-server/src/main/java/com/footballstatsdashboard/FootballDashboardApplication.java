@@ -1,4 +1,4 @@
-package com.football-stats-dashboard;
+package com.footballstatsdashboard;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
