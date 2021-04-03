@@ -1,3 +1,5 @@
 .idea/
 .vscode
 *.code-workspace
+.m2/
+settings.xml
