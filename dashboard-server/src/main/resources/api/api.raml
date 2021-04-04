@@ -1,0 +1,90 @@
+#%RAML 1.0
+---
+title: Football Stats Dashboard
+version: v1
+baseUri: https://localhost:8090/football-stats-dashboard/{version}
+mediaType: application/json
+
+securitySchemes:
+  api_key:
+    description: Each request must include the api key in the headers
+    type: x-customApiKey
+    describedBy:
+      headers:
+        Authorization:
+          description: |
+            Used to send a valid api key.
+          type: string
+          example: api_key 6bc7106b-e109-48e4-b385-a574b09ce821
+      responses:
+        401:
+          description: |
+            Bad or expired api key. This can happen if the user or the backend revoked the api key.
+            To fix this, you should contact the api administrator
+          body:
+            application/json:
+              example: !include examples/response-401.json
+        403:
+          description: |
+            Bad auth request (bad nonce, expired timestamp, not enough privileges, etc). Unfortunately,
+            re-authenticating the user won't help here.
+          body:
+            application/json:
+              example: !include examples/response-403.json
+
+/players:
+  /{playerId}:
+    uriParameters:
+      playerId:
+        description: The player ID
+        type: string
+        required: true
+    get:
+      description: gets a player's data by id
+      headers:
+        Account-Id:
+          type: integer
+      securedBy: [api_key]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/player-response.json
+    put:
+      description: updates a player's data
+      headers:
+        Account-Id:
+          type: integer
+      securedBy: [api_key]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/player-response.json
+    delete:
+      description: delete a player's data
+      headers:
+        Account-Id:
+          type: integer
+      securedBy: [api_key]
+      responses:
+        200:
+          description: successfully delete a player's data
+
+  post:
+    description: adds a new player's data
+    headers:
+      Account-Id:
+        type: integer
+      Created-By:
+        type: string
+    securedBy: [api_key]
+    body:
+      application/json:
+        example: !include examples/player-post-request.json
+    responses:
+      201:
+        description: player's data created
+        body:
+          application/json:
+            example: !include examples/player-response.json
