@@ -1,12 +1,18 @@
 package com.footballstatsdashboard;
 
+import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
+import com.footballstatsdashboard.client.couchbase.config.ClusterConfiguration;
+import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
 import com.footballstatsdashboard.resources.PlayerResource;
 import io.dropwizard.Application;
+import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 public class FootballDashboardApplication extends Application<FootballDashboardConfiguration> {
 
@@ -27,8 +33,19 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
     }
 
     @Override
-    public void run(final FootballDashboardConfiguration configuration,
-                    final Environment environment) {
+    public void run(final FootballDashboardConfiguration configuration, final Environment environment) {
+
+        // setup couchbase cluster and bucket
+        CouchbaseClientManager couchbaseClientManager = new CouchbaseClientManager(getName(), environment,
+                configuration.getCouchbaseClientConfiguration());
+        environment.lifecycle().manage(couchbaseClientManager);
+
+        Map<String, ClusterConfiguration> clusterConfig = configuration.getCouchbaseClientConfiguration().getClusters();
+        String clusterName = clusterConfig.entrySet().iterator().next().getKey();
+        String bucketName = clusterConfig.get(clusterName).getBuckets().iterator().next();
+        CouchbaseDAO couchbaseDAO = new CouchbaseDAO(
+                couchbaseClientManager.getBucketContainer(clusterName, bucketName)
+        );
 
         // setup resources
         environment.jersey().register(new PlayerResource());
