@@ -1,5 +1,6 @@
 package com.footballstatsdashboard;
 
+import com.footballstatsdashboard.client.couchbase.config.CouchbaseClientConfiguration;
 import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.validator.constraints.*;
@@ -13,4 +14,13 @@ public class FootballDashboardConfiguration extends Configuration {
     @NotNull
     @JsonProperty
     private Long appId;
+
+    @Valid
+    @NotNull
+    @JsonProperty
+    private CouchbaseClientConfiguration couchbase;
+
+    public CouchbaseClientConfiguration getCouchbaseClientConfiguration() {
+        return couchbase;
+    }
 }
