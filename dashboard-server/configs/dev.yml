@@ -1,1 +1,15 @@
 appId: "1234"
+
+couchbase:
+  clusters:
+    defaultCluster:
+      username: "admin"
+      password: "123qweasd#"
+      host: "localhost"
+      buckets:
+        - "dashboard-server"
+
+logging:
+  level: INFO
+  loggers:
+    com.footballstatsdashboard: DEBUG
