@@ -53,6 +53,9 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         // setup health checks
         environment.healthChecks().register(this.getName(), new FootballDashboardHealthCheck());
 
+        // add exception mapper so that json errors are show in detail
+        environment.jersey().register(new JsonProcessingExceptionMapper(true));
+
         LOGGER.info("All resources added for {}", getName());
     }
 
