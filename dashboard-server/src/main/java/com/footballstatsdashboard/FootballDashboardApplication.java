@@ -48,7 +48,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         );
 
         // setup resources
-        environment.jersey().register(new PlayerResource());
+        environment.jersey().register(new PlayerResource(couchbaseDAO));
 
         // setup health checks
         environment.healthChecks().register(this.getName(), new FootballDashboardHealthCheck());
