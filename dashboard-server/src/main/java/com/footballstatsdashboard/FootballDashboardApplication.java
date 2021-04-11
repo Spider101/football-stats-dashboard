@@ -3,6 +3,8 @@ package com.footballstatsdashboard;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.client.couchbase.config.ClusterConfiguration;
 import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.key.PlayerKeyProvider;
+import com.footballstatsdashboard.db.key.ResourceKey;
 import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
 import com.footballstatsdashboard.resources.PlayerResource;
 import io.dropwizard.Application;
@@ -43,8 +45,10 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         Map<String, ClusterConfiguration> clusterConfig = configuration.getCouchbaseClientConfiguration().getClusters();
         String clusterName = clusterConfig.entrySet().iterator().next().getKey();
         String bucketName = clusterConfig.get(clusterName).getBuckets().iterator().next();
-        CouchbaseDAO couchbaseDAO = new CouchbaseDAO(
-                couchbaseClientManager.getBucketContainer(clusterName, bucketName)
+
+        CouchbaseDAO<ResourceKey> couchbaseDAO = new CouchbaseDAO<>(
+                couchbaseClientManager.getBucketContainer(clusterName, bucketName),
+                new PlayerKeyProvider()
         );
 
         // setup resources
