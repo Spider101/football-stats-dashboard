@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static com.footballstatsdashboard.utils.Constants.APPLICATION_NAME;
+
 public class FootballDashboardApplication extends Application<FootballDashboardConfiguration> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FootballDashboardApplication.class);
@@ -26,7 +28,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
 
     @Override
     public String getName() {
-        return "FootballDashboard";
+        return APPLICATION_NAME;
     }
 
     @Override
