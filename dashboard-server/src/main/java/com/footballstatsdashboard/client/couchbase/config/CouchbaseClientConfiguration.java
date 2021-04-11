@@ -8,7 +8,7 @@ import javax.validation.constraints.Size;
 import java.util.Map;
 
 public class CouchbaseClientConfiguration {
-    private static final long DEFAULT_KV_TIMEOUT_MS = 1000L;
+    private static final long DEFAULT_KV_TIMEOUT_MS = 10000L;
 
     @JsonProperty
     private long kvTimeout = DEFAULT_KV_TIMEOUT_MS;
