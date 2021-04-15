@@ -3,6 +3,7 @@ package com.footballstatsdashboard.resources;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,10 @@ public class PlayerResource {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("createPlayer() request.");
+        }
+
+        if (incomingPlayer.getRoles().size() == 0) {
+            return Response.status(HttpStatus.UNPROCESSABLE_ENTITY_422).entity(incomingPlayer).build();
         }
 
         ResourceKey resourceKey = new ResourceKey(incomingPlayer.getId());
