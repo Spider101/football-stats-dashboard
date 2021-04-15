@@ -1,8 +1,6 @@
 package com.footballstatsdashboard.resources;
 
-import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
-import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import org.slf4j.Logger;
@@ -20,8 +18,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.UUID;
 
 @Path("football-stats-dashboard/v1/players")
@@ -43,20 +39,10 @@ public class PlayerResource {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getPlayer() request for player with ID: {}", playerId.toString());
         }
-        Player dummyPlayer = ImmutablePlayer.builder()
-                .metadata(
-                        ImmutableMetadata.builder()
-                                .name("Sander Gard Bolin Berge")
-                                .club("Sheffield United")
-                                .country("Norway")
-                                .photo("http://lorempixel.com/640/480/people?random=7")
-                                .clubLogo("http://lorempixel.com/640/480/abstract?random=11")
-                                .countryLogo("https://s3.amazonaws.com/uifaces/faces/twitter/j04ntoh/128.jpg?random=1")
-                                .dateOfBirth(LocalDate.of(1998, Month.FEBRUARY, 18))
-                                .build()
-                )
-                .build();
-        return Response.ok(dummyPlayer).build();
+
+        ResourceKey resourceKey = new ResourceKey(playerId);
+        Player player = this.couchbaseDAO.getDocument(resourceKey, Player.class);
+        return Response.ok(player).build();
     }
 
     @POST
