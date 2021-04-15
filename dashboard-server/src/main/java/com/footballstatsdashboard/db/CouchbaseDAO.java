@@ -1,5 +1,7 @@
 package com.footballstatsdashboard.db;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
+import com.couchbase.client.java.kv.GetResult;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 
@@ -25,5 +27,18 @@ public class CouchbaseDAO<K> {
     public void insertDocument(K key, Object document) {
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         this.bucketContainer.getBucket().defaultCollection().insert(documentKey, document);
+    }
+
+    public <D> D getDocument(K key, Class<D> clazz) {
+        String documentKey = this.keyProvider.getCouchbaseKey(key);
+        GetResult result;
+
+        try {
+            result = bucketContainer.getBucket().defaultCollection().get(documentKey);
+        } catch (DocumentNotFoundException docEx) {
+            throw new RuntimeException("Unable to find player with Id: " + documentKey);
+        }
+
+        return result.contentAs(clazz);
     }
 }
