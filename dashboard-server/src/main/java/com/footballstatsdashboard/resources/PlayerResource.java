@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -66,5 +67,20 @@ public class PlayerResource {
         //  complex and use that in the response instead of the deserialized entity directly
         URI location = uriInfo.getAbsolutePathBuilder().path(incomingPlayer.getId().toString()).build();
         return Response.created(location).entity(incomingPlayer).build();
+    }
+
+    @DELETE
+    @Path("/{playerId}")
+    public Response deletePlayer(
+            @PathParam("playerId") UUID playerId) {
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("deletePlayer() request for player with ID: {}", playerId.toString());
+        }
+
+        ResourceKey resourceKey = new ResourceKey(playerId);
+        this.couchbaseDAO.deleteDocument(resourceKey);
+
+        return Response.noContent().build();
     }
 }

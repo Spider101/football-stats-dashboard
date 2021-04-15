@@ -36,9 +36,18 @@ public class CouchbaseDAO<K> {
         try {
             result = bucketContainer.getBucket().defaultCollection().get(documentKey);
         } catch (DocumentNotFoundException docEx) {
-            throw new RuntimeException("Unable to find player with Id: " + documentKey);
+            throw new RuntimeException("Unable to find document with Id: " + documentKey);
         }
 
         return result.contentAs(clazz);
+    }
+
+    public void deleteDocument(K key) {
+        String documentKey = this.keyProvider.getCouchbaseKey(key);
+        try {
+            this.bucketContainer.getBucket().defaultCollection().remove(documentKey);
+        } catch (DocumentNotFoundException docEx) {
+            throw new RuntimeException("Unable to find document with Id: " + documentKey);
+        }
     }
 }
