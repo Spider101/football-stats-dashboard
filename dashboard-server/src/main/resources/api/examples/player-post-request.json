@@ -9,16 +9,19 @@
     "countryLogo": "https://s3.amazonaws.com/uifaces/faces/twitter/j04ntoh/128.jpg?random=1",
     "age": 22
   },
-  "roles": {
-    "defensiveCentralMidfielder": [
-      "interceptions",
-      "defensive awareness",
-      "aggression",
-      "stamina",
-      "stand tackle",
-      "slide tackle"
-    ]
-  },
+  "roles": [
+    {
+      "name": "defensiveCentralMidfielder",
+      "associatedAttributes": [
+        "interceptions",
+        "defensive awareness",
+        "aggression",
+        "stamina",
+        "stand tackle",
+        "slide tackle"
+      ]
+    }
+  ],
   "attributes": {
     "attributeGroups": [
       {
