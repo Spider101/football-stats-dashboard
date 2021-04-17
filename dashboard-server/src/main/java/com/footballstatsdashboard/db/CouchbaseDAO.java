@@ -2,8 +2,10 @@ package com.footballstatsdashboard.db;
 
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.kv.GetResult;
+import com.couchbase.client.java.kv.ReplaceOptions;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class CouchbaseDAO<K> {
 
@@ -29,7 +31,13 @@ public class CouchbaseDAO<K> {
         this.bucketContainer.getBucket().defaultCollection().insert(documentKey, document);
     }
 
-    public <D> D getDocument(K key, Class<D> clazz) {
+    public <D> void updateDocument(K key, D document, Long casValue) {
+        String documentKey = this.keyProvider.getCouchbaseKey(key);
+        this.bucketContainer.getBucket().defaultCollection().replace(documentKey, document,
+                ReplaceOptions.replaceOptions().cas(casValue));
+    }
+
+    public <D> Pair<D, Long> getDocument(K key, Class<D> clazz) {
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         GetResult result;
 
@@ -39,7 +47,7 @@ public class CouchbaseDAO<K> {
             throw new RuntimeException("Unable to find document with Id: " + documentKey);
         }
 
-        return result.contentAs(clazz);
+        return Pair.of(result.contentAs(clazz), result.cas());
     }
 
     public void deleteDocument(K key) {
