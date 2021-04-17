@@ -1,6 +1,6 @@
 package com.footballstatsdashboard.db.key;
 
-import static com.footballstatsdashboard.utils.Constants.APPLICATION_NAME;
+import static com.footballstatsdashboard.core.utils.Constants.APPLICATION_NAME;
 
 /**
  * Abstract key provider class for all resources

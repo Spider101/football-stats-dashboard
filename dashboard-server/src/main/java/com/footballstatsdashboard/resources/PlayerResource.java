@@ -23,9 +23,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.UUID;
 
-@Path("football-stats-dashboard/v1/players")
+import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
+import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID_PATH;
+import static com.footballstatsdashboard.core.utils.Constants.PLAYER_V1_BASE_PATH;
+
+@Path(PLAYER_V1_BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public class PlayerResource {
 
@@ -37,9 +42,9 @@ public class PlayerResource {
     }
     
     @GET
-    @Path("/{playerId}")
+    @Path(PLAYER_ID_PATH)
     public Response getPlayer(
-            @PathParam("playerId") UUID playerId) {
+            @PathParam(PLAYER_ID) UUID playerId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getPlayer() request for player with ID: {}", playerId.toString());
@@ -63,19 +68,26 @@ public class PlayerResource {
             return Response.status(HttpStatus.UNPROCESSABLE_ENTITY_422).entity(incomingPlayer).build();
         }
 
-        ResourceKey resourceKey = new ResourceKey(incomingPlayer.getId());
-        this.couchbaseDAO.insertDocument(resourceKey, incomingPlayer);
+        // TODO: 17/04/21 add more internal data when business logic becomes complicated
+        LocalDate currentDate = LocalDate.now();
+        Player newPlayer = ImmutablePlayer.builder()
+                .from(incomingPlayer)
+                .createdBy("admin") // TODO: update this when createdBy headers have been implemented
+                .createdDate(currentDate)
+                .lastModifiedDate(currentDate)
+                .build();
 
-        // TODO: 11/04/21 build a new player entity from the incoming entity when the business logic becomes more
-        //  complex and use that in the response instead of the deserialized entity directly
-        URI location = uriInfo.getAbsolutePathBuilder().path(incomingPlayer.getId().toString()).build();
-        return Response.created(location).entity(incomingPlayer).build();
+        ResourceKey resourceKey = new ResourceKey(newPlayer.getId());
+        this.couchbaseDAO.insertDocument(resourceKey, newPlayer);
+
+        URI location = uriInfo.getAbsolutePathBuilder().path(newPlayer.getId().toString()).build();
+        return Response.created(location).entity(newPlayer).build();
     }
 
     @PUT
-    @Path("/{playerId}")
+    @Path(PLAYER_ID_PATH)
     public Response updatePlayer(
-            @PathParam("playerId") UUID playerId,
+            @PathParam(PLAYER_ID) UUID playerId,
             @Valid @NotNull Player incomingPlayer) {
 
         if (LOGGER.isInfoEnabled()) {
@@ -102,9 +114,9 @@ public class PlayerResource {
     }
 
     @DELETE
-    @Path("/{playerId}")
+    @Path(PLAYER_ID_PATH)
     public Response deletePlayer(
-            @PathParam("playerId") UUID playerId) {
+            @PathParam(PLAYER_ID) UUID playerId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("deletePlayer() request for player with ID: {}", playerId.toString());

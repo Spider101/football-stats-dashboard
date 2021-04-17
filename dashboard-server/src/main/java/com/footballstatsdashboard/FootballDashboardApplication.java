@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
-import static com.footballstatsdashboard.utils.Constants.APPLICATION_NAME;
+import static com.footballstatsdashboard.core.utils.Constants.APPLICATION_NAME;
 
 public class FootballDashboardApplication extends Application<FootballDashboardConfiguration> {
 
