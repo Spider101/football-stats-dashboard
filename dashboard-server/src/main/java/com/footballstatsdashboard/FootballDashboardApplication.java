@@ -2,6 +2,7 @@ package com.footballstatsdashboard;
 
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.client.couchbase.config.ClusterConfiguration;
+import com.footballstatsdashboard.core.utils.PlayerInternalModule;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.PlayerKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
@@ -38,6 +39,8 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
 
     @Override
     public void run(final FootballDashboardConfiguration configuration, final Environment environment) {
+
+        environment.getObjectMapper().registerModule(new PlayerInternalModule());
 
         // setup couchbase cluster and bucket
         CouchbaseClientManager couchbaseClientManager = new CouchbaseClientManager(getName(), environment,
