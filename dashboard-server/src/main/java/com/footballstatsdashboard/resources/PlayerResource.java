@@ -103,7 +103,9 @@ public class PlayerResource {
 
             // TODO: 15/04/21 add validations by checking incoming player data against existing one
             ImmutablePlayer.Builder updatedPlayerBuilder = ImmutablePlayer.builder()
-                    .from(existingPlayer);
+                    .from(existingPlayer)
+                    .lastModifiedDate(LocalDate.now())
+                    .createdBy("admin"); // TODO: update this when createdBy headers have been implemented
 
             Player updatedPlayer = updatedPlayerBuilder.build();
             this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer, existingPlayerEntity.getRight());

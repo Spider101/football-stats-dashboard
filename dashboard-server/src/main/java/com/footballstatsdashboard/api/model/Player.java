@@ -1,15 +1,21 @@
 package com.footballstatsdashboard.api.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Role;
+import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
 import com.footballstatsdashboard.api.model.player.Metadata;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,4 +49,33 @@ public interface Player {
      * Information about the player's ability, both current and past data
      */
     @Valid Ability getAbility();
+
+    /**
+     * timestamp when player data was created
+     */
+    @Valid
+    @Nullable
+    @InternalField
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    LocalDate getCreatedDate();
+
+    /**
+     * timestamp when player data was last modified
+     */
+    @Valid
+    @Nullable
+    @InternalField
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @JsonSerialize(using = LocalDateSerializer.class)
+    LocalDate getLastModifiedDate();
+
+    /**
+     * represents entity that requested player data be created
+     */
+    @Nullable
+    @InternalField
+    String getCreatedBy();
 }
