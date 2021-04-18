@@ -164,7 +164,25 @@ public class PlayerResourceTest {
         Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true);
         when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingPlayerInCouchbase, existingPlayerCAS));
 
-        Player incomingPlayer = ImmutablePlayer.builder().from(existingPlayerInCouchbase).build();
+        Metadata updatedMetadata = ImmutableMetadata.builder()
+                .from(existingPlayerInCouchbase.getMetadata())
+                .name("Updated Name")
+                .build();
+        Ability updatedAbility = ImmutableAbility.builder()
+                .from(existingPlayerInCouchbase.getAbility())
+                .current(25)
+                .build();
+        Role updateRole = ImmutableRole.builder()
+                .from(existingPlayerInCouchbase.getRoles().get(0))
+                .name("updated playerRole")
+                .build();
+        Player incomingPlayer = ImmutablePlayer.builder()
+                .from(existingPlayerInCouchbase)
+                .metadata(updatedMetadata)
+                .ability(updatedAbility)
+                .roles(ImmutableList.of(updateRole))
+                .build();
+
         ArgumentCaptor<Player> updatedPlayerCaptor = ArgumentCaptor.forClass(Player.class);
         ArgumentCaptor<Long> existingPlayerCASCaptor = ArgumentCaptor.forClass(Long.class);
 
@@ -183,6 +201,12 @@ public class PlayerResourceTest {
 
         assertEquals(HttpStatus.OK_200, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
+
+        Player playerInResponse = OBJECT_MAPPER.convertValue(playerResponse.getEntity(), Player.class);
+        assertEquals(incomingPlayer.getId(), playerInResponse.getId());
+        assertEquals(incomingPlayer.getMetadata(), playerInResponse.getMetadata());
+        assertEquals(incomingPlayer.getRoles(), playerInResponse.getRoles());
+        assertEquals(incomingPlayer.getAbility(), playerInResponse.getAbility());
     }
 
     /**

@@ -104,6 +104,9 @@ public class PlayerResource {
             // TODO: 15/04/21 add validations by checking incoming player data against existing one
             ImmutablePlayer.Builder updatedPlayerBuilder = ImmutablePlayer.builder()
                     .from(existingPlayer)
+                    .metadata(incomingPlayer.getMetadata())
+                    .ability(incomingPlayer.getAbility())
+                    .roles(incomingPlayer.getRoles())
                     .lastModifiedDate(LocalDate.now())
                     .createdBy("admin"); // TODO: update this when createdBy headers have been implemented
 
