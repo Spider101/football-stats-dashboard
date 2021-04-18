@@ -64,7 +64,7 @@ public class PlayerResource {
             LOGGER.info("createPlayer() request.");
         }
 
-        if (incomingPlayer.getRoles().size() == 0) {
+        if (incomingPlayer.getRoles().size() == 0 || incomingPlayer.getAttributes().size() == 0) {
             return Response.status(HttpStatus.UNPROCESSABLE_ENTITY_422).entity(incomingPlayer).build();
         }
 
@@ -107,6 +107,7 @@ public class PlayerResource {
                     .metadata(incomingPlayer.getMetadata())
                     .ability(incomingPlayer.getAbility())
                     .roles(incomingPlayer.getRoles())
+                    .attributes(incomingPlayer.getAttributes())
                     .lastModifiedDate(LocalDate.now())
                     .createdBy("admin"); // TODO: update this when createdBy headers have been implemented
 

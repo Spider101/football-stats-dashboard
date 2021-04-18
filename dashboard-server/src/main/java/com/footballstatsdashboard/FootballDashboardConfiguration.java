@@ -3,10 +3,9 @@ package com.footballstatsdashboard;
 import com.footballstatsdashboard.client.couchbase.config.CouchbaseClientConfiguration;
 import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.*;
+import javax.validation.constraints.NotNull;
 
 public class FootballDashboardConfiguration extends Configuration {
 
