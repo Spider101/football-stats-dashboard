@@ -16,6 +16,7 @@ import java.util.List;
 @JsonSerialize
 @JsonDeserialize(as = ImmutableAttribute.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@Value.Style(jdkOnly = true) // Required if the below entity will be used in a Map, List, Set or any other collection
 public interface Attribute {
 
     /**

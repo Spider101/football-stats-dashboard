@@ -16,7 +16,6 @@ import com.footballstatsdashboard.api.model.player.Metadata;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
