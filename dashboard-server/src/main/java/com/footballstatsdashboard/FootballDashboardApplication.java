@@ -6,8 +6,10 @@ import com.footballstatsdashboard.core.utils.PlayerInternalModule;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.PlayerKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.key.UserKeyProvider;
 import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
 import com.footballstatsdashboard.resources.PlayerResource;
+import com.footballstatsdashboard.resources.UserResource;
 import io.dropwizard.Application;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.setup.Bootstrap;
@@ -51,13 +53,19 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         String clusterName = clusterConfig.entrySet().iterator().next().getKey();
         String bucketName = clusterConfig.get(clusterName).getBuckets().iterator().next();
 
-        CouchbaseDAO<ResourceKey> couchbaseDAO = new CouchbaseDAO<>(
+        CouchbaseDAO<ResourceKey> playerCouchbaseDAO = new CouchbaseDAO<>(
                 couchbaseClientManager.getBucketContainer(clusterName, bucketName),
                 new PlayerKeyProvider()
         );
 
+        CouchbaseDAO<ResourceKey> userCouchbaseDAO = new CouchbaseDAO<>(
+                couchbaseClientManager.getBucketContainer(clusterName, bucketName),
+                new UserKeyProvider()
+        );
+
         // setup resources
-        environment.jersey().register(new PlayerResource(couchbaseDAO));
+        environment.jersey().register(new UserResource(userCouchbaseDAO));
+        environment.jersey().register(new PlayerResource(playerCouchbaseDAO));
 
         // setup health checks
         environment.healthChecks().register(this.getName(), new FootballDashboardHealthCheck());
