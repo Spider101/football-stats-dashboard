@@ -23,388 +23,346 @@
       ]
     }
   ],
-  "attributes": {
-    "attributeGroups": [
-      {
-        "groupName": "Defending",
-        "attributesInGroup": [
-          1,
-          16,
-          18,
-          14,
-          15,
-          18,
-          19,
-          18,
-          11,
-          1
-        ]
-      },
-      {
-        "groupName": "Speed",
-        "attributesInGroup": [
-          4,
-          18,
-          9,
-          6,
-          16,
-          1,
-          20,
-          1,
-          4,
-          15
-        ]
-      },
-      {
-        "groupName": "Vision",
-        "attributesInGroup": [
-          14,
-          19,
-          6,
-          18,
-          20,
-          7,
-          18,
-          19,
-          5,
-          14
-        ]
-      },
-      {
-        "groupName": "Attacking",
-        "attributesInGroup": [
-          4,
-          16,
-          15,
-          6,
-          1,
-          12,
-          17,
-          19,
-          3,
-          2
-        ]
-      },
-      {
-        "groupName": "Aerial",
-        "attributesInGroup": [
-          9,
-          5,
-          19,
-          3,
-          17,
-          1,
-          5,
-          3,
-          7,
-          9
-        ]
-      }
-    ],
-    "attributeCategories": [
-      {
-        "categoryName": "Technical",
-        "attributesInCategory": [
-          {
-            "name": "FK Accuracy",
-            "value": 2,
-            "history": [
-              15,
-              20,
-              7,
-              18,
-              11
-            ]
-          },
-          {
-            "name": "penalties",
-            "value": 9,
-            "history": [
-              13,
-              0,
-              14,
-              7,
-              18
-            ]
-          },
-          {
-            "name": "heading accuracy",
-            "value": 3,
-            "history": [
-              18,
-              8,
-              17,
-              9,
-              7
-            ]
-          },
-          {
-            "name": "crossing",
-            "value": 1,
-            "history": [
-              5,
-              2,
-              17,
-              2,
-              14
-            ]
-          },
-          {
-            "name": "short passing",
-            "value": 16,
-            "history": [
-              1,
-              0,
-              9,
-              15,
-              18
-            ]
-          },
-          {
-            "name": "long passing",
-            "value": 19,
-            "history": [
-              2,
-              10,
-              20,
-              3,
-              14
-            ]
-          },
-          {
-            "name": "long shots",
-            "value": 16,
-            "history": [
-              16,
-              4,
-              5,
-              13,
-              2
-            ]
-          },
-          {
-            "name": "finishing",
-            "value": 2,
-            "history": [
-              0,
-              7,
-              5,
-              1,
-              6
-            ]
-          },
-          {
-            "name": "volleys",
-            "value": 18,
-            "history": [
-              16,
-              19,
-              12,
-              19,
-              10
-            ]
-          },
-          {
-            "name": "ball control",
-            "value": 9,
-            "history": [
-              17,
-              3,
-              13,
-              12,
-              3
-            ]
-          },
-          {
-            "name": "standing tackle",
-            "value": 8,
-            "history": [
-              5,
-              17,
-              3,
-              8,
-              4
-            ]
-          },
-          {
-            "name": "sliding tackle",
-            "value": 3,
-            "history": [
-              20,
-              3,
-              1,
-              16,
-              2
-            ]
-          },
-          {
-            "name": "dribbling",
-            "value": 7,
-            "history": [
-              6,
-              7,
-              2,
-              8,
-              5
-            ]
-          },
-          {
-            "name": "curve",
-            "value": 19,
-            "history": [
-              12,
-              1,
-              7,
-              7,
-              15
-            ]
-          }
-        ]
-      },
-      {
-        "categoryName": "Physical",
-        "attributesInCategory": [
-          {
-            "name": "stamina",
-            "value": 19,
-            "history": [
-              13,
-              19,
-              4,
-              10,
-              6
-            ]
-          },
-          {
-            "name": "jumping",
-            "value": 14,
-            "history": [
-              7,
-              9,
-              0,
-              19,
-              12
-            ]
-          },
-          {
-            "name": "strength",
-            "value": 17,
-            "history": [
-              18,
-              19,
-              6,
-              17,
-              6
-            ]
-          },
-          {
-            "name": "sprint speed",
-            "value": 8,
-            "history": [
-              12,
-              1,
-              17,
-              19,
-              20
-            ]
-          },
-          {
-            "name": "acceleration",
-            "value": 5,
-            "history": [
-              3,
-              5,
-              5,
-              1,
-              2
-            ]
-          },
-          {
-            "name": "agility",
-            "value": 17,
-            "history": [
-              12,
-              8,
-              4,
-              10,
-              11
-            ]
-          },
-          {
-            "name": "balance",
-            "value": 12,
-            "history": [
-              7,
-              9,
-              16,
-              19,
-              16
-            ]
-          }
-        ]
-      },
-      {
-        "categoryName": "Mental",
-        "attributesInCategory": [
-          {
-            "name": "aggression",
-            "value": 0,
-            "history": [
-              6,
-              6,
-              8,
-              12,
-              17
-            ]
-          },
-          {
-            "name": "vision",
-            "value": 19,
-            "history": [
-              3,
-              11,
-              2,
-              3,
-              6
-            ]
-          },
-          {
-            "name": "composure",
-            "value": 10,
-            "history": [
-              1,
-              14,
-              3,
-              18,
-              12
-            ]
-          },
-          {
-            "name": "defensive awareness",
-            "value": 11,
-            "history": [
-              12,
-              4,
-              17,
-              2,
-              4
-            ]
-          },
-          {
-            "name": "attacking position",
-            "value": 14,
-            "history": [
-              8,
-              7,
-              9,
-              7,
-              5
-            ]
-          }
-        ]
-      }
-    ]
-  },
+  "attributes": [
+    {
+      "category": "Technical",
+      "group": "Attacking",
+      "name": "FK Accuracy",
+      "value": 2,
+      "history": [
+        15,
+        20,
+        7,
+        18,
+        11
+      ]
+    },
+    {
+      "category": "Technical",
+      "groupName": "Attacking",
+      "name": "penalties",
+      "value": 9,
+      "history": [
+        13,
+        0,
+        14,
+        7,
+        18
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Aerial",
+      "name": "heading accuracy",
+      "value": 3,
+      "history": [
+        18,
+        8,
+        17,
+        9,
+        7
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Attacking",
+      "name": "crossing",
+      "value": 1,
+      "history": [
+        5,
+        2,
+        17,
+        2,
+        14
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Vision",
+      "name": "short passing",
+      "value": 16,
+      "history": [
+        1,
+        0,
+        9,
+        15,
+        18
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Vision",
+      "name": "long passing",
+      "value": 19,
+      "history": [
+        2,
+        10,
+        20,
+        3,
+        14
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Attacking",
+      "name": "long shots",
+      "value": 16,
+      "history": [
+        16,
+        4,
+        5,
+        13,
+        2
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Attacking",
+      "name": "finishing",
+      "value": 2,
+      "history": [
+        0,
+        7,
+        5,
+        1,
+        6
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Attacking",
+      "name": "volleys",
+      "value": 18,
+      "history": [
+        16,
+        19,
+        12,
+        19,
+        10
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Attacking",
+      "name": "ball control",
+      "value": 9,
+      "history": [
+        17,
+        3,
+        13,
+        12,
+        3
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Defending",
+      "name": "standing tackle",
+      "value": 8,
+      "history": [
+        5,
+        17,
+        3,
+        8,
+        4
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Defending",
+      "name": "sliding tackle",
+      "value": 3,
+      "history": [
+        20,
+        3,
+        1,
+        16,
+        2
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Attacking",
+      "name": "dribbling",
+      "value": 7,
+      "history": [
+        6,
+        7,
+        2,
+        8,
+        5
+      ]
+    },
+    {
+      "category": "Technical",
+      "group": "Attacking",
+      "name": "curve",
+      "value": 19,
+      "history": [
+        12,
+        1,
+        7,
+        7,
+        15
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Defending",
+      "name": "stamina",
+      "value": 19,
+      "history": [
+        13,
+        19,
+        4,
+        10,
+        6
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Aerial",
+      "name": "jumping",
+      "value": 14,
+      "history": [
+        7,
+        9,
+        0,
+        19,
+        12
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Defending",
+      "name": "strength",
+      "value": 17,
+      "history": [
+        18,
+        19,
+        6,
+        17,
+        6
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Speed",
+      "name": "sprint speed",
+      "value": 8,
+      "history": [
+        12,
+        1,
+        17,
+        19,
+        20
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Speed",
+      "name": "acceleration",
+      "value": 5,
+      "history": [
+        3,
+        5,
+        5,
+        1,
+        2
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Speed",
+      "name": "agility",
+      "value": 17,
+      "history": [
+        12,
+        8,
+        4,
+        10,
+        11
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Speed",
+      "name": "balance",
+      "value": 12,
+      "history": [
+        7,
+        9,
+        16,
+        19,
+        16
+      ]
+    },
+    {
+      "category": "Mental",
+      "group": "Attacking",
+      "name": "aggression",
+      "value": 0,
+      "history": [
+        6,
+        6,
+        8,
+        12,
+        17
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Vision",
+      "name": "vision",
+      "value": 19,
+      "history": [
+        3,
+        11,
+        2,
+        3,
+        6
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Attacking",
+      "name": "composure",
+      "value": 10,
+      "history": [
+        1,
+        14,
+        3,
+        18,
+        12
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Defending",
+      "name": "defensive awareness",
+      "value": 11,
+      "history": [
+        12,
+        4,
+        17,
+        2,
+        4
+      ]
+    },
+    {
+      "category": "Physical",
+      "group": "Attacking",
+      "name": "attacking position",
+      "value": 14,
+      "history": [
+        8,
+        7,
+        9,
+        7,
+        5
+      ]
+    }
+  ],
   "ability": {
     "current": 97,
     "history": [

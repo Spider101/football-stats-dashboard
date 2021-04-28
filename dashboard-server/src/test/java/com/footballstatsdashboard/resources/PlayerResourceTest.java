@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.player.Ability;
+import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.ImmutableAbility;
+import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
 import com.footballstatsdashboard.api.model.player.ImmutableRole;
 import com.footballstatsdashboard.api.model.player.Metadata;
@@ -74,7 +76,7 @@ public class PlayerResourceTest {
     public void getPlayer_fetchesPlayerFromCouchbase() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = getPlayerDataStub(playerId, true);
+        Player playerFromCouchbase = getPlayerDataStub(playerId, true, true);
         when(couchbaseDAO.getDocument(any(), any()))
                 .thenReturn(Pair.of(playerFromCouchbase, 0L));
 
@@ -113,7 +115,7 @@ public class PlayerResourceTest {
     @Test
     public void createPlayer_persistsPlayerInCouchbase() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, true);
+        Player incomingPlayer = getPlayerDataStub(null, true, true);
         ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
 
         // execute
@@ -140,7 +142,26 @@ public class PlayerResourceTest {
     @Test
     public void createPlayer_playerRolesNotProvided() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, false);
+        Player incomingPlayer = getPlayerDataStub(null, false, true);
+
+        // execute
+        Response playerResponse = playerResource.createPlayer(incomingPlayer, uriInfo);
+
+        // assert
+        verify(couchbaseDAO, never()).insertDocument(any(), any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
+        assertNotNull(playerResponse.getEntity());
+        assertEquals(incomingPlayer, playerResponse.getEntity());
+    }
+
+    /**
+     * given that the request contains a player entity without player attributes, tests that the entity is never
+     * persisted to couchbase and a 422 response status is returned
+     */
+    @Test
+    public void createPlayer_playerAttributesNotProvided() {
+        // setup
+        Player incomingPlayer = getPlayerDataStub(null, true, false);
 
         // execute
         Response playerResponse = playerResource.createPlayer(incomingPlayer, uriInfo);
@@ -161,10 +182,34 @@ public class PlayerResourceTest {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
         Long existingPlayerCAS = 123L;
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true);
+        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true);
         when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingPlayerInCouchbase, existingPlayerCAS));
 
-        Player incomingPlayer = ImmutablePlayer.builder().from(existingPlayerInCouchbase).build();
+        Metadata updatedMetadata = ImmutableMetadata.builder()
+                .from(existingPlayerInCouchbase.getMetadata())
+                .name("Updated Name")
+                .build();
+        Ability updatedAbility = ImmutableAbility.builder()
+                .from(existingPlayerInCouchbase.getAbility())
+                .current(25)
+                .build();
+        Role updatedRole = ImmutableRole.builder()
+                .from(existingPlayerInCouchbase.getRoles().get(0))
+                .name("updated playerRole")
+                .build();
+
+        Attribute updatedAttribute = ImmutableAttribute.builder()
+                .from(existingPlayerInCouchbase.getAttributes().get(0))
+                .history(ImmutableList.of(87))
+                .build();
+        Player incomingPlayer = ImmutablePlayer.builder()
+                .from(existingPlayerInCouchbase)
+                .metadata(updatedMetadata)
+                .ability(updatedAbility)
+                .roles(ImmutableList.of(updatedRole))
+                .attributes(ImmutableList.of(updatedAttribute))
+                .build();
+
         ArgumentCaptor<Player> updatedPlayerCaptor = ArgumentCaptor.forClass(Player.class);
         ArgumentCaptor<Long> existingPlayerCASCaptor = ArgumentCaptor.forClass(Long.class);
 
@@ -183,6 +228,13 @@ public class PlayerResourceTest {
 
         assertEquals(HttpStatus.OK_200, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
+
+        Player playerInResponse = OBJECT_MAPPER.convertValue(playerResponse.getEntity(), Player.class);
+        assertEquals(incomingPlayer.getId(), playerInResponse.getId());
+        assertEquals(incomingPlayer.getMetadata(), playerInResponse.getMetadata());
+        assertEquals(incomingPlayer.getRoles(), playerInResponse.getRoles());
+        assertEquals(incomingPlayer.getAbility(), playerInResponse.getAbility());
+        assertEquals(incomingPlayer.getAttributes(), playerInResponse.getAttributes());
     }
 
     /**
@@ -194,7 +246,7 @@ public class PlayerResourceTest {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
         Long existingPlayerCAS = 123L;
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true);
+        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true);
         when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingPlayerInCouchbase, existingPlayerCAS));
 
         UUID incomingPlayerId = UUID.randomUUID();
@@ -252,7 +304,7 @@ public class PlayerResourceTest {
         assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
     }
 
-    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles) {
+    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
         Metadata playerMetadata = ImmutableMetadata.builder()
                 .dateOfBirth(LocalDate.parse("16/08/2006", formatter))
@@ -274,6 +326,17 @@ public class PlayerResourceTest {
                     .name("playerRole")
                     .build();
             playerBuilder.roles(ImmutableList.of(playerRole));
+        }
+
+        if (usePlayerAttributes) {
+            Attribute playerAttribute = ImmutableAttribute.builder()
+                    .name("Sprint Speed")
+                    .value(85)
+                    .category("Technical")
+                    .group("Speed")
+                    .build();
+
+            playerBuilder.attributes(ImmutableList.of(playerAttribute));
         }
         return playerBuilder.build();
     }
