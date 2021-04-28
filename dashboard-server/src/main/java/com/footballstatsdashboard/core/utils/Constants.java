@@ -10,4 +10,8 @@ public final class Constants {
     public static final String PLAYER_ID = "playerId";
     public static final String PLAYER_ID_PATH = "/{" + PLAYER_ID + "}";
 
+    public static final String USER_V1_BASE_PATH = "football-stats-dashboard/v1/users";
+    public static final String USER_ID = "userId";
+    public static final String USER_ID_PATH = "/{" + USER_ID + "}";
+
 }
