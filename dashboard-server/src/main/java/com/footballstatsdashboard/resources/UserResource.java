@@ -2,8 +2,9 @@ package com.footballstatsdashboard.resources;
 
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,7 @@ import javax.ws.rs.core.UriInfo;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static com.footballstatsdashboard.core.utils.Constants.USER_ID;
@@ -33,9 +35,9 @@ public class UserResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 
-    public CouchbaseDAO<ResourceKey> couchbaseDAO;
-    public UserResource(CouchbaseDAO<ResourceKey> couchbaseDAO) {
-        this.couchbaseDAO = couchbaseDAO;
+    public UserDAO<ResourceKey> userDAO;
+    public UserResource(UserDAO<ResourceKey> userDAO) {
+        this.userDAO = userDAO;
     }
 
     @GET
@@ -48,7 +50,7 @@ public class UserResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(userId);
-        User user = this.couchbaseDAO.getDocument(resourceKey, User.class).getLeft();
+        User user = this.userDAO.getDocument(resourceKey, User.class).getLeft();
         return Response.ok(user).build();
     }
 
@@ -61,7 +63,11 @@ public class UserResource {
             LOGGER.info("createUser() request.");
         }
 
-        // TODO: 28/04/21 add validation to see if user with given email address already exists or not
+        List<User> existingUsers = this.userDAO.getUsersByFirstNameLastNameEmail(incomingUserDetails.getFirstName(),
+                incomingUserDetails.getLastName(), incomingUserDetails.getEmail());
+        if (existingUsers.size() > 0) {
+            return Response.status(HttpStatus.CONFLICT_409).entity(incomingUserDetails).build();
+        }
         LocalDate currentDate = LocalDate.now();
         User newUser = ImmutableUser.builder()
                 .from(incomingUserDetails)
@@ -70,7 +76,7 @@ public class UserResource {
                 .build();
 
         ResourceKey resourceKey = new ResourceKey(newUser.getId());
-        this.couchbaseDAO.insertDocument(resourceKey, newUser);
+        this.userDAO.insertDocument(resourceKey, newUser);
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newUser.getId().toString()).build();
         return Response.created(location).entity(newUser).build();

@@ -4,6 +4,7 @@ import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.client.couchbase.config.ClusterConfiguration;
 import com.footballstatsdashboard.core.utils.PlayerInternalModule;
 import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.PlayerKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.footballstatsdashboard.db.key.UserKeyProvider;
@@ -58,8 +59,9 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
                 new PlayerKeyProvider()
         );
 
-        CouchbaseDAO<ResourceKey> userCouchbaseDAO = new CouchbaseDAO<>(
+        UserDAO<ResourceKey> userCouchbaseDAO = new UserDAO<>(
                 couchbaseClientManager.getBucketContainer(clusterName, bucketName),
+                couchbaseClientManager.getClusterContainer(clusterName),
                 new UserKeyProvider()
         );
 
