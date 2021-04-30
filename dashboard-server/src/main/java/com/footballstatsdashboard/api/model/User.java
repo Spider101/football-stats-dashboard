@@ -12,6 +12,9 @@ import org.immutables.value.Value;
 import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.security.Principal;
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -19,7 +22,7 @@ import java.util.UUID;
 @JsonSerialize
 @JsonDeserialize(as = ImmutableUser.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public interface User {
+public interface User extends Principal {
     /**
      * user ID
      */
@@ -47,6 +50,27 @@ public interface User {
     @Valid
     @Email
     String getEmail();
+
+    /**
+     * user's role when accessing the API
+     */
+    @Valid
+    String getRole();
+
+    /**
+     * user's password
+     */
+    @Valid
+    @NotNull
+    @Size(min=3, max=16, message = "cannot be less than 3 or more than 16 characters")
+    String getPassword();
+
+    /**
+     * represents entity that created the user
+     */
+    @Nullable
+    @InternalField
+    String getCreatedBy();
 
     /**
      * timestamp when user data was created

@@ -63,14 +63,21 @@ public class UserResource {
             LOGGER.info("createUser() request.");
         }
 
+        // check if there are any existing users with the same first name, last name, email combination
         List<User> existingUsers = this.userDAO.getUsersByFirstNameLastNameEmail(incomingUserDetails.getFirstName(),
                 incomingUserDetails.getLastName(), incomingUserDetails.getEmail());
         if (existingUsers.size() > 0) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("There is an existing user with the same first name, last name and email combination!");
+            }
             return Response.status(HttpStatus.CONFLICT_409).entity(incomingUserDetails).build();
         }
+
         LocalDate currentDate = LocalDate.now();
+        // TODO: 30/04/21 encrypt the password before persisting the user
         User newUser = ImmutableUser.builder()
                 .from(incomingUserDetails)
+                .createdBy(incomingUserDetails.getEmail())
                 .createdDate(currentDate)
                 .lastModifiedDate(currentDate)
                 .build();
