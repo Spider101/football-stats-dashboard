@@ -1,6 +1,7 @@
 package com.footballstatsdashboard.api.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -54,7 +55,8 @@ public interface User extends Principal {
     /**
      * user's role when accessing the API
      */
-    @Valid
+    @Nullable
+    @InternalField
     String getRole();
 
     /**
@@ -93,4 +95,9 @@ public interface User extends Principal {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     @JsonSerialize(using = LocalDateSerializer.class)
     LocalDate getLastModifiedDate();
+
+    @Override
+    @JsonIgnore
+    @Value.Derived
+    default String getName() { return getEmail(); }
 }
