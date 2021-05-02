@@ -36,7 +36,7 @@ public class PlayerResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerResource.class);
 
-    public CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private final CouchbaseDAO<ResourceKey> couchbaseDAO;
     public PlayerResource(CouchbaseDAO<ResourceKey> couchbaseDAO) {
         this.couchbaseDAO = couchbaseDAO;
     }

@@ -1,7 +1,11 @@
 package com.footballstatsdashboard.resources;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
+import com.footballstatsdashboard.api.model.AuthToken;
+import com.footballstatsdashboard.api.model.ImmutableAuthToken;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.db.AuthTokenDAO;
 import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import org.eclipse.jetty.http.HttpStatus;
@@ -22,7 +26,9 @@ import javax.ws.rs.core.UriInfo;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.footballstatsdashboard.core.utils.Constants.USER_ID;
@@ -35,9 +41,13 @@ public class UserResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 
-    public UserDAO<ResourceKey> userDAO;
-    public UserResource(UserDAO<ResourceKey> userDAO) {
+    private final UserDAO<ResourceKey> userDAO;
+    private final AuthTokenDAO<ResourceKey> authTokenDAO;
+
+    public UserResource(UserDAO<ResourceKey> userDAO,
+                        AuthTokenDAO<ResourceKey> authTokenDAO) {
         this.userDAO = userDAO;
+        this.authTokenDAO = authTokenDAO;
     }
 
     @GET
@@ -73,10 +83,14 @@ public class UserResource {
             return Response.status(HttpStatus.CONFLICT_409).entity(incomingUserDetails).build();
         }
 
+        // encrypt the password before persisting the user
+        String encryptedPassword = BCrypt.withDefaults()
+                .hashToString(12, incomingUserDetails.getPassword().toCharArray());
         LocalDate currentDate = LocalDate.now();
-        // TODO: 30/04/21 encrypt the password before persisting the user
+
         User newUser = ImmutableUser.builder()
                 .from(incomingUserDetails)
+                .password(encryptedPassword)
                 .createdBy(incomingUserDetails.getEmail())
                 .createdDate(currentDate)
                 .lastModifiedDate(currentDate)
@@ -87,5 +101,38 @@ public class UserResource {
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newUser.getId().toString()).build();
         return Response.created(location).entity(newUser).build();
+    }
+
+    @POST
+    @Path("/authenticate")
+    public Response authenticateUser(
+            @Valid @NotNull User userCredentials) {
+        Optional<User> user = this.userDAO.getUserByCredentials(userCredentials.getEmail());
+
+        if (user == null || !user.isPresent()) {
+            LOGGER.error("Invalid email or password combination");
+            return Response.status(HttpStatus.BAD_REQUEST_400).entity(userCredentials).build();
+        }
+
+        // user found, verify encrypted password matches password passed in credentials
+        BCrypt.Result result = BCrypt.verifyer().verify(userCredentials.getPassword().toCharArray(),
+                user.get().getPassword());
+        if (!result.verified) {
+            LOGGER.error("Password provided in credentials does not match encrypted password hash");
+            return Response.status(HttpStatus.BAD_REQUEST_400).entity(userCredentials).build();
+        }
+
+        // password is verified, generate a new auth token and return it
+        AuthToken authToken = ImmutableAuthToken.builder()
+                .userId(user.get().getId())
+                .lastAccessUTC(OffsetDateTime.now())
+                .build();
+        ResourceKey authTokenKey = new ResourceKey(authToken.getId());
+        this.authTokenDAO.insertDocument(authTokenKey, authToken);
+
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Auth Token: " + authToken.getId() + " generated");
+        }
+        return Response.ok().entity(authToken).build();
     }
 }
