@@ -3,8 +3,8 @@ package com.footballstatsdashboard.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
+import com.footballstatsdashboard.api.deserializers.CustomInstantDeserializer;
 import org.immutables.value.Value;
 
 import javax.validation.Valid;
@@ -37,7 +37,7 @@ public interface AuthToken {
      */
     @Valid
     @NotNull
-    @JsonDeserialize(using = InstantDeserializer.class)
+    @JsonDeserialize(using = CustomInstantDeserializer.class)
     @JsonSerialize(using = InstantSerializer.class)
     Instant getLastAccessUTC();
 }
