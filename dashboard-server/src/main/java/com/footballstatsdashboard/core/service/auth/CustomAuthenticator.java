@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,7 +48,7 @@ public class CustomAuthenticator implements Authenticator<String, User> {
             AuthToken authToken = authTokenEntity.getLeft();
 
             // check if access token has expired
-            Duration duration = Duration.between(authToken.getLastAccessUTC(), OffsetDateTime.now());
+            Duration duration = Duration.between(authToken.getLastAccessUTC(), Instant.now());
             if (duration.getSeconds() <=  AUTH_TOKEN_EXPIRE_TIME_SECONDS) {
                 // touch access token to push expiration
                 this.authTokenDAO.updateLastAccessTime(authTokenKey, authTokenEntity);

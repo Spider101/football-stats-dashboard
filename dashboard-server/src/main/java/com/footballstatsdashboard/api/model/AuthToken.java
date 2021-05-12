@@ -3,11 +3,13 @@ package com.footballstatsdashboard.api.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.InstantDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import org.immutables.value.Value;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Value.Immutable
@@ -35,5 +37,7 @@ public interface AuthToken {
      */
     @Valid
     @NotNull
-    OffsetDateTime getLastAccessUTC();
+    @JsonDeserialize(using = InstantDeserializer.class)
+    @JsonSerialize(using = InstantSerializer.class)
+    Instant getLastAccessUTC();
 }
