@@ -74,8 +74,9 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         );
 
         AuthTokenDAO<ResourceKey> authTokenDAO = new AuthTokenDAO<>(
-                couchbaseClientManager.getBucketContainer(clusterName, bucketName), new AuthTokenKeyProvider()
-        );
+                couchbaseClientManager.getBucketContainer(clusterName, bucketName),
+                couchbaseClientManager.getClusterContainer(clusterName),
+                new AuthTokenKeyProvider(), environment.getObjectMapper());
 
         // setup resources
         environment.jersey().register(new UserResource(userCouchbaseDAO, authTokenDAO));
