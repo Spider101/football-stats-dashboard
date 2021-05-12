@@ -57,12 +57,6 @@ public class AuthTokenDAO<K> extends CouchbaseDAO<K> {
             return Optional.of(Pair.of(authToken, cas));
         }
 
-//        List<AuthToken> authTokenList = queryResult.rowsAs(AuthToken.class);
-
-//        if (authTokenList.size() == 1) {
-//            return Optional.of(authTokenList.iterator().next());
-//        }
-
         // TODO: 02/05/21 figure out how to handle query result returning more than one auth token for a given user id
         return Optional.empty();
     }
