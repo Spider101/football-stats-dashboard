@@ -111,7 +111,7 @@ public class UserResource {
         Optional<User> user = this.userDAO.getUserByCredentials(userCredentials.getEmail());
 
         if (user == null || !user.isPresent()) {
-            LOGGER.error("Invalid email or password combination");
+            LOGGER.error("Invalid email provided: " + userCredentials.getEmail());
             return Response.status(HttpStatus.BAD_REQUEST_400).entity(userCredentials).build();
         }
 
