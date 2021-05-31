@@ -2,6 +2,7 @@ package com.footballstatsdashboard.resources;
 
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
+import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
@@ -58,7 +59,8 @@ public class PlayerResource {
 
     @POST
     public Response createPlayer(
-            @Auth @Valid @NotNull Player incomingPlayer,
+            @Auth User user,
+            @Valid @NotNull Player incomingPlayer,
             @Context UriInfo uriInfo) {
 
         if (LOGGER.isInfoEnabled()) {
@@ -73,7 +75,7 @@ public class PlayerResource {
         LocalDate currentDate = LocalDate.now();
         Player newPlayer = ImmutablePlayer.builder()
                 .from(incomingPlayer)
-                .createdBy("admin") // TODO: update this when createdBy headers have been implemented
+                .createdBy(user.getEmail())
                 .createdDate(currentDate)
                 .lastModifiedDate(currentDate)
                 .build();
@@ -88,7 +90,8 @@ public class PlayerResource {
     @PUT
     @Path(PLAYER_ID_PATH)
     public Response updatePlayer(
-            @Auth @PathParam(PLAYER_ID) UUID playerId,
+            @Auth User user,
+            @PathParam(PLAYER_ID) UUID playerId,
             @Valid @NotNull Player incomingPlayer) {
 
         if (LOGGER.isInfoEnabled()) {
@@ -110,7 +113,7 @@ public class PlayerResource {
                     .roles(incomingPlayer.getRoles())
                     .attributes(incomingPlayer.getAttributes())
                     .lastModifiedDate(LocalDate.now())
-                    .createdBy("admin"); // TODO: update this when createdBy headers have been implemented
+                    .createdBy(user.getEmail());
 
             Player updatedPlayer = updatedPlayerBuilder.build();
             this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer, existingPlayerEntity.getRight());
