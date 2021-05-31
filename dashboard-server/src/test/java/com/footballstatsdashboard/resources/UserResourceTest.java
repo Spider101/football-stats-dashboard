@@ -221,14 +221,7 @@ public class UserResourceTest {
         Response userResponse = userResource.authenticateUser(userCredentials);
 
         // assert
-        verify(userDAO).getUserByCredentials(anyString());
-        verify(authTokenDAO, never()).getAuthTokenForUser(any());
-        verify(authTokenDAO, never()).updateLastAccessTime(any(), any());
-        verify(authTokenDAO, never()).insertDocument(any(), any());
-
-        assertEquals(HttpStatus.BAD_REQUEST_400, userResponse.getStatus());
-        assertNotNull(userResponse.getEntity());
-        assertEquals(userCredentials, userResponse.getEntity());
+        assertInvalidUserCredentials(userCredentials, userResponse);
     }
 
     /**
@@ -251,14 +244,7 @@ public class UserResourceTest {
         Response userResponse = userResource.authenticateUser(userCredentials);
 
         // assert
-        verify(userDAO).getUserByCredentials(anyString());
-        verify(authTokenDAO, never()).getAuthTokenForUser(any());
-        verify(authTokenDAO, never()).updateLastAccessTime(any(), any());
-        verify(authTokenDAO, never()).insertDocument(any(), any());
-
-        assertEquals(HttpStatus.BAD_REQUEST_400, userResponse.getStatus());
-        assertNotNull(userResponse.getEntity());
-        assertEquals(userCredentials, userResponse.getEntity());
+        assertInvalidUserCredentials(userCredentials, userResponse);
     }
 
     /**
@@ -323,5 +309,16 @@ public class UserResourceTest {
         }
 
         return userDataBuilder.build();
+    }
+
+    private void assertInvalidUserCredentials(User userCredentials, Response userResponse) {
+        verify(userDAO).getUserByCredentials(anyString());
+        verify(authTokenDAO, never()).getAuthTokenForUser(any());
+        verify(authTokenDAO, never()).updateLastAccessTime(any(), any());
+        verify(authTokenDAO, never()).insertDocument(any(), any());
+
+        assertEquals(HttpStatus.BAD_REQUEST_400, userResponse.getStatus());
+        assertNotNull(userResponse.getEntity());
+        assertEquals(userCredentials, userResponse.getEntity());
     }
 }
