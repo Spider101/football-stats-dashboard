@@ -1,67 +1,81 @@
 package com.footballstatsdashboard.api.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.footballstatsdashboard.api.model.player.Ability;
-import com.footballstatsdashboard.api.model.player.Attribute;
-import com.footballstatsdashboard.api.model.player.Role;
 import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
-import com.footballstatsdashboard.api.model.player.Metadata;
-
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.security.Principal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Value.Immutable
 @JsonSerialize
-@JsonDeserialize(as = ImmutablePlayer.class)
+@JsonDeserialize(as = ImmutableUser.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Value.Style(jdkOnly = true) // Required if the below entity will be used in a Map, List, Set or any other collection
-public interface Player {
-
+public interface User extends Principal {
     /**
-     * player ID
+     * user ID
      */
     @Valid
     @Value.Default
     default UUID getId() { return UUID.randomUUID(); }
 
     /**
-     * Information about the player
+     * user's first name
      */
     @Valid
-    Metadata getMetadata();
+    @Nullable
+    String getFirstName();
 
     /**
-     * Information about the player's role in the team
+     * user's last name
      */
     @Valid
-    List<Role> getRoles();
+    @Nullable
+    String getLastName();
 
     /**
-     * Information about the player's ability, both current and past data
-     */
-    @Valid Ability getAbility();
-
-    /**
-     * Information about the player's attributes
+     * user's email ID
      */
     @Valid
-    @Size(min = 1)
-    List<Attribute> getAttributes();
+    @Email
+    String getEmail();
 
-    // TODO: 12/05/21 update all local date times to zoned date times to involve timezones as well
     /**
-     * timestamp when player data was created
+     * user's role when accessing the API
+     */
+    @Nullable
+    @InternalField
+    String getRole();
+
+    /**
+     * user's password
+     */
+    @Valid
+    @NotNull
+    @Size(min=3, max=16, message = "cannot be less than 3 or more than 16 characters")
+    String getPassword();
+
+    /**
+     * represents entity that created the user
+     */
+    @Nullable
+    @InternalField
+    String getCreatedBy();
+
+    /**
+     * timestamp when user data was created
      */
     @Valid
     @Nullable
@@ -72,7 +86,7 @@ public interface Player {
     LocalDate getCreatedDate();
 
     /**
-     * timestamp when player data was last modified
+     * timestamp when user data was last modified
      */
     @Valid
     @Nullable
@@ -82,10 +96,8 @@ public interface Player {
     @JsonSerialize(using = LocalDateSerializer.class)
     LocalDate getLastModifiedDate();
 
-    /**
-     * represents entity that requested player data be created
-     */
-    @Nullable
-    @InternalField
-    String getCreatedBy();
+    @Override
+    @JsonIgnore
+    @Value.Derived
+    default String getName() { return getEmail(); }
 }

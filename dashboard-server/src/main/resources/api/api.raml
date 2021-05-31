@@ -6,21 +6,21 @@ baseUri: https://localhost:8090/football-stats-dashboard/{version}
 mediaType: application/json
 
 securitySchemes:
-  api_key:
+  access_token:
     description: Each request must include the api key in the headers
     type: x-customApiKey
     describedBy:
       headers:
         Authorization:
           description: |
-            Used to send a valid api key.
+            Used to send a valid auth access token.
           type: string
-          example: api_key 6bc7106b-e109-48e4-b385-a574b09ce821
+          example: BEARER 6bc7106b-e109-48e4-b385-a574b09ce821
       responses:
         401:
           description: |
-            Bad or expired api key. This can happen if the user or the backend revoked the api key.
-            To fix this, you should contact the api administrator
+            Bad or expired access token. This can happen if the backend revoked or expired the access token.
+            To fix this, you should re-authenticate the user.
           body:
             application/json:
               example: !include examples/response-401.json
@@ -41,10 +41,7 @@ securitySchemes:
         required: true
     get:
       description: gets a player's data by id
-      headers:
-        Account-Id:
-          type: integer
-      securedBy: [api_key]
+      securedBy: [access_token]
       responses:
         200:
           body:
@@ -52,33 +49,24 @@ securitySchemes:
               example: !include examples/player-response.json
     put:
       description: updates a player's data
-      headers:
-        Account-Id:
-          type: integer
-      securedBy: [api_key]
+      securedBy: [access_token]
       responses:
         200:
           body:
             application/json:
               example: !include examples/player-response.json
+        500:
+          description: failed during player data update
     delete:
       description: delete a player's data
-      headers:
-        Account-Id:
-          type: integer
-      securedBy: [api_key]
+      securedBy: [access_token]
       responses:
-        200:
+        204:
           description: successfully delete a player's data
 
   post:
     description: adds a new player's data
-    headers:
-      Account-Id:
-        type: integer
-      Created-By:
-        type: string
-    securedBy: [api_key]
+    securedBy: [access_token]
     body:
       application/json:
         example: !include examples/player-post-request.json
@@ -88,3 +76,47 @@ securitySchemes:
         body:
           application/json:
             example: !include examples/player-response.json
+      422:
+        description: unprocessable entity when player roles or attributes are missing
+
+/users
+  /{userId}:
+    uriParameters:
+      userId:
+        description: The user ID
+        type: string
+        required: true
+    get:
+      description: gets a user's data by id
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/user-response.json
+  post:
+    description: adds a new user's data
+    body:
+      application/json:
+        example: !include examples/user-post-request.json
+    responses:
+      201:
+        description: user's data created
+        body:
+          application/json:
+            example: !include examples/user-response.json
+      409:
+        description: conflict because existing user with the same first name, last name and email combination
+  /authenticate:
+    post:
+      description: authenticates a user's credentials and generates/retrieves access_token for subsequent operations
+      body:
+        application/json:
+          example: !include examples/user-auth-request.json
+      responses:
+        200:
+          description: access_token generated/retrieved
+          body:
+            application/json:
+              example: !include examples/access-token-response.json
+        400:
+          description: bad request when either email or password does not match

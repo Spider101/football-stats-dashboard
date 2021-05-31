@@ -2,8 +2,10 @@ package com.footballstatsdashboard.resources;
 
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
+import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import io.dropwizard.auth.Auth;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -36,7 +38,7 @@ public class PlayerResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerResource.class);
 
-    public CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private final CouchbaseDAO<ResourceKey> couchbaseDAO;
     public PlayerResource(CouchbaseDAO<ResourceKey> couchbaseDAO) {
         this.couchbaseDAO = couchbaseDAO;
     }
@@ -44,7 +46,7 @@ public class PlayerResource {
     @GET
     @Path(PLAYER_ID_PATH)
     public Response getPlayer(
-            @PathParam(PLAYER_ID) UUID playerId) {
+            @Auth @PathParam(PLAYER_ID) UUID playerId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getPlayer() request for player with ID: {}", playerId.toString());
@@ -57,6 +59,7 @@ public class PlayerResource {
 
     @POST
     public Response createPlayer(
+            @Auth User user,
             @Valid @NotNull Player incomingPlayer,
             @Context UriInfo uriInfo) {
 
@@ -72,7 +75,7 @@ public class PlayerResource {
         LocalDate currentDate = LocalDate.now();
         Player newPlayer = ImmutablePlayer.builder()
                 .from(incomingPlayer)
-                .createdBy("admin") // TODO: update this when createdBy headers have been implemented
+                .createdBy(user.getEmail())
                 .createdDate(currentDate)
                 .lastModifiedDate(currentDate)
                 .build();
@@ -87,6 +90,7 @@ public class PlayerResource {
     @PUT
     @Path(PLAYER_ID_PATH)
     public Response updatePlayer(
+            @Auth User user,
             @PathParam(PLAYER_ID) UUID playerId,
             @Valid @NotNull Player incomingPlayer) {
 
@@ -109,7 +113,7 @@ public class PlayerResource {
                     .roles(incomingPlayer.getRoles())
                     .attributes(incomingPlayer.getAttributes())
                     .lastModifiedDate(LocalDate.now())
-                    .createdBy("admin"); // TODO: update this when createdBy headers have been implemented
+                    .createdBy(user.getEmail());
 
             Player updatedPlayer = updatedPlayerBuilder.build();
             this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer, existingPlayerEntity.getRight());
@@ -122,7 +126,7 @@ public class PlayerResource {
     @DELETE
     @Path(PLAYER_ID_PATH)
     public Response deletePlayer(
-            @PathParam(PLAYER_ID) UUID playerId) {
+            @Auth @PathParam(PLAYER_ID) UUID playerId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("deletePlayer() request for player with ID: {}", playerId.toString());

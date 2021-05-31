@@ -2,7 +2,9 @@ package com.footballstatsdashboard.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
+import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.Player;
+import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.ImmutableAbility;
@@ -47,6 +49,7 @@ public class PlayerResourceTest {
 
     private static final String URI_PATH = "/players";
     private PlayerResource playerResource;
+    private User userPrincipal;
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
 
     @Mock
@@ -66,6 +69,13 @@ public class PlayerResourceTest {
         when(uriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
 
         playerResource = new PlayerResource(couchbaseDAO);
+        userPrincipal = ImmutableUser.builder()
+                .email("fake email")
+                // other details are not required for the purposes of this test so using empty strings
+                .password("")
+                .firstName("")
+                .lastName("")
+                .build();
     }
 
     /**
@@ -93,16 +103,18 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given a runtime exception is thrown by couchbase DAO when player entity is not found, tests that the same
-     * exception is thrown by getPlayer resource method as well
+     * given a runtime exception is thrown by couchbase DAO when player entity is not found, verifies that the same
+     * exception is thrown by `getPlayer` resource method as well
      */
     @Test(expected = RuntimeException.class)
     public void getPlayer_playerNotFoundInCouchbase() {
         // setup
-        when(couchbaseDAO.getDocument(any(), any())).thenThrow(new RuntimeException("Unable to find Player"));
+        UUID invalidPlayerId = UUID.randomUUID();
+        when(couchbaseDAO.getDocument(any(), any()))
+                .thenThrow(new RuntimeException("Unable to find document with Id: " + invalidPlayerId));
 
         // execute
-        playerResource.getPlayer(UUID.randomUUID());
+        playerResource.getPlayer(invalidPlayerId);
 
         // assert
         verify(couchbaseDAO).getDocument(any(), any());
@@ -119,14 +131,14 @@ public class PlayerResourceTest {
         ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
 
         // execute
-        Response playerResponse = playerResource.createPlayer(incomingPlayer, uriInfo);
+        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
         verify(couchbaseDAO).insertDocument(any(), newPlayerCaptor.capture());
         Player newPlayer = newPlayerCaptor.getValue();
-        assertNotNull(newPlayer.getCreatedBy());
         assertNotNull(newPlayer.getCreatedDate());
         assertNotNull(newPlayer.getLastModifiedDate());
+        assertEquals(userPrincipal.getEmail(), newPlayer.getCreatedBy());
 
         assertEquals(HttpStatus.CREATED_201, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
@@ -145,7 +157,7 @@ public class PlayerResourceTest {
         Player incomingPlayer = getPlayerDataStub(null, false, true);
 
         // execute
-        Response playerResponse = playerResource.createPlayer(incomingPlayer, uriInfo);
+        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
         verify(couchbaseDAO, never()).insertDocument(any(), any());
@@ -164,7 +176,7 @@ public class PlayerResourceTest {
         Player incomingPlayer = getPlayerDataStub(null, true, false);
 
         // execute
-        Response playerResponse = playerResource.createPlayer(incomingPlayer, uriInfo);
+        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
         verify(couchbaseDAO, never()).insertDocument(any(), any());
@@ -214,7 +226,7 @@ public class PlayerResourceTest {
         ArgumentCaptor<Long> existingPlayerCASCaptor = ArgumentCaptor.forClass(Long.class);
 
         // execute
-        Response playerResponse = playerResource.updatePlayer(existingPlayerId, incomingPlayer);
+        Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
 
         // assert
         verify(couchbaseDAO).getDocument(any(), any());
@@ -235,6 +247,7 @@ public class PlayerResourceTest {
         assertEquals(incomingPlayer.getRoles(), playerInResponse.getRoles());
         assertEquals(incomingPlayer.getAbility(), playerInResponse.getAbility());
         assertEquals(incomingPlayer.getAttributes(), playerInResponse.getAttributes());
+        assertEquals(userPrincipal.getEmail(), playerInResponse.getCreatedBy());
     }
 
     /**
@@ -256,7 +269,7 @@ public class PlayerResourceTest {
                 .build();
 
         // execute
-        Response playerResponse = playerResource.updatePlayer(existingPlayerId, incomingPlayer);
+        Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
 
         // assert
         verify(couchbaseDAO).getDocument(any(), any());

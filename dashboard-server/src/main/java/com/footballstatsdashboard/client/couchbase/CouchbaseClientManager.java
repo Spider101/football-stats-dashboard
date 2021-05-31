@@ -86,6 +86,10 @@ public class CouchbaseClientManager implements Managed {
         LOGGER.info("couchbase shutdown complete");
     }
 
+    public ClusterContainer getClusterContainer(String clusterName) {
+        return clusterContainers.get(clusterName);
+    }
+
     public BucketContainer getBucketContainer(String clusterName, String bucketName) {
         return clusterContainers.get(clusterName).getBucketContainers().get(bucketName);
     }
