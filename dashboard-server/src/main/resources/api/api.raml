@@ -6,21 +6,21 @@ baseUri: https://localhost:8090/football-stats-dashboard/{version}
 mediaType: application/json
 
 securitySchemes:
-  api_key:
+  access_token:
     description: Each request must include the api key in the headers
     type: x-customApiKey
     describedBy:
       headers:
         Authorization:
           description: |
-            Used to send a valid api key.
+            Used to send a valid auth access token.
           type: string
-          example: api_key 6bc7106b-e109-48e4-b385-a574b09ce821
+          example: BEARER 6bc7106b-e109-48e4-b385-a574b09ce821
       responses:
         401:
           description: |
-            Bad or expired api key. This can happen if the user or the backend revoked the api key.
-            To fix this, you should contact the api administrator
+            Bad or expired access token. This can happen if the backend revoked or expired the access token.
+            To fix this, you should re-authenticate the user.
           body:
             application/json:
               example: !include examples/response-401.json
