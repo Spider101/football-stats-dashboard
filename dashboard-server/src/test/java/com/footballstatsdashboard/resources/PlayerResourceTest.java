@@ -93,16 +93,18 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given a runtime exception is thrown by couchbase DAO when player entity is not found, tests that the same
-     * exception is thrown by getPlayer resource method as well
+     * given a runtime exception is thrown by couchbase DAO when player entity is not found, verifies that the same
+     * exception is thrown by `getPlayer` resource method as well
      */
     @Test(expected = RuntimeException.class)
     public void getPlayer_playerNotFoundInCouchbase() {
         // setup
-        when(couchbaseDAO.getDocument(any(), any())).thenThrow(new RuntimeException("Unable to find Player"));
+        UUID invalidPlayerId = UUID.randomUUID();
+        when(couchbaseDAO.getDocument(any(), any()))
+                .thenThrow(new RuntimeException("Unable to find document with Id: " + invalidPlayerId));
 
         // execute
-        playerResource.getPlayer(UUID.randomUUID());
+        playerResource.getPlayer(invalidPlayerId);
 
         // assert
         verify(couchbaseDAO).getDocument(any(), any());
