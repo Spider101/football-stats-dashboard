@@ -78,3 +78,45 @@ securitySchemes:
             example: !include examples/player-response.json
       422:
         description: unprocessable entity when player roles or attributes are missing
+
+/users
+  /{userId}:
+    uriParameters:
+      userId:
+        description: The user ID
+        type: string
+        required: true
+    get:
+      description: gets a user's data by id
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/user-response.json
+  post:
+    description: adds a new user's data
+    body:
+      application/json:
+        example: !include examples/user-post-request.json
+    responses:
+      201:
+        description: user's data created
+        body:
+          application/json:
+            example: !include examples/user-response.json
+      409:
+        description: conflict because existing user with the same first name, last name and email combination
+  /authenticate:
+    post:
+      description: authenticates a user's credentials and generates/retrieves access_token for subsequent operations
+      body:
+        application/json:
+          example: !include examples/user-auth-request.json
+      responses:
+        200:
+          description: access_token generated/retrieved
+          body:
+            application/json:
+              example: !include examples/access-token-response.json
+        400:
+          description: bad request when either email or password does not match
