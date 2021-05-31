@@ -41,10 +41,7 @@ securitySchemes:
         required: true
     get:
       description: gets a player's data by id
-      headers:
-        Account-Id:
-          type: integer
-      securedBy: [api_key]
+      securedBy: [access_token]
       responses:
         200:
           body:
@@ -52,33 +49,24 @@ securitySchemes:
               example: !include examples/player-response.json
     put:
       description: updates a player's data
-      headers:
-        Account-Id:
-          type: integer
-      securedBy: [api_key]
+      securedBy: [access_token]
       responses:
         200:
           body:
             application/json:
               example: !include examples/player-response.json
+        500:
+          description: failed during player data update
     delete:
       description: delete a player's data
-      headers:
-        Account-Id:
-          type: integer
-      securedBy: [api_key]
+      securedBy: [access_token]
       responses:
-        200:
+        204:
           description: successfully delete a player's data
 
   post:
     description: adds a new player's data
-    headers:
-      Account-Id:
-        type: integer
-      Created-By:
-        type: string
-    securedBy: [api_key]
+    securedBy: [access_token]
     body:
       application/json:
         example: !include examples/player-post-request.json
@@ -88,3 +76,5 @@ securitySchemes:
         body:
           application/json:
             example: !include examples/player-response.json
+      422:
+        description: unprocessable entity when player roles or attributes are missing
