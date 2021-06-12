@@ -31,6 +31,20 @@ export const fetchPlayerPerformanceData = async ({ queryKey }) => {
 
 };
 
+export const fetchUser = async ({ queryKey }) => {
+    const [ _key, { email, password }] = queryKey;
+    return await fetchDataFromEndpoint(`users?email=${email}&password=${password}`);
+};
+
+export const createUser = async (createdUserData) => {
+    const res = await fetch(`${baseUrl}users/`, {
+        method: 'POST',
+        body: JSON.stringify(createdUserData),
+        headers: { 'Content-Type': 'application/json' }
+    });
+    return res.json();
+};
+
 async function fetchDataFromEndpoint(endpointFragment) {
     const res = await fetch(`${baseUrl}${endpointFragment}`);
 
