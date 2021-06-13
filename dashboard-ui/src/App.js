@@ -5,26 +5,32 @@ import { ReactQueryDevtools } from 'react-query/devtools';
 
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 
-
 import Layout from './Layout';
 import { useThemePreference } from './context/themePreferenceProvider';
 import { ChartOptionsProvider } from './context/chartOptionsProvider';
+import { AuthContextProvider } from './context/authProvider';
 
 function App() {
     const queryClient = new QueryClient();
     const themePreference = useThemePreference();
-    const theme = React.useMemo(() => createMuiTheme({
-        palette: {
-            type: themePreference
-        }
-    }), [themePreference]);
+    const theme = React.useMemo(
+        () =>
+            createMuiTheme({
+                palette: {
+                    type: themePreference,
+                },
+            }),
+        [themePreference]
+    );
 
     return (
         <Router>
-            <QueryClientProvider client={ queryClient }>
-                <ThemeProvider theme={ theme }>
+            <QueryClientProvider client={queryClient}>
+                <ThemeProvider theme={theme}>
                     <ChartOptionsProvider>
-                        <Layout />
+                        <AuthContextProvider>
+                            <Layout />
+                        </AuthContextProvider>
                     </ChartOptionsProvider>
                 </ThemeProvider>
                 <ReactQueryDevtools initialIsOpen={false} />

@@ -28,5 +28,6 @@ const sideBarData = [{
     showInSidebar: false
 }];
 
+// TODO: rename to routingData
 export default sideBarData;
 
