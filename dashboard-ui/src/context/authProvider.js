@@ -13,7 +13,7 @@ function AuthContextProvider({ children }) {
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-AuthContext.propTypes = {
+AuthContextProvider.propTypes = {
     children: PropTypes.node
 };
 

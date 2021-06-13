@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 
@@ -11,7 +12,7 @@ import { makeStyles } from '@material-ui/core';
 import { useUserAuth } from './context/authProvider';
 import UserAuth from './pages/UserAuth';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex'
     },
@@ -78,6 +79,10 @@ const AppContainer = ({ classes }) => {
             </main>
         </>
     );
+};
+
+AppContainer.propTypes = {
+    classes: PropTypes.node
 };
 
 export default function Layout() {

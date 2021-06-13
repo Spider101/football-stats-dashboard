@@ -22,6 +22,10 @@ export default function UserAuth({ classes }) {
     );
 }
 
+UserAuth.propTypes = {
+    classes: PropTypes.node
+};
+
 const SignInContainer = () => {
     const {
         signInFormData,
