@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link as RouterLink } from 'react-router-dom';
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -40,18 +41,18 @@ const useStyles = makeStyles((theme) => ({
 export default function SignIn({ values, handleChange, handleSubmit, validations, submitStatus }) {
     const classes = useStyles();
     return (
-        <div className={ classes.paper }>
-            <Avatar  className={ classes.avatar }>
+        <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
                 <LockOutlinedIcon />
             </Avatar>
             <Typography component='h1' variant='h5'>
                 Sign In
             </Typography>
-            <div className={ classes.validations }>
-                { submitStatus === 'SUBMITTED' && <Alert severity='success' text='Signed In Successfully!' /> }
-                { validations.form != null && <Alert severity='error' text={validations.form} /> }
+            <div className={classes.validations}>
+                {submitStatus === 'SUBMITTED' && <Alert severity='success' text='Signed In Successfully!' />}
+                {validations.form != null && <Alert severity='error' text={validations.form} />}
             </div>
-            <form className={ classes.form } onSubmit={ handleSubmit } noValidate>
+            <form className={classes.form} onSubmit={handleSubmit} noValidate>
                 <TextField
                     name='email'
                     required
@@ -62,11 +63,11 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     type='email'
                     fullWidth
                     autoFocus
-                    value={ values.email }
-                    disabled={ submitStatus === 'SUBMITTING' }
-                    onChange={ e => handleChange(e) }
-                    error={ validations.email != null }
-                    helperText={ validations.email }
+                    value={values.email}
+                    disabled={submitStatus === 'SUBMITTING'}
+                    onChange={e => handleChange(e)}
+                    error={validations.email != null}
+                    helperText={validations.email}
                 />
                 <TextField
                     name='password'
@@ -78,25 +79,25 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     type='password'
                     fullWidth
                     autoComplete='current-password'
-                    value={ values.password }
-                    disabled={ submitStatus === 'SUBMITTING' }
-                    onChange={ e => handleChange(e) }
-                    error={ validations.password != null }
-                    helperText={ validations.password }
+                    value={values.password}
+                    disabled={submitStatus === 'SUBMITTING'}
+                    onChange={e => handleChange(e)}
+                    error={validations.password != null}
+                    helperText={validations.password}
                 />
                 <FormControlLabel
-                    control={<Checkbox value="remember" color="primary" disabled={ submitStatus === 'SUBMITTING' }/>}
-                    label="Remember me"
+                    control={<Checkbox value='remember' color='primary' disabled={submitStatus === 'SUBMITTING'} />}
+                    label='Remember me'
                 />
                 <Button
-                    className={ classes.submit }
+                    className={classes.submit}
                     type='submit'
                     variant='contained'
                     color='primary'
                     fullWidth
-                    disabled={ submitStatus === 'SUBMITTING' }
+                    disabled={submitStatus === 'SUBMITTING'}
                 >
-                    { submitStatus === 'SUBMITTING' ? 'Signing In ...' : 'Sign In' }
+                    {submitStatus === 'SUBMITTING' ? 'Signing In ...' : 'Sign In'}
                 </Button>
                 <Grid container>
                     <Grid item xs>
@@ -105,7 +106,7 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                         </Link>
                     </Grid>
                     <Grid item>
-                        <Link to='/signUp' variant="body2">
+                        <Link to='/signUp' component={RouterLink} variant='body2'>
                             Don&apos;t have an account? Sign Up
                         </Link>
                     </Grid>

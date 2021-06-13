@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Link as RouterLink } from 'react-router-dom';
 
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -38,18 +39,18 @@ const useStyles = makeStyles((theme) => ({
 export default function Signup({ values, handleChange, handleSubmit, validations, submitStatus }) {
     const classes = useStyles();
     return (
-        <div className={ classes.paper }>
-            <Avatar  className={ classes.avatar }>
+        <div className={classes.paper}>
+            <Avatar className={classes.avatar}>
                 <LockOutlinedIcon />
             </Avatar>
             <Typography component='h1' variant='h5'>
                 Sign Up
             </Typography>
-            <div className={ classes.validations }>
-                { submitStatus === 'SUBMITTED' && <Alert severity='success' text='Account created successfully!' /> }
-                { validations.form != null && <Alert severity='error' text={validations.form} /> }
+            <div className={classes.validations}>
+                {submitStatus === 'SUBMITTED' && <Alert severity='success' text='Account created successfully!' />}
+                {validations.form != null && <Alert severity='error' text={validations.form} />}
             </div>
-            <form className={ classes.form } onSubmit={ handleSubmit } noValidate>
+            <form className={classes.form} onSubmit={handleSubmit} noValidate>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6}>
                         <TextField
@@ -60,11 +61,11 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             variant='outlined'
                             autoFocus
                             fullWidth
-                            value={ values.firstName }
-                            disabled={ submitStatus === 'SUBMITTING' }
-                            onChange={ e => handleChange(e) }
-                            error={ validations.firstName != null }
-                            helperText={ validations.firstName }
+                            value={values.firstName}
+                            disabled={submitStatus === 'SUBMITTING'}
+                            onChange={e => handleChange(e)}
+                            error={validations.firstName != null}
+                            helperText={validations.firstName}
                         />
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -75,11 +76,11 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             label='Last Name'
                             variant='outlined'
                             fullWidth
-                            value={ values.lastName }
-                            disabled={ submitStatus === 'SUBMITTING' }
-                            onChange={ e => handleChange(e) }
-                            error={ validations.lastName != null }
-                            helperText={ validations.lastName }
+                            value={values.lastName}
+                            disabled={submitStatus === 'SUBMITTING'}
+                            onChange={e => handleChange(e)}
+                            error={validations.lastName != null}
+                            helperText={validations.lastName}
                         />
                     </Grid>
                     <Grid item xs={12} sm={12}>
@@ -89,27 +90,29 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             id='email'
                             label='Email Address'
                             variant='outlined'
+                            type='email'
                             fullWidth
-                            value={ values.email }
-                            disabled={ submitStatus === 'SUBMITTING' }
-                            onChange={ e => handleChange(e) }
-                            error={ validations.email != null }
-                            helperText={ validations.email }
+                            value={values.email}
+                            disabled={submitStatus === 'SUBMITTING'}
+                            onChange={e => handleChange(e)}
+                            error={validations.email != null}
+                            helperText={validations.email}
                         />
                     </Grid>
                     <Grid item xs={12} sm={12}>
                         <TextField
                             name='newPassword'
                             required
-                            id='pasnewPasswordsword'
+                            id='newPassword'
                             label='New Password'
                             variant='outlined'
+                            type='password'
                             fullWidth
-                            value={ values.newPassword }
-                            disabled={ submitStatus === 'SUBMITTING' }
-                            onChange={ e => handleChange(e) }
-                            error={ validations.newPassword != null }
-                            helperText={ validations.newPassword }
+                            value={values.newPassword}
+                            disabled={submitStatus === 'SUBMITTING'}
+                            onChange={e => handleChange(e)}
+                            error={validations.newPassword != null}
+                            helperText={validations.newPassword}
                         />
                     </Grid>
                     <Grid item xs={12} sm={12}>
@@ -119,28 +122,29 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             id='confirmedPassword'
                             label='Confirm Password'
                             variant='outlined'
+                            type='password'
                             fullWidth
-                            value={ values.confirmedPassword }
-                            disabled={ submitStatus === 'SUBMITTING' }
-                            onChange={ e => handleChange(e) }
-                            error={ validations.confirmedPassword != null }
-                            helperText={ validations.confirmedPassword }
+                            value={values.confirmedPassword}
+                            disabled={submitStatus === 'SUBMITTING'}
+                            onChange={e => handleChange(e)}
+                            error={validations.confirmedPassword != null}
+                            helperText={validations.confirmedPassword}
                         />
                     </Grid>
                 </Grid>
                 <Button
-                    className={ classes.submit }
+                    className={classes.submit}
                     type='submit'
                     variant='contained'
                     color='primary'
                     fullWidth
-                    disabled={ submitStatus === 'SUBMITTING' }
+                    disabled={submitStatus === 'SUBMITTING'}
                 >
-                    { submitStatus === 'SUBMITTING' ? 'Signing Up ...' : 'Sign Up' }
+                    {submitStatus === 'SUBMITTING' ? 'Signing Up ...' : 'Sign Up'}
                 </Button>
                 <Grid container justify='flex-end'>
                     <Grid item>
-                        <Link to='/signIn' variant='body2'>
+                        <Link to='/' component={RouterLink} variant='body2'>
                             Already have an account? Sign In
                         </Link>
                     </Grid>
