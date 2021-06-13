@@ -8,6 +8,8 @@ import Sidebar from './widgets/Sidebar';
 import routingData from './routingData';
 import { Link, Route, Switch } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core';
+import { useUserAuth } from './context/authProvider';
+import UserAuth from './pages/UserAuth';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -27,9 +29,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function Layout() {
-    const classes = useStyles();
-
+const AppContainer = ({ classes }) => {
     const [open, setOpen] = React.useState(false);
 
     const handleDrawerOpen = () => {
@@ -40,7 +40,8 @@ export default function Layout() {
         setOpen(false);
     };
 
-    const sideBarItems = routingData.filter(sidebarItem => sidebarItem.showInSidebar)
+    const sideBarItems = routingData
+        .filter(sidebarItem => sidebarItem.showInSidebar)
         .map((sidebarItemData, _idx) => ({
             isGroup: false,
             listItem: {
@@ -57,36 +58,37 @@ export default function Layout() {
         title: 'Dummy App Bar Menu Title',
         teamColor: 'red'
     };
-
     return (
-        <div className={ classes.root }>
-            <CssBaseline />
-            <AppBarMenu
-                menu={{ ...menuData }}
-                isOpen={ open }
-                onClickHandler={ handleDrawerOpen }
-            />
-            <Sidebar
-                sideBarItems={ sideBarItems }
-                isOpen={ open }
-                onClickHandler={ handleDrawerClose }
-            />
-            <main className={ classes.content }>
-                <div className={ classes.view }>
+        <>
+            <AppBarMenu menu={{ ...menuData }} isOpen={open} onClickHandler={handleDrawerOpen} />
+            <Sidebar sideBarItems={sideBarItems} isOpen={open} onClickHandler={handleDrawerClose} />
+            <main className={classes.content}>
+                <div className={classes.view}>
                     <Switch>
-                        {
-                            routingData.map((sidebarItemData, _idx) => (
-                                <Route exact={ sidebarItemData.isExact }
-                                    key={ _idx }
-                                    path={ sidebarItemData.routePath }
-                                    component={ sidebarItemData.component }
-                                />
-                            ))
-                        }
+                        {routingData.map((sidebarItemData, _idx) => (
+                            <Route
+                                exact={sidebarItemData.isExact}
+                                key={_idx}
+                                path={sidebarItemData.routePath}
+                                component={sidebarItemData.component}
+                            />
+                        ))}
                     </Switch>
                 </div>
             </main>
+        </>
+    );
+};
+
+export default function Layout() {
+    const classes = useStyles();
+
+    const userAuth = useUserAuth();
+
+    return (
+        <div className={classes.root}>
+            <CssBaseline />
+            {userAuth.currentUser ? <AppContainer classes={classes} /> : <UserAuth classes={classes} />}
         </div>
     );
-
 }
