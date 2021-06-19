@@ -28,6 +28,5 @@ const routingData = [{
     showInSidebar: false
 }];
 
-// TODO: rename to routingData
 export default routingData;
 

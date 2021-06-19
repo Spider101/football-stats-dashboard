@@ -27,11 +27,11 @@ export default function MenuItem({ text, icon, clsName, selectedItem, menuItemIn
 
 MenuItem.propTypes = {
     text: PropTypes.string,
-    icon: PropTypes.elementType,
+    icon: PropTypes.node,
     clsName: PropTypes.string,
     selectedItem: PropTypes.number,
     menuItemIndex: PropTypes.number,
     handleMenuItemClick: PropTypes.func,
-    componentType: PropTypes.element,
+    componentType: PropTypes.elementType,
     routePath: PropTypes.string
 };

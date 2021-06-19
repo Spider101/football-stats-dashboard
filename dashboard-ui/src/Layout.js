@@ -99,7 +99,7 @@ const AppContainer = ({ classes }) => {
 };
 
 AppContainer.propTypes = {
-    classes: PropTypes.node
+    classes: PropTypes.object
 };
 
 export default function Layout() {

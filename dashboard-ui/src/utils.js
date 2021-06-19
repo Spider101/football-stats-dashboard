@@ -7,7 +7,7 @@ export const queryKeys = {
     PLAYER_DATA: 'playerData',
     COMPARED_PLAYER_DATA: 'comparedPlayerData',
     PLAYER_PERFORMANCE_DATA: 'playerPerformance',
-    USER_DATE: 'userData'
+    USER_DATA: 'userData'
 };
 
 // TODO: this will be returned from the service in future; remove this then

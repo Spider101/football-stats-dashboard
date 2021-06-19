@@ -67,6 +67,7 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     variant='outlined'
                     margin='normal'
                     type='email'
+                    autoComplete='email'
                     fullWidth
                     autoFocus
                     value={values.email}
