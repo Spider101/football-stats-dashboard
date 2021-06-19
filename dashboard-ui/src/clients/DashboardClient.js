@@ -37,7 +37,7 @@ export const authenticateUser = async ({ username, password }) => {
         const { authToken } = userData[0];
         return authToken;
     } else {
-        throw new Error(`Unable to find account with email: ${username}!`)
+        throw new Error(`Unable to find account with email: ${username}!`);
     }
 };
 

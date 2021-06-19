@@ -19,12 +19,14 @@ function AuthContextProvider({ children }) {
             errorMessage = `${err.message}. Please create an account first.`;
         }
 
-        console.info('Persisting auth token in localStorage and Context: ' + authToken);
+        if (errorMessage == null) {
+            console.info('Persisting auth token in localStorage and Context: ' + authToken);
 
-        // persist the token to localStorage and in context provider via state setter
-        // TODO: figure out if we need to invalidate the `user` react-query
-        localStorage.setItem('auth-token', authToken);
-        setAuthToken(authToken);
+            // persist the token to localStorage and in context provider via state setter
+            // TODO: figure out if we need to invalidate the `user` react-query
+            localStorage.setItem('auth-token', authToken);
+            setAuthToken(authToken);
+        }
 
         return errorMessage;
     };
