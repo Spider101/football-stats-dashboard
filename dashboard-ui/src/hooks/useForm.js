@@ -93,22 +93,28 @@ const useForm = () => {
         });
     };
 
-    const submitFormLogic = (formValidations, authAction) => {
+    async function submitFormLogic(formValidations, setFormValidations, authAction) {
         if (submitStatus === 'SUBMITTING' && Object.values(formValidations).every(validation => validation == null)) {
-            authAction();
+            const formErrorMessage = await authAction();
+            if (formErrorMessage != null) {
+                setFormValidations({
+                    ...formValidations,
+                    form: formErrorMessage
+                });
+            }
             setSubmitStatus('SUBMITTED');
         } else {
             // reset/unlock form
             setSubmitStatus(null);
         }
-    };
+    }
 
     React.useEffect(() => {
-        submitFormLogic(signInFormValidations, () => login(signInFormData, setAuthToken));
+        submitFormLogic(signInFormValidations, setSignInFormValidations, () => login(signInFormData, setAuthToken));
     }, [signInFormValidations]);
 
     React.useEffect(() => {
-        submitFormLogic(signUpFormValidations);
+        submitFormLogic(signUpFormValidations, setSignUpFormValidations, () => createAccount(signUpFormData));
     }, [signUpFormValidations]);
 
     return {
