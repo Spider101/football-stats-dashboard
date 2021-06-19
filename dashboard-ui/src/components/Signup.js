@@ -93,6 +93,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             type='email'
                             fullWidth
                             value={values.email}
+                            autoComplete='email'
                             disabled={submitStatus === 'SUBMITTING'}
                             onChange={e => handleChange(e)}
                             error={validations.email != null}
@@ -109,6 +110,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             type='password'
                             fullWidth
                             value={values.newPassword}
+                            autoComplete='new-password'
                             disabled={submitStatus === 'SUBMITTING'}
                             onChange={e => handleChange(e)}
                             error={validations.newPassword != null}
@@ -125,6 +127,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             type='password'
                             fullWidth
                             value={values.confirmedPassword}
+                            autoComplete='new-password'
                             disabled={submitStatus === 'SUBMITTING'}
                             onChange={e => handleChange(e)}
                             error={validations.confirmedPassword != null}
