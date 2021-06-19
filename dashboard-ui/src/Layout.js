@@ -39,6 +39,11 @@ const useStyles = makeStyles(theme => ({
         width: '200px !important',
         height: '200px !important',
         margin: '35vh'
+    },
+    formContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
     }
 }));
 

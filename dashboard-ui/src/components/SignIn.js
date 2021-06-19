@@ -20,7 +20,13 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         marginTop: theme.spacing(8),
         flexDirection: 'column',
-        alignItems: 'center'
+        alignItems: 'center',
+        width: '50%',
+        borderColor: theme.palette.divider,
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        borderRadius: '5px',
+        padding: theme.spacing(3, 2)
     },
     avatar: {
         margin: theme.spacing(1),

@@ -10,14 +10,16 @@ import useForm from '../hooks/useForm';
 export default function UserAuth({ classes }) {
     return (
         <div className={classes.content}>
-            <Switch>
-                <Route exact path='/'>
-                    <SignInContainer />
-                </Route>
-                <Route path='/signUp'>
-                    <SignUpContainer />
-                </Route>
-            </Switch>
+            <div className={classes.formContainer}>
+                <Switch>
+                    <Route exact path='/'>
+                        <SignInContainer />
+                    </Route>
+                    <Route path='/signUp'>
+                        <SignUpContainer />
+                    </Route>
+                </Switch>
+            </div>
         </div>
     );
 }
