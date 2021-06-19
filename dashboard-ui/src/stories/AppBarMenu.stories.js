@@ -3,7 +3,6 @@ import { action } from '@storybook/addon-actions';
 
 import AppBarMenu from '../components/AppBarMenu';
 
-// TODO: add storybook controls to dynamically change the isOpen prop
 const menuData = {
     menu: {
         title: 'Manchester United',

@@ -177,7 +177,7 @@ function getPlayerData(numPlayers, numAttributes, nationsList) {
                 history: abilityHistory
             }
 
-        }
+        };
 
         playerData.push(player);
     }
@@ -223,10 +223,31 @@ function getPlayerPerformanceData(playerData, numCompetitions, numMatches) {
     return performanceData;
 }
 
+function getUserData(numUsers) {
+    const userData = [];
+    for (let i = 0; i < numUsers; i++) {
+        userData.push({
+            id: i,
+            firstName: faker.name.firstName(),
+            lastName: faker.name.lastName(),
+            email: faker.internet.email(),
+            password: faker.internet.password(),
+            authToken: faker.random.uuid()
+        });
+    }
+    return userData;
+}
+
 module.exports = () => {
     const playerData = getPlayerData(100, 3 * 10, nations);
     const squadPlayerData = getSquadHubPlayerData(playerData, 10, moraleList);
     const playerPerformanceData = getPlayerPerformanceData(playerData, 5, 10);
-    const data = { players: playerData, squadPlayers: squadPlayerData, performance: playerPerformanceData };
+    const userData = getUserData(100);
+    const data = {
+        players: playerData,
+        squadPlayers: squadPlayerData,
+        performance: playerPerformanceData,
+        users: userData
+    };
     return data;
-}
+};

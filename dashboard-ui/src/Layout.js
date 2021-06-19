@@ -1,15 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { Link, Route, Switch } from 'react-router-dom';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { makeStyles } from '@material-ui/core/styles';
 
 import AppBarMenu from './components/AppBarMenu';
 import Sidebar from './widgets/Sidebar';
-
+import UserAuth from './pages/UserAuth';
 import routingData from './routingData';
-import { Link, Route, Switch } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core';
+import { useUserAuth } from './context/authProvider';
+import useUserData from './hooks/useUserData';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex'
     },
@@ -24,12 +28,26 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(0, 1),
         // necessary for content to be below app bar
         ...theme.mixins.toolbar
+    },
+    loadingCircleRoot: {
+        display: 'flex',
+        flexDirection: 'column',
+        flexGrow: 1,
+        alignItems: 'center'
+    },
+    loadingCircle: {
+        width: '200px !important',
+        height: '200px !important',
+        margin: '35vh'
+    },
+    formContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
     }
 }));
 
-export default function Layout() {
-    const classes = useStyles();
-
+const AppContainer = ({ classes }) => {
     const [open, setOpen] = React.useState(false);
 
     const handleDrawerOpen = () => {
@@ -40,7 +58,8 @@ export default function Layout() {
         setOpen(false);
     };
 
-    const sideBarItems = routingData.filter(sidebarItem => sidebarItem.showInSidebar)
+    const sideBarItems = routingData
+        .filter(sidebarItem => sidebarItem.showInSidebar)
         .map((sidebarItemData, _idx) => ({
             isGroup: false,
             listItem: {
@@ -57,36 +76,50 @@ export default function Layout() {
         title: 'Dummy App Bar Menu Title',
         teamColor: 'red'
     };
-
     return (
-        <div className={ classes.root }>
-            <CssBaseline />
-            <AppBarMenu
-                menu={{ ...menuData }}
-                isOpen={ open }
-                onClickHandler={ handleDrawerOpen }
-            />
-            <Sidebar
-                sideBarItems={ sideBarItems }
-                isOpen={ open }
-                onClickHandler={ handleDrawerClose }
-            />
-            <main className={ classes.content }>
-                <div className={ classes.view }>
+        <>
+            <AppBarMenu menu={{ ...menuData }} isOpen={open} onClickHandler={handleDrawerOpen} />
+            <Sidebar sideBarItems={sideBarItems} isOpen={open} onClickHandler={handleDrawerClose} />
+            <main className={classes.content}>
+                <div className={classes.view}>
                     <Switch>
-                        {
-                            routingData.map((sidebarItemData, _idx) => (
-                                <Route exact={ sidebarItemData.isExact }
-                                    key={ _idx }
-                                    path={ sidebarItemData.routePath }
-                                    component={ sidebarItemData.component }
-                                />
-                            ))
-                        }
+                        {routingData.map((sidebarItemData, _idx) => (
+                            <Route
+                                exact={sidebarItemData.isExact}
+                                key={_idx}
+                                path={sidebarItemData.routePath}
+                                component={sidebarItemData.component}
+                            />
+                        ))}
                     </Switch>
                 </div>
             </main>
+        </>
+    );
+};
+
+AppContainer.propTypes = {
+    classes: PropTypes.object
+};
+
+export default function Layout() {
+    const classes = useStyles();
+
+    const { authToken } = useUserAuth();
+    const { isLoading, isLoggedIn } = useUserData(authToken);
+
+    return (
+        <div className={classes.root}>
+            <CssBaseline />
+            {isLoading ? (
+                <div className={classes.loadingCircleRoot}>
+                    <CircularProgress className={classes.loadingCircle} />
+                </div>
+            ) : isLoggedIn ? (
+                <AppContainer classes={classes} />
+            ) : (
+                <UserAuth classes={classes} />
+            )}
         </div>
     );
-
 }
