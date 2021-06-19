@@ -1,4 +1,5 @@
 import React from 'react';
+import { authenticateUser } from '../clients/DashboardClient';
 
 import { capitalizeLabel } from '../utils';
 
@@ -23,7 +24,7 @@ const validateFormData = formData => {
         } else if (key === 'confirmedPassword') {
             if (value.length < 6 || value.length >= 12) {
                 errorMessage = 'Password must be between 6 and 12 characters!';
-            } else if (value != newPassword) {
+            } else if (value !== newPassword) {
                 errorMessage = 'Passwords must match!';
             }
         }
@@ -40,7 +41,18 @@ const validateFormData = formData => {
     };
 };
 
-const useForm = () => {
+const login = async ({email, password}, setAuthToken) => {
+    const authToken = await authenticateUser({ username: email, password });
+
+    console.info('Persisting auth token in localStorage and Context: ' + authToken);
+
+    // persist the token to localStorage and in context provider via state setter
+    // TODO: figure out if we need to invalidate the `user` react-query
+    localStorage.setItem('auth-token', authToken);
+    setAuthToken(authToken);
+};
+
+const useForm = setAuthToken => {
     const [submitStatus, setSubmitStatus] = React.useState();
 
     // sign in form data
@@ -91,9 +103,9 @@ const useForm = () => {
         });
     };
 
-    const submitFormLogic = formValidations => {
+    const submitFormLogic = (formValidations, authAction) => {
         if (submitStatus === 'SUBMITTING' && Object.values(formValidations).every(validation => validation == null)) {
-            // TODO: call sign in endpoint here
+            authAction();
             setSubmitStatus('SUBMITTED');
         } else {
             // reset/unlock form
@@ -102,7 +114,7 @@ const useForm = () => {
     };
 
     React.useEffect(() => {
-        submitFormLogic(signInFormValidations);
+        submitFormLogic(signInFormValidations, () => login(signInFormData, setAuthToken));
     }, [signInFormValidations]);
 
     React.useEffect(() => {
