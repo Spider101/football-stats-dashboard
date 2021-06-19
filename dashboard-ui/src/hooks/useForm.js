@@ -3,7 +3,7 @@ import React from 'react';
 import { capitalizeLabel } from '../utils';
 import { useUserAuth } from '../context/authProvider';
 
-const validateEmail = email => { return /\S+@\S+\.\S+/.test(email); };
+const validateEmail = email => /\S+@\S+\.\S+/.test(email);
 
 const validateFormData = formData => {
     let validations = {};
@@ -18,11 +18,11 @@ const validateFormData = formData => {
             errorMessage = 'Email is in incorrect format!';
         } else if (key === 'newPassword') {
             newPassword = value;
-            if (value.length < 6 || value.length >= 12) {
+            if (value.length < 6 || value.length > 12) {
                 errorMessage = 'Password must be between 6 and 12 characters!';
             }
         } else if (key === 'confirmedPassword') {
-            if (value.length < 6 || value.length >= 12) {
+            if (value.length < 6 || value.length > 12) {
                 errorMessage = 'Password must be between 6 and 12 characters!';
             } else if (value !== newPassword) {
                 errorMessage = 'Passwords must match!';
