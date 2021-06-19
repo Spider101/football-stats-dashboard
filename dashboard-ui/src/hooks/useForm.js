@@ -1,7 +1,7 @@
 import React from 'react';
-import { authenticateUser } from '../clients/DashboardClient';
 
 import { capitalizeLabel } from '../utils';
+import { useUserAuth } from '../context/authProvider';
 
 const validateEmail = email => { return /\S+@\S+\.\S+/.test(email); };
 
@@ -41,18 +41,8 @@ const validateFormData = formData => {
     };
 };
 
-const login = async ({email, password}, setAuthToken) => {
-    const authToken = await authenticateUser({ username: email, password });
-
-    console.info('Persisting auth token in localStorage and Context: ' + authToken);
-
-    // persist the token to localStorage and in context provider via state setter
-    // TODO: figure out if we need to invalidate the `user` react-query
-    localStorage.setItem('auth-token', authToken);
-    setAuthToken(authToken);
-};
-
-const useForm = setAuthToken => {
+const useForm = () => {
+    const { setAuthToken, login, createAccount } = useUserAuth();
     const [submitStatus, setSubmitStatus] = React.useState();
 
     // sign in form data

@@ -6,7 +6,6 @@ import SignIn from '../components/SignIn';
 import SignUp from '../components/Signup';
 
 import useForm from '../hooks/useForm';
-import { useUserAuth } from '../context/authProvider';
 
 export default function UserAuth({ classes }) {
     return (
@@ -28,14 +27,13 @@ UserAuth.propTypes = {
 };
 
 const SignInContainer = () => {
-    const { setAuthToken } = useUserAuth();
     const {
         signInFormData,
         submitStatus,
         signInFormValidations,
         signInFormChangeHandler: handleChangeFn,
         signInFormSubmitHandler: handleSubmitFn
-    } = useForm(setAuthToken);
+    } = useForm();
 
     return (
         <SignIn
