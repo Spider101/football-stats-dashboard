@@ -227,6 +227,7 @@ function getUserData(numUsers) {
     const userData = [];
     for (let i = 0; i < numUsers; i++) {
         userData.push({
+            id: i,
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName(),
             email: faker.internet.email(),
