@@ -7,7 +7,7 @@ import SquadHub from './pages/SquadHub';
 import Home from './pages/Home';
 import Player from './pages/Player';
 
-const sideBarData = [{
+const routingData = [{
     text: 'Home',
     icon: <HomeIcon />,
     routePath: '/',
@@ -29,5 +29,5 @@ const sideBarData = [{
 }];
 
 // TODO: rename to routingData
-export default sideBarData;
+export default routingData;
 
