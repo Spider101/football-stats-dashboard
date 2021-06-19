@@ -48,11 +48,18 @@ function AuthContextProvider({ children }) {
         return errorMessage;
     };
 
+    const logOut = () => {
+        console.info('Logging user out ...');
+        localStorage.removeItem('auth-token');
+        setAuthToken(null);
+    };
+
     const value = {
         authToken,
         setAuthToken,
         login,
-        createAccount
+        createAccount,
+        logOut
     };
 
     return (
