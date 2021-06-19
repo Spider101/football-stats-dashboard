@@ -230,7 +230,8 @@ function getUserData(numUsers) {
             firstName: faker.name.firstName(),
             lastName: faker.name.lastName(),
             email: faker.internet.email(),
-            password: faker.internet.password()
+            password: faker.internet.password(),
+            authToken: faker.random.uuid()
         });
     }
     return userData;
