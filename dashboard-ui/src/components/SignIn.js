@@ -5,8 +5,8 @@ import { Link as RouterLink } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
+// import FormControlLabel from '@material-ui/core/FormControlLabel';
+// import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Grid from '@material-ui/core/Grid';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
@@ -85,10 +85,11 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     error={validations.password != null}
                     helperText={validations.password}
                 />
-                <FormControlLabel
+                {/* // TODO: uncomment when Remember Me functionality is ready */}
+                {/* <FormControlLabel
                     control={<Checkbox value='remember' color='primary' disabled={submitStatus === 'SUBMITTING'} />}
                     label='Remember me'
-                />
+                /> */}
                 <Button
                     className={classes.submit}
                     type='submit'
@@ -100,11 +101,12 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     {submitStatus === 'SUBMITTING' ? 'Signing In ...' : 'Sign In'}
                 </Button>
                 <Grid container>
-                    <Grid item xs>
+                    {/* // TODO: uncomment when forgot password functionality is ready */}
+                    {/* <Grid item xs>
                         <Link href='/forgotPassword' variant='body2'>
                             Forgot password?
                         </Link>
-                    </Grid>
+                    </Grid> */}
                     <Grid item>
                         <Link to='/signUp' component={RouterLink} variant='body2'>
                             Don&apos;t have an account? Sign Up

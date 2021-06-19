@@ -59,6 +59,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             id='firstName'
                             label='First Name'
                             variant='outlined'
+                            style={{ marginTop: '8px'}}
                             autoFocus
                             fullWidth
                             value={values.firstName}
@@ -75,6 +76,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             id='lastName'
                             label='Last Name'
                             variant='outlined'
+                            style={{ marginTop: '8px'}}
                             fullWidth
                             value={values.lastName}
                             disabled={submitStatus === 'SUBMITTING'}
