@@ -6,11 +6,15 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import IconButton from '@material-ui/core/IconButton';
+import Menu from '@material-ui/core/Menu';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import { DRAWER_WIDTH } from '../utils';
+import { MenuItem } from '@material-ui/core';
+import { AccountCircleSharp } from '@material-ui/icons';
+import { useUserAuth } from '../context/authProvider';
 
 const useStyles = makeStyles((theme) => ({
     grow: {
@@ -20,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
         zIndex: theme.zIndex.drawer + 1,
         transition: theme.transitions.create(['width', 'margin'], {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
+            duration: theme.transitions.duration.leavingScreen
         })
     },
     appBarShift: {
@@ -28,20 +32,20 @@ const useStyles = makeStyles((theme) => ({
         width: `calc(100% - ${DRAWER_WIDTH}px)`,
         transition: theme.transitions.create(['width', 'margin'], {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
+            duration: theme.transitions.duration.enteringScreen
         })
     },
     hide: {
         display: 'none'
     },
     menuButton: {
-        marginRight: theme.spacing(2),
+        marginRight: theme.spacing(2)
     },
     title: {
         display: 'none',
         [theme.breakpoints.up('sm')]: {
-            display: 'block',
-        },
+            display: 'block'
+        }
     },
     search: {
         position: 'relative',
@@ -51,12 +55,12 @@ const useStyles = makeStyles((theme) => ({
         width: '100%',
         backgroundColor: fade(theme.palette.common.white, 0.15),
         '&:hover': {
-            backgroundColor: fade(theme.palette.common.white, 0.25),
+            backgroundColor: fade(theme.palette.common.white, 0.25)
         },
         [theme.breakpoints.up('sm')]: {
             marginLeft: theme.spacing(3),
-            width: 'auto',
-        },
+            width: 'auto'
+        }
     },
     searchIcon: {
         padding: theme.spacing(0, 2),
@@ -65,10 +69,10 @@ const useStyles = makeStyles((theme) => ({
         pointerEvents: 'none',
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'center'
     },
     inputRoot: {
-        color: 'inherit',
+        color: 'inherit'
     },
     inputInput: {
         padding: theme.spacing(1, 1, 1, 0),
@@ -77,57 +81,84 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width'),
         width: '100%',
         [theme.breakpoints.up('md')]: {
-            width: '20ch',
-        },
-    },
+            width: '20ch'
+        }
+    }
 }));
 
 export default function AppBarMenu({ menu: { title, teamColor }, onClickHandler, isOpen }) {
     const classes = useStyles();
+    const [menuAnchor, setMenuAnchor] = React.useState(null);
+    const isMenuOpen = Boolean(menuAnchor);
+    const { logOut } = useUserAuth();
 
-    const teamStyle = {
-        backgroundColor: teamColor
+    const handleMenuOpen = e => {
+        setMenuAnchor(e.currentTarget);
     };
 
-    return (
-        <AppBar
-            style={teamStyle}
-            className={
-                clsx(classes.appBar, {
-                    [classes.appBarShift]: isOpen
-                })
-            }
-            position="fixed"
+    const handleMenuClose = () => {
+        setMenuAnchor(null);
+    };
+
+    const renderUserMenu = (
+        <Menu
+            keepMounted
+            anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            open={isMenuOpen}
+            anchorEl={menuAnchor}
+            onClose={handleMenuClose}
         >
-            <Toolbar>
-                <IconButton
-                    edge="start"
-                    className={
-                        clsx(classes.menuButton, {
+            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={logOut}>Log Out</MenuItem>
+        </Menu>
+    );
+
+    return (
+        <>
+            <AppBar
+                style={{ backgroundColor: teamColor }}
+                className={clsx(classes.appBar, {
+                    [classes.appBarShift]: isOpen
+                })}
+                position='fixed'
+            >
+                <Toolbar>
+                    <IconButton
+                        edge='start'
+                        className={clsx(classes.menuButton, {
                             [classes.hide]: isOpen
                         })}
-                    color="inherit"
-                    onClick={  onClickHandler }
-                >
-                    <MenuIcon/>
-                </IconButton>
-                <Typography variant="h6" className={classes.title} noWrap>
-                    { title }
-                </Typography>
-                <div className={classes.search}>
-                    <div className={classes.searchIcon}>
-                        <SearchIcon />
+                        color='inherit'
+                        onClick={onClickHandler}
+                    >
+                        <MenuIcon />
+                    </IconButton>
+                    <Typography variant='h6' className={classes.title} noWrap>
+                        {title}
+                    </Typography>
+                    <div className={classes.search}>
+                        <div className={classes.searchIcon}>
+                            <SearchIcon />
+                        </div>
+                        <InputBase
+                            placeholder='Search players ...'
+                            classes={{
+                                root: classes.inputRoot,
+                                input: classes.inputInput
+                            }}
+                        />
                     </div>
-                    <InputBase
-                        placeholder="Search players ..."
-                        classes={{
-                            root: classes.inputRoot,
-                            input: classes.inputInput
-                        }}
-                    />
-                </div>
-            </Toolbar>
-        </AppBar>
+                    <div style={{ flexGrow: 1 }} />
+                    <div style={{ display: 'flex' }}>
+                        <IconButton color='inherit' onClick={handleMenuOpen}>
+                            <AccountCircleSharp />
+                        </IconButton>
+                    </div>
+                </Toolbar>
+            </AppBar>
+            {renderUserMenu}
+        </>
     );
 }
 
