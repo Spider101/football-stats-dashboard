@@ -31,9 +31,29 @@ export const fetchPlayerPerformanceData = async ({ queryKey }) => {
 
 };
 
+export const authenticateUser = async ({ username, password }) => {
+    const userData = await fetchDataFromEndpoint(`users?username=${username}&password=${password}`);
+    if (userData.length > 0) {
+        const { authToken } = userData[0];
+        return authToken;
+    }
+};
+
 export const fetchUser = async ({ queryKey }) => {
-    const [ _key, { email, password }] = queryKey;
-    return await fetchDataFromEndpoint(`users?email=${email}&password=${password}`);
+    const [ _key, { authToken }] = queryKey;
+    // TODO: adding authToken in query params to replicate server behavior in json-server
+    // remove once integrated with backend
+    const res = await fetch(`${baseUrl}users?authToken=${authToken}`, {
+        method: 'GET',
+        headers: { 'Authentication': `BEARER ${authToken}` }
+    });
+    if (res.ok) {
+        const userData = await res.json();
+        if (userData.length > 0) {
+            return await userData[0];
+        }
+        throw new Error(`No user found with given auth token: ${authToken}`);
+    }
 };
 
 export const createUser = async (createdUserData) => {
@@ -42,7 +62,7 @@ export const createUser = async (createdUserData) => {
         body: JSON.stringify(createdUserData),
         headers: { 'Content-Type': 'application/json' }
     });
-    return res.json();
+    return await res.json();
 };
 
 async function fetchDataFromEndpoint(endpointFragment) {
