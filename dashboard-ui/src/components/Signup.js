@@ -12,8 +12,9 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Alert from './Alert';
+import { formSubmission } from '../utils';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     paper: {
         display: 'flex',
         marginTop: theme.spacing(8),
@@ -53,7 +54,9 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                 Sign Up
             </Typography>
             <div className={classes.validations}>
-                {submitStatus === 'SUBMITTED' && <Alert severity='success' text='Account created successfully!' />}
+                {submitStatus === formSubmission.COMPLETE && (
+                    <Alert severity='success' text='Account created successfully!' />
+                )}
                 {validations.form != null && <Alert severity='error' text={validations.form} />}
             </div>
             <form className={classes.form} onSubmit={handleSubmit} noValidate>
@@ -65,11 +68,11 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             id='firstName'
                             label='First Name'
                             variant='outlined'
-                            style={{ marginTop: '8px'}}
+                            style={{ marginTop: '8px' }}
                             autoFocus
                             fullWidth
                             value={values.firstName}
-                            disabled={submitStatus === 'SUBMITTING'}
+                            disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
                             error={validations.firstName != null}
                             helperText={validations.firstName}
@@ -82,10 +85,10 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             id='lastName'
                             label='Last Name'
                             variant='outlined'
-                            style={{ marginTop: '8px'}}
+                            style={{ marginTop: '8px' }}
                             fullWidth
                             value={values.lastName}
-                            disabled={submitStatus === 'SUBMITTING'}
+                            disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
                             error={validations.lastName != null}
                             helperText={validations.lastName}
@@ -102,7 +105,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             fullWidth
                             value={values.email}
                             autoComplete='email'
-                            disabled={submitStatus === 'SUBMITTING'}
+                            disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
                             error={validations.email != null}
                             helperText={validations.email}
@@ -119,7 +122,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             fullWidth
                             value={values.newPassword}
                             autoComplete='new-password'
-                            disabled={submitStatus === 'SUBMITTING'}
+                            disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
                             error={validations.newPassword != null}
                             helperText={validations.newPassword}
@@ -136,7 +139,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             fullWidth
                             value={values.confirmedPassword}
                             autoComplete='new-password'
-                            disabled={submitStatus === 'SUBMITTING'}
+                            disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
                             error={validations.confirmedPassword != null}
                             helperText={validations.confirmedPassword}
@@ -149,9 +152,9 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                     variant='contained'
                     color='primary'
                     fullWidth
-                    disabled={submitStatus === 'SUBMITTING'}
+                    disabled={submitStatus === formSubmission.INPROGRESS}
                 >
-                    {submitStatus === 'SUBMITTING' ? 'Signing Up ...' : 'Sign Up'}
+                    {submitStatus === formSubmission.INPROGRESS ? 'Signing Up ...' : 'Sign Up'}
                 </Button>
                 <Grid container justify='flex-end'>
                     <Grid item>

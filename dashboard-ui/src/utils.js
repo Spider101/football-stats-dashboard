@@ -57,6 +57,11 @@ export const moraleIconsMap = [
     { morale: 'Happy', icon: <MoodIcon /> }
 ];
 
+export const formSubmission = {
+    COMPLETE: 'COMPLETE',
+    INPROGRESS: 'INPROGRESS'
+};
+
 export const capitalizeLabel = label => {
     return label
         .split('_')
