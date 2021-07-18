@@ -82,17 +82,17 @@ const compare = (row1, row2, sortOrder, cellLabel) => {
     // we can assume that the two cells are from the same column
     // so we can just take the comparator method from one of them
     switch (cell1.type) {
-        case 'icon':
-            comparator = iconMetadataComparator;
-            break;
-        case 'image':
-            comparator = imageMetadataComparator;
-            break;
-        case 'chart':
-            comparator = chartMetadataComparator;
-            break;
-        default:
-            comparator = defaultComparator;
+    case 'icon':
+        comparator = iconMetadataComparator;
+        break;
+    case 'image':
+        comparator = imageMetadataComparator;
+        break;
+    case 'chart':
+        comparator = chartMetadataComparator;
+        break;
+    default:
+        comparator = defaultComparator;
     }
 
     return sortOrder === 'asc' ? comparator(cell1, cell2) : -comparator(cell1, cell2);

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
@@ -10,13 +11,13 @@ import useUserData from '../hooks/useUserData';
 
 import HomePageView from '../views/HomePageView';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles({
     loadingCircle: {
         width: '200px !important',
         height: '200px !important',
         margin: '35vh'
     }
-}));
+});
 
 const Home = () => {
     const classes = useStyles();
@@ -45,6 +46,16 @@ const HomeContainer = ({ userData }) => {
             <HomePageView />
         </>
     );
+};
+
+HomeContainer.propTypes = {
+    userData: PropTypes.shape({
+        firstName: PropTypes.string,
+        lastName: PropTypes.string,
+        email: PropTypes.string,
+        password: PropTypes.string,
+        authToken: PropTypes.string
+    })
 };
 
 export default Home;
