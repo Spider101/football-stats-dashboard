@@ -97,7 +97,13 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                 />
                 {/* // TODO: uncomment when Remember Me functionality is ready */}
                 {/* <FormControlLabel
-                    control={<Checkbox value='remember' color='primary' disabled={submitStatus === formSubmission.INPROGRESS} />}
+                    control={
+                        <Checkbox
+                            value='remember'
+                            color='primary'
+                            disabled={submitStatus === formSubmission.INPROGRESS}
+                        />
+                    }
                     label='Remember me'
                 /> */}
                 <Button
