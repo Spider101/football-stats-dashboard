@@ -7,7 +7,7 @@ export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
 const NUM_MONTHS = 6;
 
-const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * upper) + lower;
+const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * (upper - lower)) + lower;
 
 export const getAttributeItemData = (attributeName, highlightedAttributes = []) => ({
     attributeName,
@@ -268,3 +268,23 @@ export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) =>
         };
     })
 });
+
+/**
+ * The league table will show the following data -
+ * 1. team name,
+ * 2. games played,
+ * 3. goals for
+ * 4. goals against
+ * 5. points tally
+ * @param {*} numTeams the number of team to be displayed in the table
+ * @returns the metadata to build the table
+ */
+export const getLeagueTableData = (numTeams) => {
+    return [ ...Array(numTeams)].map(() => ({
+        team: faker.company.companyName(),
+        gamesPlayed: getRandomNumberInRange(35, 30),
+        goalsFor: getRandomNumberInRange(30, 10),
+        goalsAgainst: getRandomNumberInRange(30, 10),
+        points: getRandomNumberInRange(80, 50)
+    }));
+};

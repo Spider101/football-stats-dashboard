@@ -44,8 +44,12 @@ export const nationalityFlagMap = [
     { nationality: 'France', flag: 'https://upload.wikimedia.org/wikipedia/commons/6/62/Flag_of_France.png' },
     { nationality: 'Germany', flag: 'https://freepngimg.com/thumb/germany_flag/1-2-germany-flag-picture.png' },
     { nationality: 'Spain', flag: 'https://freepngimg.com/thumb/spain/5-2-spain-flag-picture.png' },
-    { nationality: 'Netherlands', flag: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/'
-        + 'Flag_of_the_Netherlands.svg/125px-Flag_of_the_Netherlands.svg.png' },
+    {
+        nationality: 'Netherlands',
+        flag:
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/' +
+            'Flag_of_the_Netherlands.svg/125px-Flag_of_the_Netherlands.svg.png'
+    }
 ];
 
 export const moraleIconsMap = [
@@ -53,8 +57,9 @@ export const moraleIconsMap = [
     { morale: 'Happy', icon: <MoodIcon /> }
 ];
 
-export const capitalizeLabel = (label) => {
-    return label.split('_')
+export const capitalizeLabel = label => {
+    return label
+        .split('_')
         .map(word => word[0].toUpperCase() + word.slice(1))
         .join(' ');
 };
@@ -66,7 +71,7 @@ const imageMetadataComparator = (x, y) =>
     x.metadata.sortValue < y.metadata.sortValue ? -1 : x.metadata.sortValue > y.metadata.sortValue ? 1 : 0;
 const chartMetadataComparator = (x, y) =>
     x.metadata.sortValue < y.metadata.sortValue ? -1 : x.metadata.sortValue > y.metadata.sortValue ? 1 : 0;
-const defaultComparator = (x, y) => x.data < y.data ? -1 : x.data > y.data ? 1 : 0;
+const defaultComparator = (x, y) => (x.data < y.data ? -1 : x.data > y.data ? 1 : 0);
 
 const compare = (row1, row2, sortOrder, cellLabel) => {
     const cell1 = row1.find(cell => cell.id === cellLabel);
@@ -76,7 +81,7 @@ const compare = (row1, row2, sortOrder, cellLabel) => {
 
     // we can assume that the two cells are from the same column
     // so we can just take the comparator method from one of them
-    switch(cell1.type) {
+    switch (cell1.type) {
     case 'icon':
         comparator = iconMetadataComparator;
         break;
@@ -99,7 +104,7 @@ export const stableSortList = (array, sortOrder, columnNameToOrderBy) => {
         return array;
     }
 
-    const orderedArray = array.map((el, _idx) => [ el, _idx]);
+    const orderedArray = array.map((el, _idx) => [el, _idx]);
 
     orderedArray.sort((a, b) => {
         const order = compare(a[0], b[0], sortOrder, columnNameToOrderBy);
@@ -115,3 +120,6 @@ export const stableSortList = (array, sortOrder, columnNameToOrderBy) => {
     // eslint-disable-next-line no-unused-vars
     return orderedArray.map(([el, _]) => el);
 };
+
+export const convertCamelCaseToSnakeCase = camelCaseString =>
+    camelCaseString.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
