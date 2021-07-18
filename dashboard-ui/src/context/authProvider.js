@@ -48,7 +48,7 @@ function AuthContextProvider({ children }) {
         try {
             await createUser(newUserData);
         } catch (err) {
-            errorMessage = `${err.message}. Try logging in instead.`;
+            errorMessage = `${err.message} Try logging in instead.`;
         }
 
         return errorMessage;

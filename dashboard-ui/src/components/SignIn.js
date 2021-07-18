@@ -14,8 +14,9 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Alert from './Alert';
+import { formSubmission } from '../utils';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     paper: {
         display: 'flex',
         marginTop: theme.spacing(8),
@@ -55,8 +56,10 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                 Sign In
             </Typography>
             <div className={classes.validations}>
-                {submitStatus === 'SUBMITTED' && <Alert severity='success' text='Signed In Successfully!' />}
-                {validations.form != null && <Alert severity='error' text={validations.form} />}
+                {submitStatus === formSubmission.COMPLETE && (
+                    <Alert severity='success' text='Signed In Successfully!' />
+                )}
+                {validations.form && <Alert severity='error' text={validations.form} />}
             </div>
             <form className={classes.form} onSubmit={handleSubmit} noValidate>
                 <TextField
@@ -71,9 +74,9 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     fullWidth
                     autoFocus
                     value={values.email}
-                    disabled={submitStatus === 'SUBMITTING'}
+                    disabled={submitStatus === formSubmission.INPROGRESS}
                     onChange={e => handleChange(e)}
-                    error={validations.email != null}
+                    error={validations.email}
                     helperText={validations.email}
                 />
                 <TextField
@@ -87,14 +90,20 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     fullWidth
                     autoComplete='current-password'
                     value={values.password}
-                    disabled={submitStatus === 'SUBMITTING'}
+                    disabled={submitStatus === formSubmission.INPROGRESS}
                     onChange={e => handleChange(e)}
-                    error={validations.password != null}
+                    error={validations.password}
                     helperText={validations.password}
                 />
                 {/* // TODO: uncomment when Remember Me functionality is ready */}
                 {/* <FormControlLabel
-                    control={<Checkbox value='remember' color='primary' disabled={submitStatus === 'SUBMITTING'} />}
+                    control={
+                        <Checkbox
+                            value='remember'
+                            color='primary'
+                            disabled={submitStatus === formSubmission.INPROGRESS}
+                        />
+                    }
                     label='Remember me'
                 /> */}
                 <Button
@@ -103,9 +112,9 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     variant='contained'
                     color='primary'
                     fullWidth
-                    disabled={submitStatus === 'SUBMITTING'}
+                    disabled={submitStatus === formSubmission.INPROGRESS}
                 >
-                    {submitStatus === 'SUBMITTING' ? 'Signing In ...' : 'Sign In'}
+                    {submitStatus === formSubmission.INPROGRESS ? 'Signing In ...' : 'Sign In'}
                 </Button>
                 <Grid container>
                     {/* // TODO: uncomment when forgot password functionality is ready */}

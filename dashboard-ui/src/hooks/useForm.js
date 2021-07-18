@@ -1,91 +1,34 @@
 import React from 'react';
 
-import { capitalizeLabel } from '../utils';
-import { useUserAuth } from '../context/authProvider';
+import { capitalizeLabel, convertCamelCaseToSnakeCase, formSubmission } from '../utils';
 
 const validateEmail = email => /\S+@\S+\.\S+/.test(email);
 
 const validateFormData = formData => {
-    let validations = {};
-
-    let newPassword;
-    Object.entries(formData).forEach(([key, value]) => {
-        let errorMessage = null;
-
+    const formValidations = Object.entries(formData).reduce((validations, [key, value]) => {
         if (!value.trim()) {
-            errorMessage = `${capitalizeLabel(key)} cannot be empty!`;
+            validations[key] = `${capitalizeLabel(convertCamelCaseToSnakeCase(key))} cannot be empty!`;
         } else if (key === 'email' && !validateEmail(value)) {
-            errorMessage = 'Email is in incorrect format!';
-        } else if (key === 'newPassword') {
-            newPassword = value;
+            validations[key] = 'Email is in incorrect format!';
+        } else if (key === 'newPassword' || key === 'confirmedPassword') {
             if (value.length < 6 || value.length > 12) {
-                errorMessage = 'Password must be between 6 and 12 characters!';
-            }
-        } else if (key === 'confirmedPassword') {
-            if (value.length < 6 || value.length > 12) {
-                errorMessage = 'Password must be between 6 and 12 characters!';
-            } else if (value !== newPassword) {
-                errorMessage = 'Passwords must match!';
+                validations[key] = 'Password must be between 6 and 12 characters!';
             }
         }
+        return validations;
+    }, {});
 
-        validations = {
-            ...validations,
-            [key]: errorMessage
-        };
-    });
-
-    return {
-        ...validations,
-        form: null
-    };
+    return formData['newPassword'] !== formData['confirmedPassword']
+        ? Object.assign({}, formValidations, { confirmedPassword: 'Passwords must match!' })
+        : formValidations;
 };
 
-const useForm = () => {
-    const { setAuthToken, login, createAccount } = useUserAuth();
+const useForm = (defaultFormValues, callback) => {
+    const [formData, setFormData] = React.useState(defaultFormValues);
+    const [formValidations, setFormValidations] = React.useState({});
     const [submitStatus, setSubmitStatus] = React.useState();
 
-    // sign in form data
-    const [signInFormData, setSignInFormData] = React.useState({
-        email: '',
-        password: ''
-    });
-
-    const [signInFormValidations, setSignInFormValidations] = React.useState({
-        email: null,
-        password: null,
-        form: null
-    });
-
-    // sign up form data
-    const [signUpFormData, setSignUpFormData] = React.useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        newPassword: '',
-        confirmedPassword: ''
-    });
-
-    const [signUpFormValidations, setSignUpFormValidations] = React.useState({
-        firstName: null,
-        lastName: null,
-        email: null,
-        newPassword: null,
-        confirmedPassword: null,
-        form: null
-    });
-
-    // common logic
-    const handleSubmitFn = (e, formData, setFormValidations) => {
-        e.preventDefault();
-
-        setFormValidations(validateFormData(formData));
-
-        // lock form by disabling input fields and button
-        setSubmitStatus('SUBMITTING');
-    };
-
-    const handleChangeFn = (e, formData, setFormData) => {
+    const handleChangeFn = e => {
         const { name, value } = e.target;
         setFormData({
             ...formData,
@@ -93,40 +36,46 @@ const useForm = () => {
         });
     };
 
-    async function submitFormLogic(formValidations, setFormValidations, authAction) {
-        if (submitStatus === 'SUBMITTING' && Object.values(formValidations).every(validation => validation == null)) {
-            const formErrorMessage = await authAction();
+    const handleSubmitFn = e => {
+        e.preventDefault();
+
+        setFormValidations(validateFormData(formData));
+
+        // lock form by disabling input fields and button
+        setSubmitStatus(formSubmission.INPROGRESS);
+    };
+
+    const postFormData = React.useCallback(
+        async authAction => {
+            const formErrorMessage = await authAction(formData);
             if (formErrorMessage != null) {
-                setFormValidations({
+                setFormValidations(formValidations => ({
                     ...formValidations,
                     form: formErrorMessage
-                });
+                }));
+            } else {
+                setSubmitStatus(formSubmission.COMPLETE);
             }
-            setSubmitStatus('SUBMITTED');
-        } else {
-            // reset/unlock form
+        },
+        [formData]
+    );
+
+    React.useEffect(() => {
+        // check if there are any validations set when we are trying to submit the form data
+        if (submitStatus === formSubmission.INPROGRESS && Object.values(formValidations).length === 0) {
+            postFormData(callback);
+        } else if (submitStatus != formSubmission.COMPLETE) {
+            // reset/ unlock form if form submission is in progress and errors are found
             setSubmitStatus(null);
         }
-    }
-
-    React.useEffect(() => {
-        submitFormLogic(signInFormValidations, setSignInFormValidations, () => login(signInFormData, setAuthToken));
-    }, [signInFormValidations]);
-
-    React.useEffect(() => {
-        submitFormLogic(signUpFormValidations, setSignUpFormValidations, () => createAccount(signUpFormData));
-    }, [signUpFormValidations]);
+    }, [formValidations, submitStatus, callback]);
 
     return {
-        submitStatus,
-        signInFormData,
-        signInFormValidations,
-        signInFormChangeHandler: e => handleChangeFn(e, signInFormData, setSignInFormData),
-        signInFormSubmitHandler: e => handleSubmitFn(e, signInFormData, setSignInFormValidations),
-        signUpFormData,
-        signUpFormValidations,
-        signUpFormChangeHandler: e => handleChangeFn(e, signUpFormData, setSignUpFormData),
-        signUpFormSubmitHandler: e => handleSubmitFn(e, signUpFormData, setSignUpFormValidations)
+        handleChangeFn,
+        handleSubmitFn,
+        formData,
+        formValidations,
+        submitStatus
     };
 };
 

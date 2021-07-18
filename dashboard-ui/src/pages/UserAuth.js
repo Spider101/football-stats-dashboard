@@ -6,6 +6,7 @@ import SignIn from '../components/SignIn';
 import SignUp from '../components/Signup';
 
 import useForm from '../hooks/useForm';
+import { useUserAuth } from '../context/authProvider';
 
 export default function UserAuth({ classes }) {
     return (
@@ -29,13 +30,20 @@ UserAuth.propTypes = {
 };
 
 const SignInContainer = () => {
+    const { setAuthToken, login } = useUserAuth();
     const {
-        signInFormData,
-        submitStatus,
-        signInFormValidations,
-        signInFormChangeHandler: handleChangeFn,
-        signInFormSubmitHandler: handleSubmitFn
-    } = useForm();
+        handleChangeFn,
+        handleSubmitFn,
+        formData: signInFormData,
+        formValidations: signInFormValidations,
+        submitStatus
+    } = useForm(
+        {
+            email: '',
+            password: ''
+        },
+        React.useCallback(authData => login(authData, setAuthToken), [login, setAuthToken])
+    );
 
     return (
         <SignIn
@@ -49,13 +57,23 @@ const SignInContainer = () => {
 };
 
 const SignUpContainer = () => {
+    const { setAuthToken, createAccount } = useUserAuth();
     const {
-        submitStatus,
-        signUpFormData,
-        signUpFormValidations,
-        signUpFormChangeHandler: handleChangeFn,
-        signUpFormSubmitHandler: handleSubmitFn
-    } = useForm();
+        handleChangeFn,
+        handleSubmitFn,
+        formData: signUpFormData,
+        formValidations: signUpFormValidations,
+        submitStatus
+    } = useForm(
+        {
+            firstName: '',
+            lastName: '',
+            email: '',
+            newPassword: '',
+            confirmedPassword: ''
+        },
+        React.useCallback(userCreds => createAccount(userCreds, setAuthToken), [createAccount, setAuthToken])
+    );
     return (
         <SignUp
             values={signUpFormData}
