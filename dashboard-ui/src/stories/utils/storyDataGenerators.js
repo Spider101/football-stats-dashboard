@@ -7,7 +7,7 @@ export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
 const NUM_MONTHS = 6;
 
-const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * upper) + lower;
+const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * (upper - lower)) + lower;
 
 export const getAttributeItemData = (attributeName, highlightedAttributes = []) => ({
     attributeName,
