@@ -22,9 +22,6 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(10, 3)
     },
     view: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
         padding: theme.spacing(0, 1),
         // necessary for content to be below app bar
         ...theme.mixins.toolbar
