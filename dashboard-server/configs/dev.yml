@@ -4,10 +4,10 @@ couchbase:
   clusters:
     defaultCluster:
       username: "admin"
-      password: "123qweasd#"
+      password: "123qweasd"
       host: "localhost"
       buckets:
-        - "dashboard-server"
+        - "dashboard-data"
 
 logging:
   level: INFO
