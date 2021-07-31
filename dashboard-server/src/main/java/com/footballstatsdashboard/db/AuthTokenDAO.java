@@ -39,7 +39,7 @@ public class AuthTokenDAO<K> extends CouchbaseDAO<K> {
     }
 
     public Optional<Pair<AuthToken, Long>> getAuthTokenForUser(UUID userId) {
-        String query = "Select *, META(authToken).cas as cas from `dashboard-server` AS authToken " +
+        String query = "Select *, META(authToken).cas as cas from `dashboard-data` AS authToken " +
                 "where userId = $userId";
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("userId", userId.toString())
