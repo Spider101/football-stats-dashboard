@@ -60,7 +60,7 @@ public class CouchbaseClientManager implements Managed {
     }
 
     public void start() {
-        LOGGER.info("Connecting to couchbase cluster {}", "dashboard-server");
+        LOGGER.info("Connecting to couchbase cluster: {}", "football-stats-dashboard");
 
         this.config.getClusters().forEach((clusterName, clusterConfig) -> {
             String username = clusterConfig.getUsername();
