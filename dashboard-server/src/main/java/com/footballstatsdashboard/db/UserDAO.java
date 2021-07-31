@@ -22,8 +22,8 @@ public class UserDAO<K> extends CouchbaseDAO<K> {
     }
 
     public List<User> getUsersByFirstNameLastNameEmail(String firstName, String lastName, String emailAddress) {
-        String query = "Select b.* from `dashboard-data` AS b where firstName = $firstName AND lastName = $lastName" +
-                " AND email = $email";
+        String query = String.format("Select b.* from `%s` AS b where firstName = $firstName AND lastName = $lastName" +
+                " AND email = $email", this.getBucketNameResolver().get());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create()
                         .put("firstName", firstName)
@@ -35,7 +35,8 @@ public class UserDAO<K> extends CouchbaseDAO<K> {
     }
 
     public Optional<User> getUserByCredentials(String emailAddress) {
-        String query = "Select b.* from `dashboard-data` AS b where email = $email";
+        String query = String.format("Select b.* from `%s` AS b where email = $email",
+                this.getBucketNameResolver().get());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("email", emailAddress)
         );

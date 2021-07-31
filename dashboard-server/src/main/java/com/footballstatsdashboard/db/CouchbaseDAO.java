@@ -7,15 +7,19 @@ import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.function.Supplier;
+
 public class CouchbaseDAO<K> {
 
     private final CouchbaseClientManager.BucketContainer bucketContainer;
     private final CouchbaseKeyProvider<K> keyProvider;
+    private final Supplier<String> bucketNameResolver;
 
     public CouchbaseDAO(CouchbaseClientManager.BucketContainer bucketContainer,
                         CouchbaseKeyProvider<K> couchbaseKeyProvider) {
         this.bucketContainer = bucketContainer;
         this.keyProvider = couchbaseKeyProvider;
+        this.bucketNameResolver = () -> bucketContainer.getBucket().name();
     }
 
     public CouchbaseClientManager.BucketContainer getBucketContainer() {
@@ -24,6 +28,10 @@ public class CouchbaseDAO<K> {
 
     public CouchbaseKeyProvider<K> getKeyProvider() {
         return keyProvider;
+    }
+
+    public Supplier<String> getBucketNameResolver() {
+        return bucketNameResolver;
     }
 
     public void insertDocument(K key, Object document) {
