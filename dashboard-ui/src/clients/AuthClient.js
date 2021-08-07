@@ -26,15 +26,13 @@ export const authenticateUser = async ({ username, password }) => {
  * @returns user data containing userId, email, firstName, lastName and encrypted password
  */
 export const fetchUser = async ({ queryKey }) => {
-    const [ _key, { authToken } ] = queryKey;
-    const userEndpoint = process.env.NODE_ENV === 'development'
-        ? `/users/${authToken.userId}`
-        : `/users?authToken=${authToken}`;
-    const res = await fetchDataFromEndpoint(userEndpoint, 'GET', { Authentication: `BEARER ${authToken.id}` });
+    const [ _key, { authData } ] = queryKey;
+    const userEndpoint = `/users/${authData.userId}`;
+    const res = await fetchDataFromEndpoint(userEndpoint, 'GET', { Authentication: `BEARER ${authData.id}` });
     if (res.ok) {
         return await res.json();
     } else {
-        throw new Error(`No user found with given auth token: ${authToken}`);
+        throw new Error(`No user found with given auth token: ${authData}`);
     }
 };
 
