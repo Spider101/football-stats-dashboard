@@ -8,6 +8,8 @@ export default function(authToken) {
         fetchUser, {
             retry: 0,
             staleTime: 1000 * 60 * 60 * 8,
+            // don't run the query if authToken is not valid
+            enabled: !!authToken
         }
     );
     return {

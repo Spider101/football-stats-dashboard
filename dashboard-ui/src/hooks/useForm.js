@@ -64,7 +64,7 @@ const useForm = (defaultFormValues, callback) => {
         // check if there are any validations set when we are trying to submit the form data
         if (submitStatus === formSubmission.INPROGRESS && Object.values(formValidations).length === 0) {
             postFormData(callback);
-        } else if (submitStatus != formSubmission.COMPLETE) {
+        } else if (submitStatus !== formSubmission.COMPLETE) {
             // reset/ unlock form if form submission is in progress and errors are found
             setSubmitStatus(null);
         }
