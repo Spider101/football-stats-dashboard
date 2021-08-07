@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import faker from 'faker';
 import { useQueryClient } from 'react-query';
 
-import { authenticateUser, createUser } from '../clients/DashboardClient';
+import { authenticateUser, createUser } from "../clients/AuthClient";
 import { queryKeys } from '../utils';
 
 const AuthContext = React.createContext();

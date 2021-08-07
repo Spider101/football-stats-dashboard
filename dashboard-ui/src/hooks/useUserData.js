@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { fetchUser } from '../clients/DashboardClient';
+import { fetchUser } from "../clients/AuthClient";
 import { queryKeys } from '../utils';
 
 export default function(authToken) {
