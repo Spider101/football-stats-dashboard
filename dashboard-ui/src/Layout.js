@@ -102,8 +102,7 @@ AppContainer.propTypes = {
 export default function Layout() {
     const classes = useStyles();
 
-    const { authToken } = useUserAuth();
-    const { isLoading, isLoggedIn } = useUserData(authToken);
+    const { isLoading, isLoggedIn } = useUserData();
 
     return (
         <div className={classes.root}>

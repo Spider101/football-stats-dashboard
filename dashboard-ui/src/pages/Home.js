@@ -21,8 +21,7 @@ const useStyles = makeStyles({
 
 const Home = () => {
     const classes = useStyles();
-    const { authToken } = useUserAuth();
-    const { isLoading, userData } = useUserData(authToken);
+    const { isLoading, userData } = useUserData();
 
     return (
         <>
