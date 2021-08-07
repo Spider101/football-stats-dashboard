@@ -9,7 +9,7 @@ import { queryKeys } from '../utils';
 const AuthContext = React.createContext();
 
 function AuthContextProvider({ children }) {
-    const existingAuthToken = localStorage.getItem('auth-token');
+    const existingAuthToken = JSON.parse(localStorage.getItem('auth-token'));
     const [authToken, setAuthToken] = React.useState(existingAuthToken);
     const queryClient = useQueryClient();
 
@@ -26,8 +26,8 @@ function AuthContextProvider({ children }) {
         if (errorMessage == null) {
             console.info('Persisting auth token in localStorage and Context: ' + authToken);
 
-            // persist the token to localStorage and in context provider via state setter
-            localStorage.setItem('auth-token', authToken);
+            // persist the auth data including the bearer token to localStorage and in context provider via state setter
+            localStorage.setItem('auth-token', JSON.stringify(authToken));
             queryClient.invalidateQueries(queryKeys.USER_DATA);
             setAuthToken(authToken);
         }
