@@ -2,6 +2,13 @@ import React from 'react';
 import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 
+export const httpStatus = {
+    OK: 200,
+    BAD_REQUEST: 400,
+    CREATED: 201,
+    CONFLICT: 409
+};
+
 export const queryKeys = {
     SQUAD_DATA: 'squadData',
     PLAYER_DATA: 'playerData',
