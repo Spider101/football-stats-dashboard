@@ -1,4 +1,5 @@
 .idea/
+.env*
 .vscode
 *.code-workspace
 .m2/
