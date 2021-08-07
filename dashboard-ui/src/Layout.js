@@ -10,7 +10,6 @@ import AppBarMenu from './components/AppBarMenu';
 import Sidebar from './widgets/Sidebar';
 import UserAuth from './pages/UserAuth';
 import routingData from './routingData';
-import { useUserAuth } from './context/authProvider';
 import useUserData from './hooks/useUserData';
 
 const useStyles = makeStyles(theme => ({

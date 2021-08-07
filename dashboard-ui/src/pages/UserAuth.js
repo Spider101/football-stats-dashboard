@@ -30,7 +30,7 @@ UserAuth.propTypes = {
 };
 
 const SignInContainer = () => {
-    const { setAuthToken, login } = useUserAuth();
+    const { setAuthData, login } = useUserAuth();
     const {
         handleChangeFn,
         handleSubmitFn,
@@ -42,7 +42,7 @@ const SignInContainer = () => {
             email: '',
             password: ''
         },
-        React.useCallback(authData => login(authData, setAuthToken), [login, setAuthToken])
+        React.useCallback(authData => login(authData, setAuthData), [login, setAuthData])
     );
 
     return (
@@ -57,7 +57,7 @@ const SignInContainer = () => {
 };
 
 const SignUpContainer = () => {
-    const { setAuthToken, createAccount } = useUserAuth();
+    const { setAuthData, createAccount } = useUserAuth();
     const {
         handleChangeFn,
         handleSubmitFn,
@@ -72,7 +72,7 @@ const SignUpContainer = () => {
             newPassword: '',
             confirmedPassword: ''
         },
-        React.useCallback(userCreds => createAccount(userCreds, setAuthToken), [createAccount, setAuthToken])
+        React.useCallback(userCreds => createAccount(userCreds, setAuthData), [createAccount, setAuthData])
     );
     return (
         <SignUp

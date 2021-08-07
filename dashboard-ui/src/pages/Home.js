@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography';
 
 import { makeStyles } from '@material-ui/styles';
 
-import { useUserAuth } from '../context/authProvider';
 import useUserData from '../hooks/useUserData';
 
 import HomePageView from '../views/HomePageView';

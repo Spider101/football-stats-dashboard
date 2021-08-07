@@ -51,6 +51,6 @@ export const createUser = async newUserData => {
     } else if (res.status === httpStatus.CONFLICT) {
         throw new Error(`User with email address: ${email}, already exists!`);
     } else {
-        throw new Error(`Something went wrong in creating new user! Please try again`);
+        throw new Error('Something went wrong in creating new user! Please try again');
     }
 };

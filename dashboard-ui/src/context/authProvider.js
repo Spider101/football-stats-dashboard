@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQueryClient } from 'react-query';
 
-import { authenticateUser, createUser } from "../clients/AuthClient";
+import { authenticateUser, createUser } from '../clients/AuthClient';
 import { queryKeys } from '../utils';
 
 const AuthContext = React.createContext();
@@ -13,23 +13,23 @@ function AuthContextProvider({ children }) {
     const [authData, setAuthData] = React.useState(existingAuthData);
     const queryClient = useQueryClient();
 
-    const login = async ({ email, password }, setAuthToken) => {
+    const login = async ({ email, password }, setAuthData) => {
         let authData;
         let errorMessage = null;
 
         try {
             authData = await authenticateUser({ username: email, password });
         } catch (err) {
-            errorMessage = `${err.message}. Please create an account first.`;
+            errorMessage = err.message;
         }
 
         if (errorMessage == null) {
             console.info('Persisting auth data in localStorage and Context: ' + authData);
 
             // persist the auth data including the bearer token to localStorage and in context provider via state setter
-            localStorage.setItem('auth-data', JSON.stringify(authData));
+            localStorage.setItem(authDataKey, JSON.stringify(authData));
             queryClient.invalidateQueries(queryKeys.USER_DATA);
-            setAuthToken(authData);
+            setAuthData(authData);
         }
 
         return errorMessage;
@@ -47,7 +47,7 @@ function AuthContextProvider({ children }) {
         try {
             await createUser(newUserData);
         } catch (err) {
-            errorMessage = `${err.message} Try logging in instead.`;
+            errorMessage = err.message;
         }
 
         return errorMessage;
@@ -60,7 +60,7 @@ function AuthContextProvider({ children }) {
     };
 
     const value = {
-        authToken: authData,
+        authData,
         setAuthData,
         login,
         createAccount,

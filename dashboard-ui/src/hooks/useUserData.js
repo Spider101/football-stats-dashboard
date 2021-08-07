@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { fetchUser } from "../clients/AuthClient";
+import { fetchUser } from '../clients/AuthClient';
 import { useUserAuth } from '../context/authProvider';
 import { queryKeys } from '../utils';
 
