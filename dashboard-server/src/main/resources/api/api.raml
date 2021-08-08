@@ -79,7 +79,7 @@ securitySchemes:
       422:
         description: unprocessable entity when player roles or attributes are missing
 
-/users
+/users:
   /{userId}:
     uriParameters:
       userId:
@@ -120,3 +120,47 @@ securitySchemes:
               example: !include examples/access-token-response.json
         400:
           description: bad request when either email or password does not match
+
+/club:
+  /{clubId}:
+    uriParameters:
+      clubId:
+        description: The club ID
+        type: string
+        required: true
+    get:
+      description: gets a club's data by id
+      securedBy: [access_token]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/club-response.json
+    put:
+      description: updates a club's data
+      securedBy: [access_token]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/club-response.json
+        500:
+          description: failed during club data update
+    delete:
+      description: delete a club's data
+      securedBy: [access_token]
+      responses:
+        204:
+          description: successfully delete a club's data
+  post:
+    description: adds a new club's data
+    securedBy: [access_token]
+    body:
+      application/json:
+        example: !include examples/club-post-request.json
+    responses:
+      201:
+        description: club's data created
+        body:
+          application/json:
+            example: !include examples/club-response.json
