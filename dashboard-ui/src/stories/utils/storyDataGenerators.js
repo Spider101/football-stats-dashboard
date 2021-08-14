@@ -95,60 +95,24 @@ export const getPlayerMetadata = () => ({
 });
 
 
-const getAttributesInCategory = (numAttributes, attributesList, hasHistory) => (
-    [ ...Array(numAttributes)].map((_, i) => {
-        let attributeMap = {
-            name: attributesList[i],
-            value: getRandomNumberInRange(MAX_ATTR_VALUE)
-        };
-
-        if (hasHistory) {
-            const attributeHistory = [ ...Array(NUM_MONTHS -1) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE));
-            attributeMap = {
-                ...attributeMap,
-                history: [ ...attributeHistory, attributeMap.value ]
-            };
-        }
-
-        return attributeMap;
-    })
-);
-
-const  getPlayerAttributeCategoryData = (attributeNamesList, hasHistory) => ([
-    {
-        categoryName: 'Technical',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(0, 10), hasHistory)
-    }, {
-        categoryName: 'Physical',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(10, 20), hasHistory)
-    }, {
-        categoryName: 'Mental',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(20, 30), hasHistory)
-    }
-]);
-
-const getPlayerAttributeGroupData = (numAttributes) => ([
-    {
-        groupName: 'Defending',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }, {
-        groupName: 'Speed',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }, {
-        groupName: 'Vision',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }, {
-        groupName: 'Attacking',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }, {
-        groupName: 'Aerial',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }
-]);
+const getAttributes = (numAttributes, categories, groups, attributeList, hasHistory) => attributeList.map(attribute => {
+    const attributeValue = getRandomNumberInRange(MAX_ATTR_VALUE);
+    const attributeHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE));
+    return {
+        name: attribute,
+        category: _.sample(categories),
+        group: _.sample(groups),
+        value: attributeValue,
+        ...(hasHistory && { history: [ ...attributeHistory, attributeValue ] })
+    };
+});
 
 export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     const currentPlayerOverall = getRandomNumberInRange(MAX_OVERALL_VALUE);
     const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_OVERALL_VALUE));
+
+    const categories = ['Technical', 'Physical', 'Mental'];
+    const categoryGroups = ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial'];
 
     return {
         playerMetadata: getPlayerMetadata(),
@@ -157,10 +121,7 @@ export const getPlayerData = (attributeNamesList, hasHistory = false) => {
             currentValue: currentPlayerOverall,
             history: [ ...playerOverallHistory, currentPlayerOverall ],
         },
-        playerAttributes: {
-            attributeCategories: getPlayerAttributeCategoryData(attributeNamesList, hasHistory),
-            attributeGroups: getPlayerAttributeGroupData(10)
-        }
+        playerAttributes: getAttributes(30, categories, categoryGroups, attributeNamesList, hasHistory)
     };
 };
 

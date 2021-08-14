@@ -8,7 +8,8 @@ import AttributeItem from '../components/AttributeItem';
 import PlayerBioCard from '../components/PlayerBioCard';
 import PlayerProgressionCharts from '../widgets/PlayerProgressionCharts';
 
-const getGrowthIndicator = ({ value, history }) => {
+const getGrowthIndicator = history => {
+    const value = history[history.length - 1];
     const penultimateValue = history[history.length - 2];
     if (value > penultimateValue) {
         return 'up';
@@ -19,53 +20,53 @@ const getGrowthIndicator = ({ value, history }) => {
     }
 };
 
-const buildAttributeTableData = (attributeCategoryData) => {
-    const maxRows = Math.max(
-        ...attributeCategoryData.map(category => category.attributesInCategory.length)
-    );
-
-    const numCategories = attributeCategoryData.length;
-    const rows = [ ...Array(maxRows) ].map((_, i) => (
-        [ ...Array(numCategories) ].map((_, j) => {
-            const currentCategory = attributeCategoryData[j];
-            return i > currentCategory.attributesInCategory.length ? null : {
-                attributeName: currentCategory.attributesInCategory[i].name,
-                attributeValue: currentCategory.attributesInCategory[i].value,
+/**
+ * convert the attributes collection into a format that can be fed into a table DOM structure
+ * @param {array} attributes
+ * @returns
+ */
+const buildAttributeTableData = attributes => {
+    const categories = Array.from(new Set(attributes.map(attribute => attribute.category)));
+    const data = categories.map(category =>
+        attributes
+            .filter(attribute => attribute.category === category)
+            .map(attribute => ({
+                attributeName: attribute.name,
+                attributeValue: attribute.value,
                 highlightedAttributes: [],
-                growthIndicator: getGrowthIndicator(currentCategory.attributesInCategory[i])
+                growthIndicator: getGrowthIndicator(attribute.history)
+            }))
+    );
+    const maxRows = Math.max(...data.map(row => row.length));
 
-            };
-        })
-    ));
-
+    // transpose the attribute data so that each column corresponds to a given attribute category
+    const rows = [...Array(maxRows)].map((_, i) =>
+        [...Array(categories.length)].map((_, j) => (i > data[j].length ? null : data[j][i]))
+    );
     return {
-        headers: attributeCategoryData.map(category => category.categoryName),
+        headers: categories,
         rows
     };
 };
 
-const buildAttributeProgressChartData = (attributeCategoryData) => {
-    const attributeProgressChartData = attributeCategoryData.map(category => category.attributesInCategory)
-        .flat()
-        .map(attributeData => ({ name: attributeData.name, data: attributeData.history }));
+const buildAttributeProgressChartData = attributeData => {
+    const attributeProgressChartData = attributeData
+        .map(attribute => ({ name: attribute.name, data: attribute.history }));
     return { attributeData: attributeProgressChartData };
-
 };
 
 const buildOverallProgressChartData = ({ history: overallHistory }) => ({
     overallData: [{ name: 'Player Ability', data: overallHistory }]
 });
 
-export default function PlayerProgressionView({ playerMetadata, playerRoles, playerOverall,
-    playerAttributes: { attributeCategories } }) {
-
+export default function PlayerProgressionView({ playerMetadata, playerRoles, playerOverall, playerAttributes }) {
     const attributeTableData = {
-        ...buildAttributeTableData(attributeCategories),
+        ...buildAttributeTableData(playerAttributes),
         roles: playerRoles
     };
 
     const playerProgressionChartData = {
-        playerAttributeProgressData: buildAttributeProgressChartData(attributeCategories),
+        playerAttributeProgressData: buildAttributeProgressChartData(playerAttributes),
         playerOverallProgressData: buildOverallProgressChartData(playerOverall)
     };
 
@@ -73,48 +74,39 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles, pla
         <>
             <Grid container spacing={2}>
                 <Grid item xs={12}>
-                    <PlayerBioCard { ...playerMetadata } />
+                    <PlayerBioCard {...playerMetadata} />
                 </Grid>
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs>
-                    <PlayerProgressionCharts { ...playerProgressionChartData } />
+                    <PlayerProgressionCharts {...playerProgressionChartData} />
                 </Grid>
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs>
-                    <PlayerAttributesTable { ...attributeTableData } >
+                    <PlayerAttributesTable {...attributeTableData}>
                         <AttributeItem />
                     </PlayerAttributesTable>
                 </Grid>
             </Grid>
         </>
-        
     );
 }
 
 PlayerProgressionView.propTypes = {
     playerMetadata: PropTypes.shape(PlayerBioCard.propTypes),
-    playerRoles: PropTypes.object,
+    playerRoles: PropTypes.array,
     playerOverall: PropTypes.shape({
         currentValue: PropTypes.number,
         history: PropTypes.arrayOf(PropTypes.number)
     }),
-    playerAttributes: PropTypes.shape({
-        attributeCategories: PropTypes.arrayOf(
-            PropTypes.shape({
-                categoryName: PropTypes.string,
-                attributesInCategory: PropTypes.arrayOf(
-                    PropTypes.shape({
-                        name: PropTypes.string,
-                        value: PropTypes.number
-                    })
-                )
-            })
-        ),
-        attributeGroups: PropTypes.arrayOf(PropTypes.shape({
-            groupName: PropTypes.string,
-            attributesInGroup: PropTypes.array
-        }))
-    })
+    playerAttributes: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string,
+            group: PropTypes.string,
+            category: PropTypes.string,
+            value: PropTypes.number,
+            history: PropTypes.arrayOf(PropTypes.number)
+        })
+    )
 };
