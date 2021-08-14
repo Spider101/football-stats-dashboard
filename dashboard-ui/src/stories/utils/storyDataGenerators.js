@@ -42,11 +42,10 @@ export const getAttributeNamesList = (totalNumOfAttributes) =>
 
 const getPlayerRolesMap = (numOfRoles, attributeList) => {
     const roles = faker.lorem.words(numOfRoles).split(' ');
-    let roleAttributeMap = {};
-    roles.forEach(role => {
-        roleAttributeMap[role] = _.sampleSize(attributeList, 6);
-    });
-    return roleAttributeMap;
+    return roles.map(role => ({
+        name: role.name,
+        associatedAttributes: _.sampleSize(attributeList, 6)
+    }));
 };
 
 export const getAttributeComparisonTableData = (getAttrItemData) => {
@@ -86,7 +85,7 @@ export const getAttrGroupData = (numGroups) => (
 
 export const getPlayerMetadata = () => ({
     name: faker.name.findName(),
-    dob: faker.date.past().toJSON(),
+    dateOfBirth: faker.date.past().toJSON(),
     club: faker.company.companyName(),
     country: faker.address.country(),
     photo: `${faker.image.people()}?random=${getRandomNumberInRange(20)}`,

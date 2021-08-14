@@ -33,7 +33,7 @@ const useStyles = makeStyles({
 
 const renderPlayerDOB = (dob, age) => dob.slice(0, 10).split`-`.join`/` + age;
 
-export default function PlayerBioCard({  name, club, clubLogo, dob, age, country, countryLogo, photo }) {
+export default function PlayerBioCard({  name, club, clubLogo, dateOfBirth, age, country, countryLogo, photo }) {
     const classes = useStyles();
 
     return (
@@ -53,7 +53,7 @@ export default function PlayerBioCard({  name, club, clubLogo, dob, age, country
                     </Typography>
                 </div>
                 <Typography variant="subtitle1" color="textSecondary">
-                    { renderPlayerDOB(dob, age) }
+                    { renderPlayerDOB(dateOfBirth, age) }
                 </Typography>
                 <div className={ classes.avatarGroup }>
                     <Avatar className={classes.clubLogo} src={ countryLogo } />
@@ -70,8 +70,8 @@ PlayerBioCard.propTypes = {
     name: PropTypes.string,
     club: PropTypes.string,
     clubLogo: PropTypes.string,
-    dob: PropTypes.string,
-    age: PropTypes.string,
+    dateOfBirth: PropTypes.string,
+    age: PropTypes.number,
     country:  PropTypes.string,
     countryLogo: PropTypes.string,
     photo: PropTypes.string
