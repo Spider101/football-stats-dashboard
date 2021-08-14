@@ -4,11 +4,13 @@ import { useQueryClient } from 'react-query';
 
 import { authenticateUser, createUser } from '../clients/AuthClient';
 import { queryKeys } from '../utils';
+import { useHistory } from 'react-router-dom';
 
 const AuthContext = React.createContext();
 
 const authDataKey = 'auth-data';
 function AuthContextProvider({ children }) {
+    const history = useHistory();
     const existingAuthData = JSON.parse(localStorage.getItem(authDataKey));
     const [authData, setAuthData] = React.useState(existingAuthData);
     const queryClient = useQueryClient();
@@ -55,8 +57,12 @@ function AuthContextProvider({ children }) {
 
     const logOut = () => {
         console.info('Logging user out ...');
+
+        // redirect to home page (login form) after removing auth data from localStorage and state
         localStorage.removeItem(authDataKey);
         setAuthData(null);
+        history.push('/');
+
     };
 
     const value = {

@@ -4,7 +4,7 @@ import { useUserAuth } from '../context/authProvider';
 import { queryKeys } from '../utils';
 
 export default function() {
-    const { authData } = useUserAuth();
+    const { authData, logOut } = useUserAuth();
 
     const { isLoading, isSuccess, data } = useQuery(
         [queryKeys.USER_DATA, { authData }],
@@ -12,7 +12,12 @@ export default function() {
             retry: 0,
             staleTime: 1000 * 60 * 60 * 8,
             // don't run the query if authToken is not valid
-            enabled: !!authData
+            enabled: !!authData,
+            onError: (err) => {
+                if (err.name === 'Unauthorized Error') {
+                    logOut();
+                }
+            }
         }
     );
     return {
