@@ -31,7 +31,7 @@ const useStyles = makeStyles({
     }
 });
 
-const renderPlayerDOB = (dob, age) => dob.slice(0, 10).split`-`.join`/` + age;
+const renderPlayerDOB = (dob, age) => `${dob.slice(0, 10).split`-`.join`/`} (${age} years old)`;
 
 export default function PlayerBioCard({  name, club, clubLogo, dateOfBirth, age, country, countryLogo, photo }) {
     const classes = useStyles();

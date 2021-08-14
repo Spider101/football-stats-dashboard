@@ -39,5 +39,5 @@ export default function LeagueTable({ metadata }) {
 }
 
 LeagueTable.propTypes = {
-    metadata: PropTypes.object
+    metadata: PropTypes.array
 };

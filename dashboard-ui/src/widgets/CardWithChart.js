@@ -39,7 +39,7 @@ export default function CardWithChart({ cardTitle, chartData, dataTransformer, c
 
 CardWithChart.propTypes = {
     cardTitle: PropTypes.string,
-    chartData: PropTypes.object,
+    chartData: PropTypes.array,
     dataTransformer: PropTypes.func,
     chartOptions: PropTypes.object,
     chartType: PropTypes.string,

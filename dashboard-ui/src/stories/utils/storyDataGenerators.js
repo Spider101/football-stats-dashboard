@@ -91,7 +91,7 @@ export const getPlayerMetadata = () => ({
     photo: `${faker.image.people()}?random=${getRandomNumberInRange(20)}`,
     clubLogo: `${faker.image.abstract()}?random=${getRandomNumberInRange(20)}`,
     countryLogo: `${faker.image.avatar()}?random=${getRandomNumberInRange(20)}`,
-    age:  ' (' + faker.random.number({ 'min': 16, 'max': 35 }) + ' years old)'
+    age:  faker.random.number({ 'min': 16, 'max': 35 })
 });
 
 
