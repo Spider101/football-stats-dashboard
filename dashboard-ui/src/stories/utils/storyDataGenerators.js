@@ -43,7 +43,7 @@ export const getAttributeNamesList = (totalNumOfAttributes) =>
 const getPlayerRolesMap = (numOfRoles, attributeList) => {
     const roles = faker.lorem.words(numOfRoles).split(' ');
     return roles.map(role => ({
-        name: role.name,
+        name: role,
         associatedAttributes: _.sampleSize(attributeList, 6)
     }));
 };
