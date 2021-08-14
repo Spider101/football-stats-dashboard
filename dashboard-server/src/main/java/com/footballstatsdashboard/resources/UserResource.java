@@ -8,6 +8,7 @@ import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.db.AuthTokenDAO;
 import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import io.dropwizard.auth.Auth;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -54,7 +55,7 @@ public class UserResource {
     @GET
     @Path(USER_ID_PATH)
     public Response getUser(
-            @PathParam(USER_ID) UUID userId) {
+            @Auth @PathParam(USER_ID) UUID userId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getUser() request for user with ID: {}", userId.toString());
