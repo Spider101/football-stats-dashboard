@@ -1,5 +1,6 @@
 import { httpStatus } from '../utils';
 import fetchDataFromEndpoint from './utils';
+import UnauthorizedError from '../errors/UnauthorizedError';
 
 /**
  * accepts the user's credentials and authenticates their request to login
@@ -32,6 +33,8 @@ export const fetchUser = async ({ queryKey }) => {
     });
     if (res.ok) {
         return await res.json();
+    } else if (res.status === httpStatus.UNAUTHORIZED) {
+        throw new UnauthorizedError(res, 'User is unauthorized to view this page. Please login!');
     } else {
         throw new Error(`No user found with given auth token: ${authData}`);
     }
