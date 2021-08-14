@@ -28,7 +28,7 @@ export const authenticateUser = async ({ username, password }) => {
 export const fetchUser = async ({ queryKey }) => {
     const [_key, { authData }] = queryKey;
     const res = await fetchDataFromEndpoint(`users/${authData.userId}`, 'GET', {
-        Authentication: `BEARER ${authData.id}`
+        Authorization: `BEARER ${authData.id}`
     });
     if (res.ok) {
         return await res.json();
