@@ -1,10 +1,21 @@
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+
 import Signup from '../components/Signup';
 import { mockHandleChange, mockSubmit } from './utils/storyMocks';
 
 export default {
     component: Signup,
     title: 'Components/UserAuth/Signup',
+    decorators: [
+        Story => (
+            <Router>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Story />
+                </div>
+            </Router>
+        )
+    ]
 };
 
 const defaultArgs = {
