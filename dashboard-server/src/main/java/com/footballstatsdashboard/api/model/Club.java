@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Value.Immutable
 @JsonSerialize
-@JsonDeserialize(as = ImmutablePlayer.class)
+@JsonDeserialize(as = ImmutableClub.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public interface Club {
 
