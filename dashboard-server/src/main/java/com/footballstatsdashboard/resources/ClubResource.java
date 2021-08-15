@@ -30,7 +30,6 @@ import java.util.UUID;
 import static com.footballstatsdashboard.core.utils.Constants.CLUB_ID;
 import static com.footballstatsdashboard.core.utils.Constants.CLUB_ID_PATH;
 import static com.footballstatsdashboard.core.utils.Constants.CLUB_V1_BASE_PATH;
-import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID_PATH;
 
 @Path(CLUB_V1_BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -84,7 +83,7 @@ public class ClubResource {
     }
 
     @PUT
-    @Path(PLAYER_ID_PATH)
+    @Path(CLUB_ID_PATH)
     public Response updateClub(
             @Auth @PathParam(CLUB_ID) UUID existingClubId,
             @Valid @NotNull Club incomingClub) {

@@ -158,7 +158,7 @@ public class ClubResourceTest {
         UUID existingClubId = UUID.randomUUID();
         Long existingClubCAS = 123L;
         Club existingClubInCouchbase = getClubDataStub(existingClubId, true);
-        Club incomingClub = ImmutableClub.builder().from(getClubDataStub(null, false))
+        Club incomingClub = ImmutableClub.builder().from(getClubDataStub(existingClubId, false))
                 .wageBudget(BigDecimal.valueOf(300))
                 .build();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
