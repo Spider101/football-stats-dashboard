@@ -59,10 +59,9 @@ public interface Club {
     BigDecimal getExpenditure();
 
     /**
-     * ID of user the club belong's to
+     * ID of user the club belongs to
      */
     @Valid
-    @InternalField
     UUID getUserId();
 
     // TODO: 12/05/21 update all local date times to zoned date times to involve timezones as well
