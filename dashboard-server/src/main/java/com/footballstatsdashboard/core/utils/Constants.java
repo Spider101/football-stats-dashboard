@@ -18,4 +18,8 @@ public final class Constants {
     public static final String CLUB_V1_BASE_PATH = "football-stats-dashboard/v1/club";
     public static final String CLUB_ID = "clubId";
     public static final String CLUB_ID_PATH = "/{" + CLUB_ID + "}";
+
+    public static final String MATCH_PERFORMANCE_V1_BASE_PATH = "football-stats-dashboard/v1/match-performance";
+    public static final String MATCH_PERFORMANCE_ID = "matchPerformanceId";
+    public static final String MATCH_PERFORMANCE_ID_PATH = "/{" + MATCH_PERFORMANCE_ID + "}";
 }
