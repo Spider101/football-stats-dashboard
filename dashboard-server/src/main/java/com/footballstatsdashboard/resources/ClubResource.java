@@ -1,8 +1,8 @@
 package com.footballstatsdashboard.resources;
 
-import com.footballstatsdashboard.api.model.Club;
-import com.footballstatsdashboard.api.model.ImmutableClub;
+import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
