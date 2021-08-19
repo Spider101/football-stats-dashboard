@@ -152,6 +152,15 @@ securitySchemes:
       responses:
         204:
           description: successfully delete a club's data
+    /squadPlayers:
+      get:
+        description: gets list of all players in the corresponding club
+        securedBy: [access_token]
+        responses:
+          200:
+            body:
+              application/json:
+                example: !include examples/squad-players-response.json
   post:
     description: adds a new club's data
     securedBy: [access_token]
