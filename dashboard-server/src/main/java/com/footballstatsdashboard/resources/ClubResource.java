@@ -3,7 +3,7 @@ package com.footballstatsdashboard.resources;
 import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
-import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
 import org.apache.commons.lang3.tuple.Pair;
@@ -36,10 +36,10 @@ import static com.footballstatsdashboard.core.utils.Constants.CLUB_V1_BASE_PATH;
 public class ClubResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
-    private final CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private final ClubDAO<ResourceKey> clubDAO;
 
-    public ClubResource(CouchbaseDAO<ResourceKey> couchbaseDAO) {
-        this.couchbaseDAO = couchbaseDAO;
+    public ClubResource(ClubDAO<ResourceKey> clubDAO) {
+        this.clubDAO = clubDAO;
     }
 
     @GET
@@ -52,7 +52,7 @@ public class ClubResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(clubId);
-        Club club = this.couchbaseDAO.getDocument(resourceKey, Club.class).getLeft();
+        Club club = this.clubDAO.getDocument(resourceKey, Club.class).getLeft();
         return Response.ok().entity(club).build();
     }
 
@@ -76,7 +76,7 @@ public class ClubResource {
                 .build();
 
         ResourceKey resourceKey = new ResourceKey(newClub.getId());
-        this.couchbaseDAO.insertDocument(resourceKey, newClub);
+        this.clubDAO.insertDocument(resourceKey, newClub);
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newClub.getId().toString()).build();
         return Response.created(location).entity(newClub).build();
@@ -93,7 +93,7 @@ public class ClubResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(existingClubId);
-        Pair<Club, Long> existingClubEntity = this.couchbaseDAO.getDocument(resourceKey, Club.class);
+        Pair<Club, Long> existingClubEntity = this.clubDAO.getDocument(resourceKey, Club.class);
 
         Club existingClub = existingClubEntity.getLeft();
         if (existingClub.getId().equals(incomingClub.getId())) {
@@ -109,7 +109,7 @@ public class ClubResource {
                     .lastModifiedDate(LocalDate.now())
                     .build();
 
-            this.couchbaseDAO.updateDocument(resourceKey, updatedClub, existingClubEntity.getRight());
+            this.clubDAO.updateDocument(resourceKey, updatedClub, existingClubEntity.getRight());
             return Response.ok().entity(updatedClub).build();
         }
 
@@ -130,7 +130,7 @@ public class ClubResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(clubId);
-        this.couchbaseDAO.deleteDocument(resourceKey);
+        this.clubDAO.deleteDocument(resourceKey);
 
         return Response.noContent().build();
     }

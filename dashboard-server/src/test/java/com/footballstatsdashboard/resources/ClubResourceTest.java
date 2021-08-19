@@ -5,7 +5,7 @@ import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.jackson.Jackson;
 import org.apache.commons.lang3.tuple.Pair;
@@ -49,7 +49,7 @@ public class ClubResourceTest {
     private ClubResource clubResource;
 
     @Mock
-    private CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private ClubDAO<ResourceKey> clubDAO;
 
     @Mock
     private UriInfo uriInfo;
@@ -72,7 +72,7 @@ public class ClubResourceTest {
                 .lastName("")
                 .build();
 
-        clubResource = new ClubResource(couchbaseDAO);
+        clubResource = new ClubResource(clubDAO);
     }
 
     /**
@@ -84,14 +84,14 @@ public class ClubResourceTest {
         // setup
         UUID clubId = UUID.randomUUID();
         Club clubFromCouchbase = getClubDataStub(clubId, false);
-        when(couchbaseDAO.getDocument(any(), any()))
+        when(clubDAO.getDocument(any(), any()))
                 .thenReturn(Pair.of(clubFromCouchbase, 0L));
 
         // execute
         Response clubResponse = clubResource.getClub(clubId);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
+        verify(clubDAO).getDocument(any(), any());
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
@@ -107,14 +107,14 @@ public class ClubResourceTest {
     public void getClub_clubNotFoundInCouchbase() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(couchbaseDAO.getDocument(any(), any()))
+        when(clubDAO.getDocument(any(), any()))
                 .thenThrow(new RuntimeException("Unable to find document with ID: " + invalidClubId));
 
         // execute
         clubResource.getClub(invalidClubId);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
+        verify(clubDAO).getDocument(any(), any());
     }
 
     /**
@@ -131,7 +131,7 @@ public class ClubResourceTest {
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClub, uriInfo);
 
         // assert
-        verify(couchbaseDAO).insertDocument(any(), newClubCaptor.capture());
+        verify(clubDAO).insertDocument(any(), newClubCaptor.capture());
         Club newClub = newClubCaptor.getValue();
         assertNotNull(newClub.getCreatedDate());
         assertNotNull(newClub.getLastModifiedDate());
@@ -163,17 +163,17 @@ public class ClubResourceTest {
                 .build();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingClubInCouchbase, existingClubCAS));
+        when(clubDAO.getDocument(any(), any())).thenReturn(Pair.of(existingClubInCouchbase, existingClubCAS));
 
         // execute
         Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
 
         // assert
-        verify(couchbaseDAO).getDocument(resourceKeyCaptor.capture(), any());
+        verify(clubDAO).getDocument(resourceKeyCaptor.capture(), any());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(existingClubId, capturedResourceKey.getResourceId());
 
-        verify(couchbaseDAO).updateDocument(eq(capturedResourceKey), updatedClubCaptor.capture(), eq(existingClubCAS));
+        verify(clubDAO).updateDocument(eq(capturedResourceKey), updatedClubCaptor.capture(), eq(existingClubCAS));
         Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
         assertNotNull(clubToBeUpdatedInCouchbase);
         assertEquals(userPrincipal.getEmail(), clubToBeUpdatedInCouchbase.getCreatedBy());
@@ -198,7 +198,7 @@ public class ClubResourceTest {
         UUID existingClubId = UUID.randomUUID();
         Long existingClubCas = 123L;
         Club existingClubInCouchbase = getClubDataStub(existingClubId, true);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingClubInCouchbase, existingClubCas));
+        when(clubDAO.getDocument(any(), any())).thenReturn(Pair.of(existingClubInCouchbase, existingClubCas));
 
         UUID incorrectIncomingClubId = UUID.randomUUID();
         Club incomingClub = ImmutableClub.builder()
@@ -210,8 +210,8 @@ public class ClubResourceTest {
         Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
-        verify(couchbaseDAO, never()).updateDocument(any(), any(), anyLong());
+        verify(clubDAO).getDocument(any(), any());
+        verify(clubDAO, never()).updateDocument(any(), any(), anyLong());
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, clubResponse.getStatus());
         assertTrue(clubResponse.getEntity().toString().contains(incorrectIncomingClubId.toString()));
@@ -230,7 +230,7 @@ public class ClubResourceTest {
         Response clubResponse = clubResource.deleteClub(clubId);
 
         // assert
-        verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
+        verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(clubId, capturedResourceKey.getResourceId());
 

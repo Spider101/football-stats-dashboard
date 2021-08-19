@@ -7,6 +7,7 @@ import com.footballstatsdashboard.core.service.auth.CustomAuthenticator;
 import com.footballstatsdashboard.core.service.auth.CustomAuthorizer;
 import com.footballstatsdashboard.core.utils.PlayerInternalModule;
 import com.footballstatsdashboard.db.AuthTokenDAO;
+import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.AuthTokenKeyProvider;
@@ -70,8 +71,9 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
                 new PlayerKeyProvider()
         );
 
-        CouchbaseDAO<ResourceKey> clubCouchbaseDAO = new CouchbaseDAO<>(
+        ClubDAO<ResourceKey> clubCouchbaseDAO = new ClubDAO<>(
                 couchbaseClientManager.getBucketContainer(clusterName, bucketName),
+                couchbaseClientManager.getClusterContainer(clusterName),
                 new ClubKeyProvider()
         );
 
