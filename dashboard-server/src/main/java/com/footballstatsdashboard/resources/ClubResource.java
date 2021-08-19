@@ -3,6 +3,7 @@ package com.footballstatsdashboard.resources;
 import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
+import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
@@ -25,6 +26,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import static com.footballstatsdashboard.core.utils.Constants.CLUB_ID;
@@ -133,5 +135,16 @@ public class ClubResource {
         this.clubDAO.deleteDocument(resourceKey);
 
         return Response.noContent().build();
+    }
+
+    @GET
+    @Path(CLUB_ID_PATH + "/squadPlayers")
+    public Response getSquadPlayers(
+            @Auth @PathParam(CLUB_ID) UUID clubId) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("getSquadPlayers() request for club with ID: {}", clubId);
+        }
+        List<SquadPlayer> squadPlayerList = clubDAO.getPlayersInClub(clubId);
+        return Response.ok().entity(squadPlayerList).build();
     }
 }

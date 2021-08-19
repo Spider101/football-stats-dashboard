@@ -5,8 +5,11 @@ import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
+import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
@@ -24,9 +27,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -235,7 +240,37 @@ public class ClubResourceTest {
         assertEquals(clubId, capturedResourceKey.getResourceId());
 
         assertEquals(HttpStatus.NO_CONTENT_204, clubResponse.getStatus());
+    }
 
+    @Test
+    public void getSquadPlayers_fetchesPlayersFromCouchbase() {
+        // setup
+        UUID clubId = UUID.randomUUID();
+        ImmutableSquadPlayer expectedSquadPlayer = ImmutableSquadPlayer.builder()
+                .name("fake player name")
+                .country("fake player country")
+                .role("fake player role")
+                .currentAbility(19)
+                .playerId(UUID.randomUUID())
+                .build();
+        when(clubDAO.getPlayersInClub(eq(clubId))).thenReturn(ImmutableList.of(expectedSquadPlayer));
+
+        // execute
+        Response response = clubResource.getSquadPlayers(clubId);
+
+        // assert
+        verify(clubDAO).getPlayersInClub(eq(clubId));
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK_200, response.getStatus());
+        assertNotNull(response.getEntity());
+
+        List<Object> entityList = OBJECT_MAPPER.convertValue(response.getEntity(), List.class);
+        assertFalse(entityList.isEmpty());
+        entityList.forEach(entity -> {
+            SquadPlayer squadPlayerFromResponse = OBJECT_MAPPER.convertValue(entity, SquadPlayer.class);
+            assertNotNull(squadPlayerFromResponse);
+            assertEquals(expectedSquadPlayer, squadPlayerFromResponse);
+        });
     }
 
     private Club getClubDataStub(UUID clubId, boolean isExisting) {
