@@ -1,0 +1,16 @@
+[
+  {
+    "id": "700eb034-91e2-49a9-8608-5cbd3fa853ba",
+    "name": "Sander Gard Bolin Berge",
+    "country": "Norway",
+    "role": "defensiveCentralMidfielder",
+    "currentAbility": 97
+  },
+  {
+    "id": "11bc7344-b5f1-4039-b083-7851ac495153",
+    "name": "Paul Pogba",
+    "country": "France",
+    "role": "centralMidfielder",
+    "currentAbility": 92
+  }
+]

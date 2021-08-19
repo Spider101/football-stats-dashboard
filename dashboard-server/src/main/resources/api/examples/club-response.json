@@ -1,0 +1,12 @@
+{
+  "id": "d7b2772f-699b-408b-bead-bb21e7761115",
+  "name": "Chelsea F.C",
+  "transferBudget": 5000000,
+  "wageBudget": 300000,
+  "income": 10000000,
+  "expenditure": 100000,
+  "players": [
+    "8c9e3503-2179-4aab-86d7-3d7a7ade7a3d",
+    "25377cc9-8fba-47a1-ac8d-d52089d8077f"
+  ]
+}

@@ -28,15 +28,20 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -53,10 +58,10 @@ public class PlayerResourceTest {
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
 
     @Mock
-    CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private CouchbaseDAO<ResourceKey> couchbaseDAO;
 
     @Mock
-    UriInfo uriInfo;
+    private UriInfo uriInfo;
 
     /**
      * set up test data before each test case is run
@@ -86,7 +91,7 @@ public class PlayerResourceTest {
     public void getPlayer_fetchesPlayerFromCouchbase() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = getPlayerDataStub(playerId, true, true);
+        Player playerFromCouchbase = getPlayerDataStub(playerId, true, true, false);
         when(couchbaseDAO.getDocument(any(), any()))
                 .thenReturn(Pair.of(playerFromCouchbase, 0L));
 
@@ -127,7 +132,7 @@ public class PlayerResourceTest {
     @Test
     public void createPlayer_persistsPlayerInCouchbase() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, true, true);
+        Player incomingPlayer = getPlayerDataStub(null, true, true, false);
         ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
 
         // execute
@@ -154,7 +159,7 @@ public class PlayerResourceTest {
     @Test
     public void createPlayer_playerRolesNotProvided() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, false, true);
+        Player incomingPlayer = getPlayerDataStub(null, false, true, false);
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
@@ -173,7 +178,7 @@ public class PlayerResourceTest {
     @Test
     public void createPlayer_playerAttributesNotProvided() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, true, false);
+        Player incomingPlayer = getPlayerDataStub(null, true, false, false);
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
@@ -194,7 +199,7 @@ public class PlayerResourceTest {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
         Long existingPlayerCAS = 123L;
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true);
+        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
         when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingPlayerInCouchbase, existingPlayerCAS));
 
         Metadata updatedMetadata = ImmutableMetadata.builder()
@@ -209,11 +214,11 @@ public class PlayerResourceTest {
                 .from(existingPlayerInCouchbase.getRoles().get(0))
                 .name("updated playerRole")
                 .build();
-
         Attribute updatedAttribute = ImmutableAttribute.builder()
                 .from(existingPlayerInCouchbase.getAttributes().get(0))
                 .history(ImmutableList.of(87))
                 .build();
+
         Player incomingPlayer = ImmutablePlayer.builder()
                 .from(existingPlayerInCouchbase)
                 .metadata(updatedMetadata)
@@ -223,20 +228,20 @@ public class PlayerResourceTest {
                 .build();
 
         ArgumentCaptor<Player> updatedPlayerCaptor = ArgumentCaptor.forClass(Player.class);
-        ArgumentCaptor<Long> existingPlayerCASCaptor = ArgumentCaptor.forClass(Long.class);
+        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
         Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
+        verify(couchbaseDAO).getDocument(resourceKeyCaptor.capture(), any());
+        ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
+        assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
 
-        verify(couchbaseDAO).updateDocument(any(), updatedPlayerCaptor.capture(), existingPlayerCASCaptor.capture());
+        verify(couchbaseDAO).updateDocument(eq(capturedResourceKey), updatedPlayerCaptor.capture(), eq(existingPlayerCAS));
         Player updatedPlayer = updatedPlayerCaptor.getValue();
-        assertNotNull(updatedPlayer.getLastModifiedDate());
-        assertNotNull(updatedPlayer.getCreatedBy());
-
-        assertEquals(existingPlayerCAS, existingPlayerCASCaptor.getValue());
+        assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
+        assertEquals(userPrincipal.getEmail(), updatedPlayer.getCreatedBy());
 
         assertEquals(HttpStatus.OK_200, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
@@ -259,7 +264,7 @@ public class PlayerResourceTest {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
         Long existingPlayerCAS = 123L;
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true);
+        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
         when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingPlayerInCouchbase, existingPlayerCAS));
 
         UUID incomingPlayerId = UUID.randomUUID();
@@ -317,7 +322,7 @@ public class PlayerResourceTest {
         assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
     }
 
-    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes) {
+    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes, boolean isExistingPlayer) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
         Metadata playerMetadata = ImmutableMetadata.builder()
                 .dateOfBirth(LocalDate.parse("16/08/2006", formatter))
@@ -332,6 +337,12 @@ public class PlayerResourceTest {
 
         if (playerId != null) {
             playerBuilder.id(playerId);
+        }
+
+        if (isExistingPlayer) {
+            Instant currentInstant = Instant.now();
+            Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
+            playerBuilder.lastModifiedDate(LocalDate.ofInstant(olderInstant, ZoneId.systemDefault()));
         }
 
         if (usePlayerRoles) {
@@ -351,6 +362,6 @@ public class PlayerResourceTest {
 
             playerBuilder.attributes(ImmutableList.of(playerAttribute));
         }
-        return playerBuilder.build();
+        return playerBuilder.clubId(UUID.randomUUID()).build();
     }
 }
