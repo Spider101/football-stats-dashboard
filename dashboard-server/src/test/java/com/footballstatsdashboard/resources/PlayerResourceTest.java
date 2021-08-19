@@ -362,6 +362,6 @@ public class PlayerResourceTest {
 
             playerBuilder.attributes(ImmutableList.of(playerAttribute));
         }
-        return playerBuilder.build();
+        return playerBuilder.clubId(UUID.randomUUID()).build();
     }
 }
