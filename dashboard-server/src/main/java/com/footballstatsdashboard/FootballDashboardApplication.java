@@ -12,11 +12,13 @@ import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.AuthTokenKeyProvider;
 import com.footballstatsdashboard.db.key.ClubKeyProvider;
+import com.footballstatsdashboard.db.key.MatchPerformanceKeyProvider;
 import com.footballstatsdashboard.db.key.PlayerKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.footballstatsdashboard.db.key.UserKeyProvider;
 import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
 import com.footballstatsdashboard.resources.ClubResource;
+import com.footballstatsdashboard.resources.MatchPerformanceResource;
 import com.footballstatsdashboard.resources.PlayerResource;
 import com.footballstatsdashboard.resources.UserResource;
 import io.dropwizard.Application;
@@ -77,6 +79,11 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
                 new ClubKeyProvider()
         );
 
+        CouchbaseDAO<ResourceKey> matchPerformanceDAO = new CouchbaseDAO<>(
+                couchbaseClientManager.getBucketContainer(clusterName, bucketName),
+                new MatchPerformanceKeyProvider()
+        );
+
         UserDAO<ResourceKey> userCouchbaseDAO = new UserDAO<>(
                 couchbaseClientManager.getBucketContainer(clusterName, bucketName),
                 couchbaseClientManager.getClusterContainer(clusterName),
@@ -92,6 +99,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         environment.jersey().register(new UserResource(userCouchbaseDAO, authTokenDAO));
         environment.jersey().register(new PlayerResource(playerCouchbaseDAO));
         environment.jersey().register(new ClubResource(clubCouchbaseDAO));
+        environment.jersey().register(new MatchPerformanceResource(matchPerformanceDAO));
 
         // Register OAuth authentication
         environment.jersey()
