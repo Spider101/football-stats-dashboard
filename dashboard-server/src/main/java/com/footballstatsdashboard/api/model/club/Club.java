@@ -93,4 +93,12 @@ public interface Club {
     @Nullable
     @InternalField
     String getCreatedBy();
+
+    /**
+     * represent the type of entity
+     */
+    @Nullable
+    @InternalField
+    @Value.Default
+    default String getType() { return "Club"; }
 }
