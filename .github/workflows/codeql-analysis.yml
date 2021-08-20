@@ -80,12 +80,6 @@ jobs:
         </toolchains>
         EOF
 
-    - name: Set Up JDK
-      uses: actions/setup-java@v2.2.0
-      with:
-        distribution: 'adopt-openj9'
-        java-version: ${{ matrix.java }}
-
     #- if: matrix.language == 'java'
     #  name: Build With Maven
     #  run: cd dashboard-server && mvn clean install
