@@ -33,6 +33,8 @@ jobs:
       fail-fast: false
       matrix:
         language: [ 'java', 'javascript' ]
+        os: [ ubuntu-latest ]
+        java: [8, 11]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
         # Learn more:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
@@ -40,6 +42,51 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - name: Set up cache for ~/.m2/repository
+      uses: actions/cache@2.1.6
+      with:
+        path: ~/.m2/repository
+        key: maven-${{ matrix.os }}-java${{ matrix.java }}-${{ hashFiles('**/pom.xml') }}
+        restore-keys:
+          maven-${{ matrix.os }}-java${{ matrix.java }}-
+          maven-${{ matrix.os }}-
+
+    - name: Install JDK To Be Used In ToolChain
+      if: ${{ matrix.java == '11' }}
+      uses: battila7/jdk-via-jabba@v1.3.0
+      with:
+        jdk: adopt-openj9@1.11.0-7
+        javaHomeEnvironmentVariable: TOOLCHAIN_JDK
+
+    - name: Set Up Toolchain XML
+      if: ${{ matrix.java == '11' }}
+      shell: bash
+      run: |
+        mkdir -p $HOME/.m2 \
+        && cat << EOF > $HOME/.m2/toolchains.xml
+        <?xml version="1.0" encoding="UTF8"?>
+        <toolchains>
+          <toolchain>
+            <type>jdk</type>
+              <provides>
+                <version>11</version>
+                <vendor>adopt</vendor>
+              </provides>
+              <configuration>
+                <jdkHome>${{ env.TOOLCHAIN_JDK }}</jdkHome>
+              </configuration>
+          </toolchain>
+        </toolchains>
+        EOF
+
+    - name: Set Up JDK
+      uses: actions/setup-java@v2.2.0
+      with:
+        java-version: ${{ matrix.java }}
+
+    - name: Build With Maven
+      run: mvn clean install
 
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
@@ -53,8 +100,8 @@ jobs:
 
     # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
     # If this step fails, then you should remove it and run the build manually (see below)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v1
+    #- name: Autobuild
+    #  uses: github/codeql-action/autobuild@v1
 
     # ℹ️ Command-line programs to run using the OS shell.
     # 📚 https://git.io/JvXDl
