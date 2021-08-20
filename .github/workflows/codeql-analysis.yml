@@ -83,7 +83,7 @@ jobs:
     - name: Set Up JDK
       uses: actions/setup-java@v2.2.0
       with:
-        distribution: 'adopt-open'
+        distribution: 'adopt'
         java-version: ${{ matrix.java }}
 
     - if: matrix.language == 'java'
