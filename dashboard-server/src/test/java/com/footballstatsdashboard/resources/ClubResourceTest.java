@@ -27,6 +27,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -253,6 +254,7 @@ public class ClubResourceTest {
                 .country("fake player country")
                 .role("fake player role")
                 .currentAbility(19)
+                .recentForm(new ArrayList<>())
                 .playerId(UUID.randomUUID())
                 .build();
         when(clubDAO.getPlayersInClub(eq(clubId))).thenReturn(ImmutableList.of(expectedSquadPlayer));
