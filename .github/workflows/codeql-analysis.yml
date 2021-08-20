@@ -52,13 +52,6 @@ jobs:
           maven-${{ matrix.os }}-java${{ matrix.java }}-
           maven-${{ matrix.os }}-
 
-    - name: Install JDK To Be Used In ToolChain
-      if: ${{ matrix.java == '11' }}
-      uses: battila7/jdk-via-jabba@v1.3.0
-      with:
-        jdk: adopt-openj9@11.0.5-1
-        javaHomeEnvironmentVariable: TOOLCHAIN_JDK
-
     - name: Set Up Toolchain XML
       if: ${{ matrix.java == '11' }}
       shell: bash
@@ -74,7 +67,7 @@ jobs:
                 <vendor>adoptopenjdk</vendor>
               </provides>
               <configuration>
-                <jdkHome>${{ env.TOOLCHAIN_JDK }}</jdkHome>
+                <jdkHome>${{ env.CODEQL_JAVA_HOME }}</jdkHome>
               </configuration>
           </toolchain>
         </toolchains>
