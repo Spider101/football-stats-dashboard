@@ -8,7 +8,7 @@ export default function() {
     const queryClient = useQueryClient();
     const { authData } = useUserAuth();
 
-    const { isLoading, data } = useQuery(
+    const { isLoading, data: squadPlayersData } = useQuery(
         [queryKeys.SQUAD_DATA, { authData }],
         fetchSquadHubData, {
             initialData: () => queryClient.getQueryData(queryKeys.SQUAD_DATA),
@@ -19,6 +19,12 @@ export default function() {
 
     return {
         isLoading,
-        data: isLoading ? [] : data
+        data: isLoading ? [] : squadPlayersData.map(squadPlayerData => ({
+            playerId: squadPlayerData.playerId,
+            name: squadPlayerData.name,
+            nationality: squadPlayerData.country,
+            current_ability: squadPlayerData.currentAbility,
+            role: squadPlayerData.role
+        }))
     };
 }
