@@ -35,7 +35,6 @@ import static com.footballstatsdashboard.core.utils.Constants.PLAYER_V1_BASE_PAT
 @Path(PLAYER_V1_BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public class PlayerResource {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerResource.class);
 
     private final CouchbaseDAO<ResourceKey> couchbaseDAO;
@@ -119,7 +118,8 @@ public class PlayerResource {
             this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer, existingPlayerEntity.getRight());
             return Response.ok(updatedPlayer).build();
         }
-        return Response.serverError().entity("Unable to update player with ID: " + incomingPlayer.getId().toString())
+        return Response.serverError()
+                .entity("Unable to update player with ID: " + incomingPlayer.getId().toString())
                 .build();
     }
 
@@ -129,7 +129,7 @@ public class PlayerResource {
             @Auth @PathParam(PLAYER_ID) UUID playerId) {
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("deletePlayer() request for player with ID: {}", playerId.toString());
+            LOGGER.info("deletePlayer() request for player with ID: {}", playerId);
         }
 
         ResourceKey resourceKey = new ResourceKey(playerId);

@@ -7,13 +7,16 @@ import com.footballstatsdashboard.core.service.auth.CustomAuthenticator;
 import com.footballstatsdashboard.core.service.auth.CustomAuthorizer;
 import com.footballstatsdashboard.core.utils.PlayerInternalModule;
 import com.footballstatsdashboard.db.AuthTokenDAO;
+import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.AuthTokenKeyProvider;
+import com.footballstatsdashboard.db.key.ClubKeyProvider;
 import com.footballstatsdashboard.db.key.PlayerKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.footballstatsdashboard.db.key.UserKeyProvider;
 import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
+import com.footballstatsdashboard.resources.ClubResource;
 import com.footballstatsdashboard.resources.PlayerResource;
 import com.footballstatsdashboard.resources.UserResource;
 import io.dropwizard.Application;
@@ -68,6 +71,12 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
                 new PlayerKeyProvider()
         );
 
+        ClubDAO<ResourceKey> clubCouchbaseDAO = new ClubDAO<>(
+                couchbaseClientManager.getBucketContainer(clusterName, bucketName),
+                couchbaseClientManager.getClusterContainer(clusterName),
+                new ClubKeyProvider()
+        );
+
         UserDAO<ResourceKey> userCouchbaseDAO = new UserDAO<>(
                 couchbaseClientManager.getBucketContainer(clusterName, bucketName),
                 couchbaseClientManager.getClusterContainer(clusterName),
@@ -82,6 +91,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         // setup resources
         environment.jersey().register(new UserResource(userCouchbaseDAO, authTokenDAO));
         environment.jersey().register(new PlayerResource(playerCouchbaseDAO));
+        environment.jersey().register(new ClubResource(clubCouchbaseDAO));
 
         // Register OAuth authentication
         environment.jersey()

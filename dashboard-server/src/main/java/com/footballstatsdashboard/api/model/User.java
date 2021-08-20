@@ -100,4 +100,12 @@ public interface User extends Principal {
     @JsonIgnore
     @Value.Derived
     default String getName() { return getEmail(); }
+
+    /**
+     * represent the type of entity
+     */
+    @Nullable
+    @InternalField
+    @Value.Default
+    default String getType() { return "User"; }
 }

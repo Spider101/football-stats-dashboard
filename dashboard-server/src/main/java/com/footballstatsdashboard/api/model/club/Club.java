@@ -1,4 +1,4 @@
-package com.footballstatsdashboard.api.model;
+package com.footballstatsdashboard.api.model.club;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -6,64 +6,63 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
-import com.footballstatsdashboard.api.model.player.Ability;
-import com.footballstatsdashboard.api.model.player.Attribute;
-import com.footballstatsdashboard.api.model.player.Role;
 import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
-import com.footballstatsdashboard.api.model.player.Metadata;
-
 import javax.annotation.Nullable;
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 @Value.Immutable
 @JsonSerialize
-@JsonDeserialize(as = ImmutablePlayer.class)
+@JsonDeserialize(as = ImmutableClub.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Value.Style(jdkOnly = true) // Required if the below entity will be used in a Map, List, Set or any other collection
-public interface Player {
+public interface Club {
 
     /**
-     * player ID
+     * club ID
      */
     @Valid
     @Value.Default
     default UUID getId() { return UUID.randomUUID(); }
 
     /**
-     * Information about the player
+     * club name
      */
     @Valid
-    Metadata getMetadata();
+    String getName();
 
     /**
-     * Information about the player's role in the team
+     * club's yearly transfer budget
      */
     @Valid
-    List<Role> getRoles();
+    BigDecimal getTransferBudget();
 
     /**
-     * Information about the player's ability, both current and past data
-     */
-    @Valid Ability getAbility();
-
-    /**
-     * Information about the player's attributes
+     * club's yearly wage budget
      */
     @Valid
-    @Size(min = 1)
-    List<Attribute> getAttributes();
+    BigDecimal getWageBudget();
 
     /**
-     * ID of club the player belongs to
+     * club's income in a year
      */
     @Valid
-    UUID getClubId();
+    BigDecimal getIncome();
+
+    /**
+     * club's expenditure in a year
+     */
+    @Valid
+    BigDecimal getExpenditure();
+
+    /**
+     * ID of user the club belongs to
+     */
+    @Valid
+    UUID getUserId();
 
     // TODO: 12/05/21 update all local date times to zoned date times to involve timezones as well
     /**
@@ -101,5 +100,5 @@ public interface Player {
     @Nullable
     @InternalField
     @Value.Default
-    default String getType() { return "Player"; }
+    default String getType() { return "Club"; }
 }
