@@ -34,7 +34,7 @@ jobs:
       matrix:
         language: [ 'java', 'javascript' ]
         os: [ ubuntu-latest ]
-        java: [8, 11]
+        java: [11]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
         # Learn more:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
@@ -83,9 +83,11 @@ jobs:
     - name: Set Up JDK
       uses: actions/setup-java@v2.2.0
       with:
+        distribution: 'adopt-open'
         java-version: ${{ matrix.java }}
 
-    - name: Build With Maven
+    - if: matrix.language == 'java'
+      name: Build With Maven
       run: mvn clean install
 
     # Initializes the CodeQL tools for scanning.
