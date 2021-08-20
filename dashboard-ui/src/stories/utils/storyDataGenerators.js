@@ -1,11 +1,21 @@
 import faker from 'faker';
 import _ from 'lodash';
-import { allMatchPerformanceTableHeaders, allSquadHubTableHeaders } from '../../utils';
+import { allMatchPerformanceTableHeaders } from '../../utils';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
 const NUM_MONTHS = 6;
+
+const allSquadHubTableHeaders = [
+    { id: 'name', type: 'string' },
+    { id: 'nationality', type: 'image' },
+    { id: 'role', type: 'string' },
+    { id: 'wages', type: 'string' },
+    { id: 'form', type: 'chart' },
+    { id: 'morale', type: 'icon' },
+    { id: 'current_ability', type: 'number' }
+];
 
 const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * (upper - lower)) + lower;
 

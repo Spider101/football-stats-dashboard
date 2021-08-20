@@ -18,16 +18,15 @@ export const queryKeys = {
     USER_DATA: 'userData'
 };
 
-// TODO: this will be returned from the service in future; remove this then
-export const allSquadHubTableHeaders = [
-    { id: 'name', type: 'string' },
-    { id: 'nationality', type: 'image' },
-    { id: 'role', type: 'string' },
-    { id: 'wages', type: 'string' },
-    { id: 'form', type: 'chart' },
-    { id: 'morale', type: 'icon' },
-    { id: 'current_ability', type: 'number' }
-];
+export const squadTableHeaderDisplayTypeMap = {
+    name: 'string',
+    nationality: 'image',
+    role: 'string',
+    wages: 'string',
+    form: 'chart',
+    morale: 'icon',
+    current_ability: 'number'
+};
 
 // TODO: this will be returned from the service in future; remove this then
 export const allMatchPerformanceTableHeaders = [
