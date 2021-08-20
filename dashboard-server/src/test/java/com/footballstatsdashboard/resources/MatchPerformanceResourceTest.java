@@ -163,7 +163,7 @@ public class MatchPerformanceResourceTest {
                 true);
         int updatedAppearances = existingMatchPerformanceInCouchbase.getAppearances() + 10;
         MatchPerformance incomingMatchPerformance = ImmutableMatchPerformance.builder()
-                .from(getMatchPerformanceDataStub(null, false))
+                .from(getMatchPerformanceDataStub(existingMatchPerformanceId, false))
                 .appearances(updatedAppearances)
                 .build();
 
