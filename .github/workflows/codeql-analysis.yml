@@ -56,7 +56,7 @@ jobs:
       if: ${{ matrix.java == '11' }}
       uses: battila7/jdk-via-jabba@v1.3.0
       with:
-        jdk: adopt-openj9@1.11.0-7
+        jdk: adopt-openj9@1.11.0-11
         javaHomeEnvironmentVariable: TOOLCHAIN_JDK
 
     - name: Set Up Toolchain XML
