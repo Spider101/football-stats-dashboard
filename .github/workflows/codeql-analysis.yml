@@ -71,7 +71,7 @@ jobs:
             <type>jdk</type>
               <provides>
                 <version>11</version>
-                <vendor>adopt</vendor>
+                <vendor>adoptopenjdk</vendor>
               </provides>
               <configuration>
                 <jdkHome>${{ env.TOOLCHAIN_JDK }}</jdkHome>
@@ -83,7 +83,7 @@ jobs:
     - name: Set Up JDK
       uses: actions/setup-java@v2.2.0
       with:
-        distribution: 'adopt'
+        distribution: 'adopt-openj9'
         java-version: ${{ matrix.java }}
 
     - if: matrix.language == 'java'
