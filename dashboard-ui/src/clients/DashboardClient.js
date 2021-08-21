@@ -18,9 +18,14 @@ export const fetchPlayerData = async ({ queryKey }) => {
 
 export const fetchPlayerPerformanceData = async ({ queryKey }) => {
     const [_key, { playerId, authData }] = queryKey;
-    const res = await fetchDataFromEndpoint(`players/${playerId}/performance`, 'GET', {
-        Authorization: `BEARER ${authData.id}`
-    });
+    const competitionId = '8c853fa8-e4ab-47a5-98c2-fe01a15c29d2';
+    const res = await fetchDataFromEndpoint(
+        `match-performance/lookup/${playerId}?competitionId=${competitionId}`,
+        'GET',
+        {
+            Authorization: `BEARER ${authData.id}`
+        }
+    );
 
     const playerPerformanceData = await res.json();
     return playerPerformanceData.map(performanceData =>
@@ -29,6 +34,9 @@ export const fetchPlayerPerformanceData = async ({ queryKey }) => {
             .reduce((result, key) => {
                 if (key === 'competitionId') {
                     result['id'] = performanceData[key];
+                    return result;
+                } else if (key === 'matchRating') {
+                    result['matchRatingHistory'] = performanceData[key].history;
                     return result;
                 }
                 result[key] = performanceData[key];
