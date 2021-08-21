@@ -9,6 +9,7 @@ import com.footballstatsdashboard.core.utils.PlayerInternalModule;
 import com.footballstatsdashboard.db.AuthTokenDAO;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.MatchPerformanceDAO;
 import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.AuthTokenKeyProvider;
 import com.footballstatsdashboard.db.key.ClubKeyProvider;
@@ -79,8 +80,9 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
                 new ClubKeyProvider()
         );
 
-        CouchbaseDAO<ResourceKey> matchPerformanceDAO = new CouchbaseDAO<>(
+        MatchPerformanceDAO<ResourceKey> matchPerformanceDAO = new MatchPerformanceDAO<>(
                 couchbaseClientManager.getBucketContainer(clusterName, bucketName),
+                couchbaseClientManager.getClusterContainer(clusterName),
                 new MatchPerformanceKeyProvider()
         );
 

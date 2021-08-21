@@ -3,11 +3,8 @@ package com.footballstatsdashboard.resources;
 import com.footballstatsdashboard.api.model.ImmutableMatchPerformance;
 import com.footballstatsdashboard.api.model.MatchPerformance;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.matchPerformance.ImmutableMatchRating;
-import com.footballstatsdashboard.api.model.matchPerformance.MatchRating;
-import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.MatchPerformanceDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
-import com.google.common.collect.ImmutableList;
 import io.dropwizard.auth.Auth;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -34,16 +31,17 @@ import java.util.UUID;
 import static com.footballstatsdashboard.core.utils.Constants.MATCH_PERFORMANCE_ID;
 import static com.footballstatsdashboard.core.utils.Constants.MATCH_PERFORMANCE_ID_PATH;
 import static com.footballstatsdashboard.core.utils.Constants.MATCH_PERFORMANCE_V1_BASE_PATH;
+import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
 
 @Path(MATCH_PERFORMANCE_V1_BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public class MatchPerformanceResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
-    private final CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private final MatchPerformanceDAO<ResourceKey> matchPerformanceDAO;
 
-    public MatchPerformanceResource(CouchbaseDAO<ResourceKey> couchbaseDAO) {
-        this.couchbaseDAO = couchbaseDAO;
+    public MatchPerformanceResource(MatchPerformanceDAO<ResourceKey> matchPerformanceDAO) {
+        this.matchPerformanceDAO = matchPerformanceDAO;
     }
 
     @GET
@@ -57,7 +55,7 @@ public class MatchPerformanceResource {
 
         ResourceKey resourceKey = new ResourceKey(matchPerformanceId);
         MatchPerformance matchPerformance =
-                this.couchbaseDAO.getDocument(resourceKey, MatchPerformance.class).getLeft();
+                this.matchPerformanceDAO.getDocument(resourceKey, MatchPerformance.class).getLeft();
         return Response.ok().entity(matchPerformance).build();
     }
 
@@ -81,7 +79,7 @@ public class MatchPerformanceResource {
                 .build();
 
         ResourceKey resourceKey = new ResourceKey(newMatchPerformance.getId());
-        this.couchbaseDAO.insertDocument(resourceKey, newMatchPerformance);
+        this.matchPerformanceDAO.insertDocument(resourceKey, newMatchPerformance);
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newMatchPerformance.getId().toString()).build();
         return Response.created(location).entity(new HashMap<>()).build();
@@ -98,7 +96,7 @@ public class MatchPerformanceResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(existingMatchPerformanceId);
-        Pair<MatchPerformance, Long> existingMatchPerformanceEntity = this.couchbaseDAO.getDocument(resourceKey,
+        Pair<MatchPerformance, Long> existingMatchPerformanceEntity = this.matchPerformanceDAO.getDocument(resourceKey,
                 MatchPerformance.class);
         MatchPerformance existingMatchPerformance = existingMatchPerformanceEntity.getLeft();
 
@@ -120,7 +118,7 @@ public class MatchPerformanceResource {
                     .lastModifiedDate(LocalDate.now())
                     .build();
 
-            this.couchbaseDAO.updateDocument(resourceKey, updatedMatchPerformance,
+            this.matchPerformanceDAO.updateDocument(resourceKey, updatedMatchPerformance,
                     existingMatchPerformanceEntity.getRight());
             return Response.ok().entity(updatedMatchPerformance).build();
         }

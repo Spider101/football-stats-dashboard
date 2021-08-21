@@ -7,7 +7,7 @@ import com.footballstatsdashboard.api.model.MatchPerformance;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.matchPerformance.ImmutableMatchRating;
 import com.footballstatsdashboard.api.model.matchPerformance.MatchRating;
-import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.MatchPerformanceDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
@@ -50,7 +50,7 @@ public class MatchPerformanceResourceTest {
     private MatchPerformanceResource matchPerformanceResource;
 
     @Mock
-    private CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private MatchPerformanceDAO<ResourceKey> matchPerformanceDAO;
 
     @Mock
     private UriInfo uriInfo;
@@ -70,7 +70,7 @@ public class MatchPerformanceResourceTest {
                 .firstName("")
                 .lastName("")
                 .build();
-        matchPerformanceResource = new MatchPerformanceResource(couchbaseDAO);
+        matchPerformanceResource = new MatchPerformanceResource(matchPerformanceDAO);
     }
 
     /**
@@ -81,15 +81,15 @@ public class MatchPerformanceResourceTest {
     public void getMatchPerformance_fetchesMatchPerformanceDataFromCouchbase() {
         // setup
         UUID matchPerformanceId = UUID.randomUUID();
-        MatchPerformance matchPerformanceFromCouchbase = getMatchPerformanceDataStub(matchPerformanceId, false);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(matchPerformanceFromCouchbase, 123L));
+        MatchPerformance matchPerformanceFromCouchbase = getMatchPerformanceDataStub(matchPerformanceId, null, null, false);
+        when(matchPerformanceDAO.getDocument(any(), any())).thenReturn(Pair.of(matchPerformanceFromCouchbase, 123L));
 
         // execute
         Response matchPerformanceResponse = matchPerformanceResource.getMatchPerformance(matchPerformanceId);
 
         // TODO: 19/08/21 refactor common assertions into an assertion helper
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
+        verify(matchPerformanceDAO).getDocument(any(), any());
 
         assertNotNull(matchPerformanceResponse);
         assertEquals(HttpStatus.OK_200, matchPerformanceResponse.getStatus());
@@ -108,14 +108,14 @@ public class MatchPerformanceResourceTest {
     public void getMatchPerformance_matchPerformanceNotFoundInCouchbase() {
         // setup
         UUID invalidMatchPerformanceId = UUID.randomUUID();
-        when(couchbaseDAO.getDocument(any(), any()))
+        when(matchPerformanceDAO.getDocument(any(), any()))
                 .thenThrow(new RuntimeException("Unable to find document with ID: " + invalidMatchPerformanceId));
 
         // execute
         matchPerformanceResource.getMatchPerformance(invalidMatchPerformanceId);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
+        verify(matchPerformanceDAO).getDocument(any(), any());
     }
 
     /**
@@ -125,7 +125,7 @@ public class MatchPerformanceResourceTest {
     @Test
     public void createMatchPerformance_persistsMatchPerformanceInCouchbase() {
         // setup
-        MatchPerformance incomingMatchPerformance = getMatchPerformanceDataStub(null, false);
+        MatchPerformance incomingMatchPerformance = getMatchPerformanceDataStub(null, null, null, false);
         ArgumentCaptor<MatchPerformance> newMatchPerformanceCaptor = ArgumentCaptor.forClass(MatchPerformance.class);
 
         // execute
@@ -133,7 +133,7 @@ public class MatchPerformanceResourceTest {
                 incomingMatchPerformance, uriInfo);
 
         // assert
-        verify(couchbaseDAO).insertDocument(any(), newMatchPerformanceCaptor.capture());
+        verify(matchPerformanceDAO).insertDocument(any(), newMatchPerformanceCaptor.capture());
         MatchPerformance capturedMatchPerformance = newMatchPerformanceCaptor.getValue();
         assertNotNull(capturedMatchPerformance);
         assertNotNull(capturedMatchPerformance.getCreatedDate());
@@ -160,15 +160,15 @@ public class MatchPerformanceResourceTest {
         UUID existingMatchPerformanceId = UUID.randomUUID();
         Long existingMatchPerformanceCAS = 123L;
         MatchPerformance existingMatchPerformanceInCouchbase = getMatchPerformanceDataStub(existingMatchPerformanceId,
-                true);
+                null, null, true);
         int updatedAppearances = existingMatchPerformanceInCouchbase.getAppearances() + 10;
         MatchPerformance incomingMatchPerformance = ImmutableMatchPerformance.builder()
-                .from(getMatchPerformanceDataStub(existingMatchPerformanceId, false))
+                .from(getMatchPerformanceDataStub(existingMatchPerformanceId, null, null, false))
                 .appearances(updatedAppearances)
                 .build();
 
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingMatchPerformanceInCouchbase,
+        when(matchPerformanceDAO.getDocument(any(), any())).thenReturn(Pair.of(existingMatchPerformanceInCouchbase,
                 existingMatchPerformanceCAS));
 
         ArgumentCaptor<MatchPerformance> matchPerformanceToBeUpdatedCaptor =
@@ -179,11 +179,11 @@ public class MatchPerformanceResourceTest {
                 matchPerformanceResource.updateMatchPerformance(existingMatchPerformanceId, incomingMatchPerformance);
 
         // assert
-        verify(couchbaseDAO).getDocument(resourceKeyCaptor.capture(), any());
+        verify(matchPerformanceDAO).getDocument(resourceKeyCaptor.capture(), any());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(existingMatchPerformanceId, capturedResourceKey.getResourceId());
 
-        verify(couchbaseDAO).updateDocument(eq(capturedResourceKey), matchPerformanceToBeUpdatedCaptor.capture(),
+        verify(matchPerformanceDAO).updateDocument(eq(capturedResourceKey), matchPerformanceToBeUpdatedCaptor.capture(),
                 eq(existingMatchPerformanceCAS));
         MatchPerformance matchPerformanceToBeUpdated = matchPerformanceToBeUpdatedCaptor.getValue();
         assertNotNull(matchPerformanceToBeUpdated);
@@ -210,8 +210,8 @@ public class MatchPerformanceResourceTest {
         // setup
         UUID existingMatchPerformanceId = UUID.randomUUID();
         Long existingMatchPerformanceCAS = 123L;
-        MatchPerformance existingMatchPerformance = getMatchPerformanceDataStub(existingMatchPerformanceId, true);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingMatchPerformance,
+        MatchPerformance existingMatchPerformance = getMatchPerformanceDataStub(existingMatchPerformanceId, null, null, true);
+        when(matchPerformanceDAO.getDocument(any(), any())).thenReturn(Pair.of(existingMatchPerformance,
                 existingMatchPerformanceCAS));
 
         UUID incorrectMatchPerformanceId = UUID.randomUUID();
@@ -225,8 +225,8 @@ public class MatchPerformanceResourceTest {
                 matchPerformanceResource.updateMatchPerformance(existingMatchPerformanceId, incomingMatchPerformance);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
-        verify(couchbaseDAO, never()).updateDocument(any(), any(), anyLong());
+        verify(matchPerformanceDAO).getDocument(any(), any());
+        verify(matchPerformanceDAO, never()).updateDocument(any(), any(), anyLong());
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, matchPerformanceResponse.getStatus());
         assertTrue(matchPerformanceResponse.getEntity().toString().contains(incorrectMatchPerformanceId.toString()));
@@ -245,7 +245,7 @@ public class MatchPerformanceResourceTest {
         Response matchPerformanceResponse = matchPerformanceResource.deleteMatchPerformance(matchPerformanceId);
 
         // assert
-        verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
+        verify(matchPerformanceDAO).deleteDocument(resourceKeyCaptor.capture());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertNotNull(capturedResourceKey);
         assertEquals(matchPerformanceId, capturedResourceKey.getResourceId());
