@@ -254,14 +254,75 @@ public class MatchPerformanceResourceTest {
         assertEquals(HttpStatus.NO_CONTENT_204, matchPerformanceResponse.getStatus());
     }
 
-    private MatchPerformance getMatchPerformanceDataStub(UUID matchPerformanceId, boolean isExisting) {
+    /**
+     * given a valid player id and competition id, tests that the associated match performance entity is looked up in
+     * couchbase server and returned in the response
+     */
+    @Test
+    public void lookupMatchPerformanceByPlayerId_fetchesMatchPerformanceDataFromCouchbase() {
+        // setup
+        UUID playerId = UUID.randomUUID();
+        UUID competitionId = UUID.randomUUID();
+        UUID expectedMatchPerformanceId = UUID.randomUUID();
+        MatchPerformance matchPerformanceFromCouchbase = getMatchPerformanceDataStub(expectedMatchPerformanceId,
+                playerId, competitionId, false);
+        when(matchPerformanceDAO.lookupMatchPerformanceByPlayerId(any(), any())).thenReturn(matchPerformanceFromCouchbase);
+
+        // execute
+        Response matchPerformanceResponse = matchPerformanceResource.lookupMatchPerformanceByPlayerId(playerId,
+                competitionId);
+
+        // assert
+        verify(matchPerformanceDAO).lookupMatchPerformanceByPlayerId(eq(playerId), eq(competitionId));
+
+        assertNotNull(matchPerformanceResponse);
+        assertEquals(HttpStatus.OK_200, matchPerformanceResponse.getStatus());
+        assertNotNull(matchPerformanceResponse.getEntity());
+
+        MatchPerformance matchPerformanceFromResponse =
+                OBJECT_MAPPER.convertValue(matchPerformanceResponse.getEntity(), MatchPerformance.class);
+        assertEquals(playerId, matchPerformanceFromResponse.getPlayerId());
+        assertEquals(competitionId, matchPerformanceFromResponse.getCompetitionId());
+        assertEquals(expectedMatchPerformanceId, matchPerformanceFromResponse.getId());
+    }
+
+    @Test
+    public void lookupMatchPerformanceByPlayerId_noMatchPerformanceDataFound() {
+        // setup
+        UUID playerId = UUID.randomUUID();
+        UUID competitionId = UUID.randomUUID();
+//        UUID expectedMatchPerformanceId = UUID.randomUUID();
+//        MatchPerformance matchPerformanceFromCouchbase = getMatchPerformanceDataStub(expectedMatchPerformanceId,
+//                playerId, competitionId, false);
+        when(matchPerformanceDAO.lookupMatchPerformanceByPlayerId(any(), any())).thenReturn(null);
+
+        // execute
+        Response matchPerformanceResponse = matchPerformanceResource.lookupMatchPerformanceByPlayerId(playerId,
+                competitionId);
+
+        // assert
+        verify(matchPerformanceDAO).lookupMatchPerformanceByPlayerId(eq(playerId), eq(competitionId));
+
+        assertNotNull(matchPerformanceResponse);
+        assertEquals(HttpStatus.NOT_FOUND_404, matchPerformanceResponse.getStatus());
+//        assertNotNull(matchPerformanceResponse.getEntity());
+
+//        MatchPerformance matchPerformanceFromResponse =
+//                OBJECT_MAPPER.convertValue(matchPerformanceResponse.getEntity(), MatchPerformance.class);
+//        assertEquals(playerId, matchPerformanceFromResponse.getPlayerId());
+//        assertEquals(competitionId, matchPerformanceFromResponse.getCompetitionId());
+//        assertEquals(expectedMatchPerformanceId, matchPerformanceFromResponse.getId());
+    }
+
+    private MatchPerformance getMatchPerformanceDataStub(UUID matchPerformanceId, UUID playerId, UUID competitionId,
+                                                         boolean isExisting) {
         MatchRating matchRatingFromCouchbase = ImmutableMatchRating.builder()
                 .current(7f)
                 .history(ImmutableList.of(3.55f, 4f))
                 .build();
         ImmutableMatchPerformance.Builder matchPerformanceBuilder = ImmutableMatchPerformance.builder()
-                .playerId(UUID.randomUUID())
-                .competitionId(UUID.randomUUID())
+                .playerId(playerId != null ? playerId : UUID.randomUUID())
+                .competitionId(competitionId != null ? competitionId : UUID.randomUUID())
                 .appearances(10)
                 .goals(10)
                 .dribbles(10)

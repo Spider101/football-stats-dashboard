@@ -18,6 +18,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -142,8 +143,27 @@ public class MatchPerformanceResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(matchPerformanceId);
-        this.couchbaseDAO.deleteDocument(resourceKey);
+        this.matchPerformanceDAO.deleteDocument(resourceKey);
 
         return Response.noContent().build();
+    }
+
+    @GET
+    @Path("lookup/{playerId}")
+    public Response lookupMatchPerformanceByPlayerId(
+            @Auth @PathParam(PLAYER_ID) UUID playerId,
+            @QueryParam("competitionId") UUID competitionId) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("getMatchPerformanceByPlayerId() request made!");
+        }
+        MatchPerformance matchPerformance = this.matchPerformanceDAO.lookupMatchPerformanceByPlayerId(playerId,
+                competitionId);
+        if (matchPerformance != null) {
+            return Response.ok().entity(matchPerformance).build();
+        }
+
+        LOGGER.error("Unable to fetch match performance data associated with playerId: {} and competitionId: {}",
+                playerId, competitionId);
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
 }
