@@ -11,7 +11,6 @@ import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +35,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -89,8 +87,7 @@ public class ClubResourceTest {
         // setup
         UUID clubId = UUID.randomUUID();
         Club clubFromCouchbase = getClubDataStub(clubId, false);
-        when(clubDAO.getDocument(any(), any()))
-                .thenReturn(Pair.of(clubFromCouchbase, 0L));
+        when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
 
         // execute
         Response clubResponse = clubResource.getClub(clubId);
@@ -161,14 +158,13 @@ public class ClubResourceTest {
     public void updateClub_updatesClubInCouchbase() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Long existingClubCAS = 123L;
         Club existingClubInCouchbase = getClubDataStub(existingClubId, true);
         Club incomingClub = ImmutableClub.builder().from(getClubDataStub(existingClubId, false))
                 .wageBudget(BigDecimal.valueOf(300))
                 .build();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
-        when(clubDAO.getDocument(any(), any())).thenReturn(Pair.of(existingClubInCouchbase, existingClubCAS));
+        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
 
         // execute
         Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
@@ -178,7 +174,7 @@ public class ClubResourceTest {
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(existingClubId, capturedResourceKey.getResourceId());
 
-        verify(clubDAO).updateDocument(eq(capturedResourceKey), updatedClubCaptor.capture(), eq(existingClubCAS));
+        verify(clubDAO).updateDocument(eq(capturedResourceKey), updatedClubCaptor.capture());
         Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
         assertNotNull(clubToBeUpdatedInCouchbase);
         assertEquals(userPrincipal.getEmail(), clubToBeUpdatedInCouchbase.getCreatedBy());
@@ -201,9 +197,8 @@ public class ClubResourceTest {
     public void updateClub_incomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Long existingClubCas = 123L;
         Club existingClubInCouchbase = getClubDataStub(existingClubId, true);
-        when(clubDAO.getDocument(any(), any())).thenReturn(Pair.of(existingClubInCouchbase, existingClubCas));
+        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
 
         UUID incorrectIncomingClubId = UUID.randomUUID();
         Club incomingClub = ImmutableClub.builder()
@@ -216,7 +211,7 @@ public class ClubResourceTest {
 
         // assert
         verify(clubDAO).getDocument(any(), any());
-        verify(clubDAO, never()).updateDocument(any(), any(), anyLong());
+        verify(clubDAO, never()).updateDocument(any(), any());
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, clubResponse.getStatus());
         assertTrue(clubResponse.getEntity().toString().contains(incorrectIncomingClubId.toString()));

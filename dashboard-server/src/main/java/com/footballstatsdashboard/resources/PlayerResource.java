@@ -52,7 +52,7 @@ public class PlayerResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(playerId);
-        Player player = this.couchbaseDAO.getDocument(resourceKey, Player.class).getLeft();
+        Player player = this.couchbaseDAO.getDocument(resourceKey, Player.class);
         return Response.ok(player).build();
     }
 
@@ -98,9 +98,8 @@ public class PlayerResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(playerId);
-        Pair<Player, Long> existingPlayerEntity = this.couchbaseDAO.getDocument(resourceKey, Player.class);
+        Player existingPlayer = this.couchbaseDAO.getDocument(resourceKey, Player.class);
 
-        Player existingPlayer = existingPlayerEntity.getLeft();
         // incoming player's basic details should match with that of the existing player
         if (existingPlayer.getId().equals(incomingPlayer.getId())) {
 
@@ -115,7 +114,7 @@ public class PlayerResource {
                     .createdBy(user.getEmail());
 
             Player updatedPlayer = updatedPlayerBuilder.build();
-            this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer, existingPlayerEntity.getRight());
+            this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer);
             return Response.ok(updatedPlayer).build();
         }
         return Response.serverError()

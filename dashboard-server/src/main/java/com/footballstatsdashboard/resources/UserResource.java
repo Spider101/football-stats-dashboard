@@ -62,7 +62,7 @@ public class UserResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(userId);
-        User user = this.userDAO.getDocument(resourceKey, User.class).getLeft();
+        User user = this.userDAO.getDocument(resourceKey, User.class);
         return Response.ok(user).build();
     }
 
@@ -127,10 +127,10 @@ public class UserResource {
 
         // password is verified, check if an auth token exists for the user, touch the lastAccessDate property
         // and then return it
-        Optional<Pair<AuthToken, Long>> authToken = this.authTokenDAO.getAuthTokenForUser(validUser.getId());
+        Optional<AuthToken> authToken = this.authTokenDAO.getAuthTokenForUser(validUser.getId());
 
         if (authToken != null && authToken.isPresent()) {
-            AuthToken validAuthToken = authToken.get().getLeft();
+            AuthToken validAuthToken = authToken.get();
 
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Existing Auth Token: " + validAuthToken.getId() + " found for userId: "

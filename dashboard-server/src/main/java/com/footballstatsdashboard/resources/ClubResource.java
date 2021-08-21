@@ -54,7 +54,7 @@ public class ClubResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(clubId);
-        Club club = this.clubDAO.getDocument(resourceKey, Club.class).getLeft();
+        Club club = this.clubDAO.getDocument(resourceKey, Club.class);
         return Response.ok().entity(club).build();
     }
 
@@ -95,9 +95,8 @@ public class ClubResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(existingClubId);
-        Pair<Club, Long> existingClubEntity = this.clubDAO.getDocument(resourceKey, Club.class);
+        Club existingClub = this.clubDAO.getDocument(resourceKey, Club.class);
 
-        Club existingClub = existingClubEntity.getLeft();
         if (existingClub.getId().equals(incomingClub.getId())) {
 
             // TODO: 15/04/21 add validations by checking incoming club data against existing one
@@ -111,7 +110,7 @@ public class ClubResource {
                     .lastModifiedDate(LocalDate.now())
                     .build();
 
-            this.clubDAO.updateDocument(resourceKey, updatedClub, existingClubEntity.getRight());
+            this.clubDAO.updateDocument(resourceKey, updatedClub);
             return Response.ok().entity(updatedClub).build();
         }
 

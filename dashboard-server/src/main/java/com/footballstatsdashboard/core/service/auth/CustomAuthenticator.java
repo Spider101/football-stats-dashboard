@@ -42,21 +42,19 @@ public class CustomAuthenticator implements Authenticator<String, User> {
 
         // retrieve the auth token entity using the authTokenId
         ResourceKey authTokenKey = new ResourceKey(validAuthToken);
-        Pair<AuthToken, Long> authTokenEntity = this.authTokenDAO.getDocument(authTokenKey, AuthToken.class);
+        AuthToken authToken = this.authTokenDAO.getDocument(authTokenKey, AuthToken.class);
 
-        if (authTokenEntity.getLeft() != null) {
-            AuthToken authToken = authTokenEntity.getLeft();
-
+        if (authToken != null) {
             // check if access token has expired
             Duration duration = Duration.between(authToken.getLastAccessUTC(), Instant.now());
             if (duration.getSeconds() <=  AUTH_TOKEN_EXPIRE_TIME_SECONDS) {
                 // touch access token to push expiration
-                this.authTokenDAO.updateLastAccessTime(authTokenKey, authTokenEntity);
+                this.authTokenDAO.updateLastAccessTime(authTokenKey, authToken);
 
                 // return the user entity as the authenticated principal
                 ResourceKey userKey = new ResourceKey(authToken.getUserId());
-                Pair<User, Long> userEntity = this.userDAO.getDocument(userKey, User.class);
-                return Optional.of(userEntity.getLeft());
+                User user = this.userDAO.getDocument(userKey, User.class);
+                return Optional.of(user);
             }
         }
         return Optional.empty();

@@ -11,7 +11,6 @@ import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +74,7 @@ public class UserResourceTest {
         // setup
         UUID userId = UUID.randomUUID();
         User userFromCouchbase = getUserDataStub(userId, false);
-        when(userDAO.getDocument(any(), any())).thenReturn(Pair.of(userFromCouchbase, 0L));
+        when(userDAO.getDocument(any(), any())).thenReturn(userFromCouchbase);
 
         // execute
         Response userResponse = userResource.getUser(userId);
@@ -270,9 +269,9 @@ public class UserResourceTest {
                 .userId(userId)
                 .lastAccessUTC(instantInPast)
                 .build();
-        ArgumentCaptor<Pair<AuthToken, Long>> existingAuthTokenCaptor = ArgumentCaptor.forClass(Pair.class);
+        ArgumentCaptor<AuthToken> existingAuthTokenCaptor = ArgumentCaptor.forClass(AuthToken.class);
         when(authTokenDAO.getAuthTokenForUser(eq(userId)))
-                .thenReturn(Optional.of(Pair.of(existingAuthToken, 0L)));
+                .thenReturn(Optional.of(existingAuthToken));
 
         // execute
         Response userResponse = userResource.authenticateUser(userCredentials);
@@ -283,7 +282,7 @@ public class UserResourceTest {
         verify(authTokenDAO, never()).insertDocument(any(), any());
 
         verify(authTokenDAO).updateLastAccessTime(any(), existingAuthTokenCaptor.capture());
-        AuthToken capturedExistingAuthToken = existingAuthTokenCaptor.getValue().getLeft();
+        AuthToken capturedExistingAuthToken = existingAuthTokenCaptor.getValue();
         assertEquals(existingAuthToken, capturedExistingAuthToken);
 
         assertEquals(HttpStatus.OK_200, userResponse.getStatus());
