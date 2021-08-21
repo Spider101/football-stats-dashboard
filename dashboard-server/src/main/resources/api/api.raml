@@ -173,3 +173,69 @@ securitySchemes:
         body:
           application/json:
             example: !include examples/club-response.json
+
+/match-performance:
+  /{matchPerformanceId}:
+    uriParameters:
+      matchPerformanceId:
+        description: The identifier for the match performance corresponding to a player and a competition
+        type: string
+        required: true
+    get:
+      description: gets a player's performance data in a given competition on the basis of the performance ID
+      securedBy: [access_token]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/match-performance-response.json
+    put:
+      description: updates a player's performance data in a given competition on the basis of the performance ID
+      securedBy: [access_token]
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/match-performance-response.json
+        500:
+          description: failed during player performance data update
+    delete:
+      description: delete a player's performance data in a given competition on the basis of the performance ID
+      securedBy: [access_token]
+      responses:
+        204:
+          description: successfully delete a player's performance data
+  post:
+    description: add new match performance data for a given player in a give competition
+    securedBy: [access_token]
+    body:
+      application/json:
+        example: !include examples/match-performance-post-request.json
+    responses:
+      201:
+        description: player's match performance data created
+        body:
+          application/json:
+            example: !include examples/match-performance-response.json
+      422:
+        description: unprocessable entity when playerID or competitionID is missing
+  /lookup/{playerId}:
+    uriParameters:
+      playerId:
+        description: The player ID
+        type: string
+        required: true
+    get:
+      description: gets a player's performance data based on their ID and the competitionID
+      securedBy: [access_token]
+      queryParameters:
+        competitionId:
+          displayName: Competition ID
+          type: string
+          required: false
+          description: The competition identifier
+      responses:
+        200:
+          body:
+            application/json:
+              example: !include examples/match-performance-response.json

@@ -26,6 +26,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +47,7 @@ import static org.mockito.Mockito.when;
 public class ClubResourceTest {
     private static final String URI_PATH = "/club";
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
-    public static final String USER_EMAIL = "fake email";
+    private static final String USER_EMAIL = "fake email";
     private User userPrincipal;
 
     private ClubResource clubResource;
@@ -159,8 +160,10 @@ public class ClubResourceTest {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubInCouchbase = getClubDataStub(existingClubId, true);
-        Club incomingClub = ImmutableClub.builder().from(getClubDataStub(existingClubId, false))
-                .wageBudget(BigDecimal.valueOf(300))
+        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(BigDecimal.valueOf(100));
+        Club incomingClub = ImmutableClub.builder()
+                .from(getClubDataStub(existingClubId, false))
+                .wageBudget(updatedWageBudget)
                 .build();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
@@ -178,14 +181,14 @@ public class ClubResourceTest {
         Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
         assertNotNull(clubToBeUpdatedInCouchbase);
         assertEquals(userPrincipal.getEmail(), clubToBeUpdatedInCouchbase.getCreatedBy());
-        assertNotEquals(existingClubInCouchbase.getLastModifiedDate(), clubToBeUpdatedInCouchbase.getLastModifiedDate());
+        assertEquals(LocalDate.now(), clubToBeUpdatedInCouchbase.getLastModifiedDate());
 
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
         Club clubInResponse = OBJECT_MAPPER.convertValue(clubResponse.getEntity(), Club.class);
         assertEquals(existingClubInCouchbase.getId(), clubInResponse.getId());
-        assertEquals(incomingClub.getWageBudget(), clubInResponse.getWageBudget());
+        assertEquals(updatedWageBudget, clubInResponse.getWageBudget());
         assertEquals(userPrincipal.getEmail(), clubInResponse.getCreatedBy());
     }
 
@@ -246,6 +249,7 @@ public class ClubResourceTest {
                 .country("fake player country")
                 .role("fake player role")
                 .currentAbility(19)
+                .recentForm(new ArrayList<>())
                 .playerId(UUID.randomUUID())
                 .build();
         when(clubDAO.getPlayersInClub(eq(clubId))).thenReturn(ImmutableList.of(expectedSquadPlayer));
