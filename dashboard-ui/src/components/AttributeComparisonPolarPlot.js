@@ -1,9 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
-import { useGlobalChartOptions } from '../context/chartOptionsProvider';
 
-export default function AttributeComparisonPolarPlot({ playerAttributes }) {
+import { useGlobalChartOptions } from '../context/chartOptionsProvider';
+import { playerAttributes } from '../utils';
+
+export default function AttributeComparisonPolarPlot({ playersWithAttributes }) {
     const globalChartOptions = useGlobalChartOptions();
 
     const options = {
@@ -12,7 +14,7 @@ export default function AttributeComparisonPolarPlot({ playerAttributes }) {
         fill: { opacity: 0.2 },
         xaxis: {
             labels: { style: { fontSize: '14px' } },
-            categories: [ 'Defense', 'Mental', 'Physical', 'Attack', 'Technical' ]
+            categories: playerAttributes.GROUPS
         },
         plotOptions: {
             radar: {
@@ -24,27 +26,31 @@ export default function AttributeComparisonPolarPlot({ playerAttributes }) {
         }
     };
 
-    const series = playerAttributes.map(player => ({
+    const series = playersWithAttributes.map(player => ({
         name: player.name,
-        data: player.attributes.map(attrGroup =>
-            Math.round(attrGroup.attributesInGroup.reduce((a, b) => a + b, 0) / attrGroup.attributesInGroup.length))
+        data: playerAttributes.GROUPS.map(groupName => {
+            const attributeGroup = player.attributes.find(attribute => attribute.groupName === groupName);
+            const attributesInGroup = attributeGroup?.attributesInGroup || [];
+            const attributesGroupTotal = attributesInGroup.reduce((a, b) => a + b, 0);
+            return attributesGroupTotal === 0
+                ? attributesGroupTotal
+                : Math.round(attributesGroupTotal / attributesInGroup.length);
+        })
     }));
 
-    return (
-        <ReactApexChart
-            options={ options }
-            series={ series }
-            type='radar'
-        />
-    );
+    return <ReactApexChart options={options} series={series} type='radar' />;
 }
 
 AttributeComparisonPolarPlot.propTypes = {
-    playerAttributes: PropTypes.arrayOf(PropTypes.shape({
-        name: PropTypes.string,
-        attributes: PropTypes.arrayOf(PropTypes.shape({
-            groupName: PropTypes.string,
-            attributesInGroup: PropTypes.array
-        }))
-    }))
+    playersWithAttributes: PropTypes.arrayOf(
+        PropTypes.shape({
+            name: PropTypes.string,
+            attributes: PropTypes.arrayOf(
+                PropTypes.shape({
+                    groupName: PropTypes.string,
+                    attributesInGroup: PropTypes.array
+                })
+            )
+        })
+    )
 };
