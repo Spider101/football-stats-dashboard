@@ -26,6 +26,7 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 import static com.footballstatsdashboard.core.utils.Constants.MATCH_PERFORMANCE_ID;
@@ -154,9 +155,9 @@ public class MatchPerformanceResource {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getMatchPerformanceByPlayerId() request made!");
         }
-        MatchPerformance matchPerformance = this.matchPerformanceDAO.lookupMatchPerformanceByPlayerId(playerId,
+        List<MatchPerformance> matchPerformance = this.matchPerformanceDAO.lookupMatchPerformanceByPlayerId(playerId,
                 competitionId);
-        if (matchPerformance != null) {
+        if (matchPerformance != null && !matchPerformance.isEmpty()) {
             return Response.ok().entity(matchPerformance).build();
         }
 

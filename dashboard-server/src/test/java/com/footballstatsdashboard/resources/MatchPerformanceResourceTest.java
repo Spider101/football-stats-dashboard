@@ -25,9 +25,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -260,7 +263,8 @@ public class MatchPerformanceResourceTest {
         UUID expectedMatchPerformanceId = UUID.randomUUID();
         MatchPerformance matchPerformanceFromCouchbase = getMatchPerformanceDataStub(expectedMatchPerformanceId,
                 playerId, competitionId, false);
-        when(matchPerformanceDAO.lookupMatchPerformanceByPlayerId(any(), any())).thenReturn(matchPerformanceFromCouchbase);
+        when(matchPerformanceDAO.lookupMatchPerformanceByPlayerId(any(), any()))
+                .thenReturn(ImmutableList.of(matchPerformanceFromCouchbase));
 
         // execute
         Response matchPerformanceResponse = matchPerformanceResource.lookupMatchPerformanceByPlayerId(playerId,
@@ -273,11 +277,14 @@ public class MatchPerformanceResourceTest {
         assertEquals(HttpStatus.OK_200, matchPerformanceResponse.getStatus());
         assertNotNull(matchPerformanceResponse.getEntity());
 
-        MatchPerformance matchPerformanceFromResponse =
-                OBJECT_MAPPER.convertValue(matchPerformanceResponse.getEntity(), MatchPerformance.class);
-        assertEquals(playerId, matchPerformanceFromResponse.getPlayerId());
-        assertEquals(competitionId, matchPerformanceFromResponse.getCompetitionId());
-        assertEquals(expectedMatchPerformanceId, matchPerformanceFromResponse.getId());
+        List<Object> entityList = OBJECT_MAPPER.convertValue(matchPerformanceResponse.getEntity(), List.class);
+        assertFalse(entityList.isEmpty());
+        entityList.forEach(entity -> {
+            MatchPerformance matchPerformanceFromResponse = OBJECT_MAPPER.convertValue(entity, MatchPerformance.class);
+            assertEquals(playerId, matchPerformanceFromResponse.getPlayerId());
+            assertEquals(competitionId, matchPerformanceFromResponse.getCompetitionId());
+            assertEquals(expectedMatchPerformanceId, matchPerformanceFromResponse.getId());
+        });
     }
 
     @Test
@@ -285,7 +292,7 @@ public class MatchPerformanceResourceTest {
         // setup
         UUID playerId = UUID.randomUUID();
         UUID competitionId = UUID.randomUUID();
-        when(matchPerformanceDAO.lookupMatchPerformanceByPlayerId(any(), any())).thenReturn(null);
+        when(matchPerformanceDAO.lookupMatchPerformanceByPlayerId(any(), any())).thenReturn(new ArrayList<>());
 
         // execute
         Response matchPerformanceResponse = matchPerformanceResource.lookupMatchPerformanceByPlayerId(playerId,
