@@ -7,8 +7,14 @@ import Grid from '@material-ui/core/Grid';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
-import { allMatchPerformanceTableHeaders, convertCamelCaseToSnakeCase } from '../utils';
+import { convertCamelCaseToSnakeCase, matchPerformanceTableHeaderDisplayTypeMap } from '../utils';
 import { useGlobalChartOptions } from '../context/chartOptionsProvider';
+
+const buildHeaderDataForMatchPerformanceTable = headerNames =>
+    headerNames.map(name => ({
+        id: name === 'id' ? 'competition' : convertCamelCaseToSnakeCase(name) + (name.includes('Rate') ? ' (%)' : ''),
+        type: matchPerformanceTableHeaderDisplayTypeMap[name]
+    }));
 
 const buildMatchPerformanceData = competitionData => {
     return competitionData.map(competitionPerformance => {
@@ -64,8 +70,11 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
 
     const rowData = React.useMemo(() => buildMatchPerformanceData(competitions), [competitions]);
 
+    const matchPerformanceTableHeaders = buildHeaderDataForMatchPerformanceTable(
+        Object.keys(competitions.length === 0 ? matchPerformanceTableHeaderDisplayTypeMap : competitions[0])
+    );
     const matchPerformanceData = {
-        headers: allMatchPerformanceTableHeaders,
+        headers: matchPerformanceTableHeaders,
         rows: filterMatchPerformancesByCompetitions(rowData, competitionNames)
     };
 

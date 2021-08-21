@@ -28,27 +28,26 @@ export const squadTableHeaderDisplayTypeMap = {
     current_ability: 'number'
 };
 
+export const matchPerformanceTableHeaderDisplayTypeMap = {
+    competition: 'string',
+    appearances: 'number',
+    goals: 'number',
+    penalties: 'number',
+    assists: 'number',
+    player_of_the_match: 'number',
+    yellow_cards: 'number',
+    red_cards: 'number',
+    tackles: 'number',
+    pass_completion_rate: 'string',
+    dribbles: 'number',
+    fouls: 'number',
+    average_rating: 'number'
+};
+
 export const playerAttributes = {
     CATEGORIES: ['Technical', 'Physical', 'Mental'],
     GROUPS: ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial']
 };
-
-// TODO: this will be returned from the service in future; remove this then
-export const allMatchPerformanceTableHeaders = [
-    { id: 'competition', type: 'string' },
-    { id: 'appearances', type: 'number' },
-    { id: 'goals', type: 'number' },
-    { id: 'penalties', type: 'number' },
-    { id: 'assists', type: 'number' },
-    { id: 'player_of_the_match', type: 'number' },
-    { id: 'yellow_cards', type: 'number' },
-    { id: 'red_cards', type: 'number' },
-    { id: 'tackles', type: 'number' },
-    { id: 'pass_completion_rate', type: 'string' },
-    { id: 'dribbles', type: 'number' },
-    { id: 'fouls', type: 'number' },
-    { id: 'average_rating', type: 'number' }
-];
 
 export const DRAWER_WIDTH = 240;
 

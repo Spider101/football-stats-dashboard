@@ -1,6 +1,5 @@
 import faker from 'faker';
 import _ from 'lodash';
-import { allMatchPerformanceTableHeaders } from '../../utils';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
@@ -15,6 +14,22 @@ const allSquadHubTableHeaders = [
     { id: 'form', type: 'chart' },
     { id: 'morale', type: 'icon' },
     { id: 'current_ability', type: 'number' }
+];
+
+const allMatchPerformanceTableHeaders = [
+    { id: 'competition', type: 'string' },
+    { id: 'appearances', type: 'number' },
+    { id: 'goals', type: 'number' },
+    { id: 'penalties', type: 'number' },
+    { id: 'assists', type: 'number' },
+    { id: 'player_of_the_match', type: 'number' },
+    { id: 'yellow_cards', type: 'number' },
+    { id: 'red_cards', type: 'number' },
+    { id: 'tackles', type: 'number' },
+    { id: 'pass_completion_rate', type: 'string' },
+    { id: 'dribbles', type: 'number' },
+    { id: 'fouls', type: 'number' },
+    { id: 'average_rating', type: 'number' }
 ];
 
 const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * (upper - lower)) + lower;
