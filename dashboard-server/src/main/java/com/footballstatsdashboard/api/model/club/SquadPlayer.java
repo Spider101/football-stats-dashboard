@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 
 @Value.Immutable
@@ -37,6 +38,12 @@ public interface SquadPlayer {
      */
     @Valid
     Integer getCurrentAbility();
+
+    /**
+     * Player's form in recent matches
+     */
+    @Valid
+    List<Float> getRecentForm();
 
     /**
      * Player's ID
