@@ -21,13 +21,11 @@ const buildMatchPerformanceData = competitionData => {
         return Object.entries(competitionPerformance).map(([key, value]) => {
             const label = key === 'id' ? 'competition' : key === 'matchRatingHistory' ? 'averageRating' : key;
 
-            const data = key === 'matchRatingHistory'
-                ? value.reduce((a, b) => a + b, 0) / value.length
-                : key.includes('percentage') ? (value/100).toFixed(2) : value;
+            const data = key === 'matchRatingHistory' ? value.reduce((a, b) => a + b, 0) / value.length : value;
 
             return {
                 id: convertCamelCaseToSnakeCase(label),
-                type: 'number',
+                type: key === 'id' ? 'string' : 'number',
                 data
             };
         });
@@ -55,7 +53,7 @@ const getOptions = (globalChartOptions, chartTitle) => ({
     },
     xaxis: {
         title: { text: 'Matches', style: { fontFamily: 'Roboto' } },
-        categories: [ ...Array(10) ].map((_, _idx) => _idx + 1)
+        categories: [...Array(10)].map((_, _idx) => _idx + 1)
     }
 });
 
@@ -66,7 +64,7 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
 
     const [competitionNames, setCompetitionNames] = React.useState(allCompetitionNames);
 
-    const handleChange = (event) => setCompetitionNames(event.target.value);
+    const handleChange = event => setCompetitionNames(event.target.value);
 
     const rowData = React.useMemo(() => buildMatchPerformanceData(competitions), [competitions]);
 
@@ -78,18 +76,20 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
         rows: filterMatchPerformancesByCompetitions(rowData, competitionNames)
     };
 
-    const chartData = [{
-        name: 'Match Rating',
-        data: filterMatchRatingsByCompetitions(competitions, competitionNames)
-    }];
+    const chartData = [
+        {
+            name: 'Match Rating',
+            data: filterMatchRatingsByCompetitions(competitions, competitionNames)
+        }
+    ];
 
     return (
         <Grid container spacing={2}>
             <Grid item xs={6}>
                 <TableFilterControl
-                    currentValues={ competitionNames }
-                    handleChangeFn={ handleChange }
-                    allPossibleValues={ allCompetitionNames }
+                    currentValues={competitionNames}
+                    handleChangeFn={handleChange}
+                    allPossibleValues={allCompetitionNames}
                     allValuesSelectedLabel='All Competitions'
                     inputLabelText='Filter Competitions'
                     labelIdFragment='filter-competitions'
@@ -97,14 +97,14 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
             </Grid>
             <Grid item xs={12}>
                 <ReactApexChart
-                    options={ getOptions(useGlobalChartOptions(), chartTitle) }
-                    series={ chartData }
+                    options={getOptions(useGlobalChartOptions(), chartTitle)}
+                    series={chartData}
                     type='bar'
                     height={500}
                 />
             </Grid>
             <Grid item xs={12}>
-                <SortableTable { ...matchPerformanceData } />
+                <SortableTable {...matchPerformanceData} />
             </Grid>
         </Grid>
     );
@@ -112,20 +112,22 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
 
 MatchPerformanceView.propTypes = {
     playerPerformance: PropTypes.shape({
-        competitions: PropTypes.arrayOf(PropTypes.shape({
-            id: PropTypes.string,
-            appearances: PropTypes.number,
-            goals: PropTypes.number,
-            penalties: PropTypes.number,
-            assists: PropTypes.number,
-            playerOfTheMatch: PropTypes.number,
-            yellowCards: PropTypes.number,
-            redCards: PropTypes.number,
-            tackles: PropTypes.number,
-            passCompletionRate: PropTypes.number,
-            dribbles: PropTypes.number,
-            fouls: PropTypes.number,
-            matchRatingHistory: PropTypes.arrayOf(PropTypes.number),
-        }))
+        competitions: PropTypes.arrayOf(
+            PropTypes.shape({
+                id: PropTypes.string,
+                appearances: PropTypes.number,
+                goals: PropTypes.number,
+                penalties: PropTypes.number,
+                assists: PropTypes.number,
+                playerOfTheMatch: PropTypes.number,
+                yellowCards: PropTypes.number,
+                redCards: PropTypes.number,
+                tackles: PropTypes.number,
+                passCompletionRate: PropTypes.number,
+                dribbles: PropTypes.number,
+                fouls: PropTypes.number,
+                matchRatingHistory: PropTypes.arrayOf(PropTypes.number)
+            })
+        )
     })
 };
