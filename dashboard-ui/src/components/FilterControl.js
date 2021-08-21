@@ -44,9 +44,9 @@ export default function FilterControl({ currentValue, allPossibleValues, handleC
 
 FilterControl.propTypes = {
     handleChangeFn: PropTypes.func,
-    currentValue: PropTypes.number,
+    currentValue: PropTypes.string,
     allPossibleValues: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number,
+        id: PropTypes.string,
         name: PropTypes.string,
     })),
     inputLabelText: PropTypes.string,
