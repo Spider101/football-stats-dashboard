@@ -219,7 +219,7 @@ securitySchemes:
             example: !include examples/match-performance-response.json
       422:
         description: unprocessable entity when playerID or competitionID is missing
-  /{playerId}:
+  /lookup/{playerId}:
     uriParameters:
       playerId:
         description: The player ID
