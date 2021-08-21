@@ -9,11 +9,11 @@ import PlayerAttributesTable from './PlayerAttributesTable';
 import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
+import { playerAttributes } from '../utils';
 
 // TODO: refactor this to a util fn to encapsulate common code (dupe is in PlayerProgressionView)
 const buildAttributeComparisonItemData = (attributes, playerName, isBasePlayer) => {
-    const categories = Array.from(new Set(attributes.map(attribute => attribute.category)));
-    const attributeItems = categories.map(category =>
+    const attributeItems = playerAttributes.CATEGORIES.map(category =>
         attributes
             .filter(attribute => attribute.category === category)
             .map(attribute => ({
@@ -27,11 +27,13 @@ const buildAttributeComparisonItemData = (attributes, playerName, isBasePlayer) 
     const maxRows = Math.max(...attributeItems.map(row => row.length));
 
     const rows = [...Array(maxRows)].map((_, i) =>
-        [...Array(categories.length)].map((_, j) => (i >= attributeItems[j].length ? null : attributeItems[j][i]))
+        [...Array(playerAttributes.CATEGORIES.length)].map((_, j) =>
+            i >= attributeItems[j].length ? null : attributeItems[j][i]
+        )
     );
 
     return {
-        headers: categories,
+        headers: playerAttributes.CATEGORIES,
         rows
     };
 };
@@ -43,7 +45,6 @@ const mergeAttributeComparisonItems = attributeComparisonItems => {
         } else {
             return mergedAttributeComparisonItems.map((attributeItemRow, i) =>
                 attributeItemRow.map((attributeItem, j) => {
-                    console.log(attributeComparisonItemsToMerge);
                     const attributeItemToMerge = attributeComparisonItemsToMerge[i][j];
                     if (attributeItem === null && attributeItemToMerge === null) {
                         return null;
@@ -88,14 +89,14 @@ export default function PlayerComparison({ players }) {
     };
 
     const attributePolarPlotData = {
-        playerAttributes: players.map(player => ({
+        playersWithAttributes: players.map(player => ({
             name: player.playerMetadata.name,
-            attributes: Object.entries(
-                _.groupBy(player.playerAttributes, attribute => attribute.group)
-            ).map(([groupName, attributes]) => ({
-                groupName,
-                attributesInGroup: attributes.map(attribute => attribute.value)
-            }))
+            attributes: Object.entries(_.groupBy(player.playerAttributes, attribute => attribute.group)).map(
+                ([groupName, attributes]) => ({
+                    groupName,
+                    attributesInGroup: attributes.map(attribute => attribute.value)
+                })
+            )
         }))
     };
 
