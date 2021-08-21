@@ -28,6 +28,11 @@ export const squadTableHeaderDisplayTypeMap = {
     current_ability: 'number'
 };
 
+export const playerAttributes = {
+    CATEGORIES: ['Technical', 'Physical', 'Mental'],
+    GROUPS: ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial']
+};
+
 // TODO: this will be returned from the service in future; remove this then
 export const allMatchPerformanceTableHeaders = [
     { id: 'competition', type: 'string' },
