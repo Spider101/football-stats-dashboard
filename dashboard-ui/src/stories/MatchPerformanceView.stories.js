@@ -6,12 +6,11 @@ import { getMatchPerformanceBreakDown } from './utils/storyDataGenerators';
 
 export default {
     component: MatchPerformanceView,
-    title: 'Views/MatchPerformanceView',
-    excludeStories: /.*Data$/
+    title: 'Views/MatchPerformanceView'
 };
 
-const playerPerformanceData = {
+const Template = args => <MatchPerformanceView { ...args } />;
+export const Default = Template.bind({});
+Default.args = {
     playerPerformance: getMatchPerformanceBreakDown(5, 10)
 };
-
-export const Default = () => <MatchPerformanceView { ...playerPerformanceData } />;

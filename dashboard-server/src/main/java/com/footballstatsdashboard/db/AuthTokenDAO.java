@@ -8,7 +8,6 @@ import com.footballstatsdashboard.api.model.AuthToken;
 import com.footballstatsdashboard.api.model.ImmutableAuthToken;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.time.Instant;
 import java.util.List;
@@ -29,16 +28,16 @@ public class AuthTokenDAO<K> extends CouchbaseDAO<K> {
         this.objectMapper = objectMapper;
     }
 
-    public void updateLastAccessTime(K authTokenKey, Pair<AuthToken, Long> authTokenEntity) {
+    public void updateLastAccessTime(K authTokenKey, AuthToken authToken) {
         AuthToken updatedAuthToken = ImmutableAuthToken.builder()
-                .from(authTokenEntity.getLeft())
+                .from(authToken)
                 .lastAccessUTC(Instant.now())
                 .build();
 
-        updateDocument(authTokenKey, updatedAuthToken, authTokenEntity.getRight());
+        updateDocument(authTokenKey, updatedAuthToken);
     }
 
-    public Optional<Pair<AuthToken, Long>> getAuthTokenForUser(UUID userId) {
+    public Optional<AuthToken> getAuthTokenForUser(UUID userId) {
         String query = String.format("Select *, META(authToken).cas as cas from `%s` AS authToken " +
                 "where userId = $userId", this.getBucketNameResolver().get());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
@@ -50,11 +49,10 @@ public class AuthTokenDAO<K> extends CouchbaseDAO<K> {
 
         if (authTokenEntities.size() == 1) {
             JsonObject authTokenEntity = authTokenEntities.iterator().next();
-            Long cas = authTokenEntity.getLong("cas");
             Map<String, Object> authTokenMap = authTokenEntity.getObject("authToken").toMap();
             AuthToken authToken = objectMapper.convertValue(authTokenMap, AuthToken.class);
 
-            return Optional.of(Pair.of(authToken, cas));
+            return Optional.of(authToken);
         }
 
         // TODO: 02/05/21 figure out how to handle query result returning more than one auth token for a given user id

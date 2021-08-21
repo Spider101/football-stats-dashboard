@@ -8,6 +8,7 @@ import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.db.AuthTokenDAO;
 import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import io.dropwizard.auth.Auth;
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -54,14 +55,14 @@ public class UserResource {
     @GET
     @Path(USER_ID_PATH)
     public Response getUser(
-            @PathParam(USER_ID) UUID userId) {
+            @Auth @PathParam(USER_ID) UUID userId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getUser() request for user with ID: {}", userId.toString());
         }
 
         ResourceKey resourceKey = new ResourceKey(userId);
-        User user = this.userDAO.getDocument(resourceKey, User.class).getLeft();
+        User user = this.userDAO.getDocument(resourceKey, User.class);
         return Response.ok(user).build();
     }
 
@@ -126,10 +127,10 @@ public class UserResource {
 
         // password is verified, check if an auth token exists for the user, touch the lastAccessDate property
         // and then return it
-        Optional<Pair<AuthToken, Long>> authToken = this.authTokenDAO.getAuthTokenForUser(validUser.getId());
+        Optional<AuthToken> authToken = this.authTokenDAO.getAuthTokenForUser(validUser.getId());
 
         if (authToken != null && authToken.isPresent()) {
-            AuthToken validAuthToken = authToken.get().getLeft();
+            AuthToken validAuthToken = authToken.get();
 
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Existing Auth Token: " + validAuthToken.getId() + " found for userId: "

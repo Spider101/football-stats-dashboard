@@ -6,7 +6,6 @@ import Typography from '@material-ui/core/Typography';
 
 import { makeStyles } from '@material-ui/styles';
 
-import { useUserAuth } from '../context/authProvider';
 import useUserData from '../hooks/useUserData';
 
 import HomePageView from '../views/HomePageView';
@@ -21,8 +20,7 @@ const useStyles = makeStyles({
 
 const Home = () => {
     const classes = useStyles();
-    const { authToken } = useUserAuth();
-    const { isLoading, userData } = useUserData(authToken);
+    const { isLoading, userData } = useUserData();
 
     return (
         <>

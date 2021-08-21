@@ -1,11 +1,36 @@
 import faker from 'faker';
 import _ from 'lodash';
-import { allMatchPerformanceTableHeaders, allSquadHubTableHeaders } from '../../utils';
 
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
 const NUM_MONTHS = 6;
+
+const allSquadHubTableHeaders = [
+    { id: 'name', type: 'string' },
+    { id: 'nationality', type: 'image' },
+    { id: 'role', type: 'string' },
+    { id: 'wages', type: 'string' },
+    { id: 'form', type: 'chart' },
+    { id: 'morale', type: 'icon' },
+    { id: 'current_ability', type: 'number' }
+];
+
+const allMatchPerformanceTableHeaders = [
+    { id: 'competition', type: 'string' },
+    { id: 'appearances', type: 'number' },
+    { id: 'goals', type: 'number' },
+    { id: 'penalties', type: 'number' },
+    { id: 'assists', type: 'number' },
+    { id: 'player_of_the_match', type: 'number' },
+    { id: 'yellow_cards', type: 'number' },
+    { id: 'red_cards', type: 'number' },
+    { id: 'tackles', type: 'number' },
+    { id: 'pass_completion_rate', type: 'string' },
+    { id: 'dribbles', type: 'number' },
+    { id: 'fouls', type: 'number' },
+    { id: 'average_rating', type: 'number' }
+];
 
 const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * (upper - lower)) + lower;
 
@@ -42,11 +67,10 @@ export const getAttributeNamesList = (totalNumOfAttributes) =>
 
 const getPlayerRolesMap = (numOfRoles, attributeList) => {
     const roles = faker.lorem.words(numOfRoles).split(' ');
-    let roleAttributeMap = {};
-    roles.forEach(role => {
-        roleAttributeMap[role] = _.sampleSize(attributeList, 6);
-    });
-    return roleAttributeMap;
+    return roles.map(role => ({
+        name: role,
+        associatedAttributes: _.sampleSize(attributeList, 6)
+    }));
 };
 
 export const getAttributeComparisonTableData = (getAttrItemData) => {
@@ -86,70 +110,34 @@ export const getAttrGroupData = (numGroups) => (
 
 export const getPlayerMetadata = () => ({
     name: faker.name.findName(),
-    dob: faker.date.past().toJSON(),
+    dateOfBirth: faker.date.past().toJSON(),
     club: faker.company.companyName(),
     country: faker.address.country(),
     photo: `${faker.image.people()}?random=${getRandomNumberInRange(20)}`,
     clubLogo: `${faker.image.abstract()}?random=${getRandomNumberInRange(20)}`,
     countryLogo: `${faker.image.avatar()}?random=${getRandomNumberInRange(20)}`,
-    age:  ' (' + faker.random.number({ 'min': 16, 'max': 35 }) + ' years old)'
+    age:  faker.random.number({ 'min': 16, 'max': 35 })
 });
 
 
-const getAttributesInCategory = (numAttributes, attributesList, hasHistory) => (
-    [ ...Array(numAttributes)].map((_, i) => {
-        let attributeMap = {
-            name: attributesList[i],
-            value: getRandomNumberInRange(MAX_ATTR_VALUE)
-        };
-
-        if (hasHistory) {
-            const attributeHistory = [ ...Array(NUM_MONTHS -1) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE));
-            attributeMap = {
-                ...attributeMap,
-                history: [ ...attributeHistory, attributeMap.value ]
-            };
-        }
-
-        return attributeMap;
-    })
-);
-
-const  getPlayerAttributeCategoryData = (attributeNamesList, hasHistory) => ([
-    {
-        categoryName: 'Technical',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(0, 10), hasHistory)
-    }, {
-        categoryName: 'Physical',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(10, 20), hasHistory)
-    }, {
-        categoryName: 'Mental',
-        attributesInCategory: getAttributesInCategory(10, attributeNamesList.slice(20, 30), hasHistory)
-    }
-]);
-
-const getPlayerAttributeGroupData = (numAttributes) => ([
-    {
-        groupName: 'Defending',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }, {
-        groupName: 'Speed',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }, {
-        groupName: 'Vision',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }, {
-        groupName: 'Attacking',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }, {
-        groupName: 'Aerial',
-        attributesInGroup: [ ...Array(numAttributes)].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
-    }
-]);
+const getAttributes = (numAttributes, categories, groups, attributeList, hasHistory) => attributeList.map(attribute => {
+    const attributeValue = getRandomNumberInRange(MAX_ATTR_VALUE);
+    const attributeHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE));
+    return {
+        name: attribute,
+        category: _.sample(categories),
+        group: _.sample(groups),
+        value: attributeValue,
+        ...(hasHistory && { history: [ ...attributeHistory, attributeValue ] })
+    };
+});
 
 export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     const currentPlayerOverall = getRandomNumberInRange(MAX_OVERALL_VALUE);
     const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_OVERALL_VALUE));
+
+    const categories = ['Technical', 'Physical', 'Mental'];
+    const categoryGroups = ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial'];
 
     return {
         playerMetadata: getPlayerMetadata(),
@@ -158,10 +146,7 @@ export const getPlayerData = (attributeNamesList, hasHistory = false) => {
             currentValue: currentPlayerOverall,
             history: [ ...playerOverallHistory, currentPlayerOverall ],
         },
-        playerAttributes: {
-            attributeCategories: getPlayerAttributeCategoryData(attributeNamesList, hasHistory),
-            attributeGroups: getPlayerAttributeGroupData(10)
-        }
+        playerAttributes: getAttributes(30, categories, categoryGroups, attributeNamesList, hasHistory)
     };
 };
 

@@ -2,6 +2,14 @@ import React from 'react';
 import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 
+export const httpStatus = {
+    OK: 200,
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    CREATED: 201,
+    CONFLICT: 409
+};
+
 export const queryKeys = {
     SQUAD_DATA: 'squadData',
     PLAYER_DATA: 'playerData',
@@ -10,33 +18,36 @@ export const queryKeys = {
     USER_DATA: 'userData'
 };
 
-// TODO: this will be returned from the service in future; remove this then
-export const allSquadHubTableHeaders = [
-    { id: 'name', type: 'string' },
-    { id: 'nationality', type: 'image' },
-    { id: 'role', type: 'string' },
-    { id: 'wages', type: 'string' },
-    { id: 'form', type: 'chart' },
-    { id: 'morale', type: 'icon' },
-    { id: 'current_ability', type: 'number' }
-];
+export const squadTableHeaderDisplayTypeMap = {
+    name: 'string',
+    nationality: 'image',
+    role: 'string',
+    wages: 'string',
+    form: 'chart',
+    morale: 'icon',
+    current_ability: 'number'
+};
 
-// TODO: this will be returned from the service in future; remove this then
-export const allMatchPerformanceTableHeaders = [
-    { id: 'competition', type: 'string' },
-    { id: 'appearances', type: 'number' },
-    { id: 'goals', type: 'number' },
-    { id: 'penalties', type: 'number' },
-    { id: 'assists', type: 'number' },
-    { id: 'player_of_the_match', type: 'number' },
-    { id: 'yellow_cards', type: 'number' },
-    { id: 'red_cards', type: 'number' },
-    { id: 'tackles', type: 'number' },
-    { id: 'pass_completion_rate', type: 'string' },
-    { id: 'dribbles', type: 'number' },
-    { id: 'fouls', type: 'number' },
-    { id: 'average_rating', type: 'number' }
-];
+export const matchPerformanceTableHeaderDisplayTypeMap = {
+    competition: 'string',
+    appearances: 'number',
+    goals: 'number',
+    penalties: 'number',
+    assists: 'number',
+    player_of_the_match: 'number',
+    yellow_cards: 'number',
+    red_cards: 'number',
+    tackles: 'number',
+    pass_completion_rate: 'string',
+    dribbles: 'number',
+    fouls: 'number',
+    average_rating: 'number'
+};
+
+export const playerAttributes = {
+    CATEGORIES: ['Technical', 'Physical', 'Mental'],
+    GROUPS: ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial']
+};
 
 export const DRAWER_WIDTH = 240;
 

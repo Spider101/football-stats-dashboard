@@ -20,7 +20,7 @@ public class MatchPerformanceDAO<K> extends CouchbaseDAO<K> {
         this.clusterContainer = clusterContainer;
     }
 
-    public MatchPerformance lookupMatchPerformanceByPlayerId(UUID playerId, UUID competitionId) {
+    public List<MatchPerformance> lookupMatchPerformanceByPlayerId(UUID playerId, UUID competitionId) {
         String query = String.format("Select matchPerformance.* from `%s` matchPerformance" +
                 " where playerId = $playerId and competitionId = $competitionId", this.getBucketNameResolver().get());
 
@@ -30,7 +30,6 @@ public class MatchPerformanceDAO<K> extends CouchbaseDAO<K> {
                         .put("competitionId", competitionId.toString())
         );
         QueryResult queryResult = this.clusterContainer.getCluster().query(query, queryOptions);
-        List<MatchPerformance> matchPerformanceList = queryResult.rowsAs(MatchPerformance.class);
-        return matchPerformanceList.stream().findFirst().orElse(null);
+        return queryResult.rowsAs(MatchPerformance.class);
     }
 }

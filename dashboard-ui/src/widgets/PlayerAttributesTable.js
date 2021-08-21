@@ -71,8 +71,8 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
                         onChange={ handleChange }
                     >
                         <MenuItem value={ 'None' }> <em>None</em> </MenuItem>
-                        { Object.keys(roles).map((role, _idx) => (
-                            <MenuItem key={ _idx } value={ role }> { role }</MenuItem>
+                        { roles.map((role, _idx) => (
+                            <MenuItem key={ _idx } value={ role.name }> { role.name }</MenuItem>
                         ))}
                     </Select>
                 </FormControl>
@@ -115,7 +115,7 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
 }
 
 PlayerAttributesTable.propTypes = {
-    roles: PropTypes.object,
+    roles: PropTypes.array,
     headers: PropTypes.arrayOf(PropTypes.string),
     rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.object)),
     children: PropTypes.node

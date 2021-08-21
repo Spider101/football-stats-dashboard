@@ -17,7 +17,6 @@ import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -92,8 +90,7 @@ public class PlayerResourceTest {
         // setup
         UUID playerId = UUID.randomUUID();
         Player playerFromCouchbase = getPlayerDataStub(playerId, true, true, false);
-        when(couchbaseDAO.getDocument(any(), any()))
-                .thenReturn(Pair.of(playerFromCouchbase, 0L));
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
 
         // execute
         Response playerResponse = playerResource.getPlayer(playerId);
@@ -198,9 +195,8 @@ public class PlayerResourceTest {
     public void updatePlayer_updatesPlayerInCouchbase() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Long existingPlayerCAS = 123L;
         Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingPlayerInCouchbase, existingPlayerCAS));
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
         Metadata updatedMetadata = ImmutableMetadata.builder()
                 .from(existingPlayerInCouchbase.getMetadata())
@@ -238,7 +234,7 @@ public class PlayerResourceTest {
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
 
-        verify(couchbaseDAO).updateDocument(eq(capturedResourceKey), updatedPlayerCaptor.capture(), eq(existingPlayerCAS));
+        verify(couchbaseDAO).updateDocument(eq(capturedResourceKey), updatedPlayerCaptor.capture());
         Player updatedPlayer = updatedPlayerCaptor.getValue();
         assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
         assertEquals(userPrincipal.getEmail(), updatedPlayer.getCreatedBy());
@@ -263,9 +259,8 @@ public class PlayerResourceTest {
     public void updatePlayer_incomingPlayerIdDoesNotMatchExisting() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Long existingPlayerCAS = 123L;
         Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(Pair.of(existingPlayerInCouchbase, existingPlayerCAS));
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
         UUID incomingPlayerId = UUID.randomUUID();
         Player incomingPlayer = ImmutablePlayer.builder()
@@ -278,7 +273,7 @@ public class PlayerResourceTest {
 
         // assert
         verify(couchbaseDAO).getDocument(any(), any());
-        verify(couchbaseDAO, never()).updateDocument(any(), any(), anyLong());
+        verify(couchbaseDAO, never()).updateDocument(any(), any());
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, playerResponse.getStatus());
         assertTrue(playerResponse.getEntity().toString().contains(incomingPlayerId.toString()));

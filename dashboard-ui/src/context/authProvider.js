@@ -1,35 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import faker from 'faker';
 import { useQueryClient } from 'react-query';
 
-import { authenticateUser, createUser } from '../clients/DashboardClient';
+import { authenticateUser, createUser } from '../clients/AuthClient';
 import { queryKeys } from '../utils';
+import { useHistory } from 'react-router-dom';
 
 const AuthContext = React.createContext();
 
+const authDataKey = 'auth-data';
 function AuthContextProvider({ children }) {
-    const existingAuthToken = localStorage.getItem('auth-token');
-    const [authToken, setAuthToken] = React.useState(existingAuthToken);
+    const history = useHistory();
+    const existingAuthData = JSON.parse(localStorage.getItem(authDataKey));
+    const [authData, setAuthData] = React.useState(existingAuthData);
     const queryClient = useQueryClient();
 
-    const login = async ({ email, password }, setAuthToken) => {
-        let authToken;
+    const login = async ({ email, password }, setAuthData) => {
+        let authData;
         let errorMessage = null;
 
         try {
-            authToken = await authenticateUser({ username: email, password });
+            authData = await authenticateUser({ username: email, password });
         } catch (err) {
-            errorMessage = `${err.message}. Please create an account first.`;
+            errorMessage = err.message;
         }
 
         if (errorMessage == null) {
-            console.info('Persisting auth token in localStorage and Context: ' + authToken);
+            console.info('Persisting auth data in localStorage and Context: ' + authData);
 
-            // persist the token to localStorage and in context provider via state setter
-            localStorage.setItem('auth-token', authToken);
+            // persist the auth data including the bearer token to localStorage and in context provider via state setter
+            localStorage.setItem(authDataKey, JSON.stringify(authData));
             queryClient.invalidateQueries(queryKeys.USER_DATA);
-            setAuthToken(authToken);
+            setAuthData(authData);
         }
 
         return errorMessage;
@@ -40,15 +42,14 @@ function AuthContextProvider({ children }) {
             firstName: newUserDetails.firstName,
             lastName: newUserDetails.lastName,
             email: newUserDetails.email,
-            password: newUserDetails.newPassword,
-            authToken: faker.random.uuid()
+            password: newUserDetails.newPassword
         };
 
         let errorMessage = null;
         try {
             await createUser(newUserData);
         } catch (err) {
-            errorMessage = `${err.message} Try logging in instead.`;
+            errorMessage = err.message;
         }
 
         return errorMessage;
@@ -56,13 +57,17 @@ function AuthContextProvider({ children }) {
 
     const logOut = () => {
         console.info('Logging user out ...');
-        localStorage.removeItem('auth-token');
-        setAuthToken(null);
+
+        // redirect to home page (login form) after removing auth data from localStorage and state
+        localStorage.removeItem(authDataKey);
+        setAuthData(null);
+        history.push('/');
+
     };
 
     const value = {
-        authToken,
-        setAuthToken,
+        authData,
+        setAuthData,
         login,
         createAccount,
         logOut

@@ -1,10 +1,21 @@
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+
 import SignIn from '../components/SignIn';
 import { mockHandleChange, mockSubmit } from './utils/storyMocks';
 
 export default {
     component: SignIn,
-    title: 'Components/UserAuth/SignIn'
+    title: 'Components/UserAuth/SignIn',
+    decorators: [
+        Story => (
+            <Router>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Story />
+                </div>
+            </Router>
+        )
+    ]
 };
 
 const defaultArgs = {
@@ -14,7 +25,7 @@ const defaultArgs = {
     validations: { email: null, password: null, form: null },
     submitStatus: null
 };
-const Template = args => <SignIn { ...args }/>;
+const Template = args => <SignIn {...args} />;
 
 export const Default = Template.bind({});
 Default.args = defaultArgs;
@@ -22,7 +33,7 @@ Default.args = defaultArgs;
 export const Submitting = Template.bind({});
 Submitting.args = {
     ...defaultArgs,
-    values: { email: 'fake@test.email', password: 'fakepassword'},
+    values: { email: 'fake@test.email', password: 'fakepassword' },
     submitStatus: 'SUBMITTING'
 };
 
