@@ -6,7 +6,6 @@ import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.db.MatchPerformanceDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +30,7 @@ import java.util.UUID;
 
 import static com.footballstatsdashboard.core.utils.Constants.MATCH_PERFORMANCE_ID;
 import static com.footballstatsdashboard.core.utils.Constants.MATCH_PERFORMANCE_ID_PATH;
+import static com.footballstatsdashboard.core.utils.Constants.MATCH_PERFORMANCE_LOOKUP_PATH;
 import static com.footballstatsdashboard.core.utils.Constants.MATCH_PERFORMANCE_V1_BASE_PATH;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
 
@@ -56,7 +56,7 @@ public class MatchPerformanceResource {
 
         ResourceKey resourceKey = new ResourceKey(matchPerformanceId);
         MatchPerformance matchPerformance =
-                this.matchPerformanceDAO.getDocument(resourceKey, MatchPerformance.class).getLeft();
+                this.matchPerformanceDAO.getDocument(resourceKey, MatchPerformance.class);
         return Response.ok().entity(matchPerformance).build();
     }
 
@@ -97,9 +97,8 @@ public class MatchPerformanceResource {
         }
 
         ResourceKey resourceKey = new ResourceKey(existingMatchPerformanceId);
-        Pair<MatchPerformance, Long> existingMatchPerformanceEntity = this.matchPerformanceDAO.getDocument(resourceKey,
+        MatchPerformance existingMatchPerformance = this.matchPerformanceDAO.getDocument(resourceKey,
                 MatchPerformance.class);
-        MatchPerformance existingMatchPerformance = existingMatchPerformanceEntity.getLeft();
 
         if (existingMatchPerformance.getId().equals(incomingMatchPerformance.getId())) {
             MatchPerformance updatedMatchPerformance = ImmutableMatchPerformance.builder()
@@ -119,8 +118,7 @@ public class MatchPerformanceResource {
                     .lastModifiedDate(LocalDate.now())
                     .build();
 
-            this.matchPerformanceDAO.updateDocument(resourceKey, updatedMatchPerformance,
-                    existingMatchPerformanceEntity.getRight());
+            this.matchPerformanceDAO.updateDocument(resourceKey, updatedMatchPerformance);
             return Response.ok().entity(updatedMatchPerformance).build();
         }
 
@@ -149,7 +147,7 @@ public class MatchPerformanceResource {
     }
 
     @GET
-    @Path("lookup/{playerId}")
+    @Path(MATCH_PERFORMANCE_LOOKUP_PATH)
     public Response lookupMatchPerformanceByPlayerId(
             @Auth @PathParam(PLAYER_ID) UUID playerId,
             @QueryParam("competitionId") UUID competitionId) {
