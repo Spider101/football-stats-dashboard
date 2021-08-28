@@ -12,10 +12,8 @@ export default {
 const Template = args => <AttributeComparisonPolarPlot { ...args } />;
 
 export const Default = Template.bind({});
-export const SinglePlayer = Template.bind({});
-
 Default.args = {
-    playerAttributes: [{
+    playersWithAttributes: [{
         name: faker.name.lastName(1),
         attributes: getAttrGroupData(5)
     }, {
@@ -24,8 +22,9 @@ Default.args = {
     }]
 };
 
+export const SinglePlayer = Template.bind({});
 SinglePlayer.args = {
-    playerAttributes: [{
+    playersWithAttributes: [{
         name: faker.name.lastName(1),
         attributes: getAttrGroupData(5)
     }]

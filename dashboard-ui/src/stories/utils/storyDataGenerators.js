@@ -1,6 +1,8 @@
 import faker from 'faker';
 import _ from 'lodash';
 
+import { playerAttributes } from '../../utils';
+
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
@@ -103,7 +105,7 @@ export const getAttributeComparisonTableData = (getAttrItemData) => {
 
 export const getAttrGroupData = (numGroups) => (
     [ ...Array(numGroups) ].map(() => ({
-        groupName: '',
+        groupName: _.sample(playerAttributes.GROUPS),
         attributesInGroup: [ ...Array(10) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
     }))
 );
