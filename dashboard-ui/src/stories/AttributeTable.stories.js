@@ -6,18 +6,18 @@ import { getAttributeItemData, getAttributeComparisonTableData } from './utils/s
 
 export default {
     component: PlayerAttributesTable,
-    title: 'Widgets/PlayerProgressionView/AttributesTable',
-    excludeStories: /.*Data$/,
+    title: 'Widgets/PlayerProgressionView/AttributesTable'
 };
 
-export const Default = () => (
-    <PlayerAttributesTable { ...getAttributeComparisonTableData(getAttributeItemData)}>
-        <AttributeItem/>
-    </PlayerAttributesTable>
-);
-
-export const Highlighted = () => (
-    <PlayerAttributesTable { ...getAttributeComparisonTableData(getAttributeItemData, true)}>
+const Template = args => (
+    <PlayerAttributesTable { ...args }>
         <AttributeItem />
     </PlayerAttributesTable>
 );
+
+export const Default = Template.bind({});
+Default.args = getAttributeComparisonTableData(getAttributeItemData);
+
+// TODO: investigate why the highlighting is not working
+export const Highlighted = Template.bind({});
+Highlighted.args = getAttributeComparisonTableData(getAttributeItemData, true);

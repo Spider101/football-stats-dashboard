@@ -10,6 +10,12 @@ export const actionsData = {
     onSelectMenuItem: action('onSelectMenuItem')
 };
 
+export default {
+    component: MenuItem,
+    title: 'Components/Globals/MenuItem',
+    excludeStories: /.*Data$/
+};
+
 export const selectedMenuItemData = {
     text: 'Menu Item Solo',
     selectedItem: 0,
@@ -17,31 +23,28 @@ export const selectedMenuItemData = {
     icon: <Commute />
 };
 
-const unselectedMenuItemData = {
+const Template = args => <MenuItem {...args} />;
+
+export const Selected = Template.bind({});
+Selected.args = selectedMenuItemData;
+
+export const Unselected = Template.bind({});
+Unselected.args = {
     ...selectedMenuItemData,
     selectedItem: 1,
     menuItemIndex: 0
 };
 
-const selectedMenuItemDataWithRouting = {
+export const WithReactRouter = Template.bind({});
+WithReactRouter.decorators = [
+    Story => (
+        <Router>
+            <Story />
+        </Router>
+    )
+];
+WithReactRouter.args = {
     ...selectedMenuItemData,
     componentType: Link,
     routePath: '/dummyRoute'
 };
-
-export default {
-    component: MenuItem,
-    title: 'Components/Globals/MenuItem',
-    excludeStories: /.*Data$/,
-};
-
-
-export const Selected = () => <MenuItem { ...selectedMenuItemData } />;
-
-export const Unselected = () => <MenuItem { ...unselectedMenuItemData } />;
-
-export const WithReactRouter = () => (
-    <Router>
-        <MenuItem {...selectedMenuItemDataWithRouting }  />
-    </Router>
-);

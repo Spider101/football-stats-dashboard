@@ -4,8 +4,10 @@ import { getPlayerMetadata } from './utils/storyDataGenerators';
 
 export default {
     component: PlayerBioCard,
-    title: 'Components/PlayerComparisonView/PlayerBioCard',
-    excludeStories: /.*data$/
+    title: 'Components/PlayerComparisonView/PlayerBioCard'
 };
 
-export const Default = () => <PlayerBioCard { ...getPlayerMetadata() } />;
+const Template = args => <PlayerBioCard { ...args } />;
+
+export const Default = Template.bind({});
+Default.args = getPlayerMetadata();

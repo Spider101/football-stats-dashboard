@@ -27,17 +27,25 @@ export const menuGroupData = {
     isCollapsed: false
 };
 
-const menuGroupActionsData = {
-    onCollapseMenuItemGroup: action('collapse-menu-group')
-};
-
 export default {
     component: MenuItemGroup,
     title: 'Widgets/Globals/MenuItemGroup',
-    excludeStories: /.*Data$/,
+    excludeStories: /.*Data$/
 };
 
-export const Default = () => <MenuItemGroup menuGroup={ menuGroupData } { ...menuGroupActionsData }/>;
+const Template = args => <MenuItemGroup { ...args } />;
 
-export const Collapsed =
-    () => <MenuItemGroup menuGroup={{ ...menuGroupData, isCollapsed: true }} { ...menuGroupActionsData } />;
+export const Default = Template.bind({});
+Default.args = {
+    menuGroup: menuGroupData,
+    onCollapseMenuItemGroup: action('collapse-menu-group')
+};
+
+export const Collapsed = Template.bind({});
+Collapsed.args = {
+    menuGroup: {
+        ...menuGroupData,
+        isCollapsed: true
+    },
+    onCollapseMenuItemGroup: action('collapse-menu-group')
+};

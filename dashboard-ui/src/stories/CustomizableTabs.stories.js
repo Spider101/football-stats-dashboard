@@ -4,34 +4,29 @@ import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
 
 export default {
     component: CustomizableTabs,
-    title: 'Components/Globals/CustomizableTabs',
-    excludeStories: /.*Data$/
+    title: 'Components/Globals/CustomizableTabs'
 };
 
-export const Default = () => (
-    <CustomizableTabs
-        tabValue={0}
-        onTabChange={ action('Tab Change Handler') }
-        ariaLabel="Basic Tab"
-        isFullWidth={ false }
-        tabLabels={['Basic Tab']}
-    >
+const defaultArgs = {
+    tabValue: 0,
+    onTabChange: action('Tab Change Handler'),
+    ariaLabel: 'Basic Tab',
+    isFullWidth: true,
+    tabLabels: ['Basic Tab']
+};
+const Template = args => (
+    <CustomizableTabs {...args}>
         <TabPanel value={0} index={0}>
             Item 1
         </TabPanel>
     </CustomizableTabs>
 );
 
-export const FixedWidth = () => (
-    <CustomizableTabs
-        tabValue={0}
-        onTabChange={ action('Tab Change Handler') }
-        ariaLabel="Simple Fixed Width Tab"
-        isFullWidth={ true }
-        tabLabels={['Simple Fixed Width Tab']}
-    >
-        <TabPanel value={0} index={0}>
-            Item 1
-        </TabPanel>
-    </CustomizableTabs>
-);
+export const Default = Template.bind({});
+Default.args = defaultArgs;
+
+export const FixedWidth = Template.bind({});
+FixedWidth.args = {
+    ...defaultArgs,
+    isFullWidth: false
+};

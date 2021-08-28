@@ -34,26 +34,25 @@ export default {
     excludeStories: /.*Data$/,
 };
 
-export const Default = () => (
-    <Sidebar
-        sideBarItems={ sideBarData.default }
-        onClickHandler={ action('open-drawer') }
-        isOpen={ true }
-    />
-);
+const Template = args => <Sidebar { ...args } />;
 
-export const ClosedDrawer = () => (
-    <Sidebar
-        sideBarItems={ sideBarData.default }
-        onClickHandler={ action('open-drawer') }
-        isOpen={ false }
-    />
-);
+export const Default = Template.bind({});
+Default.args = {
+    sideBarItems: sideBarData.default,
+    onClickHandler: action('open-drawer'),
+    isOpen: true
+};
 
-export const LongMenuGroupTitle = () => (
-    <Sidebar
-        sideBarItems={ sideBarData.longGroupTitle }
-        onClickHandler={ action('open-drawer') }
-        isOpen={ true }
-    />
-);
+export const ClosedDrawer = Template.bind({});
+ClosedDrawer.args = {
+    sideBarItems: sideBarData.default,
+    onClickHandler: action('open-drawer'),
+    isOpen: false
+};
+
+export const LongMenuGroupTitle = Template.bind({});
+LongMenuGroupTitle.args = {
+    sideBarItems: sideBarData.longGroupTitle,
+    onClickHandler: action('open-drawer'),
+    isOpen: true
+};

@@ -5,7 +5,6 @@ import { getPlayerProgressionData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './u
 export default {
     component: PlayerProgressionCharts,
     title: 'Widgets/PlayerProgressionView/PlayerProgressionCharts',
-    excludeStories: /.*Data$/,
     argTypes: {
         playerAttributeProgressData: {
             name: 'Attribute Progression Data',
@@ -18,17 +17,13 @@ export default {
     }
 };
 
-const playerProgressionChartsData = {
+export const Default = (args) => <PlayerProgressionCharts { ...args } />;
+
+Default.args = {
     playerAttributeProgressData: {
         attributeData: getPlayerProgressionData(10, null, MAX_ATTR_VALUE)
     },
     playerOverallProgressData: {
         overallData: getPlayerProgressionData(1, 'Player Ability', MAX_OVERALL_VALUE)
     }
-};
-
-export const Default = (args) => <PlayerProgressionCharts { ...args } />;
-
-Default.args = {
-    ...playerProgressionChartsData
 };
