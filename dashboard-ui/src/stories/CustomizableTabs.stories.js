@@ -7,13 +7,6 @@ export default {
     title: 'Components/Globals/CustomizableTabs'
 };
 
-const defaultArgs = {
-    tabValue: 0,
-    onTabChange: action('Tab Change Handler'),
-    ariaLabel: 'Basic Tab',
-    isFullWidth: true,
-    tabLabels: ['Basic Tab']
-};
 const Template = args => (
     <CustomizableTabs {...args}>
         <TabPanel value={0} index={0}>
@@ -23,10 +16,16 @@ const Template = args => (
 );
 
 export const Default = Template.bind({});
-Default.args = defaultArgs;
+Default.args = {
+    tabValue: 0,
+    onTabChange: action('Tab Change Handler'),
+    ariaLabel: 'Basic Tab',
+    isFullWidth: true,
+    tabLabels: ['Basic Tab']
+};
 
 export const FixedWidth = Template.bind({});
 FixedWidth.args = {
-    ...defaultArgs,
+    ...Default.args,
     isFullWidth: false
 };

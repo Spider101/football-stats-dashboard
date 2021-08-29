@@ -9,20 +9,14 @@ export default {
     title: 'Components/PlayerComparisonView/AttributeComparisonTable/AttributeComparisonItem'
 };
 
+const attributeName = faker.hacker.noun();
 const Template = args => <AttributeComparisonItem { ...args } />;
 
 export const Default = Template.bind({});
+Default.args = getAttrComparisonItemData(attributeName);
+
 export const Highlighted = Template.bind({});
+Highlighted.args = getAttrComparisonItemData(attributeName, 2, true);
+
 export const SingleAttribute = Template.bind({});
-
-Default.args = {
-    ...getAttrComparisonItemData(faker.hacker.noun())
-};
-
-Highlighted.args = {
-    ...getAttrComparisonItemData(faker.hacker.noun(), 2, true)
-};
-
-SingleAttribute.args = {
-    ...getAttrComparisonItemData(faker.hacker.noun(), 1)
-};
+SingleAttribute.args = getAttrComparisonItemData(attributeName, 1);

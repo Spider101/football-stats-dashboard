@@ -11,12 +11,10 @@ export default {
     title: 'Widgets/SquadHubView/SquadHubTable'
 };
 
-const defaultSquadHubTableData = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap);
-
 const Template = args => <SortableTable { ...args } />;
 
 export const Default = Template.bind({});
-Default.args = defaultSquadHubTableData;
+Default.args = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap);
 
 
 export const WithRouterLink = Template.bind({});
@@ -25,7 +23,7 @@ WithRouterLink.args = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMa
 
 export const EmptyRows = Template.bind({});
 EmptyRows.args = {
-    headers: defaultSquadHubTableData.headers,
+    headers: Default.args.headers,
     rows: []
 };
 

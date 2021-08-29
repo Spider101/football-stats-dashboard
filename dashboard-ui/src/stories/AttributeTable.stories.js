@@ -15,9 +15,6 @@ const Template = args => (
     </PlayerAttributesTable>
 );
 
+// TODO: investigate why the highlighting is not working
 export const Default = Template.bind({});
 Default.args = getAttributeComparisonTableData(getAttributeItemData);
-
-// TODO: investigate why the highlighting is not working
-export const Highlighted = Template.bind({});
-Highlighted.args = getAttributeComparisonTableData(getAttributeItemData, true);

@@ -15,7 +15,6 @@ const comparedPlayerData = getPlayerData(getAttributeNamesList(3 * 10));
 const Template = args => <PlayerComparisonView { ...args } />;
 
 export const Default = Template.bind({});
-
 Default.args = {
     basePlayer: basePlayerData,
     comparedPlayer: comparedPlayerData,
@@ -23,7 +22,6 @@ Default.args = {
 };
 
 export const SinglePlayer = Template.bind({});
-
 SinglePlayer.args = {
     basePlayer: basePlayerData,
     comparedPlayer: null,

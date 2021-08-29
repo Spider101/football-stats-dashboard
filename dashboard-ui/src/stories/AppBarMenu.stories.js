@@ -5,15 +5,6 @@ import AppBarMenu from '../components/AppBarMenu';
 import { AuthContextProvider } from '../context/authProvider';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
-const menuData = {
-    menu: {
-        title: 'Manchester United',
-        teamColor: 'red'
-    },
-    onClickHandler: action('open-menu'),
-    isOpen: false
-};
-
 export default {
     component: AppBarMenu,
     title: 'Components/Globals/AppBarMenu',
@@ -33,11 +24,16 @@ const Template = args => <AppBarMenu {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-    ...menuData
+    menu: {
+        title: 'Manchester United',
+        teamColor: 'red'
+    },
+    onClickHandler: action('open-menu'),
+    isOpen: false
 };
 
 export const MenuOpened = Template.bind({});
 MenuOpened.args = {
-    ...menuData,
+    ...Default.args,
     isOpen: true
 };

@@ -13,6 +13,7 @@ export default {
 const highlightedAttribute = faker.hacker.noun();
 
 const Template = args => <AttributeItem { ...args } />;
+
 export const Default = Template.bind({});
 Default.args = getAttributeItemData(faker.hacker.noun());
 

@@ -10,7 +10,10 @@ export default {
     title: 'Widgets/Globals/Sidebar'
 };
 
-const defaultArgs = {
+const Template = args => <Sidebar { ...args } />;
+
+export const Default = Template.bind({});
+Default.args = {
     sideBarItems: [{
         isGroup: true,
         listItem: MenuGroup.args.menuGroup
@@ -22,23 +25,18 @@ const defaultArgs = {
     isOpen: true
 };
 
-const Template = args => <Sidebar { ...args } />;
-
-export const Default = Template.bind({});
-Default.args = defaultArgs;
-
 export const ClosedDrawer = Template.bind({});
 ClosedDrawer.args = {
-    ...defaultArgs,
+    ...Default.args,
     onClickHandler: action('open-drawer'),
     isOpen: false
 };
 
 export const LongMenuGroupTitle = Template.bind({});
 LongMenuGroupTitle.args = {
-    ...defaultArgs,
+    ...Default.args,
     sideBarItems: [
-        ...defaultArgs.sideBarItems,
+        ...Default.args.sideBarItems,
         {
             isGroup: true,
             listItem: {

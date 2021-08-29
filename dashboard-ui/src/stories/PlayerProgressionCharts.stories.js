@@ -17,8 +17,9 @@ export default {
     }
 };
 
-export const Default = (args) => <PlayerProgressionCharts { ...args } />;
+const Template = (args) => <PlayerProgressionCharts { ...args } />;
 
+export const Default = Template.bind({});
 Default.args = {
     playerAttributeProgressData: {
         attributeData: getPlayerProgressionData(10, null, MAX_ATTR_VALUE)

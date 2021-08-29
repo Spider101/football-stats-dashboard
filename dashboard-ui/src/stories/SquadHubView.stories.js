@@ -25,6 +25,4 @@ const moraleList = moraleIconsMap.map(entity => entity.morale);
 
 const Template = args => <SquadHubView { ...args } />;
 export const Default = Template.bind({});
-Default.args = {
-    ...getSquadHubPlayerData(10, nations, moraleList)
-};
+Default.args = getSquadHubPlayerData(10, nations, moraleList);

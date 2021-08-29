@@ -11,25 +11,21 @@ export default {
     title: 'Components/Globals/MenuItem'
 };
 
-const selectedMenuItemArgs = {
-    text: 'Menu Item Solo',
-    selectedItem: 0,
-    menuItemIndex: 0,
-    icon: <Commute />,
-    handleMenuItemClick: action('onSelectMenuItem')
-
-};
-
 const Template = args => <MenuItem {...args} />;
-
-export const Selected = Template.bind({});
-Selected.args = selectedMenuItemArgs;
 
 export const Unselected = Template.bind({});
 Unselected.args = {
-    ...selectedMenuItemArgs,
+    text: 'Menu Item Solo',
     selectedItem: -1,
-    menuItemIndex: 0
+    menuItemIndex: 0,
+    icon: <Commute />,
+    handleMenuItemClick: action('onSelectMenuItem')
+};
+
+export const Selected = Template.bind({});
+Selected.args = {
+    ...Unselected.args,
+    selectedItem: Unselected.args.menuItemIndex
 };
 
 export const WithReactRouter = Template.bind({});
@@ -41,7 +37,7 @@ WithReactRouter.decorators = [
     )
 ];
 WithReactRouter.args = {
-    ...selectedMenuItemArgs,
+    ...Unselected.args,
     componentType: Link,
     routePath: '/dummyRoute'
 };

@@ -12,7 +12,10 @@ export default {
     title: 'Widgets/Globals/MenuItemGroup'
 };
 
-const defaultArgs = {
+const Template = args => <MenuItemGroup { ...args } />;
+
+export const Default = Template.bind({});
+Default.args = {
     menuGroup: {
         id: 'id1',
         groupTitle: 'Menu Group Title',
@@ -30,19 +33,13 @@ const defaultArgs = {
         isCollapsed: false,
     },
     onCollapseMenuItemGroup: action('collapse-menu-group')
-
 };
-
-const Template = args => <MenuItemGroup { ...args } />;
-
-export const Default = Template.bind({});
-Default.args = defaultArgs;
 
 export const Collapsed = Template.bind({});
 Collapsed.args = {
-    ...defaultArgs,
+    ...Default.args,
     menuGroup: {
-        ...defaultArgs.menuGroup,
+        ...Default.args.menuGroup,
         isCollapsed: true
     }
 };

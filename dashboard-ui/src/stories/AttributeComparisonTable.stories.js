@@ -16,17 +16,7 @@ const Template = args => (
 );
 
 export const Default = Template.bind({});
-export const Highlighted = Template.bind({});
+Default.args = getAttributeComparisonTableData(getAttrComparisonItemData);
+
 export const SinglePlayer = Template.bind({});
-
-Default.args = {
-    ...getAttributeComparisonTableData(getAttrComparisonItemData)
-};
-
-Highlighted.args = {
-    ...getAttributeComparisonTableData(getAttrComparisonItemData)
-};
-
-SinglePlayer.args = {
-    ...getAttributeComparisonTableData((attributeName) => getAttrComparisonItemData(attributeName, 1))
-};
+SinglePlayer.args = getAttributeComparisonTableData((attributeName) => getAttrComparisonItemData(attributeName, 1));

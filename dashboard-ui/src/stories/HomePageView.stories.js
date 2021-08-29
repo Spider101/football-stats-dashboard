@@ -8,4 +8,3 @@ export default {
 
 const Template = args => <HomePageView {...args} />;
 export const Default = Template.bind({});
-Default.args = {};

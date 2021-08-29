@@ -18,7 +18,10 @@ export default {
     ]
 };
 
-const defaultArgs = {
+const Template = args => <Signup { ...args }/>;
+
+export const Default = Template.bind({});
+Default.args = {
     values: { firstName: '', lastName: '', email: '', newPassword: '', confirmedPassword: '' },
     handleChange: mockHandleChange,
     handleSubmit: mockSubmit,
@@ -26,13 +29,9 @@ const defaultArgs = {
     submitStatus: null
 };
 
-const Template = args => <Signup { ...args }/>;
-export const Default = Template.bind({});
-Default.args = defaultArgs;
-
 export const Submitting = Template.bind({});
 Submitting.args = {
-    ...defaultArgs,
+    ...Default.args,
     values: {
         firstName: 'fake first name',
         lastName: 'fake last name',
@@ -45,15 +44,15 @@ Submitting.args = {
 
 export const Submitted = Template.bind({});
 Submitted.args = {
-    ...defaultArgs,
+    ...Default.args,
     submitStatus: 'SUBMITTED'
 };
 
 export const FailedInput = Template.bind({});
 FailedInput.args = {
-    ...defaultArgs,
+    ...Default.args,
     validations: {
-        ...defaultArgs.validations,
+        ...Default.args.validations,
         firstName: 'First Name is required!',
         lastName: 'LastName Name is required!',
         email: 'Email is required!',
@@ -64,9 +63,9 @@ FailedInput.args = {
 
 export const FailedSubmit = Template.bind({});
 FailedSubmit.args = {
-    ...defaultArgs,
+    ...Default.args,
     validations: {
-        ...defaultArgs.validations,
+        ...Default.args.validations,
         form: 'Unable to create account!'
     }
 };
