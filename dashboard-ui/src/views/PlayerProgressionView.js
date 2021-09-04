@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 import Grid from '@material-ui/core/Grid';
 
-import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
+import PlayerAttributesTable from '../components/PlayerAttributesTable';
 import AttributeItem from '../components/AttributeItem';
 import PlayerBioCard from '../components/PlayerBioCard';
 import PlayerProgressionCharts from '../widgets/PlayerProgressionCharts';

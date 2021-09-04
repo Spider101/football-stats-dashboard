@@ -7,7 +7,7 @@ import TableSortLabel from '@material-ui/core/TableSortLabel';
 
 import { makeStyles, withStyles } from '@material-ui/core/styles';
 
-import { StyledTableCell } from '../widgets/PlayerAttributesTable';
+import { StyledTableCell } from '../components/PlayerAttributesTable';
 
 const useStyles = makeStyles({
     visuallyHidden: {

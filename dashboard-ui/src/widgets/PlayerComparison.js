@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Grid from '@material-ui/core/Grid';
 
 import PlayerProgressionView from '../views/PlayerProgressionView';
-import PlayerAttributesTable from './PlayerAttributesTable';
+import PlayerAttributesTable from '../components/PlayerAttributesTable';
 import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';

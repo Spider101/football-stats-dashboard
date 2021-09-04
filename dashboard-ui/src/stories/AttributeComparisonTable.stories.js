@@ -1,5 +1,5 @@
 import React from 'react';
-import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
+import PlayerAttributesTable from '../components/PlayerAttributesTable';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 
 import { getAttrComparisonItemData, getAttributeComparisonTableData } from './utils/storyDataGenerators';
