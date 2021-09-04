@@ -4,7 +4,17 @@ import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
 
 export default {
     component: CustomizableTabs,
-    title: 'Components/Globals/CustomizableTabs'
+    title: 'Components/Globals/CustomizableTabs',
+    argTypes: {
+        children: { control : '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for displaying and switching between related groups of content.'
+            }
+        }
+    }
 };
 
 const Template = args => (

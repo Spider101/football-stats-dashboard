@@ -8,7 +8,21 @@ import Commute from '@material-ui/icons/Commute';
 
 export default {
     component: MenuItem,
-    title: 'Components/Globals/MenuItem'
+    title: 'Components/Globals/MenuItem',
+    argTypes: {
+        componentType: { control: '' },
+        icon: { control: '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for the smallest functional block used in composing the side bar menu.'
+                + 'It allows navigation to various views within the application. It has two states - _Selected_ and'
+                + ' _Unselected_. The former is utilized when the user navigates to a page/view matching the MenuItem.'
+                + ' The latter is the default state when the MenuItem does not match the current page/view.'
+            }
+        }
+    }
 };
 
 const Template = args => <MenuItem {...args} />;

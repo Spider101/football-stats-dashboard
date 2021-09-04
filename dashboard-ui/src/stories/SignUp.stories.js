@@ -7,6 +7,17 @@ import { mockHandleChange, mockSubmit } from './utils/storyMocks';
 export default {
     component: Signup,
     title: 'Components/UserAuth/Signup',
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for displaying a Sign In form. It consists of a _FirstName_, a _LastName_,'
+                + ' an _Email_, a _New Password_ and a _Confirm Password_ field.'
+                + ' Other than the default, it can exist in other states such as _submitting_ the form, having'
+                + ' _submitted_ the form, when one of the input fields fail client-side validations and when after'
+                + ' submitting the form, the server returns a validation.'
+            }
+        }
+    },
     decorators: [
         Story => (
             <Router>

@@ -8,7 +8,14 @@ import { moraleIconsMap, nationalityFlagMap } from '../utils';
 
 export default {
     component: SortableTable,
-    title: 'Widgets/SquadHubView/SquadHubTable'
+    title: 'Widgets/SquadHubView/SquadHubTable',
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget to display all the players in the squad with some key information and attributes.'
+            }
+        }
+    }
 };
 
 const Template = args => <SortableTable { ...args } />;

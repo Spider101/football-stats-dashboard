@@ -4,7 +4,16 @@ import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerator
 
 export default {
     component: PlayerComparison,
-    title: 'Widgets/PlayerComparisonView/PlayerComparison'
+    title: 'Widgets/PlayerComparisonView/PlayerComparison',
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget containing tools for comparing the _attributes_ of two players. It combines'
+                + ' components like `AttributeComparisonTable` and `AttributeComparisonPolarPlot` in a tabbed view'
+                + ' to achieve this.'
+            }
+        }
+    }
 };
 
 const Template = args => <PlayerComparison { ...args } />;

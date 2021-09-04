@@ -7,7 +7,15 @@ import { Unselected } from './MenuItem.stories';
 
 export default {
     component: Sidebar,
-    title: 'Widgets/Globals/Sidebar'
+    title: 'Widgets/Globals/Sidebar',
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for composing multiple `MenuItem` and `MenuItemGroup` components together to'
+                + ' represent the complete navigational entity for the application.'
+            }
+        }
+    }
 };
 
 const Template = args => <Sidebar { ...args } />;

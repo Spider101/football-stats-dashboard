@@ -6,7 +6,18 @@ import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerator
 
 export default {
     component: PlayerComparisonView,
-    title: 'Views/PlayerComparisonView'
+    title: 'Views/PlayerComparisonView',
+    argTypes: {
+        filterControl: { control: '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'View containing tools for comparing the attributes of two players in various _categories_'
+                + ' and _groups_ with the ability to highlight key attributes relevant to their _role_.'
+            }
+        }
+    }
 };
 
 const basePlayerData = getPlayerData(getAttributeNamesList(3 * 10));

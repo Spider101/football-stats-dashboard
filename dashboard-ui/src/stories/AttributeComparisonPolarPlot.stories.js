@@ -6,7 +6,15 @@ import { getAttrGroupData } from './utils/storyDataGenerators';
 
 export default {
     component: AttributeComparisonPolarPlot,
-    title: 'Components/PlayerComparisonView/AttributeComparisonPolarPlot'
+    title: 'Components/PlayerComparisonView/AttributeComparisonPolarPlot',
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for displaying a _polar plot_ comparing the attributes of two players'
+                + ' when grouped into specific categories.'
+            }
+        }
+    }
 };
 
 const Template = args => <AttributeComparisonPolarPlot { ...args } />;

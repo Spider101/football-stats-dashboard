@@ -6,7 +6,18 @@ import { getPlayerProgressionData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './u
 
 export default {
     component: CardWithChart,
-    title: 'Widgets/HomePageView/CardWithChart'
+    title: 'Widgets/HomePageView/CardWithChart',
+    argTypes: {
+        children: { control: '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for housing a chart element. The chart element and associated options are'
+                + ' dynamically passed into the widget.'
+            }
+        }
+    }
 };
 
 const baseCardWithChartArgs = {

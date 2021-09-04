@@ -7,7 +7,16 @@ import { getAttributeItemData } from './utils/storyDataGenerators';
 
 export default {
     component: AttributeItem,
-    title: 'Components/PlayerAttributeTable/AttributeItem'
+    title: 'Components/PlayerAttributeTable/AttributeItem',
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for the smallest functional block used in composing the'
+                + ' `PlayerAttributeTable` widget. It consists of the attribute name, an icon depicting the direction'
+                + ' of the attribute\'s growth and the attribute value.'
+            }
+        }
+    }
 };
 
 const highlightedAttribute = faker.hacker.noun();

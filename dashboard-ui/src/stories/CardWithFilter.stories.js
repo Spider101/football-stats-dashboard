@@ -8,6 +8,17 @@ import FilterControl from '../components/FilterControl';
 export default {
     component: CardWithFilter,
     title: 'Widgets/PlayerComparisonView/CardWithFilter',
+    argTypes: {
+        filterControl: { control: '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for housing a filter control element. The filter control element is dynamically' 
+                + ' passed into the widget.'
+            }
+        }
+    }
 };
 
 

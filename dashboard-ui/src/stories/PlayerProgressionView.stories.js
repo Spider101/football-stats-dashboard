@@ -5,7 +5,14 @@ import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerator
 
 export default {
     component: PlayerProgressionView,
-    title: 'Views/PlayerProgressionView'
+    title: 'Views/PlayerProgressionView',
+    parameters: {
+        docs: {
+            description: {
+                component: 'View containing information about the player and charts to represent their progression.'
+            }
+        }
+    }
 };
 
 const Template = args => <PlayerProgressionView { ...args } />;

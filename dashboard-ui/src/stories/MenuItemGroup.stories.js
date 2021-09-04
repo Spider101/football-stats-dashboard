@@ -9,7 +9,15 @@ import { Unselected } from './MenuItem.stories';
 
 export default {
     component: MenuItemGroup,
-    title: 'Widgets/Globals/MenuItemGroup'
+    title: 'Widgets/Globals/MenuItemGroup',
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for composing multiple `MenuItem` components into a single semantic group.'
+                + ' It allows navigation to one or more pages/views related to a single use-case.'
+            }
+        }
+    }
 };
 
 const Template = args => <MenuItemGroup { ...args } />;

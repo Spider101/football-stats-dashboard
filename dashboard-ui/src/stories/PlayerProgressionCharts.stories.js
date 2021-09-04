@@ -5,6 +5,14 @@ import { getPlayerProgressionData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './u
 export default {
     component: PlayerProgressionCharts,
     title: 'Widgets/PlayerProgressionView/PlayerProgressionCharts',
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for displaying a player\'s progress in their attributes over time. It consists of'
+                + ' a tabbed view with charts representing the _overall_ and _individual_ attribute progress.'
+            }
+        }
+    },
     argTypes: {
         playerAttributeProgressData: {
             name: 'Attribute Progression Data',

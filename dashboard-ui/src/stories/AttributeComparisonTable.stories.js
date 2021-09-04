@@ -6,7 +6,19 @@ import { getAttrComparisonItemData, getAttributeComparisonTableData } from './ut
 
 export default {
     component: PlayerAttributesTable,
-    title: 'Widgets/PlayerComparisonView/AttributeComparisonTable'
+    title: 'Components/PlayerComparisonView/AttributeComparisonTable',
+    argTypes: {
+        children: { control: '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI component for displaying a table consisting of two player\'s attributes compared against'
+                + ' each other. Each column in the table represents a particular category of attributes. The table is'
+                + ' also capable of displaying a single player\'s attributes.'
+            }
+        }
+    }
 };
 
 const Template = args => (

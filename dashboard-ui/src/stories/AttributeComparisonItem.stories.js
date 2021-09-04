@@ -6,7 +6,16 @@ import { getAttrComparisonItemData } from './utils/storyDataGenerators';
 
 export default {
     component: AttributeComparisonItem,
-    title: 'Components/PlayerComparisonView/AttributeComparisonTable/AttributeComparisonItem'
+    title: 'Components/PlayerComparisonView/AttributeComparisonTable/AttributeComparisonItem',
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for the smallest functional block used in composing the'
+                + ' `AttributeComparisonTable` component. It consists of a horizontal bar chart comparing'
+                + ' two players for a given _attribute_.'
+            }
+        }
+    }
 };
 
 const attributeName = faker.hacker.noun();

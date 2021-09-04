@@ -7,9 +7,17 @@ export default {
     title: 'Components/PlayerProgressionView/OverallProgressChart',
     excludeStories: /.*Data$/,
     argTypes: {
-        attributeData: {
+        overallData: {
             name: 'Overall Progression Data',
             control: { type: 'object' }
+        }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for displaying a bar chart documenting a player\'s overall progress over the'
+                + ' last _N_ months.'
+            }
         }
     }
 };

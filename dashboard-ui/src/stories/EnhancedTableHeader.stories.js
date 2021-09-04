@@ -6,6 +6,13 @@ import { action } from '@storybook/addon-actions';
 export default {
     component: EnhancedTableHeader,
     title: 'Components/SquadHubView/EnhancedTableHeader',
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for displaying table headers with enhanced functionality like sorting columns.'
+            }
+        }
+    },
     decorators: [
         Story => (
             <table>

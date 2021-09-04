@@ -5,7 +5,14 @@ import { getMatchPerformanceTableData } from './utils/storyDataGenerators';
 
 export default {
     component: SortableTable,
-    title: 'Widgets/MatchPerformanceView/MatchPerformanceTable'
+    title: 'Widgets/MatchPerformanceView/MatchPerformanceTable',
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for displaying the match performance details of a player in different competitions.'
+            }
+        }
+    }
 };
 
 const Template = args => <SortableTable { ...args } />;

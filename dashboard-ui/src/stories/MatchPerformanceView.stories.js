@@ -6,7 +6,14 @@ import { getMatchPerformanceBreakDown } from './utils/storyDataGenerators';
 
 export default {
     component: MatchPerformanceView,
-    title: 'Views/MatchPerformanceView'
+    title: 'Views/MatchPerformanceView',
+    parameters: {
+        docs: {
+            description: {
+                component: 'View containing all the information relevant to a player\'s performance in recent matches.'
+            }
+        }
+    }
 };
 
 const Template = args => <MatchPerformanceView { ...args } />;
