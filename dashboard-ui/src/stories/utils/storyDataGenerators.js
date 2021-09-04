@@ -191,7 +191,6 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
     })
 });
 
-// TODO: simplify this to match what we are sending into the actual table
 export const getMatchPerformanceTableData = (numCompetitions) => ({
     headers: allMatchPerformanceTableHeaders,
     rows: [ ...Array(numCompetitions) ].map(() => {
@@ -230,7 +229,7 @@ export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
 
 export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) => ({
     competitions: [ ...Array(numCompetitions) ].map(() => {
-        let competitionData = {
+        const competitionData = {
             id: faker.hacker.noun(),
             appearances: getRandomNumberInRange(30),
             goals: getRandomNumberInRange(30),
@@ -245,7 +244,6 @@ export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) =>
             fouls: getRandomNumberInRange(25)
         };
 
-        // TODO: check if we need this logic or can use matchRatingHistory object directly
         return numMatches === 0 ? {
             ...competitionData,
             averageRating: getRandomNumberInRange(10),

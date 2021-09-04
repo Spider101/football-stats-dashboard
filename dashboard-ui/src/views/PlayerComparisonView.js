@@ -42,7 +42,6 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
     );
 }
 
-// TODO: add the props for the data passed into the PlayerComparison component
 PlayerComparisonView.propTypes = {
     basePlayer: PropTypes.shape({
         playerMetadata: PropTypes.shape(PlayerBioCard.propTypes)

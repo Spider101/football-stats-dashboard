@@ -4,7 +4,6 @@ import ReactApexChart from 'react-apexcharts';
 
 import { useGlobalChartOptions } from '../context/chartOptionsProvider';
 
-// TODO: pass in the line chart title
 export default function AttributeProgressChart({ attributeData }) {
     const chartTitle = 'Player Attribute Progression over last 6 months';
     const globalChartOptions = useGlobalChartOptions();
