@@ -2,58 +2,56 @@ import React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import Sidebar from '../widgets/Sidebar';
-import { menuGroupData } from './MenuItemGroup.stories';
-import { actionsData, selectedMenuItemData as menuItemData } from './MenuItem.stories';
-
-const defaultSideBarData = [{
-    isGroup: true,
-    listItem: { ...menuGroupData }
-}, {
-    isGroup: false,
-    listItem: { ...menuItemData, ...actionsData }
-}];
-
-const sideBarData = {
-    default: defaultSideBarData,
-    longGroupTitle: [
-        ...defaultSideBarData,
-        {
-            isGroup: true,
-            listItem: {
-                ...menuGroupData,
-                id: 'id2',
-                groupTitle: 'Extremely Long Menu Group Title'
-            }
-        }
-    ]
-};
+import { Default as MenuGroup } from './MenuItemGroup.stories';
+import { Unselected } from './MenuItem.stories';
 
 export default {
     component: Sidebar,
     title: 'Widgets/Globals/Sidebar',
-    excludeStories: /.*Data$/,
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for composing multiple `MenuItem` and `MenuItemGroup` components together to'
+                + ' represent the complete navigational entity for the application.'
+            }
+        }
+    }
 };
 
-export const Default = () => (
-    <Sidebar
-        sideBarItems={ sideBarData.default }
-        onClickHandler={ action('open-drawer') }
-        isOpen={ true }
-    />
-);
+const Template = args => <Sidebar { ...args } />;
 
-export const ClosedDrawer = () => (
-    <Sidebar
-        sideBarItems={ sideBarData.default }
-        onClickHandler={ action('open-drawer') }
-        isOpen={ false }
-    />
-);
+export const Default = Template.bind({});
+Default.args = {
+    sideBarItems: [{
+        isGroup: true,
+        listItem: MenuGroup.args.menuGroup
+    }, {
+        isGroup: false,
+        listItem: Unselected.args
+    }],
+    onClickHandler: action('close-drawer'),
+    isOpen: true
+};
 
-export const LongMenuGroupTitle = () => (
-    <Sidebar
-        sideBarItems={ sideBarData.longGroupTitle }
-        onClickHandler={ action('open-drawer') }
-        isOpen={ true }
-    />
-);
+export const ClosedDrawer = Template.bind({});
+ClosedDrawer.args = {
+    ...Default.args,
+    onClickHandler: action('open-drawer'),
+    isOpen: false
+};
+
+export const LongMenuGroupTitle = Template.bind({});
+LongMenuGroupTitle.args = {
+    ...Default.args,
+    sideBarItems: [
+        ...Default.args.sideBarItems,
+        {
+            isGroup: true,
+            listItem: {
+                ...MenuGroup.args.menuGroup,
+                id: 'id2',
+                groupTitle: 'Extremely Long Menu Group Title'
+            }
+        }
+    ],
+};

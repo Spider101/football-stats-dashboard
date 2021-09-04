@@ -9,28 +9,33 @@ import { moraleIconsMap, nationalityFlagMap } from '../utils';
 export default {
     component: SortableTable,
     title: 'Widgets/SquadHubView/SquadHubTable',
-    excludeStories: /.*Data$/
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget to display all the players in the squad with some key information and attributes.'
+            }
+        }
+    }
 };
 
-const defaultSquadHubTableData = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap);
-const squadHubTableDataWithRouterLink = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap, true);
-const squadHubTableDataWithNoRows = {
-    headers: defaultSquadHubTableData.headers,
+const Template = args => <SortableTable { ...args } />;
+
+export const Default = Template.bind({});
+Default.args = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap);
+
+
+export const WithRouterLink = Template.bind({});
+WithRouterLink.decorators = [(Story) => <Router><Story/></Router>];
+WithRouterLink.args = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap, true);
+
+export const EmptyRows = Template.bind({});
+EmptyRows.args = {
+    headers: Default.args.headers,
     rows: []
 };
-const squadHubTableDataWithNoData = {
+
+export const EmptyTable = Template.bind({});
+EmptyTable.args = {
     headers: [],
     rows: []
 };
-
-export const Default = () => <SortableTable { ...defaultSquadHubTableData } />;
-
-export const WithRouterLink = () => (
-    <Router>
-        <SortableTable { ...squadHubTableDataWithRouterLink } />;
-    </Router>
-);
-
-export const EmptyRows = () => <SortableTable { ...squadHubTableDataWithNoRows } />;
-
-export const EmptyTable = () => <SortableTable { ...squadHubTableDataWithNoData } />;

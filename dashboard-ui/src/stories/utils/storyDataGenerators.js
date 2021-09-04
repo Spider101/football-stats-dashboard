@@ -1,6 +1,8 @@
 import faker from 'faker';
 import _ from 'lodash';
 
+import { playerAttributes } from '../../utils';
+
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
@@ -103,7 +105,7 @@ export const getAttributeComparisonTableData = (getAttrItemData) => {
 
 export const getAttrGroupData = (numGroups) => (
     [ ...Array(numGroups) ].map(() => ({
-        groupName: '',
+        groupName: _.sample(playerAttributes.GROUPS),
         attributesInGroup: [ ...Array(10) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
     }))
 );
@@ -189,7 +191,6 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
     })
 });
 
-// TODO: simplify this to match what we are sending into the actual table
 export const getMatchPerformanceTableData = (numCompetitions) => ({
     headers: allMatchPerformanceTableHeaders,
     rows: [ ...Array(numCompetitions) ].map(() => {
@@ -228,7 +229,7 @@ export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
 
 export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) => ({
     competitions: [ ...Array(numCompetitions) ].map(() => {
-        let competitionData = {
+        const competitionData = {
             id: faker.hacker.noun(),
             appearances: getRandomNumberInRange(30),
             goals: getRandomNumberInRange(30),
@@ -243,7 +244,6 @@ export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) =>
             fouls: getRandomNumberInRange(25)
         };
 
-        // TODO: check if we need this logic or can use matchRatingHistory object directly
         return numMatches === 0 ? {
             ...competitionData,
             averageRating: getRandomNumberInRange(10),

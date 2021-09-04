@@ -6,13 +6,21 @@ import { getPlayerProgressionData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './u
 
 export default {
     component: CardWithChart,
-    title: 'Widgets/HomePageView',
-    excludeStories: /.*Data$/,
+    title: 'Widgets/HomePageView/CardWithChart',
+    argTypes: {
+        children: { control: '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for housing a chart element. The chart element and associated options are'
+                + ' dynamically passed into the widget.'
+            }
+        }
+    }
 };
 
-const lineChartData = {
-    cardTitle: 'Demo Line Chart in Card',
-    chartData: getPlayerProgressionData(10, null, MAX_ATTR_VALUE),
+const baseCardWithChartArgs = {
     dataTransformer: x => x,
     chartOptions: {
         stroke: { width: 2, curve: 'straight' },
@@ -21,35 +29,31 @@ const lineChartData = {
             title: { text: 'Months', style: { fontFamily: 'Roboto' } },
             categories: [1, 2, 3, 4, 5, 6]
         }
-    },
+    }
+};
+
+const Template = args => (
+    <CardWithChart { ...args }>
+        <ReactApexChart />
+    </CardWithChart>
+);
+export const LineChart = Template.bind({});
+LineChart.args = {
+    ...baseCardWithChartArgs,
+    cardTitle: 'Demo Line Chart in Card',
+    chartData: getPlayerProgressionData(10, null, MAX_ATTR_VALUE),
     chartType: 'line'
 };
 
-const barChartData = {
+export const BarChart = Template.bind({});
+BarChart.args = {
+    ...baseCardWithChartArgs,
     cardTitle: 'Demo Bar Chart in Card',
     chartData: getPlayerProgressionData(1, 'Player Ability', MAX_OVERALL_VALUE),
-    dataTransformer: x => x,
     chartOptions: {
-        stroke: { width: 2, curve: 'straight' },
+        ...baseCardWithChartArgs.chartOptions,
         plotOptions: { bar: { columnWidth: '15%' } },
         dataLabels: { enabled: false },
-        legend: { show: false },
-        xaxis: {
-            title: { text: 'Months', style: { fontFamily: 'Roboto' } },
-            categories: [1, 2, 3, 4, 5, 6]
-        }
     },
     chartType: 'bar'
 };
-
-export const LineChart = () => (
-    <CardWithChart { ...lineChartData }>
-        <ReactApexChart />
-    </CardWithChart>
-);
-
-export const BarChart = () => (
-    <CardWithChart { ...barChartData }>
-        <ReactApexChart />
-    </CardWithChart>
-);

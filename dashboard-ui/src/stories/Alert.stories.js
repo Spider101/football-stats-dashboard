@@ -4,7 +4,14 @@ import Alert from '../components/Alert';
 
 export default {
     component: Alert,
-    title: 'Components/Globals/Alert'
+    title: 'Components/Globals/Alert',
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for displaying `error` or `success` messages (color-coded).'
+            }
+        }
+    }
 };
 
 const Template = args => <Alert { ...args } />;

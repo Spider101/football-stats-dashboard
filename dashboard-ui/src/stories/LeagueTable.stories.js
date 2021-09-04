@@ -4,7 +4,14 @@ import { getLeagueTableData } from './utils/storyDataGenerators';
 
 export default {
     component: LeagueTable,
-    title: 'Widgets/HomePageView/LeagueTable'
+    title: 'Widgets/HomePageView/LeagueTable',
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for displaying the league table.'
+            }
+        }
+    }
 };
 
 const Template = args => <LeagueTable { ...args } />;

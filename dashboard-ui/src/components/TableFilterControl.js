@@ -29,7 +29,6 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-// TODO: update class name to something more generic
 export default function TableFilterControl({ currentValues, handleChangeFn, allPossibleValues, allValuesSelectedLabel,
     inputLabelText, labelIdFragment, customStyles }) {
     const classes = useStyles();

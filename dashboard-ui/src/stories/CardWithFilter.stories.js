@@ -8,12 +8,27 @@ import FilterControl from '../components/FilterControl';
 export default {
     component: CardWithFilter,
     title: 'Widgets/PlayerComparisonView/CardWithFilter',
-    // exclude stories starting with lower case letter
-    excludeStories: /^[a-z].*/
+    argTypes: {
+        filterControl: { control: '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'Widget for housing a filter control element. The filter control element is dynamically' 
+                + ' passed into the widget.'
+            }
+        }
+    }
 };
 
-const filterControlProps = {
-    allPossibleValues: [ ...Array(10) ].map((_, _idx) => ({ id: _idx, text: faker.hacker.noun()})),
+
+const Template = (args) => (
+    <CardWithFilter filterControl={<FilterControl {...args} />} />
+);
+
+export const Default = Template.bind({});
+Default.args = {
+    allPossibleValues: [...Array(10)].map((_, _idx) => ({ id: _idx, text: faker.hacker.noun() })),
     currentValue: -1,
     handleChangeFn: x => x,
     labelIdFragment: 'players',
@@ -21,22 +36,8 @@ const filterControlProps = {
     helperText: 'Choose player to compare against'
 };
 
-const filterControlPropsWithSelectedValue = {
-    ...filterControlProps,
-    currentValue: _.sample(filterControlProps.allPossibleValues).id
-};
-
-export const filterControl = <FilterControl { ...filterControlProps } />;
-const filterControlWithSelectedValue = <FilterControl { ...filterControlPropsWithSelectedValue } />;
-
-const Template = args => <CardWithFilter { ...args } />;
-
-export const Default = Template.bind({});
-Default.args = {
-    filterControl
-};
-
 export const Selected = Template.bind({});
 Selected.args = {
-    filterControl: filterControlWithSelectedValue
+    ...Default.args,
+    currentValue: _.sample(Default.args.allPossibleValues).id
 };

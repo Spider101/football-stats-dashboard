@@ -6,9 +6,16 @@ import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerator
 export default {
     component: PlayerProgressionView,
     title: 'Views/PlayerProgressionView',
-    excludeStories: /.*Data$/
+    parameters: {
+        docs: {
+            description: {
+                component: 'View containing information about the player and charts to represent their progression.'
+            }
+        }
+    }
 };
 
-const playerData = getPlayerData(getAttributeNamesList(3 * 10), true);
+const Template = args => <PlayerProgressionView { ...args } />;
 
-export const Default = () => <PlayerProgressionView { ...playerData } />;
+export const Default = Template.bind({});
+Default.args = getPlayerData(getAttributeNamesList(3 * 10), true);

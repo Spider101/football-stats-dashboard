@@ -15,7 +15,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import withStyles from '@material-ui/core/styles/withStyles';
 import { makeStyles } from '@material-ui/core/styles';
 
-export const StyledTableCell = withStyles((theme) => ({
+export const StyledTableCell = withStyles(theme => ({
     root: {
         borderRight: '4px solid',
         borderRightColor: theme.palette.action.hover,
@@ -25,24 +25,23 @@ export const StyledTableCell = withStyles((theme) => ({
     },
     head: {
         backgroundColor: theme.palette.primary.dark,
-        color: theme.palette.common.white,
+        color: theme.palette.common.white
     },
     body: {
         fontSize: 14,
         padding: 0
-    },
+    }
 }))(TableCell);
 
-const StyledTableRow = withStyles((theme) => ({
+const StyledTableRow = withStyles(theme => ({
     root: {
         '&:nth-of-type(odd)': {
-            backgroundColor: theme.palette.action.hover,
-        },
-    },
+            backgroundColor: theme.palette.action.hover
+        }
+    }
 }))(TableRow);
 
-
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     dropdown: {
         display: 'flex',
         flexDirection: 'row-reverse'
@@ -55,24 +54,27 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PlayerAttributesTable({ roles, headers, rows, children }) {
     const classes = useStyles();
-    const [ role, changeRole ] = React.useState('None');
+    const [selectedRole, updateSelectedRole] = React.useState('None');
 
-    const handleChange = (evt) => {
-        changeRole(evt.target.value);
+    const handleChange = evt => {
+        updateSelectedRole(evt.target.value);
     };
 
     return (
         <div>
-            <div className={ classes.dropdown }>
-                <FormControl className={ classes.formControl }>
-                    <InputLabel  id="player-role-input-label">Player Role</InputLabel>
-                    <Select id="player-role-select-label"
-                        value={ role }
-                        onChange={ handleChange }
-                    >
-                        <MenuItem value={ 'None' }> <em>None</em> </MenuItem>
-                        { roles.map((role, _idx) => (
-                            <MenuItem key={ _idx } value={ role.name }> { role.name }</MenuItem>
+            <div className={classes.dropdown}>
+                <FormControl className={classes.formControl}>
+                    <InputLabel id='player-role-input-label'>Player Role</InputLabel>
+                    <Select id='player-role-select-label' value={selectedRole} onChange={handleChange}>
+                        <MenuItem value={'None'}>
+                            {' '}
+                            <em>None</em>{' '}
+                        </MenuItem>
+                        {roles.map((role, _idx) => (
+                            <MenuItem key={_idx} value={role.name}>
+                                {' '}
+                                {role.name}
+                            </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
@@ -81,27 +83,29 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
                 <Table>
                     <TableHead>
                         <TableRow>
-                            { headers.map((header, idx) => (
-                                <StyledTableCell key={ idx }> { header }</StyledTableCell>
+                            {headers.map((header, idx) => (
+                                <StyledTableCell key={idx}> {header}</StyledTableCell>
                             ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        { rows.map((row, _idx) => (
-                            <StyledTableRow key={ _idx }>
-                                { row.map((cell, _idx) => {
+                        {rows.map((row, _idx) => (
+                            <StyledTableRow key={_idx}>
+                                {row.map((cell, _idx) => {
                                     // inject props from current scope into the child component
                                     const childrenWithProps = React.Children.map(children, child => {
                                         if (React.isValidElement(child)) {
-                                            const highlightedAttributes = roles[role] || [];
+                                            const highlightedAttributes =
+                                                roles.find(role => role.name === selectedRole)?.associatedAttributes
+                                                || [];
                                             return React.cloneElement(child, { ...cell, highlightedAttributes });
                                         }
                                         return child;
                                     });
 
                                     return (
-                                        <StyledTableCell component='th' scope='row' key={ _idx }>
-                                            { cell != null ? childrenWithProps : null }
+                                        <StyledTableCell component='th' scope='row' key={_idx}>
+                                            {cell != null ? childrenWithProps : null}
                                         </StyledTableCell>
                                     );
                                 })}

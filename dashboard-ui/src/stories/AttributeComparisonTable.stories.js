@@ -1,12 +1,24 @@
 import React from 'react';
-import PlayerAttributesTable from '../widgets/PlayerAttributesTable';
+import PlayerAttributesTable from '../components/PlayerAttributesTable';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 
 import { getAttrComparisonItemData, getAttributeComparisonTableData } from './utils/storyDataGenerators';
 
 export default {
     component: PlayerAttributesTable,
-    title: 'Widgets/PlayerComparisonView/AttributeComparisonTable'
+    title: 'Components/PlayerComparisonView/AttributeComparisonTable',
+    argTypes: {
+        children: { control: '' }
+    },
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI component for displaying a table consisting of two player\'s attributes compared against'
+                + ' each other. Each column in the table represents a particular category of attributes. The table is'
+                + ' also capable of displaying a single player\'s attributes.'
+            }
+        }
+    }
 };
 
 const Template = args => (
@@ -16,17 +28,7 @@ const Template = args => (
 );
 
 export const Default = Template.bind({});
-export const Highlighted = Template.bind({});
+Default.args = getAttributeComparisonTableData(getAttrComparisonItemData);
+
 export const SinglePlayer = Template.bind({});
-
-Default.args = {
-    ...getAttributeComparisonTableData(getAttrComparisonItemData)
-};
-
-Highlighted.args = {
-    ...getAttributeComparisonTableData(getAttrComparisonItemData)
-};
-
-SinglePlayer.args = {
-    ...getAttributeComparisonTableData((attributeName) => getAttrComparisonItemData(attributeName, 1))
-};
+SinglePlayer.args = getAttributeComparisonTableData((attributeName) => getAttrComparisonItemData(attributeName, 1));

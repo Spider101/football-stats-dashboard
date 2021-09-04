@@ -6,10 +6,26 @@ import { action } from '@storybook/addon-actions';
 export default {
     component: EnhancedTableHeader,
     title: 'Components/SquadHubView/EnhancedTableHeader',
-    excludeStories: /.*Data$/
+    parameters: {
+        docs: {
+            description: {
+                component: 'UI Component for displaying table headers with enhanced functionality like sorting columns.'
+            }
+        }
+    },
+    decorators: [
+        Story => (
+            <table>
+                <Story />
+            </table>
+        )
+    ]
 };
 
-const defaultData = {
+const Template = args => <EnhancedTableHeader { ...args } />;
+
+export const Default = Template.bind({});
+Default.args = {
     headerCells: [
         {
             id: 'left aligned cell',
@@ -32,7 +48,8 @@ const defaultData = {
     onRequestSort: action('sort requested on this column')
 };
 
-const sortedAscData = {
+export const AscendingSortedCell = Template.bind({});
+AscendingSortedCell.args = {
     headerCells: [
         {
             id: 'table header cell to sort asc',
@@ -50,7 +67,8 @@ const sortedAscData = {
     onRequestSort: action('sort requested on this column')
 };
 
-const sortedDescData = {
+export const DescendingSortedCell = Template.bind({});
+DescendingSortedCell.args = {
     headerCells: [
         {
             id: 'table header cell to sort desc',
@@ -67,21 +85,3 @@ const sortedDescData = {
     orderBy: 'table header cell to sort desc',
     onRequestSort: action('sort requested on this column')
 };
-
-export const Default = () => (
-    <table>
-        <EnhancedTableHeader {...defaultData} />
-    </table>
-);
-
-export const AscendingSortedCell = () => (
-    <table>
-        <EnhancedTableHeader {...sortedAscData} />
-    </table>
-);
-
-export const DescendingSortedCell = () => (
-    <table>
-        <EnhancedTableHeader {...sortedDescData} />
-    </table>
-);
