@@ -96,7 +96,8 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
                                     const childrenWithProps = React.Children.map(children, child => {
                                         if (React.isValidElement(child)) {
                                             const highlightedAttributes =
-                                                roles.filter(role => role.name === selectedRole) || [];
+                                                roles.find(role => role.name === selectedRole)?.associatedAttributes
+                                                || [];
                                             return React.cloneElement(child, { ...cell, highlightedAttributes });
                                         }
                                         return child;
