@@ -20,6 +20,7 @@ const routingData = [{
     routePath: '/squadHub',
     component: SquadHub,
     isExact: false,
+    disabledPaths: ['/'],
     showInSidebar: true
 }, {
     routePath: '/player/:playerId',

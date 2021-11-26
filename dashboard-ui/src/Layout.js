@@ -63,6 +63,7 @@ const AppContainer = ({ classes }) => {
                 icon: sidebarItemData.icon,
                 menuItemIndex: _idx,
                 componentType: Link,
+                disabledPaths: sidebarItemData.disabledPaths,
                 routePath: sidebarItemData.routePath
             }
         }));
