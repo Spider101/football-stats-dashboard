@@ -6,11 +6,12 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 
 export default function MenuItem({ text, icon, clsName, selectedItem, menuItemIndex, handleMenuItemClick, componentType,
-    routePath }) {
+    routePath, isDisabled = false }) {
 
     return (
         <ListItem
             button
+            disabled={ isDisabled }
             className={ clsName }
             selected={ selectedItem === menuItemIndex }
             onClick={(event) => handleMenuItemClick(event, menuItemIndex)}
@@ -29,6 +30,7 @@ MenuItem.propTypes = {
     text: PropTypes.string,
     icon: PropTypes.node,
     clsName: PropTypes.string,
+    isDisabled: PropTypes.bool,
     selectedItem: PropTypes.number,
     menuItemIndex: PropTypes.number,
     handleMenuItemClick: PropTypes.func,
