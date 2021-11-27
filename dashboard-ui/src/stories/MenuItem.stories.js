@@ -42,6 +42,12 @@ Selected.args = {
     selectedItem: Unselected.args.menuItemIndex
 };
 
+export const Disabled = Template.bind({});
+Disabled.args = {
+    ...Unselected.args,
+    isDisabled: true
+};
+
 export const WithReactRouter = Template.bind({});
 WithReactRouter.decorators = [
     Story => (

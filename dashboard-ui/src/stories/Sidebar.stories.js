@@ -4,6 +4,7 @@ import { action } from '@storybook/addon-actions';
 import Sidebar from '../widgets/Sidebar';
 import { Default as MenuGroup } from './MenuItemGroup.stories';
 import { Unselected } from './MenuItem.stories';
+import { MemoryRouter } from 'react-router';
 
 export default {
     component: Sidebar,
@@ -15,7 +16,14 @@ export default {
                 + ' represent the complete navigational entity for the application.'
             }
         }
-    }
+    },
+    decorators: [
+        Story => (
+            <MemoryRouter initialEntries={['/']}>
+                <Story />
+            </MemoryRouter>
+        )
+    ]
 };
 
 const Template = args => <Sidebar { ...args } />;
@@ -31,6 +39,22 @@ Default.args = {
     }],
     onClickHandler: action('close-drawer'),
     isOpen: true
+};
+
+export const WithDisabledItems = Template.bind({});
+WithDisabledItems.args = {
+    ...Default.args,
+    sideBarItems: [
+        ...Default.args.sideBarItems,
+        {
+            isGroup: false,
+            listItem: {
+                ...Unselected.args,
+                text: 'Disabled Menu Item',
+                disabledPaths: ['/']
+            }
+        }
+    ]
 };
 
 export const ClosedDrawer = Template.bind({});

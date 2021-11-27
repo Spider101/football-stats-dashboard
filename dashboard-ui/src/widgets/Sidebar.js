@@ -1,18 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
+import { useLocation } from 'react-router';
 
-import MenuItemGroup from './MenuItemGroup';
-import MenuItem from '../components/MenuItem';
-import Divider from '@material-ui/core/Divider';
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
+import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import IconButton from '@material-ui/core/IconButton';
 import SettingsIcon from '@material-ui/icons/Settings';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
+import MenuItemGroup from './MenuItemGroup';
+import MenuItem from '../components/MenuItem';
 import { DRAWER_WIDTH } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
@@ -56,6 +57,7 @@ export default function Sidebar({ sideBarItems: initialSideBarItems, onClickHand
     const classes = useStyles();
     const [ sideBarItems, updateSideBarItems ] = React.useState(initialSideBarItems);
     const [selectedItem, setSelectedItem] = React.useState(-1);
+    const location = useLocation();
 
     const handleClick = (event, itemIndex) => {
         setSelectedItem(itemIndex);
@@ -119,6 +121,7 @@ export default function Sidebar({ sideBarItems: initialSideBarItems, onClickHand
                         />
                         : <MenuItem
                             key={ _idx }
+                            isDisabled={ (sideBarItem.listItem?.disabledPaths || []).includes(location.pathname) }
                             selectedItem={ selectedItem }
                             handleMenuItemClick={ handleClick }
                             { ...sideBarItem.listItem }

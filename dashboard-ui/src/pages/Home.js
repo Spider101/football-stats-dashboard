@@ -7,7 +7,6 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/styles';
 
 import useUserData from '../hooks/useUserData';
-
 import HomePageView from '../views/HomePageView';
 
 const useStyles = makeStyles({
