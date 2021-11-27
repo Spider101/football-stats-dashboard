@@ -24,11 +24,19 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:coverage": "react-scripts test --watchAll=false --coverage",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 9009 -s public",
     "build-storybook": "build-storybook -s public",
     "lint": "./node_modules/.bin/eslint --ext js src",
     "start-mock-server": "npx json-server --watch db.js --port 4000"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "<rootDir>/src/**/*.{js,jsx}",
+      "!**/node_modules/**",
+      "!**/*.stories.{js,jsx}"
+    ]
   },
   "eslintConfig": {
     "extends": "react-app"
