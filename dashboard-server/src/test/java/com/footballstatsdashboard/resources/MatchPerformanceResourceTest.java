@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.resources;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.footballstatsdashboard.api.model.ImmutableMatchPerformance;
 import com.footballstatsdashboard.api.model.ImmutableUser;
@@ -277,10 +278,12 @@ public class MatchPerformanceResourceTest {
         assertEquals(HttpStatus.OK_200, matchPerformanceResponse.getStatus());
         assertNotNull(matchPerformanceResponse.getEntity());
 
-        List<Object> entityList = OBJECT_MAPPER.convertValue(matchPerformanceResponse.getEntity(), List.class);
-        assertFalse(entityList.isEmpty());
-        entityList.forEach(entity -> {
-            MatchPerformance matchPerformanceFromResponse = OBJECT_MAPPER.convertValue(entity, MatchPerformance.class);
+        TypeReference<List<MatchPerformance>> matchPerformanceListTypeRef = new TypeReference<>() {};
+        List<MatchPerformance> matchPerformancesFromResponse =
+                OBJECT_MAPPER.convertValue(matchPerformanceResponse.getEntity(), matchPerformanceListTypeRef);
+        assertFalse(matchPerformancesFromResponse.isEmpty());
+        matchPerformancesFromResponse.forEach(matchPerformanceFromResponse -> {
+            assertNotNull(matchPerformanceFromResponse);
             assertEquals(playerId, matchPerformanceFromResponse.getPlayerId());
             assertEquals(competitionId, matchPerformanceFromResponse.getCompetitionId());
             assertEquals(expectedMatchPerformanceId, matchPerformanceFromResponse.getId());
