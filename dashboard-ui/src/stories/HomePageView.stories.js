@@ -1,6 +1,8 @@
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 
 import HomePageView from '../views/HomePageView';
+import { getClubsData } from './utils/storyDataGenerators';
 
 export default {
     component: HomePageView,
@@ -12,8 +14,24 @@ export default {
                 + ' application.'
             }
         }
-    }
+    },
+    decorators: [
+        Story => (
+            <MemoryRouter>
+                <Story />
+            </MemoryRouter>
+        )
+    ]
 };
 
 const Template = args => <HomePageView {...args} />;
+
 export const Default = Template.bind({});
+Default.args = {
+    clubs: getClubsData(5)
+};
+
+export const NoClubs = Template.bind({});
+NoClubs.args = {
+    clubs: []
+};

@@ -214,7 +214,7 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
 
 export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
     return {
-        players: [ ...Array(numPlayers) ].map((_0, idx) => ({
+        players: [ ...Array(numPlayers) ].map((_, idx) => ({
             playerId: idx,
             name: faker.name.findName(),
             nationality: _.sample(nationsList),
@@ -271,5 +271,16 @@ export const getLeagueTableData = (numTeams) => {
         goalsFor: getRandomNumberInRange(30, 10),
         goalsAgainst: getRandomNumberInRange(30, 10),
         points: getRandomNumberInRange(80, 50)
+    }));
+};
+
+export const getClubsData = (numClubs) => {
+    return [ ...Array(numClubs) ].map((_, idx) => ({
+        id: idx,
+        name: faker.company.companyName(),
+        transferBudget: getRandomNumberInRange(500000, 10000000),
+        wageBudget: getRandomNumberInRange(500000, 10000000),
+        income: getRandomNumberInRange(500000, 10000000),
+        expenditure: getRandomNumberInRange(500000, 10000000),
     }));
 };
