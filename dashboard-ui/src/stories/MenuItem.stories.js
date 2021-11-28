@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Link } from 'react-router-dom';
+import { MemoryRouter, Link } from 'react-router-dom';
 
 import { action } from '@storybook/addon-actions';
 
@@ -51,9 +51,9 @@ Disabled.args = {
 export const WithReactRouter = Template.bind({});
 WithReactRouter.decorators = [
     Story => (
-        <Router>
+        <MemoryRouter>
             <Story />
-        </Router>
+        </MemoryRouter>
     )
 ];
 WithReactRouter.args = {

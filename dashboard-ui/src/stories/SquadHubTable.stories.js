@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
 import SortableTable from '../widgets/SortableTable';
 
@@ -25,7 +25,7 @@ Default.args = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap);
 
 
 export const WithRouterLink = Template.bind({});
-WithRouterLink.decorators = [(Story) => <Router><Story/></Router>];
+WithRouterLink.decorators = [Story => <MemoryRouter><Story/></MemoryRouter>];
 WithRouterLink.args = getSquadHubTableData(10, nationalityFlagMap, moraleIconsMap, true);
 
 export const EmptyRows = Template.bind({});

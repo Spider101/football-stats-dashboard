@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 
 import { moraleIconsMap, nationalityFlagMap } from '../utils';
 
@@ -13,16 +13,17 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'View representing key information about the players in the squad with tools to focus on a'
-                + ' subset of the players or the associated information.'
+                component:
+                    'View representing key information about the players in the squad with tools to focus on a' +
+                    ' subset of the players or the associated information.'
             }
         }
     },
     decorators: [
-        (Story) => (
-            <Router>
-                <Story/>
-            </Router>
+        Story => (
+            <MemoryRouter>
+                <Story />
+            </MemoryRouter>
         )
     ]
 };
@@ -30,7 +31,7 @@ export default {
 const nations = nationalityFlagMap.map(entity => entity.nationality);
 const moraleList = moraleIconsMap.map(entity => entity.morale);
 
-const Template = args => <SquadHubView { ...args } />;
+const Template = args => <SquadHubView {...args} />;
 
 export const Default = Template.bind({});
 Default.args = getSquadHubPlayerData(10, nations, moraleList);
