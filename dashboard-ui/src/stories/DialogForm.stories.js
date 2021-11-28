@@ -23,28 +23,29 @@ export default {
 const Template = args => (
     <DialogForm {...args}>
         <TextField
+            label='Text Input'
+            autofocus
             id="textInput"
             name="textInput"
             fullWidth
-            variant="outlined"
             margin="normal"
             placeholder="Enter any text ..."
         />
         <TextField
+            label='Number Input'
             id="numberInput"
             name="numberInput"
             fullWidth
             type="number"
-            variant="outlined"
             margin="normal"
             placeholder="Enter any number ..."
         />
         <TextField
+            label='Email Input'
             id="emailInput"
             name="emailInput"
             fullWidth
             type="email"
-            variant="outlined"
             margin="normal"
             placeholder="Enter any email ..."
         />
