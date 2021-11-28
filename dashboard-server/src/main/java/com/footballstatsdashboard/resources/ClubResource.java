@@ -136,7 +136,7 @@ public class ClubResource {
     }
 
     @GET
-    @Path(CLUB_ID_PATH + "/all")
+    @Path("/all")
     public Response getClubsByUserId(@Auth User user) {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getClubsByUserId() request for user");
