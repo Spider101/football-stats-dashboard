@@ -6,7 +6,7 @@ const validateEmail = email => /\S+@\S+\.\S+/.test(email);
 
 const validateFormData = formData => {
     const formValidations = Object.entries(formData).reduce((validations, [key, value]) => {
-        if (!value.trim()) {
+        if (isNaN(value) && !value.trim()) {
             validations[key] = `${capitalizeLabel(convertCamelCaseToSnakeCase(key))} cannot be empty!`;
         } else if (key === 'email' && !validateEmail(value)) {
             validations[key] = 'Email is in incorrect format!';
