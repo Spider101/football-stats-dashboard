@@ -7,7 +7,6 @@ import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,6 +133,16 @@ public class ClubResource {
         this.clubDAO.deleteDocument(resourceKey);
 
         return Response.noContent().build();
+    }
+
+    @GET
+    @Path(CLUB_ID_PATH + "/all")
+    public Response getClubsByUserId(@Auth User user) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("getClubsByUserId() request for user");
+        }
+        List<Club> clubsByUserId = clubDAO.getClubsByUserId(user.getId());
+        return Response.ok().entity(clubsByUserId).build();
     }
 
     @GET

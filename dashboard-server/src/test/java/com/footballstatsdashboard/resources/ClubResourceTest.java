@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.resources;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
@@ -29,10 +30,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -240,6 +242,63 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.NO_CONTENT_204, clubResponse.getStatus());
     }
 
+    /**
+     * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from
+     * couchbase and returned in the response
+     */
+    @Test
+    public void getClubsByUserId_fetchesAllClubsForUser() {
+        // setup
+        int numberOfClubs = 2;
+        UUID userId = userPrincipal.getId();
+        List<Club> mockClubData = getMockClubData(numberOfClubs, userId);
+        when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
+
+        // execute
+        Response response = clubResource.getClubsByUserId(userPrincipal);
+
+        // assert
+        verify(clubDAO).getClubsByUserId(eq(userId));
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK_200, response.getStatus());
+        assertNotNull(response.getEntity());
+
+        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() {};
+        List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
+        assertFalse(clubList.isEmpty());
+
+        for (int idx=0; idx < clubList.size(); idx++) {
+            assertEquals(userId, clubList.get(idx).getUserId());
+            assertEquals(mockClubData.get(idx).getName(), clubList.get(idx).getName());
+        }
+    }
+
+    /**
+     * given a valid user entity as the auth principal but no there are no club entities associated with it, tests that
+     * an empty list is returned in the response
+     */
+    @Test
+    public void getClubsByUserId_ReturnsEmptyListWhenClubsAssociatedToUser() {
+        // setup
+        int numberOfClubs = 0;
+        UUID userId = userPrincipal.getId();
+        List<Club> mockClubData = getMockClubData(numberOfClubs, userId);
+        when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
+
+        // execute
+        Response response = clubResource.getClubsByUserId(userPrincipal);
+
+        // assert
+        verify(clubDAO).getClubsByUserId(eq(userId));
+        assertNotNull(response);
+        assertEquals(HttpStatus.OK_200, response.getStatus());
+        assertNotNull(response.getEntity());
+
+        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() {};
+        List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
+        assertTrue(clubList.isEmpty());
+    }
+
     @Test
     public void getSquadPlayers_fetchesPlayersFromCouchbase() {
         // setup
@@ -263,10 +322,10 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        List<Object> entityList = OBJECT_MAPPER.convertValue(response.getEntity(), List.class);
-        assertFalse(entityList.isEmpty());
-        entityList.forEach(entity -> {
-            SquadPlayer squadPlayerFromResponse = OBJECT_MAPPER.convertValue(entity, SquadPlayer.class);
+        TypeReference<List<SquadPlayer>> squadPlayerListTypeRef = new TypeReference<>() {};
+        List<SquadPlayer> squadPlayersFromResponse = OBJECT_MAPPER.convertValue(response.getEntity(), squadPlayerListTypeRef);
+        assertFalse(squadPlayersFromResponse.isEmpty());
+        squadPlayersFromResponse.forEach(squadPlayerFromResponse -> {
             assertNotNull(squadPlayerFromResponse);
             assertEquals(expectedSquadPlayer, squadPlayerFromResponse);
         });
@@ -292,5 +351,18 @@ public class ClubResourceTest {
         }
 
         return clubBuilder.build();
+    }
+
+    private List<Club> getMockClubData(int numClubs, UUID userId) {
+        return IntStream.range(0, numClubs).mapToObj(i ->
+                ImmutableClub.builder()
+                        .userId(userId)
+                        .name("fake club name " + i)
+                        .transferBudget(BigDecimal.ONE)
+                        .wageBudget(BigDecimal.ONE)
+                        .income(BigDecimal.ONE)
+                        .expenditure(BigDecimal.ONE)
+                        .build()
+        ).collect(Collectors.toList());
     }
 }

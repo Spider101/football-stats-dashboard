@@ -4,6 +4,7 @@ import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
+import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
@@ -22,6 +23,16 @@ public class ClubDAO<K> extends CouchbaseDAO<K> {
                    CouchbaseKeyProvider<K> couchbaseKeyProvider) {
         super(bucketContainer, couchbaseKeyProvider);
         this.clusterContainer = clusterContainer;
+    }
+
+    public List<Club> getClubsByUserId(UUID userId) {
+        String query = String.format("Select club.* from `%s` club where club.type = 'Club' and club.userId = $userId",
+                this.getBucketNameResolver().get());
+        QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
+                JsonObject.create().put("userId", userId)
+        );
+        QueryResult queryResult = this.clusterContainer.getCluster().query(query, queryOptions);
+        return queryResult.rowsAs(Club.class);
     }
 
     public List<SquadPlayer> getPlayersInClub(UUID clubId) {
