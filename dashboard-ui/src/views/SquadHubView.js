@@ -27,52 +27,52 @@ const buildRowDataForSquadTable = players => {
         return Object.entries(_.pick(player, keysToFocusOn)).map(([key, value]) => {
             let row = null;
             switch (key) {
-                case 'wages':
-                    row = { id: key, type: 'string', data: '$' + value + 'K' };
-                    break;
-                case 'nationality':
-                    row = {
-                        id: key,
-                        type: 'image',
-                        data: nationalityFlagMap.find(entity => entity.nationality === value)?.flag || '',
-                        metadata: { sortValue: value }
-                    };
-                    break;
-                case 'morale':
-                    row = {
-                        id: key,
-                        type: 'icon',
-                        data: moraleIconsMap.find(entity => entity.morale === value).icon,
-                        metadata: { sortValue: value }
-                    };
-                    break;
-                case 'form':
-                    row = {
-                        id: key,
-                        type: 'chart',
-                        data: {
-                            type: 'bar',
-                            series: [
-                                {
-                                    name: 'Match Rating',
-                                    data: value
-                                }
-                            ]
-                        },
-                        metadata: { sortValue: getSortValueForForm(value) }
-                    };
-                    break;
-                case 'name':
-                    row = {
-                        id: key,
-                        type: 'link',
-                        data: value,
-                        metadata: { playerId }
-                    };
-                    break;
-                default:
-                    row = { id: key, type: isNaN(value) ? 'string' : 'number', data: value };
-                    break;
+            case 'wages':
+                row = { id: key, type: 'string', data: '$' + value + 'K' };
+                break;
+            case 'nationality':
+                row = {
+                    id: key,
+                    type: 'image',
+                    data: nationalityFlagMap.find(entity => entity.nationality === value)?.flag || '',
+                    metadata: { sortValue: value }
+                };
+                break;
+            case 'morale':
+                row = {
+                    id: key,
+                    type: 'icon',
+                    data: moraleIconsMap.find(entity => entity.morale === value).icon,
+                    metadata: { sortValue: value }
+                };
+                break;
+            case 'form':
+                row = {
+                    id: key,
+                    type: 'chart',
+                    data: {
+                        type: 'bar',
+                        series: [
+                            {
+                                name: 'Match Rating',
+                                data: value
+                            }
+                        ]
+                    },
+                    metadata: { sortValue: getSortValueForForm(value) }
+                };
+                break;
+            case 'name':
+                row = {
+                    id: key,
+                    type: 'link',
+                    data: value,
+                    metadata: { playerId }
+                };
+                break;
+            default:
+                row = { id: key, type: isNaN(value) ? 'string' : 'number', data: value };
+                break;
             }
             return row;
         });
