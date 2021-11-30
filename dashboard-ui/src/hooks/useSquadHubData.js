@@ -8,14 +8,12 @@ export default function() {
     const queryClient = useQueryClient();
     const { authData } = useUserAuth();
 
-    const { isLoading, data: squadPlayersData } = useQuery(
-        [queryKeys.SQUAD_DATA, { authData }],
-        fetchSquadHubData, {
-            initialData: () => queryClient.getQueryData(queryKeys.SQUAD_DATA),
-            staleTime: 10 * 1000,
-            initialDataUpdatedAt: queryClient.getQueryState(queryKeys.SQUAD_DATA)?.dataUpdatedAt
-        }
-    );
+    const { isLoading, data: squadPlayersData } = useQuery(queryKeys.SQUAD_DATA, fetchSquadHubData, {
+        meta: { authData },
+        initialData: () => queryClient.getQueryData(queryKeys.SQUAD_DATA),
+        staleTime: 10 * 1000,
+        initialDataUpdatedAt: queryClient.getQueryState(queryKeys.SQUAD_DATA)?.dataUpdatedAt
+    });
 
     return {
         isLoading,
