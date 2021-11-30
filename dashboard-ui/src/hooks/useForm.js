@@ -68,7 +68,7 @@ const useForm = (defaultFormValues, callback) => {
             // reset/ unlock form if form submission is in progress and errors are found
             setSubmitStatus(null);
         }
-    }, [formValidations, submitStatus, callback]);
+    }, [formValidations, submitStatus, callback, postFormData]);
 
     return {
         handleChangeFn,
