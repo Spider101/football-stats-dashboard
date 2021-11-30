@@ -4,10 +4,7 @@ import { fetchPlayerPerformanceData } from '../clients/DashboardClient';
 import { useUserAuth } from '../context/authProvider';
 import { queryKeys } from '../utils';
 
-export default function(playerId) {
+export default function (playerId) {
     const { authData } = useUserAuth();
-    return useQuery(
-        [queryKeys.PLAYER_PERFORMANCE_DATA, { authData, playerId }],
-        fetchPlayerPerformanceData
-    );
+    return useQuery([queryKeys.PLAYER_PERFORMANCE_DATA, playerId], fetchPlayerPerformanceData, { meta: { authData } });
 }

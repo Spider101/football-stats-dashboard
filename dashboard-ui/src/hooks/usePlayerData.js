@@ -7,8 +7,9 @@ export default function(queryKey, playerId) {
     const { authData } = useUserAuth();
 
     const { isLoading, isIdle, data: playerData } = useQuery(
-        [queryKey, { playerId, authData }],
+        [queryKey, playerId],
         fetchPlayerData, {
+            meta: { authData },
             // don't run the query if playerId value is not a valid value
             enabled: playerId !== -1
         });

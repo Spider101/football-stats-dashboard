@@ -26,8 +26,7 @@ export const authenticateUser = async ({ username, password }) => {
  * @param {string} queryData.queryKey
  * @returns user data containing userId, email, firstName, lastName and encrypted password
  */
-export const fetchUser = async ({ queryKey }) => {
-    const [_key, { authData }] = queryKey;
+export const fetchUser = async ({ meta: { authData } }) => {
     const res = await fetchDataFromEndpoint(`users/${authData.userId}`, 'GET', {
         Authorization: `BEARER ${authData.id}`
     });
