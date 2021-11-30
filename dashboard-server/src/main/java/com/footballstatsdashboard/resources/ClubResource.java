@@ -71,6 +71,7 @@ public class ClubResource {
         LocalDate currentDate = LocalDate.now();
         Club newClub = ImmutableClub.builder()
                 .from(incomingClub)
+                .userId(user.getId())
                 .createdDate(currentDate)
                 .lastModifiedDate(currentDate)
                 .createdBy(user.getEmail())

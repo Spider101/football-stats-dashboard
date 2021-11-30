@@ -89,7 +89,7 @@ public class ClubResourceTest {
     public void getClub_fetchesClubFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
-        Club clubFromCouchbase = getClubDataStub(clubId, false);
+        Club clubFromCouchbase = getClubDataStub(clubId, userPrincipal.getId(), false);
         when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
 
         // execute
@@ -102,6 +102,8 @@ public class ClubResourceTest {
 
         Club clubFromResponse = OBJECT_MAPPER.convertValue(clubResponse.getEntity(), Club.class);
         assertEquals(clubId, clubFromResponse.getId());
+        assertNotNull(clubFromResponse.getUserId());
+        assertEquals(userPrincipal.getId(), clubFromResponse.getUserId());
     }
 
     /**
@@ -129,7 +131,7 @@ public class ClubResourceTest {
     @Test
     public void createClub_persistsClubInCouchbase() {
         // setup
-        Club incomingClub = getClubDataStub(null, false);
+        Club incomingClub = getClubDataStub(null, null, false);
         ArgumentCaptor<Club> newClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
@@ -141,6 +143,7 @@ public class ClubResourceTest {
         assertNotNull(newClub.getCreatedDate());
         assertNotNull(newClub.getLastModifiedDate());
         assertEquals(userPrincipal.getEmail(), newClub.getCreatedBy());
+        assertEquals(userPrincipal.getId(), newClub.getUserId());
 
         assertEquals(HttpStatus.CREATED_201, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
@@ -161,10 +164,10 @@ public class ClubResourceTest {
     public void updateClub_updatesClubInCouchbase() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClubInCouchbase = getClubDataStub(existingClubId, true);
+        Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
         BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(BigDecimal.valueOf(100));
         Club incomingClub = ImmutableClub.builder()
-                .from(getClubDataStub(existingClubId, false))
+                .from(getClubDataStub(existingClubId, null, false))
                 .wageBudget(updatedWageBudget)
                 .build();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
@@ -183,6 +186,7 @@ public class ClubResourceTest {
         Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
         assertNotNull(clubToBeUpdatedInCouchbase);
         assertEquals(userPrincipal.getEmail(), clubToBeUpdatedInCouchbase.getCreatedBy());
+        assertEquals(userPrincipal.getId(), clubToBeUpdatedInCouchbase.getUserId());
         assertEquals(LocalDate.now(), clubToBeUpdatedInCouchbase.getLastModifiedDate());
 
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
@@ -202,13 +206,13 @@ public class ClubResourceTest {
     public void updateClub_incomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClubInCouchbase = getClubDataStub(existingClubId, true);
+        Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
         when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
 
         UUID incorrectIncomingClubId = UUID.randomUUID();
         Club incomingClub = ImmutableClub.builder()
                 .from(existingClubInCouchbase)
-                .id(incorrectIncomingClubId)
+                .id(incorrectIncomingClubId) // override the incoming club data's ID to be incorrect
                 .build();
 
         // execute
@@ -251,7 +255,7 @@ public class ClubResourceTest {
         // setup
         int numberOfClubs = 2;
         UUID userId = userPrincipal.getId();
-        List<Club> mockClubData = getMockClubData(numberOfClubs, userId);
+        List<Club> mockClubData = getBulkClubDataStub(numberOfClubs, userId);
         when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
 
         // execute
@@ -282,7 +286,7 @@ public class ClubResourceTest {
         // setup
         int numberOfClubs = 0;
         UUID userId = userPrincipal.getId();
-        List<Club> mockClubData = getMockClubData(numberOfClubs, userId);
+        List<Club> mockClubData = getBulkClubDataStub(numberOfClubs, userId);
         when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
 
         // execute
@@ -331,10 +335,9 @@ public class ClubResourceTest {
         });
     }
 
-    private Club getClubDataStub(UUID clubId, boolean isExisting) {
+    private Club getClubDataStub(UUID clubId, UUID userId, boolean isExisting) {
         ImmutableClub.Builder clubBuilder = ImmutableClub.builder()
                 .name("fake club name")
-                .userId(UUID.randomUUID())
                 .expenditure(BigDecimal.valueOf(1000))
                 .income(BigDecimal.valueOf(2000))
                 .transferBudget(BigDecimal.valueOf(500))
@@ -342,9 +345,12 @@ public class ClubResourceTest {
 
         if (clubId != null) clubBuilder.id(clubId);
 
-        if (isExisting) {
+        if (userId != null) {
+            clubBuilder.userId(userId);
             clubBuilder.createdBy(USER_EMAIL);
+        }
 
+        if (isExisting) {
             Instant currentInstant = Instant.now();
             Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
             clubBuilder.lastModifiedDate(LocalDate.ofInstant(olderInstant, ZoneId.systemDefault()));
@@ -353,7 +359,7 @@ public class ClubResourceTest {
         return clubBuilder.build();
     }
 
-    private List<Club> getMockClubData(int numClubs, UUID userId) {
+    private List<Club> getBulkClubDataStub(int numClubs, UUID userId) {
         return IntStream.range(0, numClubs).mapToObj(i ->
                 ImmutableClub.builder()
                         .userId(userId)
