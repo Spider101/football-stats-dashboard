@@ -15,6 +15,7 @@ export const queryKeys = {
     PLAYER_DATA: 'playerData',
     COMPARED_PLAYER_DATA: 'comparedPlayerData',
     PLAYER_PERFORMANCE_DATA: 'playerPerformance',
+    ALL_CLUBS: 'allClubsData',
     USER_DATA: 'userData'
 };
 
