@@ -7,6 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/styles';
 
 import useUserData from '../hooks/useUserData';
+import useClubData from '../hooks/useClubData';
 import HomePageView from '../views/HomePageView';
 
 const useStyles = makeStyles({
@@ -35,12 +36,14 @@ const Home = () => {
 };
 
 const HomeContainer = ({ userData }) => {
+    const classes = useStyles();
+    const { isLoading, data: allClubsData } = useClubData();
     return (
         <>
             <Typography component='h2' variant='h3' align='center' paragraph style={{ width: '100%' }}>
                 Welcome to your dashboard, {`${userData.firstName} ${userData.lastName}`}
             </Typography>
-            <HomePageView />
+            {isLoading ? <CircularProgress className={classes.loadingCircle} /> : <HomePageView clubs={allClubsData} />}
         </>
     );
 };
