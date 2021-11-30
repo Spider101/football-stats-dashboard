@@ -29,7 +29,7 @@ public class ClubDAO<K> extends CouchbaseDAO<K> {
         String query = String.format("Select club.* from `%s` club where club.type = 'Club' and club.userId = $userId",
                 this.getBucketNameResolver().get());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
-                JsonObject.create().put("userId", userId)
+                JsonObject.create().put("userId", userId.toString())
         );
         QueryResult queryResult = this.clusterContainer.getCluster().query(query, queryOptions);
         return queryResult.rowsAs(Club.class);
