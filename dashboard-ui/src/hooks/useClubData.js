@@ -6,7 +6,7 @@ import { queryKeys } from '../utils';
 export default function () {
     const { authData } = useUserAuth();
 
-    const { isLoading, data: allClubsData } = useQuery([queryKeys.ALL_CLUBS, { authData }], fetchAllClubs);
+    const { isLoading, data: allClubsData } = useQuery(queryKeys.ALL_CLUBS, fetchAllClubs, { meta: { authData }});
 
     return {
         isLoading,

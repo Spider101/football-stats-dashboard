@@ -1,7 +1,6 @@
 import fetchDataFromEndpoint from './utils';
 
-export const fetchAllClubs = async ({ queryKey }) => {
-    const [_key, { authData }] = queryKey;
+export const fetchAllClubs = async ({ meta: { authData }}) => {
     const res = await fetchDataFromEndpoint('club/all', 'GET', {
         Authorization: `BEARER ${authData.id}`
     });
