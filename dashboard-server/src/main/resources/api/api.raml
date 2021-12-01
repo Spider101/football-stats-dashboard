@@ -173,6 +173,8 @@ securitySchemes:
         body:
           application/json:
             example: !include examples/club-response.json
+      400:
+        description: bad request when incoming club name is empty
   /all:
     get:
       description: gets data for all club entities associated with a user id
