@@ -49,6 +49,7 @@ export default function AddClub({ addClubAction }) {
                 {addNewClubValidations.form && <Alert severity='error' text={addNewClubValidations.form} />}
             </div>
             <TextField
+                autoFocus
                 name='name'
                 label='Club Name'
                 required
@@ -56,7 +57,7 @@ export default function AddClub({ addClubAction }) {
                 margin='normal'
                 fullWidth
                 value={addNewClubData.name}
-                disabled={submitStatus === formSubmission.COMPLETE}
+                disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
                 error={addNewClubValidations.name}
                 helperText={addNewClubValidations.name}
@@ -70,7 +71,7 @@ export default function AddClub({ addClubAction }) {
                 margin='normal'
                 fullWidth
                 value={addNewClubData.transferBudget}
-                disabled={submitStatus === formSubmission.COMPLETE}
+                disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
                 error={addNewClubValidations.transferBudget}
                 helperText={addNewClubValidations.transferBudget}
@@ -87,7 +88,7 @@ export default function AddClub({ addClubAction }) {
                 margin='normal'
                 fullWidth
                 value={addNewClubData.wageBudget}
-                disabled={submitStatus === formSubmission.COMPLETE}
+                disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
                 error={addNewClubValidations.wageBudget}
                 helperText={addNewClubValidations.wageBudget}
@@ -104,7 +105,7 @@ export default function AddClub({ addClubAction }) {
                 margin='normal'
                 fullWidth
                 value={addNewClubData.income}
-                disabled={submitStatus === formSubmission.COMPLETE}
+                disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
                 error={addNewClubValidations.income}
                 helperText={addNewClubValidations.income}
@@ -121,7 +122,7 @@ export default function AddClub({ addClubAction }) {
                 margin='normal'
                 fullWidth
                 value={addNewClubData.expenditure}
-                disabled={submitStatus === formSubmission.COMPLETE}
+                disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
                 error={addNewClubValidations.expenditure}
                 helperText={addNewClubValidations.expenditure}
