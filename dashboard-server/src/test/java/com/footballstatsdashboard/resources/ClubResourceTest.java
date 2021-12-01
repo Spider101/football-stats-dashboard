@@ -156,6 +156,23 @@ public class ClubResourceTest {
         assertEquals(incomingClub.getId(), createdClub.getId());
     }
 
+    @Test
+    public void createClub_clubNameIsEmpty() {
+        // setup
+        Club incomingClubWithNoName = ImmutableClub.builder()
+                .from(getClubDataStub(null, null, false))
+                .name("")
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoName, uriInfo);
+
+        // assert
+        verify(clubDAO, never()).insertDocument(any(), any());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
     /**
      * given a valid club entity in the request, tests that an updated club entity with update internal fields is
      * upserted in couchbase

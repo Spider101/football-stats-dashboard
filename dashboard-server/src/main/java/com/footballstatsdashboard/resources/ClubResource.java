@@ -6,7 +6,10 @@ import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import com.google.common.collect.ImmutableMap;
 import io.dropwizard.auth.Auth;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +28,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.footballstatsdashboard.core.utils.Constants.CLUB_ID;
@@ -68,6 +73,17 @@ public class ClubResource {
         }
 
         // TODO: 17/04/21 add more internal data when business logic becomes complicated
+        if (StringUtils.isEmpty(incomingClub.getName())) {
+            String errorMessage = "Empty club name is not allowed!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
+        }
+
         LocalDate currentDate = LocalDate.now();
         Club newClub = ImmutableClub.builder()
                 .from(incomingClub)
