@@ -13,6 +13,7 @@ export const createNewClub = async ({ newClubData, authToken }) => {
     if (res.ok) {
         return await res.json();
     } else if (res.status === httpStatus.BAD_REQUEST) {
-        throw new Error('Something went wrong trying to create new club!');
+        const { message: errorMessage } = await res.json();
+        throw new Error(errorMessage);
     }
 };
