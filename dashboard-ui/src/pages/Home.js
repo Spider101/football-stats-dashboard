@@ -43,13 +43,14 @@ const Home = () => {
 
 const HomeContainer = () => {
     const classes = useStyles();
+    const { addNewClubAction } = useAddNewClub();
+    const addClubWidget = <AddClub addClubAction={addNewClubAction} />;
+
     const { isLoading, data: allClubsData } = useClubData();
     if (isLoading) {
         return <CircularProgress className={classes.loadingCircle} />;
     }
 
-    const { addNewClubAction } = useAddNewClub();
-    const addClubWidget = <AddClub addClubAction={React.useCallback(addNewClubAction, [])} />;
     return <HomePageView clubs={allClubsData} addClubWidget={addClubWidget}/>;
 };
 
