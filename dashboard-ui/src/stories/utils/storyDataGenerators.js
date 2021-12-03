@@ -214,7 +214,7 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
 
 export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
     return {
-        players: [ ...Array(numPlayers) ].map((_, idx) => ({
+        players: [ ...Array(numPlayers) ].map((_0, idx) => ({
             playerId: idx,
             name: faker.name.findName(),
             nationality: _.sample(nationsList),
