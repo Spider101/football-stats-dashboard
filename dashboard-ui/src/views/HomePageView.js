@@ -60,10 +60,10 @@ HomePageView.propTypes = {
         PropTypes.shape({
             id: PropTypes.string,
             name: PropTypes.string,
-            transferBudget: PropTypes.string,
-            wageBudget: PropTypes.string,
-            income: PropTypes.string,
-            expenditure: PropTypes.string
+            transferBudget: PropTypes.number,
+            wageBudget: PropTypes.number,
+            income: PropTypes.number,
+            expenditure: PropTypes.number
         })
     ),
     addClubWidget: PropTypes.node

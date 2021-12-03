@@ -276,7 +276,7 @@ export const getLeagueTableData = (numTeams) => {
 
 export const getClubsData = (numClubs) => {
     return [ ...Array(numClubs) ].map((_, idx) => ({
-        id: idx,
+        id: idx.toString(),
         name: faker.company.companyName(),
         transferBudget: getRandomNumberInRange(500000, 10000000),
         wageBudget: getRandomNumberInRange(500000, 10000000),
