@@ -11,9 +11,6 @@ import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import Divider from '@material-ui/core/Divider';
 
-import AddClub from '../widgets/AddClub';
-import useAddNewClub from '../hooks/useAddNewClub';
-
 const useStyles = makeStyles(theme => ({
     fab: {
         position: 'fixed',
@@ -25,9 +22,8 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function HomePageView({ clubs }) {
+export default function HomePageView({ clubs, addClubWidget }) {
     const classes = useStyles();
-    const { addNewClubAction } = useAddNewClub();
 
     const noClubsView = (
         <Typography variant='h5' style={{ textAlign: 'center', padding: '5%' }}>
@@ -53,7 +49,7 @@ export default function HomePageView({ clubs }) {
             <Divider />
             {clubs.length === 0 ? noClubsView : allCLubsView}
             <div className={classes.fab}>
-                <AddClub addClubAction={React.useCallback(addNewClubAction, [])} />
+                {addClubWidget}
             </div>
         </Container>
     );
@@ -69,5 +65,6 @@ HomePageView.propTypes = {
             income: PropTypes.string,
             expenditure: PropTypes.string
         })
-    )
+    ),
+    addClubWidget: PropTypes.node
 };
