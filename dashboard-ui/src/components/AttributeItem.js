@@ -6,7 +6,7 @@ import TrendingUpIcon from '@material-ui/icons/TrendingUp';
 import TrendingDownIcon from '@material-ui/icons/TrendingDown';
 import TrendingFlatIcon from '@material-ui/icons/TrendingFlat';
 
-import { fade, makeStyles } from '@material-ui/core';
+import { alpha, makeStyles } from '@material-ui/core';
 import clsx from 'clsx';
 
 const useStyles = makeStyles((theme) => ({
@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
     highlighted: {
         borderLeft: '2px solid',
         borderLeftColor: theme.palette.primary.main,
-        backgroundColor: fade(theme.palette.primary.main, 0.15)
+        backgroundColor: alpha(theme.palette.primary.main, 0.15)
     }
 }));
 

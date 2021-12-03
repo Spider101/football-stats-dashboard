@@ -3,7 +3,7 @@ import ReactApexChart from 'react-apexcharts';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
 import PropTypes from 'prop-types';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import { alpha, makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
 const options = {
@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
     highlighted: {
         borderLeft: '2px solid',
         borderLeftColor: theme.palette.primary.main,
-        backgroundColor: fade(theme.palette.primary.main, 0.15)
+        backgroundColor: alpha(theme.palette.primary.main, 0.15)
     },
 }));
 

@@ -5,7 +5,7 @@ import { NavLink as RouterLink, Route, Switch, useParams, useRouteMatch  } from 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
-import { fade, makeStyles } from '@material-ui/core/styles';
+import { alpha, makeStyles } from '@material-ui/core/styles';
 
 import PlayerProgressionView from '../views/PlayerProgressionView';
 import MatchPerformanceView from '../views/MatchPerformanceView';
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
         margin: '25vh'
     },
     topMenu: {
-        borderBottomColor: fade(theme.palette.common.white, 0.25),
+        borderBottomColor: alpha(theme.palette.common.white, 0.25),
         borderBottomWidth: 1,
         borderBottomStyle: 'solid',
         marginBottom: theme.spacing(2),

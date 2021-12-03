@@ -3,7 +3,7 @@ import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 
 import Layout from './Layout';
 import { useThemePreference } from './context/themePreferenceProvider';
@@ -15,7 +15,7 @@ function App() {
     const themePreference = useThemePreference();
     const theme = React.useMemo(
         () =>
-            createMuiTheme({
+            createTheme({
                 palette: {
                     type: themePreference,
                 },
