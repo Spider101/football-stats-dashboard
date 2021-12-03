@@ -1,5 +1,5 @@
 import React from 'react';
-import faker from 'faker';
+import { hacker } from 'faker';
 import _ from 'lodash';
 
 import CardWithFilter from '../widgets/CardWithFilter';
@@ -28,7 +28,7 @@ const Template = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-    allPossibleValues: [...Array(10)].map((_, _idx) => ({ id: _idx, text: faker.hacker.noun() })),
+    allPossibleValues: [...Array(10)].map((_, _idx) => ({ id: _idx, text: hacker.noun() })),
     currentValue: -1,
     handleChangeFn: x => x,
     labelIdFragment: 'players',
