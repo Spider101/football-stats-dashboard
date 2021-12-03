@@ -12,7 +12,7 @@ it('should render the club data passed in', () => {
         </MemoryRouter>
     );
 
-    expect(queryByText(noClubViewText)).toBeNull();
+    expect(queryByText(noClubViewText)).not.toBeInTheDocument();
     Default.args.clubs.map(club => {
         const clubItem = getByRole('button', { name: club.name });
         expect(clubItem).toHaveAttribute('href', `/club/${club.id}`);
@@ -25,7 +25,7 @@ it('should render helpful text when no club data is passed in', () => {
             <NoClubs {...NoClubs.args} />
         </MemoryRouter>
     );
-    expect(queryByText(noClubViewText)).not.toBeNull();
+    expect(queryByText(noClubViewText)).toBeInTheDocument();
 });
 
 it('should always render add club widget', () => {
@@ -34,7 +34,7 @@ it('should always render add club widget', () => {
             <NoClubs {...NoClubs.args} />
         </MemoryRouter>
     );
-    expect(queryByLabelText('add')).not.toBeNull();
+    expect(queryByLabelText('add')).toBeInTheDocument();
 
     // taking snapshot here mainly to track any breaking changes due to add club widget
     expect(container).toMatchSnapshot();
@@ -45,5 +45,5 @@ it('should always render add club widget', () => {
             <Default {...Default.args} />
         </MemoryRouter>
     );
-    expect(queryByLabelText('add')).not.toBeNull();
+    expect(queryByLabelText('add')).toBeInTheDocument();
 });
