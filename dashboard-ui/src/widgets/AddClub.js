@@ -37,7 +37,7 @@ export default function AddClub({ addClubAction }) {
             income: 0,
             expenditure: 0
         },
-        addClubAction
+        React.useCallback(newClubData => addClubAction(newClubData), [addClubAction])
     );
 
     const addNewClubDialogForm = (
