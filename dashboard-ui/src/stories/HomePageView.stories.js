@@ -1,6 +1,7 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 
+import { Success } from './AddClub.stories';
 import HomePageView from '../views/HomePageView';
 import { getClubsData } from './utils/storyDataGenerators';
 
@@ -28,10 +29,12 @@ const Template = args => <HomePageView {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-    clubs: getClubsData(5)
+    clubs: getClubsData(5),
+    addClubWidget: <Success {...Success.args} />
 };
 
 export const NoClubs = Template.bind({});
 NoClubs.args = {
-    clubs: []
+    clubs: [],
+    addClubWidget: <Success {...Success.args} />
 };
