@@ -32,7 +32,6 @@ export const getClubHandlers = () => [
         );
     }),
     rest.post(`${baseUrl}/club`, (req, res, ctx) => {
-        console.log(req);
-        return res(ctx.status(201), ctx.json({ message: 'club added' }));
+        return res(ctx.status(201), ctx.json({ id: 'new-club-id', ...req.body }));
     })
 ];
