@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import TableContainer from '@material-ui/core/TableContainer';
@@ -47,11 +47,11 @@ const transformHeaderCells = (headerCells) => {
 export default function SortableTable({ headers, rows }) {
     const classes = useStyles();
 
-    const [ order, setOrder ] = React.useState('asc');
-    const [orderBy, setOrderBy ] = React.useState(getStartingColumnName(headers));
-    const [ sortedRows, setSortedRows ] = React.useState([]);
+    const [ order, setOrder ] = useState('asc');
+    const [orderBy, setOrderBy ] = useState(getStartingColumnName(headers));
+    const [ sortedRows, setSortedRows ] = useState([]);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const newStartingColumnName = getStartingColumnName(headers);
         const initialOrder = 'asc';
 

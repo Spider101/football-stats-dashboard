@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 
 import TableContainer from '@material-ui/core/TableContainer';
@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function PlayerAttributesTable({ roles, headers, rows, children }) {
     const classes = useStyles();
-    const [selectedRole, updateSelectedRole] = React.useState('None');
+    const [selectedRole, updateSelectedRole] = useState('None');
 
     const handleChange = evt => {
         updateSelectedRole(evt.target.value);
@@ -93,12 +93,12 @@ export default function PlayerAttributesTable({ roles, headers, rows, children }
                             <StyledTableRow key={_idx}>
                                 {row.map((cell, _idx) => {
                                     // inject props from current scope into the child component
-                                    const childrenWithProps = React.Children.map(children, child => {
-                                        if (React.isValidElement(child)) {
+                                    const childrenWithProps = Children.map(children, child => {
+                                        if (isValidElement(child)) {
                                             const highlightedAttributes =
                                                 roles.find(role => role.name === selectedRole)?.associatedAttributes
                                                 || [];
-                                            return React.cloneElement(child, { ...cell, highlightedAttributes });
+                                            return cloneElement(child, { ...cell, highlightedAttributes });
                                         }
                                         return child;
                                     });

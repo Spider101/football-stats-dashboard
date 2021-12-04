@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 
 import Fab from '@material-ui/core/Fab';
@@ -13,7 +13,7 @@ const actionTypeToIconMap = {
 };
 
 export default function PageAction({ dialog, actionType }) {
-    const [isFormOpen, setIsFormOpen] = React.useState(false);
+    const [isFormOpen, setIsFormOpen] = useState(false);
 
     const handleFormOpen = () => {
         setIsFormOpen(true);
@@ -25,10 +25,10 @@ export default function PageAction({ dialog, actionType }) {
 
     return (
         <>
-            <Fab color="secondary" aria-label={actionType} onClick={handleFormOpen}>
+            <Fab color='secondary' aria-label={actionType} onClick={handleFormOpen}>
                 {actionTypeToIconMap[actionType]}
             </Fab>
-            {React.cloneElement(dialog, { isOpen: isFormOpen, handleClose: handleFormClose })}
+            {cloneElement(dialog, { isOpen: isFormOpen, handleClose: handleFormClose })}
         </>
     );
 }

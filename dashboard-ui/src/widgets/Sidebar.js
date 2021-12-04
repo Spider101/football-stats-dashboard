@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { useLocation } from 'react-router';
@@ -55,8 +55,8 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Sidebar({ sideBarItems: initialSideBarItems, onClickHandler, isOpen }) {
     const classes = useStyles();
-    const [ sideBarItems, updateSideBarItems ] = React.useState(initialSideBarItems);
-    const [selectedItem, setSelectedItem] = React.useState(-1);
+    const [ sideBarItems, updateSideBarItems ] = useState(initialSideBarItems);
+    const [selectedItem, setSelectedItem] = useState(-1);
     const location = useLocation();
 
     const handleClick = (event, itemIndex) => {

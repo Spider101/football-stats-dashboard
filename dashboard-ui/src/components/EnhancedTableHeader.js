@@ -1,4 +1,3 @@
-import React from 'react';
 import PropTypes from 'prop-types';
 
 import TableHead from '@material-ui/core/TableHead';

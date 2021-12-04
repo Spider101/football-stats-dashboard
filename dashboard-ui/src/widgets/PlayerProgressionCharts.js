@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
@@ -6,7 +6,7 @@ import AttributeProgressChart from '../components/AttributeProgressChart';
 import OverallProgressChart from '../components/OverallProgressChart';
 
 export default function PlayerProgressionCharts({ playerAttributeProgressData, playerOverallProgressData }) {
-    const [ tabValue, setTabValue ] = React.useState(0);
+    const [ tabValue, setTabValue ] = useState(0);
 
     const handleTabChange = (_, newTabValue) => {
         setTabValue(newTabValue);

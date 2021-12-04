@@ -1,4 +1,4 @@
-import React from 'react';
+import { Children, isValidElement, cloneElement } from 'react';
 import PropTypes from 'prop-types';
 
 import Card from '@material-ui/core/Card';
@@ -25,9 +25,9 @@ export default function CardWithChart({ cardTitle, chartData, dataTransformer, c
             <CardHeader title={ cardTitle }/>
             <CardContent style={{ paddingTop: 0, paddingBottom: 0}}>
                 {
-                    React.Children.map(children, child => {
-                        if (React.isValidElement(child)) {
-                            return React.cloneElement(child, { ...chartProps });
+                    Children.map(children, child => {
+                        if (isValidElement(child)) {
+                            return cloneElement(child, { ...chartProps });
                         }
                         return child;
                     })
