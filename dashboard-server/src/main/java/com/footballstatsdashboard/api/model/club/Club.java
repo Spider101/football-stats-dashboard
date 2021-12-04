@@ -26,7 +26,9 @@ public interface Club {
      */
     @Valid
     @Value.Default
-    default UUID getId() { return UUID.randomUUID(); }
+    default UUID getId() {
+        return UUID.randomUUID();
+    }
 
     /**
      * club name
@@ -102,5 +104,7 @@ public interface Club {
     @Nullable
     @InternalField
     @Value.Default
-    default String getType() { return "Club"; }
+    default String getType() {
+        return "Club";
+    }
 }

@@ -47,7 +47,8 @@ public class UserDAO<K> extends CouchbaseDAO<K> {
         if (users.size() == 1) {
             return Optional.of(users.iterator().next());
         }
-        // TODO: 30/04/21 figure out a way to handle query result having more than one user (bad state; should not happen)
+        // TODO: 30/04/21 figure out a way to handle query result having more than one user
+        //  (bad state; should not happen)
         return Optional.empty();
     }
 }

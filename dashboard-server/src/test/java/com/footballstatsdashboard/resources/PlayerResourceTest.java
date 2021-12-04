@@ -317,7 +317,8 @@ public class PlayerResourceTest {
         assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
     }
 
-    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes, boolean isExistingPlayer) {
+    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes,
+                                     boolean isExistingPlayer) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
         Metadata playerMetadata = ImmutableMetadata.builder()
                 .dateOfBirth(LocalDate.parse("16/08/2006", formatter))

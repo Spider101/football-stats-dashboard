@@ -33,7 +33,9 @@ public interface Player {
      */
     @Valid
     @Value.Default
-    default UUID getId() { return UUID.randomUUID(); }
+    default UUID getId() {
+        return UUID.randomUUID();
+    }
 
     /**
      * Information about the player
@@ -101,5 +103,7 @@ public interface Player {
     @Nullable
     @InternalField
     @Value.Default
-    default String getType() { return "Player"; }
+    default String getType() {
+        return "Player";
+    }
 }

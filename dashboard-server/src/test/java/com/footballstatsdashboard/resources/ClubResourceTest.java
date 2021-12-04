@@ -284,11 +284,11 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() {};
+        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() { };
         List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
         assertFalse(clubList.isEmpty());
 
-        for (int idx=0; idx < clubList.size(); idx++) {
+        for (int idx = 0; idx < clubList.size(); idx++) {
             assertEquals(userId, clubList.get(idx).getUserId());
             assertEquals(mockClubData.get(idx).getName(), clubList.get(idx).getName());
         }
@@ -343,8 +343,9 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<SquadPlayer>> squadPlayerListTypeRef = new TypeReference<>() {};
-        List<SquadPlayer> squadPlayersFromResponse = OBJECT_MAPPER.convertValue(response.getEntity(), squadPlayerListTypeRef);
+        TypeReference<List<SquadPlayer>> squadPlayerListTypeRef = new TypeReference<>() { };
+        List<SquadPlayer> squadPlayersFromResponse = OBJECT_MAPPER.convertValue(response.getEntity(),
+                squadPlayerListTypeRef);
         assertFalse(squadPlayersFromResponse.isEmpty());
         squadPlayersFromResponse.forEach(squadPlayerFromResponse -> {
             assertNotNull(squadPlayerFromResponse);

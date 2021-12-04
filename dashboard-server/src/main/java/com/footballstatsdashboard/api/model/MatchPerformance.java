@@ -26,7 +26,9 @@ public interface MatchPerformance {
      */
     @Valid
     @Value.Default
-    default UUID getId() { return UUID.randomUUID(); }
+    default UUID getId() {
+        return UUID.randomUUID();
+    }
 
     /**
      *  player ID
@@ -148,5 +150,7 @@ public interface MatchPerformance {
     @Nullable
     @InternalField
     @Value.Default
-    default String getType() { return "MatchPerformance"; }
+    default String getType() {
+        return "MatchPerformance";
+    }
 }

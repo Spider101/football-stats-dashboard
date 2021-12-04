@@ -23,7 +23,9 @@ public interface AuthToken {
      */
     @Valid
     @Value.Default
-    default UUID getId() { return UUID.randomUUID(); }
+    default UUID getId() {
+        return UUID.randomUUID();
+    }
 
     /**
      * user ID for user associated with auth token

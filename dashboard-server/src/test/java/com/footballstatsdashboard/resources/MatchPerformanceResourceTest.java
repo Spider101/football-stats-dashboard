@@ -83,7 +83,8 @@ public class MatchPerformanceResourceTest {
     public void getMatchPerformanceFetchesMatchPerformanceDataFromCouchbase() {
         // setup
         UUID matchPerformanceId = UUID.randomUUID();
-        MatchPerformance matchPerformanceFromCouchbase = getMatchPerformanceDataStub(matchPerformanceId, null, null, false);
+        MatchPerformance matchPerformanceFromCouchbase = getMatchPerformanceDataStub(matchPerformanceId, null, null,
+                false);
         when(matchPerformanceDAO.getDocument(any(), any())).thenReturn(matchPerformanceFromCouchbase);
 
         // execute
@@ -209,7 +210,8 @@ public class MatchPerformanceResourceTest {
     public void updateMatchPerformanceWhenIncomingMatchPerformanceIdDoesNotMatchExisting() {
         // setup
         UUID existingMatchPerformanceId = UUID.randomUUID();
-        MatchPerformance existingMatchPerformance = getMatchPerformanceDataStub(existingMatchPerformanceId, null, null, true);
+        MatchPerformance existingMatchPerformance = getMatchPerformanceDataStub(existingMatchPerformanceId, null, null,
+                true);
         when(matchPerformanceDAO.getDocument(any(), any())).thenReturn(existingMatchPerformance);
 
         UUID incorrectMatchPerformanceId = UUID.randomUUID();
@@ -278,7 +280,7 @@ public class MatchPerformanceResourceTest {
         assertEquals(HttpStatus.OK_200, matchPerformanceResponse.getStatus());
         assertNotNull(matchPerformanceResponse.getEntity());
 
-        TypeReference<List<MatchPerformance>> matchPerformanceListTypeRef = new TypeReference<>() {};
+        TypeReference<List<MatchPerformance>> matchPerformanceListTypeRef = new TypeReference<>() { };
         List<MatchPerformance> matchPerformancesFromResponse =
                 OBJECT_MAPPER.convertValue(matchPerformanceResponse.getEntity(), matchPerformanceListTypeRef);
         assertFalse(matchPerformancesFromResponse.isEmpty());

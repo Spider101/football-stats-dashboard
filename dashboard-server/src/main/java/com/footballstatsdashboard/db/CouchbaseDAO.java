@@ -4,7 +4,6 @@ import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.kv.GetResult;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.Supplier;
 

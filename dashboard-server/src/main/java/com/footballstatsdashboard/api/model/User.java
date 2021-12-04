@@ -29,7 +29,9 @@ public interface User extends Principal {
      */
     @Valid
     @Value.Default
-    default UUID getId() { return UUID.randomUUID(); }
+    default UUID getId() {
+        return UUID.randomUUID();
+    }
 
     /**
      * user's first name
@@ -64,7 +66,7 @@ public interface User extends Principal {
      */
     @Valid
     @NotNull
-    @Size(min=3, max=16, message = "cannot be less than 3 or more than 16 characters")
+    @Size(min = 3, max = 16, message = "cannot be less than 3 or more than 16 characters")
     String getPassword();
 
     /**
@@ -99,7 +101,9 @@ public interface User extends Principal {
     @Override
     @JsonIgnore
     @Value.Derived
-    default String getName() { return getEmail(); }
+    default String getName() {
+        return getEmail();
+    }
 
     /**
      * represent the type of entity
@@ -107,5 +111,7 @@ public interface User extends Principal {
     @Nullable
     @InternalField
     @Value.Default
-    default String getType() { return "User"; }
+    default String getType() {
+        return "User";
+    }
 }
