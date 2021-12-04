@@ -1,4 +1,3 @@
-import React from 'react';
 import AttributeProgressChart from '../components/AttributeProgressChart';
 
 import { getPlayerProgressionData, MAX_ATTR_VALUE } from './utils/storyDataGenerators';

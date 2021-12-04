@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, wait, fireEvent } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { MemoryRouter } from 'react-router';

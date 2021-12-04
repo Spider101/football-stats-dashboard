@@ -1,4 +1,4 @@
-import React from 'react';
+import { useCallback } from 'react';
 import { Route, Switch } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
@@ -42,7 +42,7 @@ const SignInContainer = () => {
             email: '',
             password: ''
         },
-        React.useCallback(authData => login(authData, setAuthData), [login, setAuthData])
+        useCallback(authData => login(authData, setAuthData), [login, setAuthData])
     );
 
     return (
@@ -72,7 +72,7 @@ const SignUpContainer = () => {
             newPassword: '',
             confirmedPassword: ''
         },
-        React.useCallback(userCreds => createAccount(userCreds, setAuthData), [createAccount, setAuthData])
+        useCallback(userCreds => createAccount(userCreds, setAuthData), [createAccount, setAuthData])
     );
     return (
         <SignUp

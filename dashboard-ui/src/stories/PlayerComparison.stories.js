@@ -1,4 +1,3 @@
-import React from 'react';
 import PlayerComparison from '../widgets/PlayerComparison';
 import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerators';
 

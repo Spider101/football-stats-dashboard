@@ -1,4 +1,3 @@
-import React from 'react';
 import EnhancedTableHeader from '../components/EnhancedTableHeader';
 
 import { action } from '@storybook/addon-actions';

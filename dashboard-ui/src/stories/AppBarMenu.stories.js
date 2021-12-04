@@ -1,4 +1,3 @@
-import React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import AppBarMenu from '../components/AppBarMenu';

@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactApexChart from 'react-apexcharts';
 
 // TODO: remove this once the fake data generators are replaced

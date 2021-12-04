@@ -1,4 +1,4 @@
-import React from 'react';
+import { createContext, useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
@@ -6,12 +6,12 @@ import { useHistory } from 'react-router-dom';
 import { authenticateUser, createUser } from '../clients/AuthClient';
 import { AUTH_DATA_LS_KEY, queryKeys } from '../utils';
 
-const AuthContext = React.createContext();
+const AuthContext = createContext();
 
 function AuthContextProvider({ children }) {
     const history = useHistory();
     const existingAuthData = JSON.parse(localStorage.getItem(AUTH_DATA_LS_KEY));
-    const [authData, setAuthData] = React.useState(existingAuthData);
+    const [authData, setAuthData] = useState(existingAuthData);
     const queryClient = useQueryClient();
 
     const login = async ({ email, password }, setAuthData) => {
@@ -88,7 +88,7 @@ AuthContextProvider.propTypes = {
  * @returns a valid value that is stored in the context
  */
 function useUserAuth() {
-    const userAuthContext = React.useContext(AuthContext);
+    const userAuthContext = useContext(AuthContext);
 
     if (userAuthContext === undefined) {
         throw new Error('useUserAuth must be used inside AuthContextProvider');

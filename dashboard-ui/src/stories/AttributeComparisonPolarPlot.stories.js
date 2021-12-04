@@ -1,4 +1,3 @@
-import React from 'react';
 import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
 import faker from 'faker';
 

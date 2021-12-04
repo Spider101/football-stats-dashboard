@@ -1,4 +1,3 @@
-import React from 'react';
 import { MemoryRouter, Link } from 'react-router-dom';
 
 import { action } from '@storybook/addon-actions';

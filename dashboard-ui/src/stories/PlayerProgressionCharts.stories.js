@@ -1,4 +1,3 @@
-import React from 'react';
 import PlayerProgressionCharts from '../widgets/PlayerProgressionCharts';
 import { getPlayerProgressionData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './utils/storyDataGenerators';
 

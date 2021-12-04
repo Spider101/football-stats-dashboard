@@ -1,4 +1,3 @@
-import React from 'react';
 import AttributeItem from '../components/AttributeItem';
 import PlayerAttributesTable from '../components/PlayerAttributesTable';
 

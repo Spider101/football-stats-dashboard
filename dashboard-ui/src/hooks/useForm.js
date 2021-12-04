@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 import { capitalizeLabel, convertCamelCaseToSnakeCase, formSubmission } from '../utils';
 
@@ -24,9 +24,9 @@ const validateFormData = formData => {
 };
 
 const useForm = (defaultFormValues, callback) => {
-    const [formData, setFormData] = React.useState(defaultFormValues);
-    const [formValidations, setFormValidations] = React.useState({});
-    const [submitStatus, setSubmitStatus] = React.useState();
+    const [formData, setFormData] = useState(defaultFormValues);
+    const [formValidations, setFormValidations] = useState({});
+    const [submitStatus, setSubmitStatus] = useState();
 
     const handleChangeFn = e => {
         const { name, value } = e.target;
@@ -45,7 +45,7 @@ const useForm = (defaultFormValues, callback) => {
         setSubmitStatus(formSubmission.INPROGRESS);
     };
 
-    const postFormData = React.useCallback(
+    const postFormData = useCallback(
         async authAction => {
             const formErrorMessage = await authAction(formData);
             if (formErrorMessage != null) {
@@ -60,7 +60,7 @@ const useForm = (defaultFormValues, callback) => {
         [formData]
     );
 
-    React.useEffect(() => {
+    useEffect(() => {
         // check if there are any validations set when we are trying to submit the form data
         if (submitStatus === formSubmission.INPROGRESS && Object.values(formValidations).length === 0) {
             postFormData(callback);

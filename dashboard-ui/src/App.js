@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
@@ -13,7 +13,7 @@ import { AuthContextProvider } from './context/authProvider';
 function App() {
     const queryClient = new QueryClient();
     const themePreference = useThemePreference();
-    const theme = React.useMemo(
+    const theme = useMemo(
         () =>
             createTheme({
                 palette: {

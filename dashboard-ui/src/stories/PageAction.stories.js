@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Default as DialogForm } from './DialogForm.stories';
 
 import PageAction from '../components/PageAction';

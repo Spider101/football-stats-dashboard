@@ -1,4 +1,3 @@
-import React from 'react';
 import PlayerProgressionView from '../views/PlayerProgressionView';
 
 import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerators';

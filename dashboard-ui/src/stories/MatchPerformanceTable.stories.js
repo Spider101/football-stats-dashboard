@@ -1,5 +1,3 @@
-import React from 'react';
-
 import SortableTable from '../widgets/SortableTable';
 import { getMatchPerformanceTableData } from './utils/storyDataGenerators';
 

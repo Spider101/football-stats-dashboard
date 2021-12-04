@@ -1,5 +1,3 @@
-import React from 'react';
-
 import MatchPerformanceView from '../views/MatchPerformanceView';
 
 import { getMatchPerformanceBreakDown } from './utils/storyDataGenerators';

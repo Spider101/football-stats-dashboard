@@ -1,4 +1,3 @@
-import React from 'react';
 import LeagueTable from '../widgets/LeagueTable';
 import { getLeagueTableData } from './utils/storyDataGenerators';
 

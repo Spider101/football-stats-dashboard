@@ -1,5 +1,3 @@
-import React from 'react';
-
 import AddClub from '../widgets/AddClub';
 
 export default {

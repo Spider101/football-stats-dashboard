@@ -1,9 +1,9 @@
-import React from 'react';
+import { createContext, useContext } from 'react';
 import PropTypes from 'prop-types';
 
 import { useThemePreference } from './themePreferenceProvider';
 
-const ChartOptionsContext = React.createContext();
+const ChartOptionsContext = createContext();
 
 function ChartOptionsProvider({ children }) {
     const themePreference = useThemePreference();
@@ -26,7 +26,7 @@ ChartOptionsProvider.propTypes = {
 };
 
 function useGlobalChartOptions() {
-    const globalChartOptions = React.useContext(ChartOptionsContext);
+    const globalChartOptions = useContext(ChartOptionsContext);
 
     if (globalChartOptions === undefined) {
         throw new Error('useGlobalChartOptions must be used inside ChartOptionsProvider');

@@ -1,5 +1,3 @@
-import React from 'react';
-
 import PlayerComparisonView from '../views/PlayerComparisonView';
 import { Selected as CardWithFilter } from './CardWithFilter.stories';
 import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerators';

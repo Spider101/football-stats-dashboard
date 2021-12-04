@@ -1,4 +1,3 @@
-import React from 'react';
 import OverallProgressChart from '../components/OverallProgressChart';
 import { getPlayerProgressionData, MAX_OVERALL_VALUE } from './utils/storyDataGenerators';
 

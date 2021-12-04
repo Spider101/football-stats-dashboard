@@ -1,4 +1,3 @@
-import React from 'react';
 import PlayerBioCard from '../components/PlayerBioCard';
 import { getPlayerMetadata } from './utils/storyDataGenerators';
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { hacker } from 'faker';
 import _ from 'lodash';
 

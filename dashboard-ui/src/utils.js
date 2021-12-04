@@ -1,4 +1,3 @@
-import React from 'react';
 import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 
