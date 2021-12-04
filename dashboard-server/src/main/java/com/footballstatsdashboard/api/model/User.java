@@ -24,6 +24,9 @@ import java.util.UUID;
 @JsonDeserialize(as = ImmutableUser.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public interface User extends Principal {
+    int MIN_PASSWORD_LENGTH = 3;
+    int MAX_PASSWORD_LENGTH = 16;
+
     /**
      * user ID
      */
@@ -66,7 +69,8 @@ public interface User extends Principal {
      */
     @Valid
     @NotNull
-    @Size(min = 3, max = 16, message = "cannot be less than 3 or more than 16 characters")
+    @Size(min = MAX_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH,
+            message = "cannot be less than 3 or more than 16 characters")
     String getPassword();
 
     /**

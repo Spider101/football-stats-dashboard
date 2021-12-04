@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.footballstatsdashboard.core.utils.Constants.HASHING_COST;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -303,7 +304,7 @@ public class UserResourceTest {
         }
 
         if (isPasswordEncrypted) {
-            userDataBuilder.password(BCrypt.withDefaults().hashToString(12, RAW_PASSWORD.toCharArray()));
+            userDataBuilder.password(BCrypt.withDefaults().hashToString(HASHING_COST, RAW_PASSWORD.toCharArray()));
         } else {
             userDataBuilder.password(RAW_PASSWORD);
         }
