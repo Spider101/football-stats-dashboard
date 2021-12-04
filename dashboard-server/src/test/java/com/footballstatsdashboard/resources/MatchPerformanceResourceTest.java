@@ -2,12 +2,11 @@ package com.footballstatsdashboard.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.footballstatsdashboard.FixtureLoader;
 import com.footballstatsdashboard.api.model.ImmutableMatchPerformance;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.MatchPerformance;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.matchPerformance.ImmutableMatchRating;
-import com.footballstatsdashboard.api.model.matchPerformance.MatchRating;
 import com.footballstatsdashboard.db.MatchPerformanceDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
@@ -22,6 +21,7 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -47,8 +47,10 @@ public class MatchPerformanceResourceTest {
     private static final String URI_PATH = "/match-performance";
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
     private static final String USER_EMAIL = "fake email";
-    private User userPrincipal;
+    private static final int UPDATED_PLAYER_APPEARANCES = 20;
+    private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(OBJECT_MAPPER);
 
+    private User userPrincipal;
     private MatchPerformanceResource matchPerformanceResource;
 
     @Mock
@@ -163,10 +165,9 @@ public class MatchPerformanceResourceTest {
         UUID existingMatchPerformanceId = UUID.randomUUID();
         MatchPerformance existingMatchPerformanceInCouchbase = getMatchPerformanceDataStub(existingMatchPerformanceId,
                 null, null, true);
-        int updatedAppearances = existingMatchPerformanceInCouchbase.getAppearances() + 10;
         MatchPerformance incomingMatchPerformance = ImmutableMatchPerformance.builder()
                 .from(getMatchPerformanceDataStub(existingMatchPerformanceId, null, null, false))
-                .appearances(updatedAppearances)
+                .appearances(UPDATED_PLAYER_APPEARANCES)
                 .build();
 
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
@@ -198,7 +199,7 @@ public class MatchPerformanceResourceTest {
         MatchPerformance matchPerformanceFromResponse = OBJECT_MAPPER.convertValue(matchPerformanceResponse.getEntity(),
                 MatchPerformance.class);
         assertEquals(existingMatchPerformanceId, matchPerformanceFromResponse.getId());
-        assertEquals(updatedAppearances, (int) matchPerformanceFromResponse.getAppearances());
+        assertEquals(UPDATED_PLAYER_APPEARANCES, (int) matchPerformanceFromResponse.getAppearances());
     }
 
     /**
@@ -312,25 +313,17 @@ public class MatchPerformanceResourceTest {
 
     private MatchPerformance getMatchPerformanceDataStub(UUID matchPerformanceId, UUID playerId, UUID competitionId,
                                                          boolean isExisting) {
-        MatchRating matchRatingFromCouchbase = ImmutableMatchRating.builder()
-                .current(7f)
-                .history(ImmutableList.of(3.55f, 4f))
-                .build();
+        MatchPerformance matchPerformanceFromFixture;
+        try {
+            matchPerformanceFromFixture = FIXTURE_LOADER.loadFixture("fixtures/match-performance.json",
+                    MatchPerformance.class);
+        } catch (IOException ioException) {
+            throw new RuntimeException(ioException);
+        }
         ImmutableMatchPerformance.Builder matchPerformanceBuilder = ImmutableMatchPerformance.builder()
-                .playerId(playerId != null ? playerId : UUID.randomUUID())
-                .competitionId(competitionId != null ? competitionId : UUID.randomUUID())
-                .appearances(10)
-                .goals(10)
-                .dribbles(10)
-                .passCompletionRate(80.0f)
-                .assists(10)
-                .yellowCards(10)
-                .redCards(10)
-                .tackles(10)
-                .matchRating(matchRatingFromCouchbase)
-                .playerOfTheMatch(10)
-                .penalties(10)
-                .fouls(10);
+                .from(matchPerformanceFromFixture)
+                .playerId(playerId != null ? playerId : matchPerformanceFromFixture.getPlayerId())
+                .competitionId(competitionId != null ? competitionId : matchPerformanceFromFixture.getCompetitionId());
 
         if (matchPerformanceId != null) {
             matchPerformanceBuilder.id(matchPerformanceId);
