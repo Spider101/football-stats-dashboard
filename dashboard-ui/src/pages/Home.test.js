@@ -1,4 +1,6 @@
-import { render, wait, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { MemoryRouter } from 'react-router';
 
@@ -18,7 +20,7 @@ const createQueryWrapper = children => {
 };
 
 it('should render view with club data fetched from backend', async () => {
-    const { queryByRole } = render(
+    render(
         <MemoryRouter>
             {createQueryWrapper(
                 <AuthContextProvider>
@@ -29,11 +31,11 @@ it('should render view with club data fetched from backend', async () => {
     );
 
     // verify that a listItem (role=button) is rendered with the club name as fetched from the backend
-    await wait(() => expect(queryByRole('button', { name: 'Chelsea F.C' })).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'Chelsea F.C' })).toBeInTheDocument());
 });
 
 it('should render success message when add new club form is submitted', async () => {
-    const { getByRole, queryByRole, getByLabelText, findByRole, findByText } = render(
+    render(
         <MemoryRouter>
             {createQueryWrapper(
                 <AuthContextProvider>
@@ -43,15 +45,15 @@ it('should render success message when add new club form is submitted', async ()
         </MemoryRouter>
     );
 
-    const addClubButton = await findByRole('button', { name: 'add'});
-    fireEvent.click(addClubButton);
+    const addClubButton = await screen.findByRole('button', { name: 'add' });
+    userEvent.click(addClubButton);
 
-    expect(queryByRole('dialog')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).toBeInTheDocument();
 
     const inputValue = 'Aston Villa FC';
-    fireEvent.change(getByLabelText(/club name/i), { target: { value: inputValue } });
-    const submitButton = getByRole('button', { name: 'Submit' });
-    fireEvent.click(submitButton);
+    userEvent.type(screen.getByLabelText(/club name/i), inputValue);
+    const submitButton = screen.getByRole('button', { name: 'Submit' });
+    userEvent.click(submitButton);
 
-    await findByText('New Club Added Successfully!');
+    await screen.findByText('New Club Added Successfully!');
 });
