@@ -1,4 +1,4 @@
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 
 import { Success } from './AddClub.stories';
 import HomePageView from '../views/HomePageView';

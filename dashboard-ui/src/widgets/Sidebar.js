@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 
 import { makeStyles } from '@material-ui/core/styles';
 import List from '@material-ui/core/List';
