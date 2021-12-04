@@ -1,7 +1,7 @@
 package com.footballstatsdashboard.core.utils;
 
 public final class Constants {
-    public Constants() {
+    private Constants() {
         throw new AssertionError("Should not be initialized");
     }
 
