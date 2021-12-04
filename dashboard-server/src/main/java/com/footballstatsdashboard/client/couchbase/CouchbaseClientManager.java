@@ -33,7 +33,7 @@ public class CouchbaseClientManager implements Managed {
         this.config = config;
         this.clusterContainers = new HashMap<>();
         this.defaultClusterEnvironment = ClusterEnvironment.builder()
-                .timeoutConfig(TimeoutConfig.kvTimeout(Duration.ofSeconds(config.getKvTimeout() / 1000)))
+                .timeoutConfig(TimeoutConfig.kvTimeout(Duration.ofMillis(config.getKvTimeout())))
                 .build();
 
         this.config.getClusters().forEach((clusterName, clusterConfiguration) -> {
