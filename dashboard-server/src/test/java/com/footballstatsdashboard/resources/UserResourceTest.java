@@ -46,14 +46,15 @@ public class UserResourceTest {
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
 
     @Mock
-    AuthTokenDAO<ResourceKey> authTokenDAO;
+    private AuthTokenDAO<ResourceKey> authTokenDAO;
 
     @Mock
-    UserDAO<ResourceKey> userDAO;
+    private UserDAO<ResourceKey> userDAO;
 
     @Mock
-    UriInfo uriInfo;
-    public static final String RAW_PASSWORD = "fake rawPassword";
+    private UriInfo uriInfo;
+
+    private static final String RAW_PASSWORD = "fake rawPassword";
 
     @Before
     public void initialize() {
