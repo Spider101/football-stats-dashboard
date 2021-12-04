@@ -273,3 +273,14 @@ export const getLeagueTableData = (numTeams) => {
         points: getRandomNumberInRange(80, 50)
     }));
 };
+
+export const getClubsData = (numClubs) => {
+    return [ ...Array(numClubs) ].map((_, idx) => ({
+        id: idx.toString(),
+        name: faker.company.companyName(),
+        transferBudget: getRandomNumberInRange(500000, 10000000),
+        wageBudget: getRandomNumberInRange(500000, 10000000),
+        income: getRandomNumberInRange(500000, 10000000),
+        expenditure: getRandomNumberInRange(500000, 10000000),
+    }));
+};

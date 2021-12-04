@@ -1,7 +1,7 @@
 import React from 'react';
 
 import PlayerComparisonView from '../views/PlayerComparisonView';
-import { filterControl } from './CardWithFilter.stories';
+import { Selected as CardWithFilter } from './CardWithFilter.stories';
 import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerators';
 
 export default {
@@ -23,18 +23,18 @@ export default {
 const basePlayerData = getPlayerData(getAttributeNamesList(3 * 10));
 const comparedPlayerData = getPlayerData(getAttributeNamesList(3 * 10));
 
-const Template = args => <PlayerComparisonView { ...args } />;
+const Template = args => <PlayerComparisonView {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
     basePlayer: basePlayerData,
     comparedPlayer: comparedPlayerData,
-    filterControl
+    filterControl: null
 };
 
 export const SinglePlayer = Template.bind({});
 SinglePlayer.args = {
     basePlayer: basePlayerData,
     comparedPlayer: null,
-    filterControl
+    filterControl: <CardWithFilter {...CardWithFilter.args} />
 };

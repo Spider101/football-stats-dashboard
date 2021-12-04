@@ -24,7 +24,7 @@ const Template = args => (
     <DialogForm {...args}>
         <TextField
             label='Text Input'
-            autofocus
+            autoFocus
             id="textInput"
             name="textInput"
             fullWidth

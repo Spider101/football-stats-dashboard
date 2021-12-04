@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
@@ -7,7 +6,10 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/styles';
 
 import useUserData from '../hooks/useUserData';
+import useClubData from '../hooks/useClubData';
 import HomePageView from '../views/HomePageView';
+import useAddNewClub from '../hooks/useAddNewClub';
+import AddClub from '../widgets/AddClub';
 
 const useStyles = makeStyles({
     loadingCircle: {
@@ -28,31 +30,28 @@ const Home = () => {
                     <CircularProgress className={classes.loadingCircle} />
                 </div>
             ) : (
-                <HomeContainer userData={userData} />
+                <>
+                    <Typography component='h2' variant='h3' align='center' paragraph style={{ width: '100%' }}>
+                        Welcome to your dashboard, {`${userData.firstName} ${userData.lastName}`}
+                    </Typography>
+                    <HomeContainer />
+                </>
             )}
         </>
     );
 };
 
-const HomeContainer = ({ userData }) => {
-    return (
-        <>
-            <Typography component='h2' variant='h3' align='center' paragraph style={{ width: '100%' }}>
-                Welcome to your dashboard, {`${userData.firstName} ${userData.lastName}`}
-            </Typography>
-            <HomePageView />
-        </>
-    );
-};
+const HomeContainer = () => {
+    const classes = useStyles();
+    const { addNewClubAction } = useAddNewClub();
+    const addClubWidget = <AddClub addClubAction={addNewClubAction} />;
 
-HomeContainer.propTypes = {
-    userData: PropTypes.shape({
-        firstName: PropTypes.string,
-        lastName: PropTypes.string,
-        email: PropTypes.string,
-        password: PropTypes.string,
-        authToken: PropTypes.string
-    })
+    const { isLoading, data: allClubsData } = useClubData();
+    if (isLoading) {
+        return <CircularProgress className={classes.loadingCircle} />;
+    }
+
+    return <HomePageView clubs={allClubsData} addClubWidget={addClubWidget}/>;
 };
 
 export default Home;

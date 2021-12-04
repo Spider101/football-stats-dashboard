@@ -1,17 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useQueryClient } from 'react-query';
+import { useHistory } from 'react-router-dom';
 
 import { authenticateUser, createUser } from '../clients/AuthClient';
-import { queryKeys } from '../utils';
-import { useHistory } from 'react-router-dom';
+import { AUTH_DATA_LS_KEY, queryKeys } from '../utils';
 
 const AuthContext = React.createContext();
 
-const authDataKey = 'auth-data';
 function AuthContextProvider({ children }) {
     const history = useHistory();
-    const existingAuthData = JSON.parse(localStorage.getItem(authDataKey));
+    const existingAuthData = JSON.parse(localStorage.getItem(AUTH_DATA_LS_KEY));
     const [authData, setAuthData] = React.useState(existingAuthData);
     const queryClient = useQueryClient();
 
@@ -29,7 +28,7 @@ function AuthContextProvider({ children }) {
             console.info('Persisting auth data in localStorage and Context: ' + authData);
 
             // persist the auth data including the bearer token to localStorage and in context provider via state setter
-            localStorage.setItem(authDataKey, JSON.stringify(authData));
+            localStorage.setItem(AUTH_DATA_LS_KEY, JSON.stringify(authData));
             queryClient.invalidateQueries(queryKeys.USER_DATA);
             setAuthData(authData);
         }
@@ -59,7 +58,7 @@ function AuthContextProvider({ children }) {
         console.info('Logging user out ...');
 
         // redirect to home page (login form) after removing auth data from localStorage and state
-        localStorage.removeItem(authDataKey);
+        localStorage.removeItem(AUTH_DATA_LS_KEY);
         setAuthData(null);
         history.push('/');
 

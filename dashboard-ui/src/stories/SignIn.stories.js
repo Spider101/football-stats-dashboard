@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 
 import SignIn from '../components/SignIn';
 import { mockHandleChange, mockSubmit } from './utils/storyMocks';
@@ -19,11 +19,11 @@ export default {
     },
     decorators: [
         Story => (
-            <Router>
+            <MemoryRouter>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <Story />
                 </div>
-            </Router>
+            </MemoryRouter>
         )
     ]
 };

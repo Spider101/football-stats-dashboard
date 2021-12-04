@@ -15,6 +15,7 @@ export const queryKeys = {
     PLAYER_DATA: 'playerData',
     COMPARED_PLAYER_DATA: 'comparedPlayerData',
     PLAYER_PERFORMANCE_DATA: 'playerPerformance',
+    ALL_CLUBS: 'allClubsData',
     USER_DATA: 'userData'
 };
 
@@ -139,3 +140,6 @@ export const stableSortList = (array, sortOrder, columnNameToOrderBy) => {
 
 export const convertCamelCaseToSnakeCase = camelCaseString =>
     camelCaseString.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+
+// key for storing the auth token data in localstorage
+export const AUTH_DATA_LS_KEY = 'auth-data';
