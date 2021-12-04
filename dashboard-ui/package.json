@@ -21,6 +21,9 @@
     "react-scripts": "^4.0.3",
     "web-vitals": "^0.2.4"
   },
+  "resolutions": {
+    "babel-loader": "8.1.0"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -56,12 +59,12 @@
     ]
   },
   "devDependencies": {
-    "@storybook/addon-actions": "~6.1.10",
-    "@storybook/addon-essentials": "~6.1.10",
-    "@storybook/addon-links": "~6.1.10",
-    "@storybook/addons": "~6.1.10",
+    "@storybook/addon-actions": "~6.4.7",
+    "@storybook/addon-essentials": "~6.4.7",
+    "@storybook/addon-links": "~6.4.7",
+    "@storybook/addons": "~6.4.7",
     "@storybook/preset-create-react-app": "~3.1.5",
-    "@storybook/react": "~6.1.10",
+    "@storybook/react": "~6.4.7",
     "faker": "^4.1.0",
     "json-server": "^0.16.3",
     "msw": "^0.35.0"
