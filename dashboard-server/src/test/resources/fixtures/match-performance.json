@@ -1,0 +1,19 @@
+{
+  "playerId": "2333f81c-3026-4ce2-a411-0f38c7f0cc0d",
+  "competitionId": "9b90a9c7-2889-41c1-b79c-9775717d05ca",
+  "appearances": 10,
+  "goals": 10,
+  "dribbles": 10,
+  "passCompletionRate": 80.0,
+  "assists": 10,
+  "yellowCards": 10,
+  "redCards": 10,
+  "tackles": 10,
+  "matchRating": {
+    "current": 7.0,
+    "history": [3.55, 4.0]
+  },
+  "playerOfTheMatch": 10,
+  "penalties": 10,
+  "fouls": 10
+}

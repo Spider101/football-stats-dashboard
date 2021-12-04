@@ -1,7 +1,7 @@
 package com.footballstatsdashboard.core.utils;
 
 public final class Constants {
-    public Constants() {
+    private Constants() {
         throw new AssertionError("Should not be initialized");
     }
 
@@ -23,4 +23,6 @@ public final class Constants {
     public static final String MATCH_PERFORMANCE_ID = "matchPerformanceId";
     public static final String MATCH_PERFORMANCE_ID_PATH = "/{" + MATCH_PERFORMANCE_ID + "}";
     public static final String MATCH_PERFORMANCE_LOOKUP_PATH = "/lookup" + PLAYER_ID_PATH;
+
+    public static final int HASHING_COST = 12;
 }

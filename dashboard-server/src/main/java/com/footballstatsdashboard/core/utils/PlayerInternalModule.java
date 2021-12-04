@@ -27,7 +27,9 @@ public class PlayerInternalModule extends Module {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerInternalModule.class);
 
     @Override
-    public String getModuleName() { return "PlayerInternalModule"; }
+    public String getModuleName() {
+        return "PlayerInternalModule";
+    }
 
     @Override
     public Version version() {
@@ -69,7 +71,7 @@ public class PlayerInternalModule extends Module {
                                                      BeanDescription beanDescription, BeanDeserializerBuilder builder) {
             Iterator<SettableBeanProperty> propertyIterator = builder.getProperties();
             List<SettableBeanProperty> propertiesToRemove = new ArrayList<>();
-            while(propertyIterator.hasNext()) {
+            while (propertyIterator.hasNext()) {
                 SettableBeanProperty property = propertyIterator.next();
                 if (property.getAnnotation(InternalField.class) != null) {
                     propertiesToRemove.add(property);

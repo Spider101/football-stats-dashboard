@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 public class ClubDAO<K> extends CouchbaseDAO<K> {
     private final CouchbaseClientManager.ClusterContainer clusterContainer;
+    private static final int MATCH_LIMIT_FOR_FORM = 5;
 
     public ClubDAO(CouchbaseClientManager.BucketContainer bucketContainer,
                    CouchbaseClientManager.ClusterContainer clusterContainer,
@@ -57,7 +58,7 @@ public class ClubDAO<K> extends CouchbaseDAO<K> {
                     ? matchRatingHistory.toList().stream()
                     .map(rating -> Float.valueOf(rating.toString()))
                     // recent form is limited to the last 5 matches
-                    .limit(Math.min(5, matchRatingHistory.size()))
+                    .limit(Math.min(MATCH_LIMIT_FOR_FORM, matchRatingHistory.size()))
                     .collect(Collectors.toList())
                     : new ArrayList<>();
 

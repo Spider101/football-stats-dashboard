@@ -50,8 +50,9 @@ public class ClubResourceTest {
     private static final String URI_PATH = "/club";
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
     private static final String USER_EMAIL = "fake email";
-    private User userPrincipal;
+    private static final int CURRENT_PLAYER_ABILITY = 19;
 
+    private User userPrincipal;
     private ClubResource clubResource;
 
     @Mock
@@ -86,7 +87,7 @@ public class ClubResourceTest {
      * in the response
      */
     @Test
-    public void getClub_fetchesClubFromCouchbase() {
+    public void getClubCetchesClubFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
         Club clubFromCouchbase = getClubDataStub(clubId, userPrincipal.getId(), false);
@@ -111,7 +112,7 @@ public class ClubResourceTest {
      * exception is thrown by `getClub` resource method as well
      */
     @Test(expected = RuntimeException.class)
-    public void getClub_clubNotFoundInCouchbase() {
+    public void getClubClubNotFoundInCouchbase() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
         when(clubDAO.getDocument(any(), any()))
@@ -129,7 +130,7 @@ public class ClubResourceTest {
      * persisted in couchbase
      */
     @Test
-    public void createClub_persistsClubInCouchbase() {
+    public void createClubPersistsClubInCouchbase() {
         // setup
         Club incomingClub = getClubDataStub(null, null, false);
         ArgumentCaptor<Club> newClubCaptor = ArgumentCaptor.forClass(Club.class);
@@ -157,7 +158,7 @@ public class ClubResourceTest {
     }
 
     @Test
-    public void createClub_clubNameIsEmpty() {
+    public void createClubWhenClubNameIsEmpty() {
         // setup
         Club incomingClubWithNoName = ImmutableClub.builder()
                 .from(getClubDataStub(null, null, false))
@@ -178,11 +179,11 @@ public class ClubResourceTest {
      * upserted in couchbase
      */
     @Test
-    public void updateClub_updatesClubInCouchbase() {
+    public void updateClubUpdatesClubInCouchbase() {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
-        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(BigDecimal.valueOf(100));
+        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(new BigDecimal("100"));
         Club incomingClub = ImmutableClub.builder()
                 .from(getClubDataStub(existingClubId, null, false))
                 .wageBudget(updatedWageBudget)
@@ -220,7 +221,7 @@ public class ClubResourceTest {
      * invalid entity is not upserted in couchbase and a server error response is returned
      */
     @Test
-    public void updateClub_incomingClubIdDoesNotMatchExisting() {
+    public void updateClubWhenIncomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
@@ -247,7 +248,7 @@ public class ClubResourceTest {
      * given a valid club ID, removes the club entity from couchbase
      */
     @Test
-    public void deleteClub_removesClubFromCouchbase() {
+    public void deleteClubRemovesClubFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
@@ -268,7 +269,7 @@ public class ClubResourceTest {
      * couchbase and returned in the response
      */
     @Test
-    public void getClubsByUserId_fetchesAllClubsForUser() {
+    public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
         int numberOfClubs = 2;
         UUID userId = userPrincipal.getId();
@@ -284,11 +285,11 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() {};
+        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() { };
         List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
         assertFalse(clubList.isEmpty());
 
-        for (int idx=0; idx < clubList.size(); idx++) {
+        for (int idx = 0; idx < clubList.size(); idx++) {
             assertEquals(userId, clubList.get(idx).getUserId());
             assertEquals(mockClubData.get(idx).getName(), clubList.get(idx).getName());
         }
@@ -299,7 +300,7 @@ public class ClubResourceTest {
      * an empty list is returned in the response
      */
     @Test
-    public void getClubsByUserId_ReturnsEmptyListWhenClubsAssociatedToUser() {
+    public void getClubsByUserIdReturnsEmptyListWhenNoClubsAreAssociatedWithUser() {
         // setup
         int numberOfClubs = 0;
         UUID userId = userPrincipal.getId();
@@ -315,20 +316,20 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() {};
+        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() { };
         List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
         assertTrue(clubList.isEmpty());
     }
 
     @Test
-    public void getSquadPlayers_fetchesPlayersFromCouchbase() {
+    public void getSquadPlayersFetchesPlayersFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
         ImmutableSquadPlayer expectedSquadPlayer = ImmutableSquadPlayer.builder()
                 .name("fake player name")
                 .country("fake player country")
                 .role("fake player role")
-                .currentAbility(19)
+                .currentAbility(CURRENT_PLAYER_ABILITY)
                 .recentForm(new ArrayList<>())
                 .playerId(UUID.randomUUID())
                 .build();
@@ -343,8 +344,9 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<SquadPlayer>> squadPlayerListTypeRef = new TypeReference<>() {};
-        List<SquadPlayer> squadPlayersFromResponse = OBJECT_MAPPER.convertValue(response.getEntity(), squadPlayerListTypeRef);
+        TypeReference<List<SquadPlayer>> squadPlayerListTypeRef = new TypeReference<>() { };
+        List<SquadPlayer> squadPlayersFromResponse = OBJECT_MAPPER.convertValue(response.getEntity(),
+                squadPlayerListTypeRef);
         assertFalse(squadPlayersFromResponse.isEmpty());
         squadPlayersFromResponse.forEach(squadPlayerFromResponse -> {
             assertNotNull(squadPlayerFromResponse);
@@ -355,10 +357,10 @@ public class ClubResourceTest {
     private Club getClubDataStub(UUID clubId, UUID userId, boolean isExisting) {
         ImmutableClub.Builder clubBuilder = ImmutableClub.builder()
                 .name("fake club name")
-                .expenditure(BigDecimal.valueOf(1000))
-                .income(BigDecimal.valueOf(2000))
-                .transferBudget(BigDecimal.valueOf(500))
-                .wageBudget(BigDecimal.valueOf(200));
+                .expenditure(new BigDecimal("1000"))
+                .income(new BigDecimal("2000"))
+                .transferBudget(new BigDecimal("500"))
+                .wageBudget(new BigDecimal("200"));
 
         if (clubId != null) clubBuilder.id(clubId);
 

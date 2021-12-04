@@ -9,7 +9,6 @@ import com.footballstatsdashboard.db.AuthTokenDAO;
 import com.footballstatsdashboard.db.UserDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
-import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.footballstatsdashboard.core.utils.Constants.HASHING_COST;
 import static com.footballstatsdashboard.core.utils.Constants.USER_ID;
 import static com.footballstatsdashboard.core.utils.Constants.USER_ID_PATH;
 import static com.footballstatsdashboard.core.utils.Constants.USER_V1_BASE_PATH;
@@ -87,7 +87,7 @@ public class UserResource {
 
         // encrypt the password before persisting the user
         String encryptedPassword = BCrypt.withDefaults()
-                .hashToString(12, incomingUserDetails.getPassword().toCharArray());
+                .hashToString(HASHING_COST, incomingUserDetails.getPassword().toCharArray());
         LocalDate currentDate = LocalDate.now();
 
         User newUser = ImmutableUser.builder()

@@ -22,11 +22,11 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.footballstatsdashboard.core.utils.Constants.HASHING_COST;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -42,18 +42,21 @@ import static org.mockito.Mockito.when;
  */
 public class UserResourceTest {
     private static final String URI_PATH = "/users";
-    private UserResource userResource;
+    private static final int SECONDS_TO_SUBTRACT = 1000;
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
 
-    @Mock
-    AuthTokenDAO<ResourceKey> authTokenDAO;
+    private UserResource userResource;
 
     @Mock
-    UserDAO<ResourceKey> userDAO;
+    private AuthTokenDAO<ResourceKey> authTokenDAO;
 
     @Mock
-    UriInfo uriInfo;
-    public static final String RAW_PASSWORD = "fake rawPassword";
+    private UserDAO<ResourceKey> userDAO;
+
+    @Mock
+    private UriInfo uriInfo;
+
+    private static final String RAW_PASSWORD = "fake rawPassword";
 
     @Before
     public void initialize() {
@@ -70,7 +73,7 @@ public class UserResourceTest {
      * returned in the response
      */
     @Test
-    public void getUser_fetchesUserFromCouchbase() {
+    public void getUserFetchesUserFromCouchbase() {
         // setup
         UUID userId = UUID.randomUUID();
         User userFromCouchbase = getUserDataStub(userId, false);
@@ -93,7 +96,7 @@ public class UserResourceTest {
      * exception is thrown by the `getUser` resource method as well
      */
     @Test(expected = RuntimeException.class)
-    public void getUser_userNotFoundInCouchbase() {
+    public void getUserWhenUserNotFoundInCouchbase() {
         // setup
         UUID invalidUserId = UUID.randomUUID();
         when(userDAO.getDocument(any(), any()))
@@ -111,7 +114,7 @@ public class UserResourceTest {
      * persisted in couchbase
      */
     @Test
-    public void createUser_persistsUserInCouchbase() {
+    public void createUserPersistsUserInCouchbase() {
         // setup
         User incomingUser = getUserDataStub(null, false);
         ArgumentCaptor<User> newUserCaptor = ArgumentCaptor.forClass(User.class);
@@ -149,7 +152,7 @@ public class UserResourceTest {
      * couchbase and CONFLICT_409 response is returned
      */
     @Test
-    public void createUser_userAlreadyExists() {
+    public void createUserWhenUserAlreadyExists() {
         // setup
         User incomingUser = getUserDataStub(null, false);
         when(userDAO.getUsersByFirstNameLastNameEmail(
@@ -173,7 +176,7 @@ public class UserResourceTest {
      * verifies that a new auth token is generated for the requesting user
      */
     @Test
-    public void authenticateUser_createsNewAuthToken() {
+    public void authenticateUserCreatesNewAuthToken() {
         // setup
         UUID userId = UUID.randomUUID();
         User userFromCouchbase = getUserDataStub(userId, true);
@@ -207,7 +210,7 @@ public class UserResourceTest {
      * returned
      */
     @Test
-    public void authenticateUser_invalidEmail() {
+    public void authenticateUserWithInvalidEmail() {
         // setup
         User userCredentials = ImmutableUser.builder()
                 .email("invalid email")
@@ -228,7 +231,7 @@ public class UserResourceTest {
      * or generated for the user and a BAD_REQUEST_400 response is returned
      */
     @Test
-    public void authenticateUser_invalidPassword() {
+    public void authenticateUserWithInvalidPassword() {
         // setup
         UUID userId = UUID.randomUUID();
         User userCredentials = ImmutableUser.builder()
@@ -252,7 +255,7 @@ public class UserResourceTest {
      * lastAccessUTC field
      */
     @Test
-    public void authenticateUser_returnsExistingAuthToken() {
+    public void authenticateUserReturnsExistingAuthToken() {
         // setup
         UUID userId = UUID.randomUUID();
         User userFromCouchbase = getUserDataStub(userId, true);
@@ -263,8 +266,7 @@ public class UserResourceTest {
         when(userDAO.getUserByCredentials(eq(userCredentials.getEmail())))
                 .thenReturn(Optional.of(userFromCouchbase));
 
-        long currentInstant = Instant.now().toEpochMilli();
-        Instant instantInPast = Instant.EPOCH.minus(currentInstant - 1000, ChronoUnit.MILLIS);
+        Instant instantInPast = Instant.now().minusSeconds(SECONDS_TO_SUBTRACT);
         AuthToken existingAuthToken = ImmutableAuthToken.builder()
                 .userId(userId)
                 .lastAccessUTC(instantInPast)
@@ -302,7 +304,7 @@ public class UserResourceTest {
         }
 
         if (isPasswordEncrypted) {
-            userDataBuilder.password(BCrypt.withDefaults().hashToString(12, RAW_PASSWORD.toCharArray()));
+            userDataBuilder.password(BCrypt.withDefaults().hashToString(HASHING_COST, RAW_PASSWORD.toCharArray()));
         } else {
             userDataBuilder.password(RAW_PASSWORD);
         }
