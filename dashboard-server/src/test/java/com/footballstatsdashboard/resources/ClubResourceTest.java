@@ -86,7 +86,7 @@ public class ClubResourceTest {
      * in the response
      */
     @Test
-    public void getClub_fetchesClubFromCouchbase() {
+    public void getClubCetchesClubFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
         Club clubFromCouchbase = getClubDataStub(clubId, userPrincipal.getId(), false);
@@ -111,7 +111,7 @@ public class ClubResourceTest {
      * exception is thrown by `getClub` resource method as well
      */
     @Test(expected = RuntimeException.class)
-    public void getClub_clubNotFoundInCouchbase() {
+    public void getClubClubNotFoundInCouchbase() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
         when(clubDAO.getDocument(any(), any()))
@@ -129,7 +129,7 @@ public class ClubResourceTest {
      * persisted in couchbase
      */
     @Test
-    public void createClub_persistsClubInCouchbase() {
+    public void createClubPersistsClubInCouchbase() {
         // setup
         Club incomingClub = getClubDataStub(null, null, false);
         ArgumentCaptor<Club> newClubCaptor = ArgumentCaptor.forClass(Club.class);
@@ -157,7 +157,7 @@ public class ClubResourceTest {
     }
 
     @Test
-    public void createClub_clubNameIsEmpty() {
+    public void createClubWhenClubNameIsEmpty() {
         // setup
         Club incomingClubWithNoName = ImmutableClub.builder()
                 .from(getClubDataStub(null, null, false))
@@ -178,7 +178,7 @@ public class ClubResourceTest {
      * upserted in couchbase
      */
     @Test
-    public void updateClub_updatesClubInCouchbase() {
+    public void updateClubUpdatesClubInCouchbase() {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
@@ -220,7 +220,7 @@ public class ClubResourceTest {
      * invalid entity is not upserted in couchbase and a server error response is returned
      */
     @Test
-    public void updateClub_incomingClubIdDoesNotMatchExisting() {
+    public void updateClubWhenIncomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
@@ -247,7 +247,7 @@ public class ClubResourceTest {
      * given a valid club ID, removes the club entity from couchbase
      */
     @Test
-    public void deleteClub_removesClubFromCouchbase() {
+    public void deleteClubRemovesClubFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
@@ -268,7 +268,7 @@ public class ClubResourceTest {
      * couchbase and returned in the response
      */
     @Test
-    public void getClubsByUserId_fetchesAllClubsForUser() {
+    public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
         int numberOfClubs = 2;
         UUID userId = userPrincipal.getId();
@@ -299,7 +299,7 @@ public class ClubResourceTest {
      * an empty list is returned in the response
      */
     @Test
-    public void getClubsByUserId_ReturnsEmptyListWhenClubsAssociatedToUser() {
+    public void getClubsByUserIdReturnsEmptyListWhenNoClubsAreAssociatedWithUser() {
         // setup
         int numberOfClubs = 0;
         UUID userId = userPrincipal.getId();
@@ -315,13 +315,13 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() {};
+        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() { };
         List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
         assertTrue(clubList.isEmpty());
     }
 
     @Test
-    public void getSquadPlayers_fetchesPlayersFromCouchbase() {
+    public void getSquadPlayersFetchesPlayersFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
         ImmutableSquadPlayer expectedSquadPlayer = ImmutableSquadPlayer.builder()

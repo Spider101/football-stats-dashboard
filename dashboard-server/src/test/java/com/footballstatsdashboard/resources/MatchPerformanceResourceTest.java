@@ -80,7 +80,7 @@ public class MatchPerformanceResourceTest {
      * couchbase server and returned in the response
      */
     @Test
-    public void getMatchPerformance_fetchesMatchPerformanceDataFromCouchbase() {
+    public void getMatchPerformanceFetchesMatchPerformanceDataFromCouchbase() {
         // setup
         UUID matchPerformanceId = UUID.randomUUID();
         MatchPerformance matchPerformanceFromCouchbase = getMatchPerformanceDataStub(matchPerformanceId, null, null, false);
@@ -107,7 +107,7 @@ public class MatchPerformanceResourceTest {
      * that the same exception is thrown by `getClub` resource method as well
      */
     @Test(expected = RuntimeException.class)
-    public void getMatchPerformance_matchPerformanceNotFoundInCouchbase() {
+    public void getMatchPerformanceWhenMatchPerformanceNotFoundInCouchbase() {
         // setup
         UUID invalidMatchPerformanceId = UUID.randomUUID();
         when(matchPerformanceDAO.getDocument(any(), any()))
@@ -125,7 +125,7 @@ public class MatchPerformanceResourceTest {
      * entity and persisted in couchbase
      */
     @Test
-    public void createMatchPerformance_persistsMatchPerformanceInCouchbase() {
+    public void createMatchPerformancePersistsMatchPerformanceInCouchbase() {
         // setup
         MatchPerformance incomingMatchPerformance = getMatchPerformanceDataStub(null, null, null, false);
         ArgumentCaptor<MatchPerformance> newMatchPerformanceCaptor = ArgumentCaptor.forClass(MatchPerformance.class);
@@ -157,7 +157,7 @@ public class MatchPerformanceResourceTest {
      * fields is upserted in couchbase
      */
     @Test
-    public void updateMatchPerformance_updatesMatchPerformanceInCouchbase() {
+    public void updateMatchPerformanceUpdatesMatchPerformanceInCouchbase() {
         // setup
         UUID existingMatchPerformanceId = UUID.randomUUID();
         MatchPerformance existingMatchPerformanceInCouchbase = getMatchPerformanceDataStub(existingMatchPerformanceId,
@@ -206,7 +206,7 @@ public class MatchPerformanceResourceTest {
      * response is returned
      */
     @Test
-    public void updateMatchPerformance_incomingMatchPerformanceIdDoesNotMatchExisting() {
+    public void updateMatchPerformanceWhenIncomingMatchPerformanceIdDoesNotMatchExisting() {
         // setup
         UUID existingMatchPerformanceId = UUID.randomUUID();
         MatchPerformance existingMatchPerformance = getMatchPerformanceDataStub(existingMatchPerformanceId, null, null, true);
@@ -234,7 +234,7 @@ public class MatchPerformanceResourceTest {
      * given a valid match performance ID, removes the match performance entity from couchbase
      */
     @Test
-    public void deleteMatchPerformance_removesMatchPerformanceFromCouchbase() {
+    public void deleteMatchPerformanceRemovesMatchPerformanceFromCouchbase() {
         // setup
         UUID matchPerformanceId = UUID.randomUUID();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
@@ -257,7 +257,7 @@ public class MatchPerformanceResourceTest {
      * couchbase server and returned in the response
      */
     @Test
-    public void lookupMatchPerformanceByPlayerId_fetchesMatchPerformanceDataFromCouchbase() {
+    public void lookupMatchPerformanceByPlayerIdFetchesMatchPerformanceDataFromCouchbase() {
         // setup
         UUID playerId = UUID.randomUUID();
         UUID competitionId = UUID.randomUUID();
@@ -291,7 +291,7 @@ public class MatchPerformanceResourceTest {
     }
 
     @Test
-    public void lookupMatchPerformanceByPlayerId_noMatchPerformanceDataFound() {
+    public void lookupMatchPerformanceByPlayerIdWhenNoMatchPerformanceDataFound() {
         // setup
         UUID playerId = UUID.randomUUID();
         UUID competitionId = UUID.randomUUID();

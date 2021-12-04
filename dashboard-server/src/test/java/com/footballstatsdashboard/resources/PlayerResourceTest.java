@@ -86,7 +86,7 @@ public class PlayerResourceTest {
      * returned in the response
      */
     @Test
-    public void getPlayer_fetchesPlayerFromCouchbase() {
+    public void getPlayerFetchesPlayerFromCouchbase() {
         // setup
         UUID playerId = UUID.randomUUID();
         Player playerFromCouchbase = getPlayerDataStub(playerId, true, true, false);
@@ -109,7 +109,7 @@ public class PlayerResourceTest {
      * exception is thrown by `getPlayer` resource method as well
      */
     @Test(expected = RuntimeException.class)
-    public void getPlayer_playerNotFoundInCouchbase() {
+    public void getPlayerWhenPlayerNotFoundInCouchbase() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
         when(couchbaseDAO.getDocument(any(), any()))
@@ -127,7 +127,7 @@ public class PlayerResourceTest {
      * persisted in couchbase
      */
     @Test
-    public void createPlayer_persistsPlayerInCouchbase() {
+    public void createPlayerPersistsPlayerInCouchbase() {
         // setup
         Player incomingPlayer = getPlayerDataStub(null, true, true, false);
         ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
@@ -154,7 +154,7 @@ public class PlayerResourceTest {
      * to couchbase and a 422 response status is returned
      */
     @Test
-    public void createPlayer_playerRolesNotProvided() {
+    public void createPlayerWhenPlayerRolesNotProvided() {
         // setup
         Player incomingPlayer = getPlayerDataStub(null, false, true, false);
 
@@ -173,7 +173,7 @@ public class PlayerResourceTest {
      * persisted to couchbase and a 422 response status is returned
      */
     @Test
-    public void createPlayer_playerAttributesNotProvided() {
+    public void createPlayerWhenPlayerAttributesNotProvided() {
         // setup
         Player incomingPlayer = getPlayerDataStub(null, true, false, false);
 
@@ -192,7 +192,7 @@ public class PlayerResourceTest {
      * is upserted in couchbase
      */
     @Test
-    public void updatePlayer_updatesPlayerInCouchbase() {
+    public void updatePlayerUpdatesPlayerInCouchbase() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
         Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
@@ -256,7 +256,7 @@ public class PlayerResourceTest {
      * the invalid entity is not upserted in couchbase and a server error response is returned
      */
     @Test
-    public void updatePlayer_incomingPlayerIdDoesNotMatchExisting() {
+    public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
         Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
@@ -283,7 +283,7 @@ public class PlayerResourceTest {
      * given a valid player id, removes the player entity from couchbase
      */
     @Test
-    public void deletePlayer_removesPlayerFromCouchbase() {
+    public void deletePlayerRemovesPlayerFromCouchbase() {
         // setup
         UUID playerId = UUID.randomUUID();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
@@ -303,7 +303,7 @@ public class PlayerResourceTest {
      * same exception is propagated and thrown by the resource method as well
      */
     @Test(expected = RuntimeException.class)
-    public void deletePlayer_playerNotFound() {
+    public void deletePlayerWhenPlayerNotFound() {
         // setup
         UUID playerId = UUID.randomUUID();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);

@@ -70,7 +70,7 @@ public class UserResourceTest {
      * returned in the response
      */
     @Test
-    public void getUser_fetchesUserFromCouchbase() {
+    public void getUserFetchesUserFromCouchbase() {
         // setup
         UUID userId = UUID.randomUUID();
         User userFromCouchbase = getUserDataStub(userId, false);
@@ -93,7 +93,7 @@ public class UserResourceTest {
      * exception is thrown by the `getUser` resource method as well
      */
     @Test(expected = RuntimeException.class)
-    public void getUser_userNotFoundInCouchbase() {
+    public void getUserWhenUserNotFoundInCouchbase() {
         // setup
         UUID invalidUserId = UUID.randomUUID();
         when(userDAO.getDocument(any(), any()))
@@ -111,7 +111,7 @@ public class UserResourceTest {
      * persisted in couchbase
      */
     @Test
-    public void createUser_persistsUserInCouchbase() {
+    public void createUserPersistsUserInCouchbase() {
         // setup
         User incomingUser = getUserDataStub(null, false);
         ArgumentCaptor<User> newUserCaptor = ArgumentCaptor.forClass(User.class);
@@ -149,7 +149,7 @@ public class UserResourceTest {
      * couchbase and CONFLICT_409 response is returned
      */
     @Test
-    public void createUser_userAlreadyExists() {
+    public void createUserWhenUserAlreadyExists() {
         // setup
         User incomingUser = getUserDataStub(null, false);
         when(userDAO.getUsersByFirstNameLastNameEmail(
@@ -173,7 +173,7 @@ public class UserResourceTest {
      * verifies that a new auth token is generated for the requesting user
      */
     @Test
-    public void authenticateUser_createsNewAuthToken() {
+    public void authenticateUserCreatesNewAuthToken() {
         // setup
         UUID userId = UUID.randomUUID();
         User userFromCouchbase = getUserDataStub(userId, true);
@@ -207,7 +207,7 @@ public class UserResourceTest {
      * returned
      */
     @Test
-    public void authenticateUser_invalidEmail() {
+    public void authenticateUserWithInvalidEmail() {
         // setup
         User userCredentials = ImmutableUser.builder()
                 .email("invalid email")
@@ -228,7 +228,7 @@ public class UserResourceTest {
      * or generated for the user and a BAD_REQUEST_400 response is returned
      */
     @Test
-    public void authenticateUser_invalidPassword() {
+    public void authenticateUserWithInvalidPassword() {
         // setup
         UUID userId = UUID.randomUUID();
         User userCredentials = ImmutableUser.builder()
@@ -252,7 +252,7 @@ public class UserResourceTest {
      * lastAccessUTC field
      */
     @Test
-    public void authenticateUser_returnsExistingAuthToken() {
+    public void authenticateUserReturnsExistingAuthToken() {
         // setup
         UUID userId = UUID.randomUUID();
         User userFromCouchbase = getUserDataStub(userId, true);
