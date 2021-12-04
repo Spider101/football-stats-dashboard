@@ -6,7 +6,7 @@ export default {
     component: PageAction,
     title: 'Components/Globals/PageAction',
     argTypes: {
-        dialog: { control: '' }
+        dialog: { table: { disable: true } }
     },
     parameters: {
         docs: {

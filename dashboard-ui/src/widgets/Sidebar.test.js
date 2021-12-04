@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { WithDisabledItems } from '../stories/Sidebar.stories';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 
 it('should render menu item as disabled', () => {
     render(

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 
 import { Default, NoClubs } from '../stories/HomePageView.stories';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 
 const noClubViewText = 'No clubs have been created yet! Please create a club to proceed.';
 it('should render the club data passed in', () => {
@@ -20,7 +20,7 @@ it('should render the club data passed in', () => {
 
 it('should render helpful text when no club data is passed in', () => {
     render(
-        <MemoryRouter initialEntries={['/']}>
+        <MemoryRouter>
             <NoClubs {...NoClubs.args} />
         </MemoryRouter>
     );
@@ -29,7 +29,7 @@ it('should render helpful text when no club data is passed in', () => {
 
 it('should always render add club widget', () => {
     const { rerender, container } = render(
-        <MemoryRouter initialEntries={['/']}>
+        <MemoryRouter>
             <NoClubs {...NoClubs.args} />
         </MemoryRouter>
     );
@@ -40,7 +40,7 @@ it('should always render add club widget', () => {
 
     // not taking snapshot here as club props are dynamically generated for test
     rerender(
-        <MemoryRouter initialEntries={['/']}>
+        <MemoryRouter>
             <Default {...Default.args} />
         </MemoryRouter>
     );
