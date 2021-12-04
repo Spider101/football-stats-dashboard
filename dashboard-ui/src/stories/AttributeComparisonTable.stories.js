@@ -7,7 +7,7 @@ export default {
     component: PlayerAttributesTable,
     title: 'Components/PlayerComparisonView/AttributeComparisonTable',
     argTypes: {
-        children: { control: '' }
+        children: { table: { disable: true } }
     },
     parameters: {
         docs: {
@@ -21,7 +21,7 @@ export default {
 };
 
 const Template = args => (
-    <PlayerAttributesTable { ...args } >
+    <PlayerAttributesTable {...args}>
         <AttributeComparisonItem />
     </PlayerAttributesTable>
 );
@@ -30,4 +30,4 @@ export const Default = Template.bind({});
 Default.args = getAttributeComparisonTableData(getAttrComparisonItemData);
 
 export const SinglePlayer = Template.bind({});
-SinglePlayer.args = getAttributeComparisonTableData((attributeName) => getAttrComparisonItemData(attributeName, 1));
+SinglePlayer.args = getAttributeComparisonTableData(attributeName => getAttrComparisonItemData(attributeName, 1));

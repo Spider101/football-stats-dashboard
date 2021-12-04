@@ -7,6 +7,9 @@ import { getClubsData } from './utils/storyDataGenerators';
 export default {
     component: HomePageView,
     title: 'Views/HomePageView',
+    argTypes: {
+        addClubWidget: { table: { disable: true } }
+    },
     parameters: {
         docs: {
             description: {

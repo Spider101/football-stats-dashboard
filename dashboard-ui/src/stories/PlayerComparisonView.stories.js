@@ -5,9 +5,6 @@ import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerator
 export default {
     component: PlayerComparisonView,
     title: 'Views/PlayerComparisonView',
-    argTypes: {
-        filterControl: { control: '' }
-    },
     parameters: {
         docs: {
             description: {

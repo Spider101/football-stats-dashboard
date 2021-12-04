@@ -5,9 +5,9 @@ import { getPlayerProgressionData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './u
 
 export default {
     component: CardWithChart,
-    title: 'Widgets/HomePageView/CardWithChart',
+    title: 'Widgets/ClubPageView/CardWithChart',
     argTypes: {
-        children: { control: '' }
+        children: { table: { disable: true } }
     },
     parameters: {
         docs: {
