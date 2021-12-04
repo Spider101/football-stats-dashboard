@@ -51,9 +51,14 @@ import static org.mockito.Mockito.when;
 public class PlayerResourceTest {
 
     private static final String URI_PATH = "/players";
+    private static final int CURRENT_PLAYER_ABILITY = 19;
+    private static final int CURRENT_PLAYER_SPRINT_SPEED = 85;
+    private static final int UPDATED_PLAYER_ABILITY = 25;
+    private static final int UPDATED_PLAYER_SPRINT_SPEED = 87;
+    private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
+
     private PlayerResource playerResource;
     private User userPrincipal;
-    private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
 
     @Mock
     private CouchbaseDAO<ResourceKey> couchbaseDAO;
@@ -204,7 +209,7 @@ public class PlayerResourceTest {
                 .build();
         Ability updatedAbility = ImmutableAbility.builder()
                 .from(existingPlayerInCouchbase.getAbility())
-                .current(25)
+                .current(UPDATED_PLAYER_ABILITY)
                 .build();
         Role updatedRole = ImmutableRole.builder()
                 .from(existingPlayerInCouchbase.getRoles().get(0))
@@ -212,7 +217,7 @@ public class PlayerResourceTest {
                 .build();
         Attribute updatedAttribute = ImmutableAttribute.builder()
                 .from(existingPlayerInCouchbase.getAttributes().get(0))
-                .history(ImmutableList.of(87))
+                .history(ImmutableList.of(UPDATED_PLAYER_SPRINT_SPEED))
                 .build();
 
         Player incomingPlayer = ImmutablePlayer.builder()
@@ -320,11 +325,12 @@ public class PlayerResourceTest {
     private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes,
                                      boolean isExistingPlayer) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
+
         Metadata playerMetadata = ImmutableMetadata.builder()
                 .dateOfBirth(LocalDate.parse("16/08/2006", formatter))
                 .build();
         Ability playerAbility = ImmutableAbility.builder()
-                .current(19)
+                .current(CURRENT_PLAYER_ABILITY)
                 .build();
 
         ImmutablePlayer.Builder playerBuilder = ImmutablePlayer.builder()
@@ -351,7 +357,7 @@ public class PlayerResourceTest {
         if (usePlayerAttributes) {
             Attribute playerAttribute = ImmutableAttribute.builder()
                     .name("Sprint Speed")
-                    .value(85)
+                    .value(CURRENT_PLAYER_SPRINT_SPEED)
                     .category("Technical")
                     .group("Speed")
                     .build();

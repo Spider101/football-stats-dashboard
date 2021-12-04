@@ -50,8 +50,9 @@ public class ClubResourceTest {
     private static final String URI_PATH = "/club";
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
     private static final String USER_EMAIL = "fake email";
-    private User userPrincipal;
+    private static final int CURRENT_PLAYER_ABILITY = 19;
 
+    private User userPrincipal;
     private ClubResource clubResource;
 
     @Mock
@@ -182,7 +183,7 @@ public class ClubResourceTest {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
-        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(BigDecimal.valueOf(100));
+        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(new BigDecimal("100"));
         Club incomingClub = ImmutableClub.builder()
                 .from(getClubDataStub(existingClubId, null, false))
                 .wageBudget(updatedWageBudget)
@@ -328,7 +329,7 @@ public class ClubResourceTest {
                 .name("fake player name")
                 .country("fake player country")
                 .role("fake player role")
-                .currentAbility(19)
+                .currentAbility(CURRENT_PLAYER_ABILITY)
                 .recentForm(new ArrayList<>())
                 .playerId(UUID.randomUUID())
                 .build();
@@ -356,10 +357,10 @@ public class ClubResourceTest {
     private Club getClubDataStub(UUID clubId, UUID userId, boolean isExisting) {
         ImmutableClub.Builder clubBuilder = ImmutableClub.builder()
                 .name("fake club name")
-                .expenditure(BigDecimal.valueOf(1000))
-                .income(BigDecimal.valueOf(2000))
-                .transferBudget(BigDecimal.valueOf(500))
-                .wageBudget(BigDecimal.valueOf(200));
+                .expenditure(new BigDecimal("1000"))
+                .income(new BigDecimal("2000"))
+                .transferBudget(new BigDecimal("500"))
+                .wageBudget(new BigDecimal("200"));
 
         if (clubId != null) clubBuilder.id(clubId);
 

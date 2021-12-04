@@ -22,7 +22,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,8 +42,10 @@ import static org.mockito.Mockito.when;
  */
 public class UserResourceTest {
     private static final String URI_PATH = "/users";
-    private UserResource userResource;
+    private static final int SECONDS_TO_SUBTRACT = 1000;
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
+
+    private UserResource userResource;
 
     @Mock
     private AuthTokenDAO<ResourceKey> authTokenDAO;
@@ -265,8 +266,7 @@ public class UserResourceTest {
         when(userDAO.getUserByCredentials(eq(userCredentials.getEmail())))
                 .thenReturn(Optional.of(userFromCouchbase));
 
-        long currentInstant = Instant.now().toEpochMilli();
-        Instant instantInPast = Instant.EPOCH.minus(currentInstant - 1000, ChronoUnit.MILLIS);
+        Instant instantInPast = Instant.now().minusSeconds(SECONDS_TO_SUBTRACT);
         AuthToken existingAuthToken = ImmutableAuthToken.builder()
                 .userId(userId)
                 .lastAccessUTC(instantInPast)
