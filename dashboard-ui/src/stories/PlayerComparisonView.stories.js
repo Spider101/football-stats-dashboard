@@ -1,5 +1,3 @@
-import React from 'react';
-
 import PlayerComparisonView from '../views/PlayerComparisonView';
 import { Selected as CardWithFilter } from './CardWithFilter.stories';
 import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerators';
@@ -7,9 +5,6 @@ import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerator
 export default {
     component: PlayerComparisonView,
     title: 'Views/PlayerComparisonView',
-    argTypes: {
-        filterControl: { control: '' }
-    },
     parameters: {
         docs: {
             description: {

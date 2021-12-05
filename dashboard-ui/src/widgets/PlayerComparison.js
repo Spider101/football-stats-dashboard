@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -70,7 +70,7 @@ const mergeAttributeComparisonItems = attributeComparisonItems => {
     }, []);
 };
 export default function PlayerComparison({ players }) {
-    const [tabValue, setTabValue] = React.useState(0);
+    const [tabValue, setTabValue] = useState(0);
 
     const handleTabChange = (_, newTabValue) => {
         setTabValue(newTabValue);

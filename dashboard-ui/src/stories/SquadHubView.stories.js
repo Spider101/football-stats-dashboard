@@ -1,5 +1,4 @@
-import React from 'react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 
 import { moraleIconsMap, nationalityFlagMap } from '../utils';
 

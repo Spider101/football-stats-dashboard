@@ -1,28 +1,28 @@
-import React from 'react';
-import { render, fireEvent, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import { AddAction } from '../stories/PageAction.stories';
 
 it('should open dialog when floating action button (fab) is clicked', () => {
-    const { queryByRole, getByRole } = render(<AddAction {...AddAction.args} />);
-    const fab = getByRole('button');
+    render(<AddAction {...AddAction.args} />);
+    const fab = screen.getByRole('button');
 
     // verify that by default dialog is not present in the DOM
-    expect(queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
     // verify that the dialog is now present after clicking on the `fab` button
-    fireEvent.click(fab);
-    expect(queryByRole('dialog')).toBeInTheDocument();
+    userEvent.click(fab);
+    expect(screen.queryByRole('dialog')).toBeInTheDocument();
 });
 
 it('should close dialog when cancel button in dialog actions section is clicked', async () => {
-    const { getByRole, queryByRole } = render(<AddAction {...AddAction.args} />);
-    const fab = getByRole('button');
-    fireEvent.click(fab);
-    expect(queryByRole('dialog')).toBeInTheDocument();
+    render(<AddAction {...AddAction.args} />);
+    const fab = screen.getByRole('button');
+    userEvent.click(fab);
+    expect(screen.queryByRole('dialog')).toBeInTheDocument();
 
     // verify dialog is removed from DOM after clicking on Cancel button on the dialog
-    const cancelButton = getByRole('button', { name: 'Cancel'});
-    fireEvent.click(cancelButton);
-    await waitForElementToBeRemoved(() => queryByRole('dialog'));
+    const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+    userEvent.click(cancelButton);
+    await waitForElementToBeRemoved(() => screen.queryByRole('dialog'));
 });

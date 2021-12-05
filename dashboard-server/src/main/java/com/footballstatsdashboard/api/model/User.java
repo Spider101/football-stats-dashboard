@@ -69,7 +69,7 @@ public interface User extends Principal {
      */
     @Valid
     @NotNull
-    @Size(min = MAX_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH,
+    @Size(min = MIN_PASSWORD_LENGTH, max = MAX_PASSWORD_LENGTH,
             message = "cannot be less than 3 or more than 16 characters")
     String getPassword();
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { hacker } from 'faker';
 import _ from 'lodash';
 
@@ -9,7 +8,7 @@ export default {
     component: CardWithFilter,
     title: 'Widgets/PlayerComparisonView/CardWithFilter',
     argTypes: {
-        filterControl: { control: '' }
+        filterControl: { table: { disable: true } }
     },
     parameters: {
         docs: {

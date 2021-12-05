@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -99,16 +99,16 @@ const filterRowsByRole = (originalRowData, roles) =>
     });
 
 export default function SquadHubView({ players }) {
-    const [playerRoles, setPlayerRoles] = React.useState([]);
+    const [playerRoles, setPlayerRoles] = useState([]);
 
     const initialSquadHubTableHeaders = buildHeaderDataForSquadTable(
         Object.keys(players.length === 0 ? squadTableHeaderDisplayTypeMap : players[0])
     );
     const allSquadHubTableHeaderNames = initialSquadHubTableHeaders.map(header => header.id);
-    const [columnNames, setColumnNames] = React.useState(allSquadHubTableHeaderNames);
+    const [columnNames, setColumnNames] = useState(allSquadHubTableHeaderNames);
 
-    const allPlayerRoles = React.useRef([]);
-    React.useEffect(() => {
+    const allPlayerRoles = useRef([]);
+    useEffect(() => {
         // get all the distinct player roles in the dataset
         allPlayerRoles.current = [...new Set(players.map(player => player.role))];
 
@@ -118,7 +118,7 @@ export default function SquadHubView({ players }) {
     const handleChange = changeHandler => event => changeHandler(event.target.value);
 
     // we just need to calculate this once when the component is mounted
-    const rowData = React.useMemo(() => buildRowDataForSquadTable(players), [players]);
+    const rowData = useMemo(() => buildRowDataForSquadTable(players), [players]);
 
     const filteredRowData = filterRowsByRole(rowData, playerRoles);
 

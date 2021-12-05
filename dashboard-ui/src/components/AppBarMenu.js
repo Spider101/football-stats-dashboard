@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 
@@ -91,7 +91,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function AppBarMenu({ menu: { title, teamColor }, onClickHandler, isOpen }) {
     const classes = useStyles();
-    const [menuAnchor, setMenuAnchor] = React.useState(null);
+    const [menuAnchor, setMenuAnchor] = useState(null);
     const isMenuOpen = Boolean(menuAnchor);
     const { logOut } = useUserAuth();
 

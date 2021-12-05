@@ -1,4 +1,3 @@
-import React from 'react';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import faker from 'faker';
 

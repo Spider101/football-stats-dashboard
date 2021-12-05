@@ -1,49 +1,48 @@
-import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { Default, NoClubs } from '../stories/HomePageView.stories';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 
 const noClubViewText = 'No clubs have been created yet! Please create a club to proceed.';
 it('should render the club data passed in', () => {
-    const { getByRole, queryByText } = render(
+    render(
         <MemoryRouter>
             <Default {...Default.args} />
         </MemoryRouter>
     );
 
-    expect(queryByText(noClubViewText)).not.toBeInTheDocument();
+    expect(screen.queryByText(noClubViewText)).not.toBeInTheDocument();
     Default.args.clubs.map(club => {
-        const clubItem = getByRole('button', { name: club.name });
+        const clubItem = screen.getByRole('button', { name: club.name });
         expect(clubItem).toHaveAttribute('href', `/club/${club.id}`);
     });
 });
 
 it('should render helpful text when no club data is passed in', () => {
-    const { queryByText } = render(
-        <MemoryRouter initialEntries={['/']}>
+    render(
+        <MemoryRouter>
             <NoClubs {...NoClubs.args} />
         </MemoryRouter>
     );
-    expect(queryByText(noClubViewText)).toBeInTheDocument();
+    expect(screen.queryByText(noClubViewText)).toBeInTheDocument();
 });
 
 it('should always render add club widget', () => {
-    const { rerender, queryByLabelText, container } = render(
-        <MemoryRouter initialEntries={['/']}>
+    const { rerender, container } = render(
+        <MemoryRouter>
             <NoClubs {...NoClubs.args} />
         </MemoryRouter>
     );
-    expect(queryByLabelText('add')).toBeInTheDocument();
+    expect(screen.queryByLabelText('add')).toBeInTheDocument();
 
     // taking snapshot here mainly to track any breaking changes due to add club widget
     expect(container).toMatchSnapshot();
 
     // not taking snapshot here as club props are dynamically generated for test
     rerender(
-        <MemoryRouter initialEntries={['/']}>
+        <MemoryRouter>
             <Default {...Default.args} />
         </MemoryRouter>
     );
-    expect(queryByLabelText('add')).toBeInTheDocument();
+    expect(screen.queryByLabelText('add')).toBeInTheDocument();
 });

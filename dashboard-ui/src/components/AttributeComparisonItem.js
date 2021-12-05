@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactApexChart from 'react-apexcharts';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';

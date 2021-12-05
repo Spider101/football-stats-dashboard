@@ -1,10 +1,9 @@
-import React from 'react';
 import { action } from '@storybook/addon-actions';
 
 import Sidebar from '../widgets/Sidebar';
 import { Default as MenuGroup } from './MenuItemGroup.stories';
 import { Unselected } from './MenuItem.stories';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter } from 'react-router-dom';
 
 export default {
     component: Sidebar,

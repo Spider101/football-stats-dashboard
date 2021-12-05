@@ -1,5 +1,3 @@
-import React from 'react';
-
 import TextField from '@material-ui/core/TextField';
 
 import DialogForm from '../components/DialogForm';
@@ -9,7 +7,7 @@ export default {
     component: DialogForm,
     title: 'Components/Globals/DialogForm',
     argTypes: {
-        children: { control: '' }
+        children: { table: { disable: true } }
     },
     parameters: {
         docs: {

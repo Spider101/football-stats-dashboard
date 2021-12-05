@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 import ReactApexChart from 'react-apexcharts';
@@ -62,11 +62,11 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
 
     const allCompetitionNames = competitions.map(competition => competition.id).flat();
 
-    const [competitionNames, setCompetitionNames] = React.useState(allCompetitionNames);
+    const [competitionNames, setCompetitionNames] = useState(allCompetitionNames);
 
     const handleChange = event => setCompetitionNames(event.target.value);
 
-    const rowData = React.useMemo(() => buildMatchPerformanceData(competitions), [competitions]);
+    const rowData = useMemo(() => buildMatchPerformanceData(competitions), [competitions]);
 
     const matchPerformanceTableHeaders = buildHeaderDataForMatchPerformanceTable(
         Object.keys(competitions.length === 0 ? matchPerformanceTableHeaderDisplayTypeMap : competitions[0])

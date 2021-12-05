@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { NavLink as RouterLink, Route, Switch, useParams, useRouteMatch  } from 'react-router-dom';
 
@@ -134,7 +134,7 @@ const PlayerPerformanceContainer = ({ playerId, classes }) => {
 };
 
 const PlayerComparisonContainer = ({ playerId, classes }) => {
-    const [comparedPlayerId, setCurrentPlayerId] = React.useState(-1);
+    const [comparedPlayerId, setCurrentPlayerId] = useState(-1);
 
     const handlePlayerChange = (event) => {
         setCurrentPlayerId(event.target.value);

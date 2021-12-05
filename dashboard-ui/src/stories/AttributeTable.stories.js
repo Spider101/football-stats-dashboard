@@ -1,4 +1,3 @@
-import React from 'react';
 import AttributeItem from '../components/AttributeItem';
 import PlayerAttributesTable from '../components/PlayerAttributesTable';
 
@@ -8,7 +7,7 @@ export default {
     component: PlayerAttributesTable,
     title: 'Widgets/PlayerProgressionView/AttributesTable',
     argTypes: {
-        children: { control: '' }
+        children: { table: { disable: true } }
     },
     parameters: {
         docs: {

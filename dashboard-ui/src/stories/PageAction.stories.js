@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { Default as DialogForm } from './DialogForm.stories';
 
 import PageAction from '../components/PageAction';
@@ -8,7 +6,7 @@ export default {
     component: PageAction,
     title: 'Components/Globals/PageAction',
     argTypes: {
-        dialog: { control: '' }
+        dialog: { table: { disable: true } }
     },
     parameters: {
         docs: {

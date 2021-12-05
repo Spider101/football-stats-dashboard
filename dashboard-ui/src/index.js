@@ -1,13 +1,13 @@
-import React from 'react';
+import { StrictMode } from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import { ThemePreferenceProvider } from './context/themePreferenceProvider';
 
 ReactDOM.render(
-    <React.StrictMode>
+    <StrictMode>
         <ThemePreferenceProvider>
             <App />
         </ThemePreferenceProvider>
-    </React.StrictMode>,
+    </StrictMode>,
     document.getElementById('root')
 );
