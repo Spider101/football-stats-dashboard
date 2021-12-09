@@ -1,10 +1,8 @@
 import { setupServer } from 'msw/node';
+
 import { getUserHandlers, getClubHandlers } from './handlers';
 
-export const mockAuthData = {
-    id: 'fakeAuthToken',
-    userId: 'fakeUserId'
-};
+const baseUrl = 'http://localhost' + `${process.env.REACT_APP_SERVER_ENDPOINT.replace(/\/$/, '')}`;
 
-const handlers = [ ...getUserHandlers(mockAuthData.userId), ...getClubHandlers()];
+const handlers = [...getUserHandlers(baseUrl, 'fakeUserId', true), ...getClubHandlers(baseUrl, 'fakeClubId')];
 export const server = setupServer(...handlers);

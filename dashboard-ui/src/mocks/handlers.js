@@ -1,37 +1,52 @@
 import { rest } from 'msw';
 
-const baseUrl = `http://localhost${process.env.REACT_APP_SERVER_ENDPOINT}`;
+import { AUTH_DATA_LS_KEY } from '../utils';
 
-export const getUserHandlers =  (fakeUserId) => [
-    rest.get(`${baseUrl}/users/${fakeUserId}`, (req, res, ctx) => {
-        return res(
-            ctx.status(200),
-            ctx.json({
-                firstName: 'fake first name',
-                lastName: 'fake last name',
-                email: 'fake email address'
-            })
-        );
-    })
-];
+const mockAuthData = {
+    id: 'fakeAuthToken',
+    userId: 'fakeUserId'
+};
 
-export const getClubHandlers = () => [
-    rest.get(`${baseUrl}/club/all`, (req, res, ctx) => {
-        return res(
-            ctx.status(200),
-            ctx.json([
-                {
-                    id: 'd7b2772f-699b-408b-bead-bb21e7761115',
-                    name: 'Chelsea F.C',
-                    transferBudget: 5000000,
-                    wageBudget: 300000,
-                    income: 10000000,
-                    expenditure: 100000
-                }
-            ])
-        );
-    }),
-    rest.post(`${baseUrl}/club`, (req, res, ctx) => {
-        return res(ctx.status(201), ctx.json({ id: 'new-club-id', ...req.body }));
-    })
-];
+export const getUserHandlers = (baseUrl = '*', userIdFragment = ':userId', isForServer = false) => {
+    if (isForServer && localStorage.getItem(AUTH_DATA_LS_KEY) === null) {
+        localStorage.setItem(AUTH_DATA_LS_KEY, JSON.stringify(mockAuthData));
+    }
+    return [
+        rest.post(`${baseUrl}/users/authenticate`, (req, res, ctx) => {
+            localStorage.setItem(AUTH_DATA_LS_KEY, JSON.stringify(mockAuthData));
+            return res(ctx.status(200), ctx.json(mockAuthData));
+        }),
+        rest.get(`${baseUrl}/users/${userIdFragment}`, (req, res, ctx) => {
+            return res(
+                ctx.status(200),
+                ctx.json({
+                    firstName: 'fake first name',
+                    lastName: 'fake last name',
+                    email: 'fake email address'
+                })
+            );
+        })
+    ];
+};
+
+export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
+    const dummyClub = {
+        id: 'd7b2772f-699b-408b-bead-bb21e7761115',
+        name: 'Chelsea F.C',
+        transferBudget: 5000000,
+        wageBudget: 300000,
+        income: 10000000,
+        expenditure: 100000
+    };
+    return [
+        rest.get(`${baseUrl}/club/all`, (req, res, ctx) => {
+            return res(ctx.status(200), ctx.json([dummyClub]));
+        }),
+        rest.get(`${baseUrl}/club/${clubIdFragment}`, (req, res, ctx) => {
+            return res(ctx.status(200), ctx.json(dummyClub));
+        }),
+        rest.post(`${baseUrl}/club`, (req, res, ctx) => {
+            return res(ctx.status(201), ctx.json({ id: 'new-club-id', ...req.body }));
+        })
+    ];
+};
