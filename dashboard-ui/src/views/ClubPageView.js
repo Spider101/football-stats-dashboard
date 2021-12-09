@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 import ReactApexChart from 'react-apexcharts';
 
 // TODO: remove this once the fake data generators are replaced
@@ -18,7 +20,7 @@ import CardWithChart from '../widgets/CardWithChart';
 // TODO: remove this once the fake data generators are replaced
 import { getLeagueTableData, getPlayerProgressionData, MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
 
-export default function ClubPageView() {
+export default function ClubPageView({ club }) {
     return (
         <>
             <Grid container spacing={2}>
@@ -143,4 +145,15 @@ const BoardObjectives = () => {
             </List>
         </Card>
     );
+};
+
+ClubPageView.propTypes = {
+    club: PropTypes.shape({
+        id: PropTypes.string,
+        name: PropTypes.string,
+        transferBudget: PropTypes.number,
+        wageBudget: PropTypes.number,
+        income: PropTypes.number,
+        expenditure: PropTypes.number
+    })
 };

@@ -1,5 +1,7 @@
 import ClubPageView from '../views/ClubPageView';
 
+import { getClubsData } from './utils/storyDataGenerators';
+
 export default {
     component: ClubPageView,
     title: 'Views/ClubPageView',
@@ -16,3 +18,6 @@ export default {
 
 const Template = args => <ClubPageView {...args} />;
 export const Default = Template.bind({});
+Default.args = {
+    club: getClubsData(1)[0]
+};
