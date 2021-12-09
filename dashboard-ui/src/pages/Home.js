@@ -4,7 +4,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/styles';
 
 import useUserData from '../hooks/useUserData';
-import useClubData from '../hooks/useClubData';
+import { useAllClubData } from '../hooks/useClubData';
+
 import HomePageView from '../views/HomePageView';
 import useAddNewClub from '../hooks/useAddNewClub';
 import AddClub from '../widgets/AddClub';
@@ -44,7 +45,7 @@ const HomeContainer = () => {
     const { addNewClubAction } = useAddNewClub();
     const addClubWidget = <AddClub addClubAction={addNewClubAction} />;
 
-    const { isLoading, data: allClubsData } = useClubData();
+    const { isLoading, data: allClubsData } = useAllClubData();
     if (isLoading) {
         return <CircularProgress className={classes.loadingCircle} />;
     }
