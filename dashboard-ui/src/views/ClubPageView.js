@@ -28,7 +28,7 @@ export default function ClubPageView({ club }) {
                     <LeagueTable metadata={getLeagueTableData(10)} />
                 </Grid>
                 <Grid item xs={8} container direction='column'>
-                    <ClubFinancesChart />
+                    <ClubFinancesChart income={club.income} expenditure={club.expenditure}/>
                     <ClubSuccessChart />
                 </Grid>
             </Grid>
@@ -37,7 +37,7 @@ export default function ClubPageView({ club }) {
                     <BoardObjectives />
                 </Grid>
                 <Grid item xs>
-                    <TransferBudgetChart />
+                    <BudgetBreakdownChart transferBudget={club.transferBudget} wageBudget={club.wageBudget}/>
                 </Grid>
             </Grid>
         </>
@@ -70,11 +70,16 @@ const ClubSuccessChart = () => {
     );
 };
 
-const ClubFinancesChart = () => {
-    // TODO: remove this fake data with the real thing
+const ClubFinancesChart = ({ income, expenditure }) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // TODO: build full array once income and expenditure history (month-wise) tracking is implemented
+    let profit = [ ...Array(months.length).fill(0) ];
+    profit[0] = income - expenditure;
+
     const clubFinancesData = {
         cardTitle: 'Club Finances',
-        chartData: getPlayerProgressionData(1, 'Income', MAX_ATTR_VALUE),
+        chartData: [{ name: 'Profit', data: profit }],
         dataTransformer: x => x,
         chartOptions: {
             stroke: { width: 2, curve: 'straight' },
@@ -83,7 +88,7 @@ const ClubFinancesChart = () => {
             legend: { show: false },
             xaxis: {
                 title: { text: 'Months', style: { fontFamily: 'Roboto' } },
-                categories: [1, 2, 3, 4, 5, 6]
+                categories: months
             }
         },
         chartType: 'bar'
@@ -97,15 +102,18 @@ const ClubFinancesChart = () => {
         </Grid>
     );
 };
+ClubFinancesChart.propTypes = {
+    income: PropTypes.number,
+    expenditure: PropTypes.number
+};
 
-const TransferBudgetChart = () => {
-    // TODO: remove this fake data with the real thing
+const BudgetBreakdownChart = ({ transferBudget, wageBudget }) => {
     const transferBudgetData = {
         cardTitle: 'Budget for EY 2021',
-        chartData: [25, 60, 15],
+        chartData: [transferBudget, wageBudget],
         dataTransformer: x => x,
         chartOptions: {
-            labels: ['Scouting', 'Transfers', 'Youth Academy']
+            labels: ['Transfers', 'Wages']
         },
         chartType: 'donut'
     };
@@ -117,6 +125,10 @@ const TransferBudgetChart = () => {
             </CardWithChart>
         </Grid>
     );
+};
+BudgetBreakdownChart.propTypes = {
+    transferBudget: PropTypes.number,
+    wageBudget: PropTypes.number
 };
 
 const BoardObjectives = () => {
