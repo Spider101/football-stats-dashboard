@@ -8,10 +8,10 @@ import faker from 'faker';
 import Grid from '@material-ui/core/Grid';
 import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
+import CardContent from '@material-ui/core/CardContent';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 
 import LeagueTable from '../widgets/LeagueTable';
@@ -128,21 +128,20 @@ const BoardObjectives = () => {
     return (
         <Card>
             <CardHeader title='Board Objectives' style={{ paddingBottom: 0 }} />
-            <List>
-                {boardObjectives.map((objective, idx) => {
-                    return (
-                        <>
-                            <ListItem key={idx}>
+            <CardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
+                <List>
+                    {boardObjectives.map((objective, idx) => {
+                        return (
+                            <ListItem key={idx} disableGutters divider={idx < boardObjectives.length - 1}>
                                 <ListItemText
                                     primary={<Typography variant='h6'>{objective.title}</Typography>}
                                     secondary={objective.description}
                                 />
                             </ListItem>
-                            {idx < boardObjectives.length - 1 && <Divider variant='middle' component='li' />}
-                        </>
-                    );
-                })}
-            </List>
+                        );
+                    })}
+                </List>
+            </CardContent>
         </Card>
     );
 };
