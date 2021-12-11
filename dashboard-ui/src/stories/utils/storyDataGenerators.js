@@ -284,3 +284,11 @@ export const getClubsData = (numClubs) => {
         expenditure: getRandomNumberInRange(500000, 10000000),
     }));
 };
+
+export const getBoardObjectives = (numObjectives = 5) =>
+    [...Array(numObjectives)].map((_0, idx) => ({
+        id: 'fake id ' + idx,
+        title: faker.lorem.sentence(),
+        description: faker.lorem.paragraph(),
+        isCompleted: false
+    }));
