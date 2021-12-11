@@ -66,24 +66,23 @@ const ClubFinancesChart = ({ income, expenditure }) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     // TODO: build full array once income and expenditure history (month-wise) tracking is implemented
-    let profit = [ ...Array(months.length).fill(0) ];
-    profit[0] = income - expenditure;
+    const profit = [ (income - expenditure), ...Array(months.length).fill(0) ];
 
     const clubFinancesData = {
         cardTitle: 'Club Finances',
-        chartData: [{ name: 'Profit', data: profit }],
-        dataTransformer: x => x,
+        chartData: [
+            { name: 'Profit', data: [...Array(months.length)].map((_, idx) => ({ x: months[idx], y: profit[idx] })) }
+        ],
         chartOptions: {
-            stroke: { width: 2, curve: 'straight' },
-            plotOptions: { bar: { columnWidth: '15%' } },
+            stroke: { curve: 'straight' },
             dataLabels: { enabled: false },
-            legend: { show: false },
+            fill: { opacity: 0.5 },
             xaxis: {
-                title: { text: 'Months', style: { fontFamily: 'Roboto' } },
-                categories: months
+                title: { text: 'Months' },
             }
         },
-        chartType: 'bar'
+        dataTransformer: x => x,
+        chartType: 'area'
     };
 
     return (
