@@ -47,6 +47,9 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
         }),
         rest.post(`${baseUrl}/club`, (req, res, ctx) => {
             return res(ctx.status(201), ctx.json({ id: 'new-club-id', ...req.body }));
+        }),
+        rest.get(`${baseUrl}/club/${clubIdFragment}/squadPlayers`, (req, res, ctx) => {
+            return res(ctx.status(200), ctx.json([]));
         })
     ];
 };
