@@ -1,10 +1,10 @@
 import HomeIcon from '@material-ui/icons/Home';
 import GroupIcon from '@material-ui/icons/Group';
 
-import SquadHub from './pages/SquadHub';
-import Home from './pages/Home';
-import Player from './pages/Player';
-import Club from './pages/Club';
+import SquadHub from '../pages/SquadHub';
+import Home from '../pages/Home';
+import Player from '../pages/Player';
+import Club from '../pages/Club';
 
 const routingData = [{
     text: 'Home',

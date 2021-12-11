@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import AppBarMenu from './components/AppBarMenu';
 import Sidebar from './widgets/Sidebar';
 import UserAuth from './pages/UserAuth';
-import routingData from './routingData';
+import routingData from './routing/routingData';
 import useUserData from './hooks/useUserData';
 
 const useStyles = makeStyles(theme => ({
