@@ -1,24 +1,16 @@
+import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
 
-// TODO: remove this once the fake data generators are replaced
-import faker from 'faker';
-
 import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Divider from '@material-ui/core/Divider';
-import Typography from '@material-ui/core/Typography';
 
 import LeagueTable from '../widgets/LeagueTable';
 import CardWithChart from '../widgets/CardWithChart';
+import BoardObjectives from '../widgets/BoardObjectives';
 
 // TODO: remove this once the fake data generators are replaced
 import { getLeagueTableData, getPlayerProgressionData, MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
 
-export default function ClubPageView() {
+export default function ClubPageView({ club }) {
     return (
         <>
             <Grid container spacing={2}>
@@ -26,16 +18,18 @@ export default function ClubPageView() {
                     <LeagueTable metadata={getLeagueTableData(10)} />
                 </Grid>
                 <Grid item xs={8} container direction='column'>
-                    <ClubFinancesChart />
+                    <ClubFinancesChart income={club.income} expenditure={club.expenditure}/>
                     <ClubSuccessChart />
                 </Grid>
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs>
-                    <BoardObjectives />
+                    {/* TODO: move this into a container function where the useMutation hook and other business logic
+                     can be housed. Then pass in actual objectives instead of the default empty list here. */}
+                    <BoardObjectives objectives={[]} />
                 </Grid>
                 <Grid item xs>
-                    <TransferBudgetChart />
+                    <BudgetBreakdownChart transferBudget={club.transferBudget} wageBudget={club.wageBudget}/>
                 </Grid>
             </Grid>
         </>
@@ -68,23 +62,27 @@ const ClubSuccessChart = () => {
     );
 };
 
-const ClubFinancesChart = () => {
-    // TODO: remove this fake data with the real thing
+const ClubFinancesChart = ({ income, expenditure }) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // TODO: build full array once income and expenditure history (month-wise) tracking is implemented
+    const profit = [ (income - expenditure), ...Array(months.length).fill(0) ];
+
     const clubFinancesData = {
         cardTitle: 'Club Finances',
-        chartData: getPlayerProgressionData(1, 'Income', MAX_ATTR_VALUE),
-        dataTransformer: x => x,
+        chartData: [
+            { name: 'Profit', data: [...Array(months.length)].map((_, idx) => ({ x: months[idx], y: profit[idx] })) }
+        ],
         chartOptions: {
-            stroke: { width: 2, curve: 'straight' },
-            plotOptions: { bar: { columnWidth: '15%' } },
+            stroke: { curve: 'straight' },
             dataLabels: { enabled: false },
-            legend: { show: false },
+            fill: { opacity: 0.5 },
             xaxis: {
-                title: { text: 'Months', style: { fontFamily: 'Roboto' } },
-                categories: [1, 2, 3, 4, 5, 6]
+                title: { text: 'Months' },
             }
         },
-        chartType: 'bar'
+        dataTransformer: x => x,
+        chartType: 'area'
     };
 
     return (
@@ -95,15 +93,18 @@ const ClubFinancesChart = () => {
         </Grid>
     );
 };
+ClubFinancesChart.propTypes = {
+    income: PropTypes.number,
+    expenditure: PropTypes.number
+};
 
-const TransferBudgetChart = () => {
-    // TODO: remove this fake data with the real thing
+const BudgetBreakdownChart = ({ transferBudget, wageBudget }) => {
     const transferBudgetData = {
         cardTitle: 'Budget for EY 2021',
-        chartData: [25, 60, 15],
+        chartData: [transferBudget, wageBudget],
         dataTransformer: x => x,
         chartOptions: {
-            labels: ['Scouting', 'Transfers', 'Youth Academy']
+            labels: ['Transfers', 'Wages']
         },
         chartType: 'donut'
     };
@@ -116,31 +117,18 @@ const TransferBudgetChart = () => {
         </Grid>
     );
 };
+BudgetBreakdownChart.propTypes = {
+    transferBudget: PropTypes.number,
+    wageBudget: PropTypes.number
+};
 
-const BoardObjectives = () => {
-    // TODO: remove this fake data with the real thing
-    const boardObjectives = [...Array(5)].map(() => ({
-        title: faker.lorem.sentence(),
-        description: faker.lorem.paragraph()
-    }));
-    return (
-        <Card>
-            <CardHeader title='Board Objectives' style={{ paddingBottom: 0 }} />
-            <List>
-                {boardObjectives.map((objective, idx) => {
-                    return (
-                        <>
-                            <ListItem key={idx}>
-                                <ListItemText
-                                    primary={<Typography variant='h6'>{objective.title}</Typography>}
-                                    secondary={objective.description}
-                                />
-                            </ListItem>
-                            {idx < boardObjectives.length - 1 && <Divider variant='middle' component='li' />}
-                        </>
-                    );
-                })}
-            </List>
-        </Card>
-    );
+ClubPageView.propTypes = {
+    club: PropTypes.shape({
+        id: PropTypes.string,
+        name: PropTypes.string,
+        transferBudget: PropTypes.number,
+        wageBudget: PropTypes.number,
+        income: PropTypes.number,
+        expenditure: PropTypes.number
+    })
 };

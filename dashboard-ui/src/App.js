@@ -9,6 +9,7 @@ import Layout from './Layout';
 import { useThemePreference } from './context/themePreferenceProvider';
 import { ChartOptionsProvider } from './context/chartOptionsProvider';
 import { AuthContextProvider } from './context/authProvider';
+import { ClubContextProvider } from './context/clubProvider';
 
 function App() {
     const queryClient = new QueryClient();
@@ -29,7 +30,9 @@ function App() {
                 <ThemeProvider theme={theme}>
                     <ChartOptionsProvider>
                         <AuthContextProvider>
-                            <Layout />
+                            <ClubContextProvider>
+                                <Layout />
+                            </ClubContextProvider>
                         </AuthContextProvider>
                     </ChartOptionsProvider>
                 </ThemeProvider>

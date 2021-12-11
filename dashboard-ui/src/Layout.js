@@ -9,8 +9,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import AppBarMenu from './components/AppBarMenu';
 import Sidebar from './widgets/Sidebar';
 import UserAuth from './pages/UserAuth';
-import routingData from './routingData';
+import routingData from './routing/routingData';
 import useUserData from './hooks/useUserData';
+import PrivateRoute from './routing/PrivateRoute';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -80,14 +81,18 @@ const AppContainer = ({ classes }) => {
             <main className={classes.content}>
                 <div className={classes.view}>
                     <Switch>
-                        {routingData.map((sidebarItemData, _idx) => (
-                            <Route
-                                exact={sidebarItemData.isExact}
-                                key={_idx}
-                                path={sidebarItemData.routePath}
-                                component={sidebarItemData.component}
-                            />
-                        ))}
+                        {routingData.map((sidebarItemData, _idx) => {
+                            return sidebarItemData.disabledPaths ? (
+                                <PrivateRoute path={sidebarItemData.routePath} component={sidebarItemData.component} />
+                            ) : (
+                                <Route
+                                    exact={sidebarItemData.isExact}
+                                    key={_idx}
+                                    path={sidebarItemData.routePath}
+                                    component={sidebarItemData.component}
+                                />
+                            );
+                        })}
                     </Switch>
                 </div>
             </main>

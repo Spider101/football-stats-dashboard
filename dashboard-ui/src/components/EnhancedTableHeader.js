@@ -50,7 +50,7 @@ export default function EnhancedTableHeader({ headerCells, order, orderBy, onReq
                         <StyledTableCell
                             key={ headerCell.id }
                             align={ headerCell.alignment }
-                            padding='default'
+                            padding='normal'
                             sortDirection={ orderBy === headerCell.id ? order : false }
                         >
                             <StyledTableSortLabel
