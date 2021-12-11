@@ -1,21 +1,11 @@
 import PropTypes from 'prop-types';
-
 import ReactApexChart from 'react-apexcharts';
 
-// TODO: remove this once the fake data generators are replaced
-import faker from 'faker';
-
 import Grid from '@material-ui/core/Grid';
-import Card from '@material-ui/core/Card';
-import CardHeader from '@material-ui/core/CardHeader';
-import CardContent from '@material-ui/core/CardContent';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import Typography from '@material-ui/core/Typography';
 
 import LeagueTable from '../widgets/LeagueTable';
 import CardWithChart from '../widgets/CardWithChart';
+import BoardObjectives from '../widgets/BoardObjectives';
 
 // TODO: remove this once the fake data generators are replaced
 import { getLeagueTableData, getPlayerProgressionData, MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
@@ -34,7 +24,9 @@ export default function ClubPageView({ club }) {
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs>
-                    <BoardObjectives />
+                    {/* TODO: move this into a container function where the useMutation hook and other business logic
+                     can be housed. Then pass in actual objectives instead of the default empty list here. */}
+                    <BoardObjectives objectives={[]} />
                 </Grid>
                 <Grid item xs>
                     <BudgetBreakdownChart transferBudget={club.transferBudget} wageBudget={club.wageBudget}/>
@@ -129,33 +121,6 @@ const BudgetBreakdownChart = ({ transferBudget, wageBudget }) => {
 BudgetBreakdownChart.propTypes = {
     transferBudget: PropTypes.number,
     wageBudget: PropTypes.number
-};
-
-const BoardObjectives = () => {
-    // TODO: remove this fake data with the real thing
-    const boardObjectives = [...Array(5)].map(() => ({
-        title: faker.lorem.sentence(),
-        description: faker.lorem.paragraph()
-    }));
-    return (
-        <Card>
-            <CardHeader title='Board Objectives' style={{ paddingBottom: 0 }} />
-            <CardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
-                <List>
-                    {boardObjectives.map((objective, idx) => {
-                        return (
-                            <ListItem key={idx} disableGutters divider={idx < boardObjectives.length - 1}>
-                                <ListItemText
-                                    primary={<Typography variant='h6'>{objective.title}</Typography>}
-                                    secondary={objective.description}
-                                />
-                            </ListItem>
-                        );
-                    })}
-                </List>
-            </CardContent>
-        </Card>
-    );
 };
 
 ClubPageView.propTypes = {
