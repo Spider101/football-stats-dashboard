@@ -23,3 +23,11 @@ export const createNewClub = async ({ newClubData, authToken }) => {
         throw new Error(errorMessage);
     }
 };
+
+export const fetchSquadHubData = async ({ queryKey, meta: { authData } }) => {
+    const clubId = queryKey[1];
+    const res = await fetchDataFromEndpoint(`club/${clubId}/squadPlayers`, 'GET', {
+        Authorization: `BEARER ${authData.id}`
+    });
+    return await res.json();
+};
