@@ -8,7 +8,7 @@ export default {
     component: CardWithFilter,
     title: 'Widgets/PlayerComparisonView/CardWithFilter',
     argTypes: {
-        filterControl: { table: { disable: true } }
+        filterControl: { control: { disable: true } }
     },
     parameters: {
         docs: {
