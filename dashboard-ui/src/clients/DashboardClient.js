@@ -1,4 +1,15 @@
 import fetchDataFromEndpoint from './utils';
+import { httpStatus } from '../utils';
+
+export const createNewPlayer = async ({ newPlayerData, authToken }) => {
+    const res = await fetchDataFromEndpoint('player', 'POST', { Authorization: `BEARER ${authToken}`}, newPlayerData);
+    if (res.ok) {
+        return await res.json();
+    } else if (res.status === httpStatus.BAD_STATUS) {
+        const { message: errorMessage } = await res.json();
+        throw new Error(errorMessage);
+    }
+};
 
 export const fetchPlayerData = async ({ queryKey, meta: { authData } }) => {
     const playerId = queryKey[1];
