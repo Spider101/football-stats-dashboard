@@ -3,6 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { moraleIconsMap, nationalityFlagMap } from '../utils';
 
 import SquadHubView from '../views/SquadHubView';
+import { Success } from './AddPlayer.stories';
 
 import { getSquadHubPlayerData } from './utils/storyDataGenerators';
 
@@ -33,4 +34,7 @@ const moraleList = moraleIconsMap.map(entity => entity.morale);
 const Template = args => <SquadHubView {...args} />;
 
 export const Default = Template.bind({});
-Default.args = getSquadHubPlayerData(10, nations, moraleList);
+Default.args = {
+    ...getSquadHubPlayerData(10, nations, moraleList),
+    addPlayerWidget: <Success {...Success.args} />
+};
