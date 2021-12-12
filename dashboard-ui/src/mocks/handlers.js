@@ -65,3 +65,11 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
         })
     ];
 };
+
+export const getPlayerHandlers = (baseUrl = '*') => {
+    return [
+        rest.post(`${baseUrl}/player`, (req, res, ctx) => {
+            return res(ctx.status(201), ctx.json({ id: 'new-player-id', ...req.body }));
+        })
+    ];
+};
