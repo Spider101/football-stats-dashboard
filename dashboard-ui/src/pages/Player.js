@@ -2,7 +2,6 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { NavLink as RouterLink, Route, Switch, useParams, useRouteMatch  } from 'react-router-dom';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
 import Grid from '@material-ui/core/Grid';
 import Link from '@material-ui/core/Link';
 import { alpha, makeStyles } from '@material-ui/core/styles';
@@ -12,6 +11,7 @@ import MatchPerformanceView from '../views/MatchPerformanceView';
 import PlayerComparisonView from '../views/PlayerComparisonView';
 
 import FilterControl from '../components/FilterControl';
+import StyledLoadingCircle from '../components/StyledLoadingCircle';
 
 import useSquadHub from '../hooks/useSquadHubData';
 import usePlayerData from '../hooks/usePlayerData';
@@ -19,12 +19,6 @@ import usePlayerPerfData from '../hooks/usePlayerPerfData';
 import { queryKeys } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
-    loadingCircle: {
-        width: '200px !important',
-        height: '200px !important',
-        alignSelf: 'center',
-        margin: '25vh'
-    },
     topMenu: {
         borderBottomColor: alpha(theme.palette.common.white, 0.25),
         borderBottomWidth: 1,
@@ -88,34 +82,35 @@ export default function Player() {
 
             <Switch>
                 <Route exact path={ path }>
-                    <PlayerProgressionContainer playerId={ playerId } classes={ classes } />
+                    <PlayerProgressionContainer playerId={ playerId } />
                 </Route>
                 <Route path={ `${path}/compare` }>
-                    <PlayerComparisonContainer playerId={ playerId } classes={ classes } />
+                    <PlayerComparisonContainer playerId={ playerId } />
                 </Route>
                 <Route path={ `${path}/performance` }>
-                    <PlayerPerformanceContainer playerId={ playerId } classes={ classes } />
+                    <PlayerPerformanceContainer playerId={ playerId } />
                 </Route>
             </Switch>
         </>
     );
 }
 
-const PlayerProgressionContainer = ({ playerId, classes }) => {
+const PlayerProgressionContainer = ({ playerId }) => {
     const { isLoading, data: playerProgressViewData } = usePlayerData(queryKeys.PLAYER_DATA, playerId);
 
-    return (
-        <>
-            {
-                isLoading ? <CircularProgress className={ classes.loadingCircle }/>
-                    : <PlayerProgressionView { ...playerProgressViewData } />
-            }
-        </>
-    );
+    if (isLoading) {
+        return <StyledLoadingCircle />;
+    }
+
+    return <PlayerProgressionView { ...playerProgressViewData } />;
 };
 
-const PlayerPerformanceContainer = ({ playerId, classes }) => {
+const PlayerPerformanceContainer = ({ playerId }) => {
     const { isLoading, data: playerPerformanceData } = usePlayerPerfData(playerId);
+
+    if (isLoading) {
+        return <StyledLoadingCircle />;
+    }
 
     const playerPerformanceViewData = {
         playerPerformance: {
@@ -123,17 +118,10 @@ const PlayerPerformanceContainer = ({ playerId, classes }) => {
         }
     };
 
-    return (
-        <>
-            {
-                isLoading ? <CircularProgress className={ classes.loadingCircle }/>
-                    : <MatchPerformanceView { ...playerPerformanceViewData } />
-            }
-        </>
-    );
+    return <MatchPerformanceView { ...playerPerformanceViewData } />;
 };
 
-const PlayerComparisonContainer = ({ playerId, classes }) => {
+const PlayerComparisonContainer = ({ playerId }) => {
     const [comparedPlayerId, setCurrentPlayerId] = useState(-1);
 
     const handlePlayerChange = (event) => {
@@ -165,20 +153,15 @@ const PlayerComparisonContainer = ({ playerId, classes }) => {
         filterControl
     };
 
-    return (
-        <>
-            {
-                squadDataQuery.isLoading || basePlayerDataQuery.isLoading
-                    ? <CircularProgress className={ classes.loadingCircle }/>
-                    : <PlayerComparisonView { ...playerComparisonViewData } />
-            }
-        </>
-    );
+    if (squadDataQuery.isLoading || basePlayerDataQuery.isLoading) {
+        return <StyledLoadingCircle />;
+    }
+
+    return <PlayerComparisonView { ...playerComparisonViewData } />;
 };
 
 PlayerProgressionContainer.propTypes = {
     playerId: PropTypes.string,
-    classes: PropTypes.object
 };
 
 PlayerComparisonContainer.propTypes = {

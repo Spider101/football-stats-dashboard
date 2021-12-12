@@ -3,10 +3,10 @@ import PropTypes from 'prop-types';
 import { Link, Route, Switch } from 'react-router-dom';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
-import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 
 import AppBarMenu from './components/AppBarMenu';
+import StyledLoadingCircle from './components/StyledLoadingCircle';
 import Sidebar from './widgets/Sidebar';
 import UserAuth from './pages/UserAuth';
 import routingData from './routing/routingData';
@@ -25,17 +25,6 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(0, 1),
         // necessary for content to be below app bar
         ...theme.mixins.toolbar
-    },
-    loadingCircleRoot: {
-        display: 'flex',
-        flexDirection: 'column',
-        flexGrow: 1,
-        alignItems: 'center'
-    },
-    loadingCircle: {
-        width: '200px !important',
-        height: '200px !important',
-        margin: '35vh'
     },
     formContainer: {
         display: 'flex',
@@ -113,9 +102,7 @@ export default function Layout() {
         <div className={classes.root}>
             <CssBaseline />
             {isLoading ? (
-                <div className={classes.loadingCircleRoot}>
-                    <CircularProgress className={classes.loadingCircle} />
-                </div>
+                <StyledLoadingCircle />
             ) : isLoggedIn ? (
                 <AppContainer classes={classes} />
             ) : (
