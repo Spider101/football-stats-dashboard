@@ -4,12 +4,15 @@ import _ from 'lodash';
 
 import Grid from '@material-ui/core/Grid';
 
-import { squadTableHeaderDisplayTypeMap, moraleIconsMap, nationalityFlagMap } from '../utils';
+import flagCodes from '../flagCodes';
+import { squadTableHeaderDisplayTypeMap, moraleIconsMap } from '../utils';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
 // TODO: define a more appropriate method for this
 const getSortValueForForm = matchRatingsList => matchRatingsList[0];
+
+const getFlagImageFromCountryName = countryName => `https://flagcdn.com/w40/${flagCodes[countryName]}.png`;
 
 const buildHeaderDataForSquadTable = headerNames =>
     headerNames
@@ -34,7 +37,7 @@ const buildRowDataForSquadTable = players => {
                 row = {
                     id: key,
                     type: 'image',
-                    data: nationalityFlagMap.find(entity => entity.nationality === value)?.flag || '',
+                    data: getFlagImageFromCountryName(value),
                     metadata: { sortValue: value }
                 };
                 break;
@@ -139,8 +142,8 @@ export default function SquadHubView({ players }) {
                     currentValues={playerRoles}
                     handleChangeFn={handleChange(setPlayerRoles)}
                     allPossibleValues={allPlayerRoles.current}
-                    allValuesSelectedLabel='All Players'
-                    inputLabelText='Filter Players'
+                    allValuesSelectedLabel='All Player Roles'
+                    inputLabelText='Filter Players By Role'
                     labelIdFragment='filter-rows'
                     customStyles={{ float: 'right' }}
                 />
