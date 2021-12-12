@@ -15,7 +15,7 @@ export default function () {
     });
 
     return {
-        addNewPlayerAciton: async newPlayerData => {
+        addNewPlayerAction: async newPlayerData => {
             try {
                 await mutateAsync({ newPlayerData, authToken: authData.id });
             } catch (err) {
