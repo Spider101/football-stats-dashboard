@@ -8,7 +8,7 @@ export default {
     component: HomePageView,
     title: 'Views/HomePageView',
     argTypes: {
-        addClubWidget: { table: { disable: true } }
+        addClubWidget: { control: { disable: true } }
     },
     parameters: {
         docs: {

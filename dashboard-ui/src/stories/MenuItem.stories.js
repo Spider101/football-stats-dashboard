@@ -9,8 +9,8 @@ export default {
     component: MenuItem,
     title: 'Components/Globals/MenuItem',
     argTypes: {
-        componentType: { table: { disable: true } },
-        icon: { table: { disable: true } }
+        componentType: { control: { disable: true } },
+        icon: { control: { disable: true } }
     },
     parameters: {
         docs: {

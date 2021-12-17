@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import PropTypes from 'prop-types';
 
-import { makeStyles } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 
@@ -12,17 +11,7 @@ import PageAction from '../components/PageAction';
 import { formSubmission } from '../utils';
 import useForm from '../hooks/useForm';
 
-const useStyles = makeStyles(theme => ({
-    submit: {
-        margin: theme.spacing(3, 0, 2)
-    },
-    validations: {
-        width: '100%'
-    }
-}));
-
 export default function AddClub({ addClubAction }) {
-    const classes = useStyles();
     const {
         handleChangeFn,
         handleSubmitFn,
@@ -42,7 +31,7 @@ export default function AddClub({ addClubAction }) {
 
     const addNewClubDialogForm = (
         <DialogForm dialogTitle='Add New Club' handleSubmit={handleSubmitFn}>
-            <div className={classes.validations}>
+            <div style={{ width: '100%' }}>
                 {submitStatus === formSubmission.COMPLETE && (
                     <Alert severity='success' text='New Club Added Successfully!' />
                 )}

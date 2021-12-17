@@ -1,0 +1,343 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`should always render add player widget 1`] = `
+<div>
+  <div
+    class="MuiGrid-root MuiGrid-container MuiGrid-spacing-xs-2"
+  >
+    <div
+      class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6"
+    >
+      <div
+        class="MuiFormControl-root makeStyles-formControl-30"
+      >
+        <label
+          class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiFormLabel-filled"
+          data-shrink="true"
+          id="configure-columns-select-label"
+        >
+          Configure Columns
+        </label>
+        <div
+          class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"
+        >
+          <div
+            aria-haspopup="listbox"
+            aria-labelledby="configure-columns-select-label configure-columns-checkbox"
+            class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiInputBase-input MuiInput-input"
+            id="configure-columns-checkbox"
+            role="button"
+            tabindex="0"
+          >
+            <div
+              class="makeStyles-chips-31"
+            >
+              <div
+                class="MuiChip-root makeStyles-chip-32"
+              >
+                <span
+                  class="MuiChip-label"
+                >
+                  All Columns
+                </span>
+              </div>
+            </div>
+          </div>
+          <input
+            aria-hidden="true"
+            class="MuiSelect-nativeInput"
+            tabindex="-1"
+            value="name,nationality,role,wages,form,morale,current_ability"
+          />
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSelect-icon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M7 10l5 5 5-5z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div
+      class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6"
+    >
+      <div
+        class="MuiFormControl-root makeStyles-formControl-30"
+        style="float: right;"
+      >
+        <label
+          class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated"
+          data-shrink="false"
+          id="filter-rows-select-label"
+        >
+          Filter Players By Role
+        </label>
+        <div
+          class="MuiInputBase-root MuiInput-root MuiInput-underline MuiInputBase-formControl MuiInput-formControl"
+        >
+          <div
+            aria-haspopup="listbox"
+            aria-labelledby="filter-rows-select-label filter-rows-checkbox"
+            class="MuiSelect-root MuiSelect-select MuiSelect-selectMenu MuiInputBase-input MuiInput-input"
+            id="filter-rows-checkbox"
+            role="button"
+            tabindex="0"
+          >
+            <span>
+              ​
+            </span>
+          </div>
+          <input
+            aria-hidden="true"
+            class="MuiSelect-nativeInput"
+            tabindex="-1"
+            value=""
+          />
+          <svg
+            aria-hidden="true"
+            class="MuiSvgIcon-root MuiSelect-icon"
+            focusable="false"
+            viewBox="0 0 24 24"
+          >
+            <path
+              d="M7 10l5 5 5-5z"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div
+      class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-12"
+    >
+      <div
+        class="MuiTableContainer-root"
+      >
+        <table
+          class="MuiTable-root makeStyles-table-33"
+        >
+          <thead
+            class="MuiTableHead-root"
+          >
+            <tr
+              class="MuiTableRow-root MuiTableRow-head"
+            >
+              <th
+                aria-sort="ascending"
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                scope="col"
+              >
+                <span
+                  aria-disabled="false"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40 MuiTableSortLabel-active WithStyles(ForwardRef(TableSortLabel))-active-41"
+                  role="button"
+                  tabindex="0"
+                >
+                  Name
+                  <span
+                    class="makeStyles-visuallyHidden-36"
+                  >
+                    sorted ascending
+                  </span>
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"
+                    />
+                  </svg>
+                </span>
+              </th>
+              <th
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                scope="col"
+              >
+                <span
+                  aria-disabled="false"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  role="button"
+                  tabindex="0"
+                >
+                  Nationality
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"
+                    />
+                  </svg>
+                </span>
+              </th>
+              <th
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                scope="col"
+              >
+                <span
+                  aria-disabled="false"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  role="button"
+                  tabindex="0"
+                >
+                  Role
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"
+                    />
+                  </svg>
+                </span>
+              </th>
+              <th
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                scope="col"
+              >
+                <span
+                  aria-disabled="false"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  role="button"
+                  tabindex="0"
+                >
+                  Wages
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"
+                    />
+                  </svg>
+                </span>
+              </th>
+              <th
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                scope="col"
+              >
+                <span
+                  aria-disabled="false"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  role="button"
+                  tabindex="0"
+                >
+                  Form
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"
+                    />
+                  </svg>
+                </span>
+              </th>
+              <th
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                scope="col"
+              >
+                <span
+                  aria-disabled="false"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  role="button"
+                  tabindex="0"
+                >
+                  Morale
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"
+                    />
+                  </svg>
+                </span>
+              </th>
+              <th
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignRight"
+                scope="col"
+              >
+                <span
+                  aria-disabled="false"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  role="button"
+                  tabindex="0"
+                >
+                  Current Ability
+                  <svg
+                    aria-hidden="true"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    focusable="false"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z"
+                    />
+                  </svg>
+                </span>
+              </th>
+            </tr>
+          </thead>
+          <tbody
+            class="MuiTableBody-root"
+          />
+        </table>
+        <div
+          class="MuiContainer-root MuiContainer-maxWidthLg"
+        >
+          <div
+            class="MuiTypography-root MuiTypography-h5"
+            style="text-align: center; padding: 5%;"
+          >
+            No Data is available for display. Please select one or more rows!
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    class="makeStyles-fab-29"
+  >
+    <button
+      aria-label="add"
+      class="MuiButtonBase-root MuiFab-root MuiFab-secondary"
+      tabindex="0"
+      type="button"
+    >
+      <span
+        class="MuiFab-label"
+      >
+        <svg
+          aria-hidden="true"
+          class="MuiSvgIcon-root"
+          focusable="false"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"
+          />
+        </svg>
+      </span>
+      <span
+        class="MuiTouchRipple-root"
+      />
+    </button>
+  </div>
+</div>
+`;

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 
 import { Default, NoClubs } from '../stories/HomePageView.stories';
-import { MemoryRouter } from 'react-router-dom';
 
 const noClubViewText = 'No clubs have been created yet! Please create a club to proceed.';
 it('should render the club data passed in', () => {

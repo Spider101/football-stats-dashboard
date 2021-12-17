@@ -3,13 +3,25 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 
 import Grid from '@material-ui/core/Grid';
+import { makeStyles } from '@material-ui/core/styles';
 
-import { squadTableHeaderDisplayTypeMap, moraleIconsMap, nationalityFlagMap } from '../utils';
+import flagCodes from '../flagCodes';
+import { squadTableHeaderDisplayTypeMap, moraleIconsMap } from '../utils';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
+const useStyles = makeStyles(theme => ({
+    fab: {
+        position: 'fixed',
+        bottom: theme.spacing(4),
+        right: theme.spacing(4)
+    }
+}));
+
 // TODO: define a more appropriate method for this
 const getSortValueForForm = matchRatingsList => matchRatingsList[0];
+
+const getFlagImageFromCountryName = countryName => `https://flagcdn.com/w40/${flagCodes[countryName]}.png`;
 
 const buildHeaderDataForSquadTable = headerNames =>
     headerNames
@@ -34,7 +46,7 @@ const buildRowDataForSquadTable = players => {
                 row = {
                     id: key,
                     type: 'image',
-                    data: nationalityFlagMap.find(entity => entity.nationality === value)?.flag || '',
+                    data: getFlagImageFromCountryName(value),
                     metadata: { sortValue: value }
                 };
                 break;
@@ -98,7 +110,8 @@ const filterRowsByRole = (originalRowData, roles) =>
         return roles.includes(roleData.data);
     });
 
-export default function SquadHubView({ players }) {
+export default function SquadHubView({ players, addPlayerWidget }) {
+    const classes = useStyles();
     const [playerRoles, setPlayerRoles] = useState([]);
 
     const initialSquadHubTableHeaders = buildHeaderDataForSquadTable(
@@ -123,32 +136,37 @@ export default function SquadHubView({ players }) {
     const filteredRowData = filterRowsByRole(rowData, playerRoles);
 
     return (
-        <Grid container spacing={2}>
-            <Grid item xs={6}>
-                <TableFilterControl
-                    currentValues={columnNames}
-                    handleChangeFn={handleChange(setColumnNames)}
-                    allPossibleValues={allSquadHubTableHeaderNames}
-                    allValuesSelectedLabel='All Columns'
-                    inputLabelText='Configure Columns'
-                    labelIdFragment='configure-columns'
-                />
+        <>
+            <Grid container spacing={2}>
+                <Grid item xs={6}>
+                    <TableFilterControl
+                        currentValues={columnNames}
+                        handleChangeFn={handleChange(setColumnNames)}
+                        allPossibleValues={allSquadHubTableHeaderNames}
+                        allValuesSelectedLabel='All Columns'
+                        inputLabelText='Configure Columns'
+                        labelIdFragment='configure-columns'
+                    />
+                </Grid>
+                <Grid item xs={6}>
+                    <TableFilterControl
+                        currentValues={playerRoles}
+                        handleChangeFn={handleChange(setPlayerRoles)}
+                        allPossibleValues={allPlayerRoles.current}
+                        allValuesSelectedLabel='All Player Roles'
+                        inputLabelText='Filter Players By Role'
+                        labelIdFragment='filter-rows'
+                        customStyles={{ float: 'right' }}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <SortableTable {...filterColumns(initialSquadHubTableHeaders, filteredRowData, columnNames)} />
+                </Grid>
             </Grid>
-            <Grid item xs={6}>
-                <TableFilterControl
-                    currentValues={playerRoles}
-                    handleChangeFn={handleChange(setPlayerRoles)}
-                    allPossibleValues={allPlayerRoles.current}
-                    allValuesSelectedLabel='All Players'
-                    inputLabelText='Filter Players'
-                    labelIdFragment='filter-rows'
-                    customStyles={{ float: 'right' }}
-                />
-            </Grid>
-            <Grid item xs={12}>
-                <SortableTable {...filterColumns(initialSquadHubTableHeaders, filteredRowData, columnNames)} />
-            </Grid>
-        </Grid>
+            <div className={classes.fab}>
+                {addPlayerWidget}
+            </div>
+        </>
     );
 }
 
@@ -164,5 +182,6 @@ SquadHubView.propTypes = {
             morale: PropTypes.string,
             currentAbility: PropTypes.number
         })
-    )
+    ),
+    addPlayerWidget: PropTypes.node
 };

@@ -1,19 +1,19 @@
-import { useQuery, useQueryClient } from 'react-query';
+import { useQuery } from 'react-query';
 
-import { fetchSquadHubData } from '../clients/DashboardClient';
+import { fetchSquadHubData } from '../clients/ClubClient';
 import { useUserAuth } from '../context/authProvider';
+import { useCurrentClub } from '../context/clubProvider';
 import { queryKeys } from '../utils';
 
 export default function() {
-    const queryClient = useQueryClient();
     const { authData } = useUserAuth();
+    const { currentClubId } = useCurrentClub();
 
-    const { isLoading, data: squadPlayersData } = useQuery(queryKeys.SQUAD_DATA, fetchSquadHubData, {
-        meta: { authData },
-        initialData: () => queryClient.getQueryData(queryKeys.SQUAD_DATA),
-        staleTime: 10 * 1000,
-        initialDataUpdatedAt: queryClient.getQueryState(queryKeys.SQUAD_DATA)?.dataUpdatedAt
-    });
+    const { isLoading, data: squadPlayersData } = useQuery([queryKeys.SQUAD_DATA, currentClubId],
+        fetchSquadHubData, {
+            meta: { authData }
+        }
+    );
 
     return {
         isLoading,

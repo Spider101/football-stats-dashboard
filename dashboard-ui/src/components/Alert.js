@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { alpha, makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
     root: {
         marginTop: theme.spacing(1),
         padding: theme.spacing(2),
@@ -26,12 +26,14 @@ const useStyles = makeStyles((theme) => ({
 export default function Alert({ severity, text }) {
     const classes = useStyles();
     return (
-        <div className={clsx(classes.root, {
-            [classes.success]: severity === 'success',
-            [classes.error]: severity === 'error' })}>
-            <Typography component='p'>
-                { text }
-            </Typography>
+        <div
+            className={clsx(classes.root, {
+                [classes.success]: severity === 'success',
+                [classes.error]: severity === 'error'
+            })}
+            role='alert'
+        >
+            <Typography component='p'>{text}</Typography>
         </div>
     );
 }

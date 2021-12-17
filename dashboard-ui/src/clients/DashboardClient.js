@@ -1,12 +1,14 @@
 import fetchDataFromEndpoint from './utils';
+import { httpStatus } from '../utils';
 
-export const fetchSquadHubData = async ({ meta: { authData } }) => {
-    // TODO: hard-coding the clubId until we can create a club from the UI
-    const clubId = 'b60a9dc6-81a3-4ca1-b24b-088220fdca59';
-    const res = await fetchDataFromEndpoint(`club/${clubId}/squadPlayers`, 'GET', {
-        Authorization: `BEARER ${authData.id}`
-    });
-    return await res.json();
+export const createNewPlayer = async ({ newPlayerData, authToken }) => {
+    const res = await fetchDataFromEndpoint('player', 'POST', { Authorization: `BEARER ${authToken}`}, newPlayerData);
+    if (res.ok) {
+        return await res.json();
+    } else if (res.status === httpStatus.BAD_STATUS) {
+        const { message: errorMessage } = await res.json();
+        throw new Error(errorMessage);
+    }
 };
 
 export const fetchPlayerData = async ({ queryKey, meta: { authData } }) => {

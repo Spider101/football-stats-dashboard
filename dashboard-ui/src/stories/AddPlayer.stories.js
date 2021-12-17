@@ -1,9 +1,9 @@
-import AddClub from '../widgets/AddClub';
+import AddPlayer from '../widgets/AddPlayer';
 
 export default {
-    component: AddClub,
-    title: 'Widgets/Club/AddClub',
-    argTypes: { addClubAction: { control: { disable: true } } },
+    component: AddPlayer,
+    title: 'Widgets/SquadHubView/AddPlayer',
+    argTypes: { addPlayerAction: { control: { disable: true } } },
     decorators: [
         Story => (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -13,14 +13,14 @@ export default {
     ]
 };
 
-const Template = args => <AddClub {...args} />;
+const Template = args => <AddPlayer {...args} />;
 
 export const Success = Template.bind({});
 Success.args = {
-    addClubAction: _ => null
+    addPlayerAction: _ => null
 };
 
 export const FormFailure = Template.bind({});
 FormFailure.args = {
-    addClubAction: _ => 'Failed to add new club!'
+    addPlayerAction: _ => 'Failed to add new player!'
 };

@@ -49,7 +49,27 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
             return res(ctx.status(201), ctx.json({ id: 'new-club-id', ...req.body }));
         }),
         rest.get(`${baseUrl}/club/${clubIdFragment}/squadPlayers`, (req, res, ctx) => {
-            return res(ctx.status(200), ctx.json([]));
+            return res(
+                ctx.status(200),
+                ctx.json([
+                    {
+                        id: '700eb034-91e2-49a9-8608-5cbd3fa853ba',
+                        name: 'Sander Gard Bolin Berge',
+                        country: 'Norway',
+                        role: 'Defensive Central Midfielder',
+                        currentAbility: 97,
+                        playerId: '03b3d2be-0e71-4d25-8ed6-f7a204779dbb'
+                    }
+                ])
+            );
+        })
+    ];
+};
+
+export const getPlayerHandlers = (baseUrl = '*') => {
+    return [
+        rest.post(`${baseUrl}/player`, (req, res, ctx) => {
+            return res(ctx.status(201), ctx.json({ id: 'new-player-id', ...req.body }));
         })
     ];
 };
