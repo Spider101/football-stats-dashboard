@@ -10,6 +10,7 @@ import { getSquadHubPlayerData } from './utils/storyDataGenerators';
 export default {
     component: SquadHubView,
     title: 'Views/SquadHubView',
+    argTypes: { addPlayerWidget: { control: { disable: true } } },
     parameters: {
         docs: {
             description: {
@@ -37,4 +38,10 @@ export const Default = Template.bind({});
 Default.args = {
     ...getSquadHubPlayerData(10, nations, moraleList),
     addPlayerWidget: <Success {...Success.args} />
+};
+
+export const NoPlayers = Template.bind({});
+NoPlayers.args = {
+    ...Default.args,
+    players: []
 };
