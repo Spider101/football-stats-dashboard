@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
-import { formSubmission } from '../utils';
 
+import { formSubmission } from '../utils';
 import useForm from './useForm';
 
 describe('useForm hook -', () => {
@@ -24,9 +24,11 @@ describe('useForm hook -', () => {
                 handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
             });
             const {
-                formValidations: { firstName: firstNameValidation }
+                formValidations: { firstName: firstNameValidation },
+                submitStatus
             } = result.current;
             expect(firstNameValidation).toBeNull();
+            expect(submitStatus).toEqual(formSubmission.READY);
         });
 
         it('validates email format', async () => {
@@ -137,13 +139,14 @@ describe('useForm hook -', () => {
 
             const { result, waitForNextUpdate } = renderHook(() => useForm({ firstName: '' }, mockCallback));
             const { handleChangeFn, submitStatus } = result.current;
-            expect(submitStatus).toBeNull();
+            expect(submitStatus).toEqual(formSubmission.NOT_READY);
 
             act(() => {
                 handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
             });
 
-            const { handleSubmitFn } = result.current;
+            const { handleSubmitFn, submitStatus: submitStatusAfterFieldUpdate } = result.current;
+            expect(submitStatusAfterFieldUpdate).toEqual(formSubmission.READY);
 
             act(() => {
                 handleSubmitFn({ preventDefault: jest.fn() });
@@ -161,7 +164,7 @@ describe('useForm hook -', () => {
 
             const { result, waitForNextUpdate } = renderHook(() => useForm({ firstName: '' }, mockCallback));
             const { handleChangeFn, submitStatus } = result.current;
-            expect(submitStatus).toBeNull();
+            expect(submitStatus).toEqual(formSubmission.NOT_READY);
 
             act(() => {
                 handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
@@ -179,10 +182,10 @@ describe('useForm hook -', () => {
             expect(formValidations.form).toEqual('Something went wrong!');
 
             // submit status is changed from INPROGRESS to null again because there is an error on the form now
-            expect(submitStatusAfterClientCall).toBeNull();
+            expect(submitStatusAfterClientCall).toEqual(formSubmission.NOT_READY);
         });
 
-        it('form fields are validated if form is submitted without updating any field', async () => {
+        it('form submit status is not updated if trying to submit form without updating any field', async () => {
             const mockCallback = jest.fn();
             const { result } = renderHook(() =>
                 useForm({ firstName: '', lastName: '' }, mockCallback)
@@ -195,9 +198,8 @@ describe('useForm hook -', () => {
 
             expect(mockCallback).not.toBeCalled();
 
-            const { formValidations, submitStatus } = result.current;
-            expect(Object.values(formValidations).length).toBeGreaterThan(0);
-            expect(submitStatus).not.toBe(formSubmission.COMPLETE);
+            const { submitStatus } = result.current;
+            expect(submitStatus).toEqual(formSubmission.NOT_READY);
         });
     });
 });

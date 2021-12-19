@@ -18,13 +18,21 @@ const validateInput = (name, value, formData) => {
 const useForm = (defaultFormValues, callback) => {
     const [formData, setFormData] = useState(defaultFormValues);
     const [formValidations, setFormValidations] = useState({});
-    const [submitStatus, setSubmitStatus] = useState();
+    const [submitStatus, setSubmitStatus] = useState(formSubmission.NOT_READY);
+    const numFields = Object.keys(defaultFormValues).length;
 
     const handleChangeFn = e => {
         const { name, value } = e.target;
 
         // validate the input
         const validation = validateInput(name, value, formData);
+        if (!validation) {
+            // the current validation returned as falsy, so set submit status to READY if the remaining fields do not
+            // have any validations either
+            if (Object.values(formValidations).filter(validation => validation === null).length === (numFields - 1)) {
+                setSubmitStatus(formSubmission.READY);
+            }
+        }
         setFormValidations({
             ...formValidations,
             [name]: validation || null
@@ -40,13 +48,8 @@ const useForm = (defaultFormValues, callback) => {
     const handleSubmitFn = e => {
         e.preventDefault();
 
-        // validate all fields once more
-        const validations = {};
-        Object.entries(formData).forEach(([key, value]) => {
-            const validation = validateInput(key, value, formData);
-            validations[key] = validation || null;
-        });
-        setFormValidations({ ...validations });
+        // do not update form submission state to IN PROGRESS if it is not in READY state
+        if (submitStatus !== formSubmission.READY) return;
 
         // lock form by disabling input fields and button
         setSubmitStatus(formSubmission.INPROGRESS);
@@ -56,11 +59,13 @@ const useForm = (defaultFormValues, callback) => {
         async authAction => {
             const formErrorMessage = await authAction(formData);
             if (formErrorMessage != null) {
+                setSubmitStatus(formSubmission.NOT_READY);
                 setFormValidations(formValidations => ({
                     ...formValidations,
                     form: formErrorMessage
                 }));
             } else {
+                // TODO: implement and invoke a function to reset the states here
                 setSubmitStatus(formSubmission.COMPLETE);
             }
         },
@@ -68,13 +73,9 @@ const useForm = (defaultFormValues, callback) => {
     );
 
     useEffect(() => {
-        // check if there are any validations set when we are trying to submit the form data
-        if (submitStatus === formSubmission.INPROGRESS &&
-            Object.values(formValidations).every(validation => validation === null)) {
+        // only invoke the callback if the form submission status is in INPROGRESS state
+        if (submitStatus === formSubmission.INPROGRESS) {
             postFormData(callback);
-        } else if (submitStatus !== formSubmission.COMPLETE) {
-            // reset/ unlock form if form submission is in progress and errors are found
-            setSubmitStatus(null);
         }
     }, [formValidations, submitStatus, callback, postFormData]);
 
