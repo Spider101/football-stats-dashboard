@@ -30,7 +30,7 @@ export default function AddClub({ addClubAction }) {
     );
 
     const addNewClubDialogForm = (
-        <DialogForm dialogTitle='Add New Club' handleSubmit={handleSubmitFn}>
+        <DialogForm dialogTitle='Add New Club' handleSubmit={handleSubmitFn} submitStatus={submitStatus}>
             <div style={{ width: '100%' }}>
                 {submitStatus === formSubmission.COMPLETE && (
                     <Alert severity='success' text='New Club Added Successfully!' />
