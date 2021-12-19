@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom';
 
 import Signup from '../components/Signup';
+import { formSubmission } from '../utils';
 import { mockHandleChange, mockSubmit } from './utils/storyMocks';
 
 export default {
@@ -35,12 +36,12 @@ Default.args = {
     values: { firstName: '', lastName: '', email: '', newPassword: '', confirmedPassword: '' },
     handleChange: mockHandleChange,
     handleSubmit: mockSubmit,
-    validations: { firstName: null, lastName: null, email: null, newPassword: null, confirmedPassword: null },
-    submitStatus: null
+    validations: {},
+    submitStatus: formSubmission.NOT_READY
 };
 
-export const Submitting = Template.bind({});
-Submitting.args = {
+export const ReadyToSubmit = Template.bind({});
+ReadyToSubmit.args = {
     ...Default.args,
     values: {
         firstName: 'fake first name',
@@ -49,13 +50,19 @@ Submitting.args = {
         newPassword: 'fake new password',
         confirmedPassword: 'fake confirmed password'
     },
-    submitStatus: 'SUBMITTING',
+    submitStatus: formSubmission.READY,
+};
+
+export const Submitting = Template.bind({});
+Submitting.args = {
+    ...ReadyToSubmit.args,
+    submitStatus: formSubmission.INPROGRESS
 };
 
 export const Submitted = Template.bind({});
 Submitted.args = {
     ...Default.args,
-    submitStatus: 'SUBMITTED'
+    submitStatus: formSubmission.COMPLETE
 };
 
 export const FailedInput = Template.bind({});

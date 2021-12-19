@@ -151,7 +151,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                     variant='contained'
                     color='primary'
                     fullWidth
-                    disabled={submitStatus === formSubmission.INPROGRESS}
+                    disabled={submitStatus !== formSubmission.READY}
                 >
                     {submitStatus === formSubmission.INPROGRESS ? 'Signing Up ...' : 'Sign Up'}
                 </Button>

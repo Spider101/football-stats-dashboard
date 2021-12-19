@@ -1,6 +1,7 @@
 import { MemoryRouter } from 'react-router-dom';
 
 import SignIn from '../components/SignIn';
+import { formSubmission } from '../utils';
 import { mockHandleChange, mockSubmit } from './utils/storyMocks';
 
 export default {
@@ -34,28 +35,34 @@ Default.args = {
     values: { email: '', password: '' },
     handleChange: mockHandleChange,
     handleSubmit: mockSubmit,
-    validations: { email: null, password: null, form: null },
-    submitStatus: null
+    validations: {},
+    submitStatus: formSubmission.NOT_READY 
+};
+
+export const ReadyToSubmit = Template.bind({});
+ReadyToSubmit.args = {
+    ...Default.args,
+    values: { email: 'fake@test.email', password: 'fakepassword' },
+    submitStatus: formSubmission.READY
 };
 
 export const Submitting = Template.bind({});
 Submitting.args = {
-    ...Default.args,
-    values: { email: 'fake@test.email', password: 'fakepassword' },
-    submitStatus: 'SUBMITTING'
+    ...ReadyToSubmit.args,
+    submitStatus: formSubmission.INPROGRESS
 };
 
 export const Submitted = Template.bind({});
 Submitted.args = {
     ...Default.args,
-    submitStatus: 'SUBMITTED'
+    submitStatus: formSubmission.COMPLETE
 };
 
 export const FailedInput = Template.bind({});
 FailedInput.args = {
     ...Default.args,
+    values: { email: 'fake@test', password: '' },
     validations: {
-        ...Default.args.validations,
         email: 'Email address is not in correct format!',
         password: 'Password is required'
     }
@@ -63,6 +70,6 @@ FailedInput.args = {
 
 export const FailedSubmit = Template.bind({});
 FailedSubmit.args = {
-    ...Default.args,
+    ...ReadyToSubmit.args,
     validations: { ...Default.args.validations, form: 'Email/Password does not match' }
 };
