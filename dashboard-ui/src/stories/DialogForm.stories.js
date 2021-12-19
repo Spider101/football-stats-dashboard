@@ -1,11 +1,12 @@
+import { action } from '@storybook/addon-actions';
 import TextField from '@material-ui/core/TextField';
 
 import DialogForm from '../components/DialogForm';
-import { action } from '@storybook/addon-actions';
+import { formSubmission } from '../utils';
 
 export default {
     component: DialogForm,
-    title: 'Components/Globals/DialogForm',
+    title: 'Components/Globals/DialogForm/SingleStep',
     argTypes: {
         children: { table: { disable: true } }
     },
@@ -50,10 +51,17 @@ const Template = args => (
     </DialogForm>
 );
 
-export const SingleStep = Template.bind({});
-SingleStep.args = {
+export const Default = Template.bind({});
+Default.args = {
     isOpen: true,
     dialogTitle: 'Generic Form In Dialog',
     handleSubmit: action('Form Submit Handler'),
-    handleClose: action('Dialog Close Handler')
+    handleClose: action('Dialog Close Handler'),
+    submitStatus: formSubmission.NOT_READY
+};
+
+export const ReadyToSubmit = Template.bind({});
+ReadyToSubmit.args = {
+    ...Default.args,
+    submitStatus: formSubmission.READY
 };

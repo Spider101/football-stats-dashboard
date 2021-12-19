@@ -1,7 +1,8 @@
+import { action } from '@storybook/addon-actions';
 import TextField from '@material-ui/core/TextField';
 
 import DialogForm from '../components/DialogForm';
-import { action } from '@storybook/addon-actions';
+import { formSubmission } from '../utils';
 
 export default {
     component: DialogForm,
@@ -57,6 +58,7 @@ FirstStep.args = {
     dialogTitle: 'Generic Form In Dialog',
     handleSubmit: action('Form Submit Handler'),
     handleClose: action('Dialog Close Handler'),
+    submitStatus: formSubmission.NOT_READY,
     handleNext: action('Form Next Step Handler'),
     handleBack: action('Form Previous Step Handler'),
     numSteps: 2

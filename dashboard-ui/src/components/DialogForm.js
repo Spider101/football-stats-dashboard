@@ -7,12 +7,15 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Divider from '@material-ui/core/Divider';
 
+import { formSubmission } from '../utils';
+
 export default function DialogForm({
     children,
     isOpen,
     dialogTitle,
     handleSubmit,
     handleClose,
+    submitStatus,
     handleNext = null,
     handleBack = null,
     numSteps = 1,
@@ -32,7 +35,11 @@ export default function DialogForm({
                         Back
                     </Button>
                 )}
-                <Button onClick={activeStep < numSteps - 1 ? handleNext : handleSubmit} color='primary'>
+                <Button
+                    disabled={submitStatus !== formSubmission.READY}
+                    onClick={activeStep < numSteps - 1 ? handleNext : handleSubmit}
+                    color='primary'
+                >
                     {activeStep < numSteps - 1 ? 'Next' : 'Submit'}
                 </Button>
             </DialogActions>
@@ -46,6 +53,7 @@ DialogForm.propTypes = {
     dialogTitle: PropTypes.string,
     handleSubmit: PropTypes.func,
     handleClose: PropTypes.func,
+    submitStatus: PropTypes.string,
     handleNext: PropTypes.func,
     handleBack: PropTypes.func,
     activeStep: PropTypes.number,
