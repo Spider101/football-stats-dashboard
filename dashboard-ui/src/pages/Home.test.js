@@ -52,6 +52,11 @@ it('should render success message when add new club form is submitted', async ()
 
     const inputValue = 'Aston Villa FC';
     userEvent.type(screen.getByLabelText(/club name/i), inputValue);
+    userEvent.type(screen.getByLabelText(/transfer budget/i), '1');
+    userEvent.type(screen.getByLabelText(/wage budget/i), '1');
+    userEvent.type(screen.getByLabelText(/income/i), '1');
+    userEvent.type(screen.getByLabelText(/expenditure/i), '1');
+
     const submitButton = screen.getByRole('button', { name: 'Submit' });
     userEvent.click(submitButton);
 
