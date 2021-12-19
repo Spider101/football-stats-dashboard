@@ -2,10 +2,12 @@ import { useState, useCallback, useEffect } from 'react';
 
 import { capitalizeLabel, convertCamelCaseToSnakeCase, formSubmission } from '../utils';
 
+const getEmptyFieldValidation = fieldName =>
+    `${capitalizeLabel(convertCamelCaseToSnakeCase(fieldName))} cannot be empty!`;
 const validateEmail = email => /\S+@\S+\.\S+/.test(email);
 
 const validateInput = (name, value, formData) => {
-    if (!value.trim()) return `${capitalizeLabel(convertCamelCaseToSnakeCase(name))} cannot be empty!`;
+    if ((isNaN(value) || isNaN(parseInt(value))) && !value.trim()) return getEmptyFieldValidation(name);
     if (name === 'email' && !validateEmail(value)) return 'Email format is incorrect!';
     if (name === 'newPassword' || name === 'confirmedPassword') {
         if (value.length < 6 || value.length > 12) return 'Password must be between 6 and 12 characters';
