@@ -2,7 +2,7 @@ import AddClub from '../widgets/AddClub';
 
 export default {
     component: AddClub,
-    title: 'Widgets/Club/AddClub',
+    title: 'Widgets/ClubPageView/AddClub',
     argTypes: { addClubAction: { control: { disable: true } } },
     decorators: [
         Story => (
