@@ -32,6 +32,8 @@ const useForm = (defaultFormValues, callback) => {
             if (Object.values(formValidations).filter(validation => validation === null).length === (numFields - 1)) {
                 setSubmitStatus(formSubmission.READY);
             }
+        } else {
+            setSubmitStatus(formSubmission.NOT_READY);
         }
         setFormValidations({
             ...formValidations,
@@ -56,6 +58,7 @@ const useForm = (defaultFormValues, callback) => {
     };
 
     const postFormData = useCallback(
+        // TODO: rename this from authaction to something more meaningful
         async authAction => {
             const formErrorMessage = await authAction(formData);
             if (formErrorMessage != null) {
