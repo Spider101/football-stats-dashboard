@@ -50,7 +50,10 @@ export default function DialogForm({
 DialogForm.propTypes = {
     children: PropTypes.arrayOf(PropTypes.node),
     isOpen: PropTypes.bool,
-    dialogTitle: PropTypes.string,
+    dialogTitle: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.object,
+    ]),
     handleSubmit: PropTypes.func,
     handleClose: PropTypes.func,
     submitStatus: PropTypes.string,
