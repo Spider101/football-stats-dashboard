@@ -184,22 +184,5 @@ describe('useForm hook -', () => {
             // submit status is changed from INPROGRESS to null again because there is an error on the form now
             expect(submitStatusAfterClientCall).toEqual(formSubmission.NOT_READY);
         });
-
-        it('form submit status is not updated if trying to submit form without updating any field', async () => {
-            const mockCallback = jest.fn();
-            const { result } = renderHook(() =>
-                useForm({ firstName: '', lastName: '' }, mockCallback)
-            );
-            const { handleSubmitFn } = result.current;
-
-            act(() => {
-                handleSubmitFn({ preventDefault: jest.fn() });
-            });
-
-            expect(mockCallback).not.toBeCalled();
-
-            const { submitStatus } = result.current;
-            expect(submitStatus).toEqual(formSubmission.NOT_READY);
-        });
     });
 });
