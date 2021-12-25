@@ -61,18 +61,17 @@ FirstStep.args = {
     submitStatus: formSubmission.NOT_READY,
     handleNext: action('Form Next Step Handler'),
     handleBack: action('Form Previous Step Handler'),
-    numSteps: 2
+    numSteps: 3
 };
 
 export const LastStep = Template.bind({});
 LastStep.args = {
     ...FirstStep.args,
-    activeStep: 1
+    activeStep: 3
 };
 
 export const IntermediateStep = Template.bind({});
 IntermediateStep.args = {
     ...FirstStep.args,
-    numSteps: 3,
     activeStep: 1
 };
