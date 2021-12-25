@@ -7,8 +7,8 @@ describe('useForm hook -', () => {
     describe('handle form input change', () => {
         it('validates the input being changed', async () => {
             const { result } = renderHook(() => useForm({ firstName: '' }, jest.fn()));
-            const { handleChangeFn } = result.current;
-            expect(result.current.formValidations.firstName).toBeUndefined();
+            const { handleChangeFn, formValidations } = result.current;
+            expect(formValidations.firstName).toBeUndefined();
 
             act(() => {
                 handleChangeFn({ target: { name: 'firstName', value: '' } });
@@ -33,8 +33,8 @@ describe('useForm hook -', () => {
 
         it('validates email format', async () => {
             const { result } = renderHook(() => useForm({ email: '', password: '' }, jest.fn()));
-            const { handleChangeFn } = result.current;
-            expect(result.current.formValidations.email).toBeUndefined();
+            const { handleChangeFn, formValidations } = result.current;
+            expect(formValidations.email).toBeUndefined();
 
             act(() => {
                 handleChangeFn({ target: { name: 'email', value: 'ab@ab' } });
@@ -57,8 +57,8 @@ describe('useForm hook -', () => {
 
         it('validates password length', async () => {
             const { result } = renderHook(() => useForm({ email: '', newPassword: '' }, jest.fn()));
-            const { handleChangeFn } = result.current;
-            expect(result.current.formValidations.newPassword).toBeUndefined();
+            const { handleChangeFn, formValidations } = result.current;
+            expect(formValidations.newPassword).toBeUndefined();
 
             act(() => {
                 handleChangeFn({ target: { name: 'newPassword', value: '12345' } });
@@ -84,8 +84,8 @@ describe('useForm hook -', () => {
             const { result } = renderHook(() =>
                 useForm({ email: '', newPassword: '123456', confirmedPassword: '' }, jest.fn())
             );
-            const { handleChangeFn } = result.current;
-            expect(result.current.formValidations.confirmedPassword).toBeUndefined();
+            const { handleChangeFn, formValidations } = result.current;
+            expect(formValidations.confirmedPassword).toBeUndefined();
 
             act(() => {
                 handleChangeFn({ target: { name: 'confirmedPassword', value: '123457' } });
