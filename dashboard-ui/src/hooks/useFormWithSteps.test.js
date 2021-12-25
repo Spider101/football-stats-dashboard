@@ -170,13 +170,12 @@ describe('useFormWithSteps hook -', () => {
  */
 const fillFormTillStep = (numSteps, resultRef) => {
     for (let i = 0; i < numSteps; i ++) {
-        if (i !== 0) {
-            const { handleNextFn } = resultRef.current;
-            act(() => handleNextFn());
-        }
         const { getFormMetadataAtStep, activeStep } = resultRef.current;
         const { formData } = getFormMetadataAtStep(activeStep);
         fillFieldsOnStep(Object.keys(formData), activeStep, resultRef);
+
+        const { handleNextFn } = resultRef.current;
+        act(() => handleNextFn());
     }
 };
 

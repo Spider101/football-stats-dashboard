@@ -47,13 +47,19 @@ const useFormWithSteps = (initialValues, callback, entity) => {
 
     const handleSubmitFn = () => {
         if (getSubmitStatusAtStep(activeStep) === formSubmission.READY) {
-            updateGlobalFormData();
             setIsSubmitting(true);
         }
     };
 
     const getFormMetadataAtStep = stepIdx => localStates[stepIdx];
-    const getSubmitStatusAtStep = stepIdx => localStates[stepIdx].submitStatus;
+    const getSubmitStatusAtStep = stepIdx => {
+        if (stepIdx < localStates.length) {
+            return localStates[stepIdx].submitStatus;
+        } else {
+            // there is no form data on the last step (confirmation page), so submission status is always READY
+            return formSubmission.READY;
+        }
+    };
 
     useEffect(() => {
         if (isSubmitting) {
@@ -62,6 +68,7 @@ const useFormWithSteps = (initialValues, callback, entity) => {
     }, [isSubmitting]);
 
     return {
+        formData: globalFormData,
         activeStep,
         formSubmissionResponse,
         handleSubmitFn,
