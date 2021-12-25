@@ -143,12 +143,12 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
 PlayerMetadataForm.propTypes = {
     newPlayerMetadata: PropTypes.shape({
         name: PropTypes.string,
-        age: PropTypes.number,
+        age: PropTypes.string,
         country: PropTypes.string
     }),
     newPlayerMetadataValidations: PropTypes.shape({
         name: PropTypes.string,
-        age: PropTypes.number,
+        age: PropTypes.string,
         country: PropTypes.string,
     }),
     handleChangeFn: PropTypes.func
@@ -175,10 +175,6 @@ const PlayerAttributeForm = ({ newPlayerAttributeData, newPlayerAttributeValidat
 };
 PlayerAttributeForm.propTypes = {
     handleChangeFn: PropTypes.func,
-    newPlayerTechnicalAttrData: PropTypes.shape({
-        dribbling: PropTypes.number,
-    }),
-    newPlayerTechnicalAttrValidations: PropTypes.shape({
-        dribbling: PropTypes.number,
-    }),
+    newPlayerAttributeData: PropTypes.object,
+    newPlayerAttributeValidations: PropTypes.object
 };
