@@ -59,38 +59,39 @@ export const getStepper = activeStep => {
 };
 
 export const getAddPlayerFormSchema = () => ({
-    metadata: { name: '', age: 0, country: '' },
+    metadata: { name: '', age: '0', country: '' },
+    role: { name: '', associatedAttributes: [] },
     technicalAttributes: {
-        freekickAccuracy: 0,
-        penalties: 0,
-        headingAccuracy: 0,
-        crossing: 0,
-        shortPassing: 0,
-        longPassing: 0,
-        longShots: 0,
-        finishing: 0,
-        volleys: 0,
-        ballControl: 0,
-        standingTackle: 0,
-        slidingTackle: 0,
-        dribbling: 0,
-        curve: 0
+        freekickAccuracy: '0',
+        penalties: '0',
+        headingAccuracy: '0',
+        crossing: '0',
+        shortPassing: '0',
+        longPassing: '0',
+        longShots: '0',
+        finishing: '0',
+        volleys: '0',
+        ballControl: '0',
+        standingTackle: '0',
+        slidingTackle: '0',
+        dribbling: '0',
+        curve: '0'
     },
     physicalAttributes: {
-        stamina: 0,
-        jumping: 0,
-        strength: 0,
-        sprintSpeed: 0,
-        acceleration: 0,
-        agility: 0,
-        balance: 0
+        stamina: '0',
+        jumping: '0',
+        strength: '0',
+        sprintSpeed: '0',
+        acceleration: '0',
+        agility: '0',
+        balance: '0'
     },
     mentalAttributes: {
-        aggression: 0,
-        vision: 0,
-        composure: 0,
-        defensiveAwareness: 0,
-        attackingPosition: 0
+        aggression: '0',
+        vision: '0',
+        composure: '0',
+        defensiveAwareness: '0',
+        attackingPosition: '0'
     }
 });
 
@@ -188,7 +189,7 @@ PlayerMetadataForm.propTypes = {
     newPlayerMetadataValidations: PropTypes.shape({
         name: PropTypes.string,
         age: PropTypes.string,
-        country: PropTypes.string,
+        country: PropTypes.string
     }),
     handleChangeFn: PropTypes.func
 };
