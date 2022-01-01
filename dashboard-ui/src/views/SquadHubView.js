@@ -31,6 +31,7 @@ const buildHeaderDataForSquadTable = headerNames =>
             type: squadTableHeaderDisplayTypeMap[name]
         }));
 
+// TODO: move this into a hook
 const buildRowDataForSquadTable = players => {
     return players.map(player => {
         const keys = Object.keys(player);
@@ -173,7 +174,7 @@ export default function SquadHubView({ players, addPlayerWidget }) {
 SquadHubView.propTypes = {
     players: PropTypes.arrayOf(
         PropTypes.shape({
-            playerId: PropTypes.number,
+            playerId: PropTypes.string,
             name: PropTypes.string,
             nationality: PropTypes.string,
             role: PropTypes.string,
