@@ -75,7 +75,7 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     value={values.email}
                     disabled={submitStatus === formSubmission.INPROGRESS}
                     onChange={e => handleChange(e)}
-                    error={validations.email}
+                    error={!!validations.email}
                     helperText={validations.email}
                 />
                 <TextField
@@ -91,7 +91,7 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                     value={values.password}
                     disabled={submitStatus === formSubmission.INPROGRESS}
                     onChange={e => handleChange(e)}
-                    error={validations.password}
+                    error={!!validations.password}
                     helperText={validations.password}
                 />
                 {/* // TODO: uncomment when Remember Me functionality is ready */}

@@ -73,7 +73,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             value={values.firstName}
                             disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
-                            error={validations.firstName != null}
+                            error={!!validations.firstName}
                             helperText={validations.firstName}
                         />
                     </Grid>
@@ -89,7 +89,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             value={values.lastName}
                             disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
-                            error={validations.lastName != null}
+                            error={!!validations.lastName}
                             helperText={validations.lastName}
                         />
                     </Grid>
@@ -106,7 +106,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             autoComplete='email'
                             disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
-                            error={validations.email != null}
+                            error={!!validations.email}
                             helperText={validations.email}
                         />
                     </Grid>
@@ -123,7 +123,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             autoComplete='new-password'
                             disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
-                            error={validations.newPassword != null}
+                            error={!!validations.newPassword}
                             helperText={validations.newPassword}
                         />
                     </Grid>
@@ -140,7 +140,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                             autoComplete='new-password'
                             disabled={submitStatus === formSubmission.INPROGRESS}
                             onChange={e => handleChange(e)}
-                            error={validations.confirmedPassword != null}
+                            error={!!validations.confirmedPassword}
                             helperText={validations.confirmedPassword}
                         />
                     </Grid>

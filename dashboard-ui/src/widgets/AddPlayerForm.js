@@ -102,7 +102,7 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 fullWidth
                 value={newPlayerMetadata.name}
                 onChange={e => handleChangeFn(e)}
-                error={newPlayerMetadataValidations.name}
+                error={!!newPlayerMetadataValidations.name}
                 helperText={newPlayerMetadataValidations.name}
             />
             <TextField
@@ -115,7 +115,7 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 fullWidth
                 value={newPlayerMetadata.age}
                 onChange={e => handleChangeFn(e)}
-                error={newPlayerMetadataValidations.age}
+                error={!!newPlayerMetadataValidations.age}
                 helperText={newPlayerMetadataValidations.age}
             />
             <TextField
@@ -127,7 +127,7 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 fullWidth
                 value={newPlayerMetadata.country}
                 onChange={e => handleChangeFn(e)}
-                error={newPlayerMetadataValidations.country}
+                error={!!newPlayerMetadataValidations.country}
                 helperText={newPlayerMetadataValidations.country}
                 select
             >
@@ -155,22 +155,24 @@ PlayerMetadataForm.propTypes = {
 };
 
 const PlayerAttributeForm = ({ newPlayerAttributeData, newPlayerAttributeValidations, handleChangeFn }) => {
-    return Object.entries(newPlayerAttributeData).map(([attrDataName, attrDataValue], index)  => {
-        return <TextField
-            autoFocus={index === 0}
-            key={attrDataName}
-            name={attrDataName}
-            label={capitalizeLabel(attrDataName)}
-            required
-            id={attrDataName}
-            type='number'
-            margin='normal'
-            fullWidth
-            value={attrDataValue}
-            onChange={e => handleChangeFn(e)}
-            error={newPlayerAttributeValidations[attrDataName]}
-            helperText={newPlayerAttributeValidations[attrDataName]}
-        />;
+    return Object.entries(newPlayerAttributeData).map(([attrDataName, attrDataValue], index) => {
+        return (
+            <TextField
+                autoFocus={index === 0}
+                key={attrDataName}
+                name={attrDataName}
+                label={capitalizeLabel(attrDataName)}
+                required
+                id={attrDataName}
+                type='number'
+                margin='normal'
+                fullWidth
+                value={attrDataValue}
+                onChange={e => handleChangeFn(e)}
+                error={!!newPlayerAttributeValidations[attrDataName]}
+                helperText={newPlayerAttributeValidations[attrDataName]}
+            />
+        );
     });
 };
 PlayerAttributeForm.propTypes = {
