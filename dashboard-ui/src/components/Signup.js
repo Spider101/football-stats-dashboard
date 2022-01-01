@@ -155,7 +155,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                 >
                     {submitStatus === formSubmission.INPROGRESS ? 'Signing Up ...' : 'Sign Up'}
                 </Button>
-                <Grid container justify='flex-end'>
+                <Grid container justifyContent='flex-end'>
                     <Grid item>
                         <Link to='/' component={RouterLink} variant='body2'>
                             Already have an account? Sign In
