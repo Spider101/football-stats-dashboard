@@ -7,7 +7,7 @@ const getEmptyFieldValidation = fieldName =>
 const validateEmail = email => /\S+@\S+\.\S+/.test(email);
 
 const validateInput = (name, value, formData) => {
-    if ((isNaN(value) || isNaN(parseInt(value))) && !value.trim()) return getEmptyFieldValidation(name);
+    if (typeof value === 'string' && !value.trim()) return getEmptyFieldValidation(name);
     if (name === 'email' && !validateEmail(value)) return 'Email format is incorrect!';
     if (name === 'newPassword' || name === 'confirmedPassword') {
         if (value.length < 6 || value.length > 12) return 'Password must be between 6 and 12 characters';
