@@ -261,7 +261,7 @@ const PlayerRoleForm = ({ newPlayerRoleData, newPlayerRoleValidations, handleCha
         <>
             <TextField
                 name='name'
-                label='Select Nationality'
+                label='Select Role'
                 required
                 id='name'
                 margin='normal'
