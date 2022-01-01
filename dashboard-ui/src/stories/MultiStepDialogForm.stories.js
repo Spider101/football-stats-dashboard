@@ -6,14 +6,15 @@ import { formSubmission } from '../utils';
 
 export default {
     component: DialogForm,
-    title: 'Components/Globals/DialogForm/SingleStep',
+    title: 'Components/Globals/DialogForm/MultiStep',
     argTypes: {
         children: { table: { disable: true } }
     },
     parameters: {
         docs: {
             description: {
-                component: 'UI Component for displaying a custom form with a title and submit and cancel buttons'
+                component:
+                    'UI Component for displaying a custom multi-step form with a title and submit and cancel buttons'
             }
         }
     }
@@ -51,17 +52,26 @@ const Template = args => (
     </DialogForm>
 );
 
-export const Default = Template.bind({});
-Default.args = {
+export const FirstStep = Template.bind({});
+FirstStep.args = {
     isOpen: true,
     dialogTitle: 'Generic Form In Dialog',
     handleSubmit: action('Form Submit Handler'),
     handleClose: action('Dialog Close Handler'),
-    submitStatus: formSubmission.NOT_READY
+    submitStatus: formSubmission.NOT_READY,
+    handleNext: action('Form Next Step Handler'),
+    handleBack: action('Form Previous Step Handler'),
+    numSteps: 3
 };
 
-export const ReadyToSubmit = Template.bind({});
-ReadyToSubmit.args = {
-    ...Default.args,
-    submitStatus: formSubmission.READY
+export const LastStep = Template.bind({});
+LastStep.args = {
+    ...FirstStep.args,
+    activeStep: 3
+};
+
+export const IntermediateStep = Template.bind({});
+IntermediateStep.args = {
+    ...FirstStep.args,
+    activeStep: 1
 };

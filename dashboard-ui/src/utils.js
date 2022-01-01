@@ -70,6 +70,8 @@ export const moraleIconsMap = [
 
 export const formSubmission = {
     COMPLETE: 'COMPLETE',
+    READY: 'READY',
+    NOT_READY: 'NOT_READY',
     INPROGRESS: 'INPROGRESS'
 };
 

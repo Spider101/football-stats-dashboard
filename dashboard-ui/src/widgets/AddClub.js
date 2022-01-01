@@ -30,7 +30,7 @@ export default function AddClub({ addClubAction }) {
     );
 
     const addNewClubDialogForm = (
-        <DialogForm dialogTitle='Add New Club' handleSubmit={handleSubmitFn}>
+        <DialogForm dialogTitle='Add New Club' handleSubmit={handleSubmitFn} submitStatus={submitStatus}>
             <div style={{ width: '100%' }}>
                 {submitStatus === formSubmission.COMPLETE && (
                     <Alert severity='success' text='New Club Added Successfully!' />
@@ -48,7 +48,7 @@ export default function AddClub({ addClubAction }) {
                 value={addNewClubData.name}
                 disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
-                error={addNewClubValidations.name}
+                error={!!addNewClubValidations.name}
                 helperText={addNewClubValidations.name}
             />
             <TextField
@@ -62,7 +62,7 @@ export default function AddClub({ addClubAction }) {
                 value={addNewClubData.transferBudget}
                 disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
-                error={addNewClubValidations.transferBudget}
+                error={!!addNewClubValidations.transferBudget}
                 helperText={addNewClubValidations.transferBudget}
                 InputProps={{
                     startAdornment: <InputAdornment position='start'>$</InputAdornment>
@@ -79,7 +79,7 @@ export default function AddClub({ addClubAction }) {
                 value={addNewClubData.wageBudget}
                 disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
-                error={addNewClubValidations.wageBudget}
+                error={!!addNewClubValidations.wageBudget}
                 helperText={addNewClubValidations.wageBudget}
                 InputProps={{
                     startAdornment: <InputAdornment position='start'>$</InputAdornment>
@@ -96,7 +96,7 @@ export default function AddClub({ addClubAction }) {
                 value={addNewClubData.income}
                 disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
-                error={addNewClubValidations.income}
+                error={!!addNewClubValidations.income}
                 helperText={addNewClubValidations.income}
                 InputProps={{
                     startAdornment: <InputAdornment position='start'>$</InputAdornment>
@@ -113,7 +113,7 @@ export default function AddClub({ addClubAction }) {
                 value={addNewClubData.expenditure}
                 disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
-                error={addNewClubValidations.expenditure}
+                error={!!addNewClubValidations.expenditure}
                 helperText={addNewClubValidations.expenditure}
                 InputProps={{
                     startAdornment: <InputAdornment position='start'>$</InputAdornment>
