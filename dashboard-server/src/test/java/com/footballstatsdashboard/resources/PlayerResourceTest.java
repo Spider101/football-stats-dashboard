@@ -5,6 +5,8 @@ import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.ImmutableAbility;
@@ -27,10 +29,10 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
@@ -51,6 +53,7 @@ import static org.mockito.Mockito.when;
 public class PlayerResourceTest {
 
     private static final String URI_PATH = "/players";
+    private static final int PLAYER_AGE = 27;
     private static final int CURRENT_PLAYER_ABILITY = 19;
     private static final int CURRENT_PLAYER_SPRINT_SPEED = 85;
     private static final int UPDATED_PLAYER_ABILITY = 25;
@@ -136,13 +139,34 @@ public class PlayerResourceTest {
         // setup
         Player incomingPlayer = getPlayerDataStub(null, true, true, false);
         ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
+        ArgumentCaptor<ResourceKey> clubResourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
+        Club existingClub = ImmutableClub.builder()
+                .name("fake club name")
+                .expenditure(new BigDecimal("1000"))
+                .income(new BigDecimal("2000"))
+                .transferBudget(new BigDecimal("500"))
+                .wageBudget(new BigDecimal("200"))
+                .build();
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingClub);
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
+        verify(couchbaseDAO).getDocument(clubResourceKeyCaptor.capture(),eq(Club.class));
+        ResourceKey capturedClubResourceKey = clubResourceKeyCaptor.getValue();
+        assertEquals(incomingPlayer.getClubId(), capturedClubResourceKey.getResourceId());
+
         verify(couchbaseDAO).insertDocument(any(), newPlayerCaptor.capture());
         Player newPlayer = newPlayerCaptor.getValue();
+        assertEquals(existingClub.getName(), newPlayer.getMetadata().getClub());
+        assertNotNull(newPlayer.getMetadata().getClubLogo());
+
+        // TODO: add assertions to verify country logo property is correctly set on the basis of the country property
+        //  set on the incoming player
+        assertNotNull(newPlayer.getMetadata().getCountryLogo());
+
+        // assertions for general house-keeping fields
         assertNotNull(newPlayer.getCreatedDate());
         assertNotNull(newPlayer.getLastModifiedDate());
         assertEquals(userPrincipal.getEmail(), newPlayer.getCreatedBy());
@@ -324,10 +348,10 @@ public class PlayerResourceTest {
 
     private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes,
                                      boolean isExistingPlayer) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-
         Metadata playerMetadata = ImmutableMetadata.builder()
-                .dateOfBirth(LocalDate.parse("16/08/2006", formatter))
+                .name("fake player name")
+                .country("fake country name")
+                .age(PLAYER_AGE)
                 .build();
         Ability playerAbility = ImmutableAbility.builder()
                 .current(CURRENT_PLAYER_ABILITY)

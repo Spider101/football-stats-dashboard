@@ -3,6 +3,9 @@ package com.footballstatsdashboard.resources;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
+import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
@@ -70,9 +73,20 @@ public class PlayerResource {
         }
 
         // TODO: 17/04/21 add more internal data when business logic becomes complicated
+        ResourceKey resourceKeyForClub = new ResourceKey(incomingPlayer.getClubId());
+        Club existingClub = this.couchbaseDAO.getDocument(resourceKeyForClub, Club.class);
+        Metadata incomingPlayerMetadata = incomingPlayer.getMetadata();
+        Metadata newPlayerMetadata = ImmutableMetadata.builder()
+                .from(incomingPlayerMetadata)
+                .club(existingClub.getName())
+                .clubLogo("") // TODO: add club logo field here after updating club entity to include it
+                .countryLogo("") // TODO: populate this correctly after implementing client for country flag look up api
+                .build();
+
         LocalDate currentDate = LocalDate.now();
         Player newPlayer = ImmutablePlayer.builder()
                 .from(incomingPlayer)
+                .metadata(newPlayerMetadata)
                 .createdBy(user.getEmail())
                 .createdDate(currentDate)
                 .lastModifiedDate(currentDate)
