@@ -34,6 +34,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -58,6 +59,9 @@ public class PlayerResourceTest {
     private static final int CURRENT_PLAYER_SPRINT_SPEED = 85;
     private static final int UPDATED_PLAYER_ABILITY = 25;
     private static final int UPDATED_PLAYER_SPRINT_SPEED = 87;
+    private static final List<String> PLAYER_ATTRIBUTE_CATEGORIES = ImmutableList.of("Technical", "Physical", "Mental");
+    private static final List<String> PLAYER_ATTRIBUTE_GROUPS = ImmutableList.of("Attacking", "Aerial", "Vision",
+            "Defending", "Speed");
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
 
     private PlayerResource playerResource;
@@ -167,6 +171,11 @@ public class PlayerResourceTest {
         assertNotNull(newPlayer.getMetadata().getCountryLogo());
 
         newPlayer.getAttributes().forEach(attribute -> {
+            assertTrue(attribute.getCategory() != null
+                    && PLAYER_ATTRIBUTE_CATEGORIES.contains(attribute.getCategory()));
+            assertTrue(attribute.getGroup() != null
+                    && PLAYER_ATTRIBUTE_GROUPS.contains(attribute.getGroup()));
+            assertNotNull(attribute.getGroup());
             assertEquals(1, attribute.getHistory().size());
             assertEquals(attribute.getValue(), attribute.getHistory().get(0));
         });
@@ -276,6 +285,11 @@ public class PlayerResourceTest {
                     .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
                     .findFirst().orElse(null);
             assertNotNull(existingPlayerAttribute);
+            assertTrue(attribute.getCategory() != null
+                    && PLAYER_ATTRIBUTE_CATEGORIES.contains(attribute.getCategory()));
+            assertTrue(attribute.getGroup() != null
+                    && PLAYER_ATTRIBUTE_GROUPS.contains(attribute.getGroup()));
+            assertEquals(existingPlayerAttribute.getHistory().size() + 1, attribute.getHistory().size());
             assertEquals(ImmutableList.of(existingPlayerAttribute.getValue(), attribute.getValue()),
                     attribute.getHistory());
         });
@@ -396,10 +410,10 @@ public class PlayerResourceTest {
 
         if (usePlayerAttributes) {
             Attribute playerAttribute = ImmutableAttribute.builder()
-                    .name("Sprint Speed")
+                    .name("sprint speed")
                     .value(CURRENT_PLAYER_SPRINT_SPEED)
-                    .category("Technical")
-                    .group("Speed")
+                    .category(isExistingPlayer ? "Technical" : null)
+                    .group(isExistingPlayer ? "Speed" : null)
                     .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_SPRINT_SPEED) : ImmutableList.of())
                     .build();
 

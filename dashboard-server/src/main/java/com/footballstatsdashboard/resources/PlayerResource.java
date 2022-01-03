@@ -11,6 +11,7 @@ import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.auth.Auth;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ATTRIBUTE_CATEGORY_MAP;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID_PATH;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_V1_BASE_PATH;
@@ -89,9 +91,16 @@ public class PlayerResource {
                 .build();
 
         List<Attribute> newPlayerAttributes = incomingPlayer.getAttributes().stream()
-                .map(attribute -> ImmutableAttribute.builder().from(attribute)
-                        .history(Collections.singletonList(attribute.getValue()))
-                        .build())
+                .map(attribute -> {
+                    Pair<String, String> categoryAndGroupNamePair =
+                            PLAYER_ATTRIBUTE_CATEGORY_MAP.get(attribute.getName());
+                    return ImmutableAttribute.builder()
+                            .from(attribute)
+                            .category(categoryAndGroupNamePair.getLeft())
+                            .group(categoryAndGroupNamePair.getRight())
+                            .history(Collections.singletonList(attribute.getValue()))
+                            .build();
+                })
                 .collect(Collectors.toList());
 
         LocalDate currentDate = LocalDate.now();
