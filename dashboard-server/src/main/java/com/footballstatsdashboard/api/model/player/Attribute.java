@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -29,12 +30,14 @@ public interface Attribute {
      * category the attribute belongs to
      */
     @Valid
+    @Nullable
     String getCategory();
 
     /**
      * group the attribute belongs to
      */
     @Valid
+    @Nullable
     String getGroup();
 
     /**
