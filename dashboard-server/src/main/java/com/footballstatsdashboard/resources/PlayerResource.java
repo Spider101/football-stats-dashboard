@@ -4,6 +4,8 @@ import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.player.Attribute;
+import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
 import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.db.CouchbaseDAO;
@@ -28,7 +30,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID_PATH;
@@ -83,10 +88,17 @@ public class PlayerResource {
                 .countryLogo("") // TODO: populate this correctly after implementing client for country flag look up api
                 .build();
 
+        List<Attribute> newPlayerAttributes = incomingPlayer.getAttributes().stream()
+                .map(attribute -> ImmutableAttribute.builder().from(attribute)
+                        .history(Collections.singletonList(attribute.getValue()))
+                        .build())
+                .collect(Collectors.toList());
+
         LocalDate currentDate = LocalDate.now();
         Player newPlayer = ImmutablePlayer.builder()
                 .from(incomingPlayer)
                 .metadata(newPlayerMetadata)
+                .attributes(newPlayerAttributes)
                 .createdBy(user.getEmail())
                 .createdDate(currentDate)
                 .lastModifiedDate(currentDate)
@@ -117,12 +129,29 @@ public class PlayerResource {
         if (existingPlayer.getId().equals(incomingPlayer.getId())) {
 
             // TODO: 15/04/21 add validations by checking incoming player data against existing one
+            List<Attribute> updatedPlayerAttributes = incomingPlayer.getAttributes().stream()
+                    .map(incomingAttribute -> {
+                        Attribute existingPlayerAttribute = existingPlayer.getAttributes().stream()
+                                .filter(attribute -> attribute.getName().equals(incomingAttribute.getName()))
+                                .findFirst().orElse(null);
+                        if (existingPlayerAttribute != null) {
+                            return ImmutableAttribute.builder()
+                                    .from(existingPlayerAttribute)
+                                    .name(incomingAttribute.getName())
+                                    .value(incomingAttribute.getValue())
+                                    .addHistory(incomingAttribute.getValue())
+                                    .build();
+                        }
+                        // TODO: 1/2/2022 figure out if an error should be thrown if existing player attribute is null
+                        return incomingAttribute;
+                    })
+                    .collect(Collectors.toList());
             ImmutablePlayer.Builder updatedPlayerBuilder = ImmutablePlayer.builder()
                     .from(existingPlayer)
                     .metadata(incomingPlayer.getMetadata())
                     .ability(incomingPlayer.getAbility())
                     .roles(incomingPlayer.getRoles())
-                    .attributes(incomingPlayer.getAttributes())
+                    .attributes(updatedPlayerAttributes)
                     .lastModifiedDate(LocalDate.now())
                     .createdBy(user.getEmail());
 

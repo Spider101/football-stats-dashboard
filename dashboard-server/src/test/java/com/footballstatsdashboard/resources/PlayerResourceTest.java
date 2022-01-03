@@ -153,7 +153,7 @@ public class PlayerResourceTest {
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(couchbaseDAO).getDocument(clubResourceKeyCaptor.capture(),eq(Club.class));
+        verify(couchbaseDAO).getDocument(clubResourceKeyCaptor.capture(), eq(Club.class));
         ResourceKey capturedClubResourceKey = clubResourceKeyCaptor.getValue();
         assertEquals(incomingPlayer.getClubId(), capturedClubResourceKey.getResourceId());
 
@@ -165,6 +165,11 @@ public class PlayerResourceTest {
         // TODO: add assertions to verify country logo property is correctly set on the basis of the country property
         //  set on the incoming player
         assertNotNull(newPlayer.getMetadata().getCountryLogo());
+
+        newPlayer.getAttributes().forEach(attribute -> {
+            assertEquals(1, attribute.getHistory().size());
+            assertEquals(attribute.getValue(), attribute.getHistory().get(0));
+        });
 
         // assertions for general house-keeping fields
         assertNotNull(newPlayer.getCreatedDate());
@@ -225,27 +230,28 @@ public class PlayerResourceTest {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
         Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
+        Player incomingPlayerBase = getPlayerDataStub(existingPlayerId, true, true, false);
         when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
         Metadata updatedMetadata = ImmutableMetadata.builder()
-                .from(existingPlayerInCouchbase.getMetadata())
+                .from(incomingPlayerBase.getMetadata())
                 .name("Updated Name")
                 .build();
         Ability updatedAbility = ImmutableAbility.builder()
-                .from(existingPlayerInCouchbase.getAbility())
+                .from(incomingPlayerBase.getAbility())
                 .current(UPDATED_PLAYER_ABILITY)
                 .build();
         Role updatedRole = ImmutableRole.builder()
-                .from(existingPlayerInCouchbase.getRoles().get(0))
+                .from(incomingPlayerBase.getRoles().get(0))
                 .name("updated playerRole")
                 .build();
         Attribute updatedAttribute = ImmutableAttribute.builder()
-                .from(existingPlayerInCouchbase.getAttributes().get(0))
-                .history(ImmutableList.of(UPDATED_PLAYER_SPRINT_SPEED))
+                .from(incomingPlayerBase.getAttributes().get(0))
+                .value(UPDATED_PLAYER_SPRINT_SPEED)
                 .build();
 
         Player incomingPlayer = ImmutablePlayer.builder()
-                .from(existingPlayerInCouchbase)
+                .from(incomingPlayerBase)
                 .metadata(updatedMetadata)
                 .ability(updatedAbility)
                 .roles(ImmutableList.of(updatedRole))
@@ -265,6 +271,14 @@ public class PlayerResourceTest {
 
         verify(couchbaseDAO).updateDocument(eq(capturedResourceKey), updatedPlayerCaptor.capture());
         Player updatedPlayer = updatedPlayerCaptor.getValue();
+        updatedPlayer.getAttributes().forEach(attribute -> {
+            Attribute existingPlayerAttribute = existingPlayerInCouchbase.getAttributes().stream()
+                    .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
+                    .findFirst().orElse(null);
+            assertNotNull(existingPlayerAttribute);
+            assertEquals(ImmutableList.of(existingPlayerAttribute.getValue(), attribute.getValue()),
+                    attribute.getHistory());
+        });
         assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
         assertEquals(userPrincipal.getEmail(), updatedPlayer.getCreatedBy());
 
@@ -276,7 +290,6 @@ public class PlayerResourceTest {
         assertEquals(incomingPlayer.getMetadata(), playerInResponse.getMetadata());
         assertEquals(incomingPlayer.getRoles(), playerInResponse.getRoles());
         assertEquals(incomingPlayer.getAbility(), playerInResponse.getAbility());
-        assertEquals(incomingPlayer.getAttributes(), playerInResponse.getAttributes());
         assertEquals(userPrincipal.getEmail(), playerInResponse.getCreatedBy());
     }
 
@@ -352,6 +365,9 @@ public class PlayerResourceTest {
                 .name("fake player name")
                 .country("fake country name")
                 .age(PLAYER_AGE)
+                .club(isExistingPlayer ? "fake club name" : null)
+                .clubLogo(isExistingPlayer ? "fake club logo" : null)
+                .countryLogo(isExistingPlayer ? "fake country logo" : null)
                 .build();
         Ability playerAbility = ImmutableAbility.builder()
                 .current(CURRENT_PLAYER_ABILITY)
@@ -384,6 +400,7 @@ public class PlayerResourceTest {
                     .value(CURRENT_PLAYER_SPRINT_SPEED)
                     .category("Technical")
                     .group("Speed")
+                    .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_SPRINT_SPEED) : ImmutableList.of())
                     .build();
 
             playerBuilder.attributes(ImmutableList.of(playerAttribute));
