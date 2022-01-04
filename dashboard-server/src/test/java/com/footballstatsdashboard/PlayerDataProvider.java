@@ -143,8 +143,11 @@ public class PlayerDataProvider {
         }
 
         public ModifiedPlayerBuilder withUpdatedCurrentAbility(int newCurrentAbility) {
-            Ability updatedAbility = ImmutableAbility.builder()
-                    .from(this.playerReference.getAbility())
+            ImmutableAbility.Builder updatedAbilityBuilder = ImmutableAbility.builder();
+            if (this.playerReference.getAbility() != null) {
+                updatedAbilityBuilder.from(this.playerReference.getAbility());
+            }
+            Ability updatedAbility = updatedAbilityBuilder
                     .current(newCurrentAbility)
                     .addHistory(newCurrentAbility)
                     .build();

@@ -106,7 +106,6 @@ public class PlayerResourceTest {
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
                 .withMetadata()
-                .withAbility()
                 .withRoles()
                 .withAttributes()
                 .build();
@@ -141,7 +140,6 @@ public class PlayerResourceTest {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
-                .withAbility()
                 .withMetadata()
                 .withAbility()
                 .withAttributes()
@@ -167,7 +165,6 @@ public class PlayerResourceTest {
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
                 .withMetadata()
-                .withAbility()
                 .withRoles()
                 .build();
 
@@ -222,7 +219,6 @@ public class PlayerResourceTest {
         Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
                 .from(incomingPlayerBase)
                 .withUpdatedNameInMetadata(updatedPlayerName)
-                .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
                 .withUpdatedRoleName(updatedRoleName)
                 .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
                 .build();
@@ -268,7 +264,6 @@ public class PlayerResourceTest {
                 .isExistingPlayer(false)
                 .withId(incomingPlayerId)
                 .withMetadata()
-                .withAbility()
                 .withRoles()
                 .withAttributes()
                 .build();

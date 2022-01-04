@@ -29,7 +29,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class PlayerServiceTest {
-    private static final int UPDATED_PLAYER_ABILITY = 25;
     private static final int UPDATED_PLAYER_SPRINT_SPEED = 87;
     private static final List<String> PLAYER_ATTRIBUTE_CATEGORIES = ImmutableList.of("Technical", "Physical", "Mental");
     private static final List<String> PLAYER_ATTRIBUTE_GROUPS = ImmutableList.of("Attacking", "Aerial", "Vision",
@@ -104,7 +103,6 @@ public class PlayerServiceTest {
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
                 .withMetadata()
-                .withAbility()
                 .withRoles()
                 .withAttributes()
                 .build();
@@ -129,14 +127,19 @@ public class PlayerServiceTest {
 
         verify(couchbaseDAO).insertDocument(any(), newPlayerCaptor.capture());
         Player newPlayer = newPlayerCaptor.getValue();
-        assertEquals(existingClub.getName(), newPlayer.getMetadata().getClub());
-        assertNotNull(newPlayer.getMetadata().getClubLogo());
+        assertEquals(createdPlayer, newPlayer);
+
+        assertEquals(existingClub.getName(), createdPlayer.getMetadata().getClub());
+        assertNotNull(createdPlayer.getMetadata().getClubLogo());
 
         // TODO: add assertions to verify country logo property is correctly set on the basis of the country property
         //  set on the incoming player
-        assertNotNull(newPlayer.getMetadata().getCountryLogo());
+        assertNotNull(createdPlayer.getMetadata().getCountryLogo());
 
-        newPlayer.getAttributes().forEach(attribute -> {
+        assertNotNull(createdPlayer.getAbility().getCurrent());
+        assertEquals(1, createdPlayer.getAbility().getHistory().size());
+
+        createdPlayer.getAttributes().forEach(attribute -> {
             assertTrue(attribute.getCategory() != null
                     && PLAYER_ATTRIBUTE_CATEGORIES.contains(attribute.getCategory()));
             assertTrue(attribute.getGroup() != null
@@ -147,9 +150,9 @@ public class PlayerServiceTest {
         });
 
         // assertions for general house-keeping fields
-        assertNotNull(newPlayer.getCreatedDate());
-        assertNotNull(newPlayer.getLastModifiedDate());
-        assertEquals(CREATED_BY, newPlayer.getCreatedBy());
+        assertNotNull(createdPlayer.getCreatedDate());
+        assertNotNull(createdPlayer.getLastModifiedDate());
+        assertEquals(CREATED_BY, createdPlayer.getCreatedBy());
     }
 
     /**
@@ -174,7 +177,6 @@ public class PlayerServiceTest {
                 .isExistingPlayer(false)
                 .withId(existingPlayerId)
                 .withMetadata()
-                .withAbility()
                 .withRoles()
                 .withAttributes()
                 .build();
@@ -183,7 +185,6 @@ public class PlayerServiceTest {
         Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
                 .from(incomingPlayerBase)
                 .withUpdatedNameInMetadata("updated name")
-                .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
                 .withUpdatedRoleName("updated role name")
                 .withUpdatedAttributeValue("sprint speed", UPDATED_PLAYER_SPRINT_SPEED)
                 .build();
@@ -211,11 +212,12 @@ public class PlayerServiceTest {
         });
 
         assertEquals(incomingPlayer.getMetadata().getName(), updatedPlayer.getMetadata().getName());
-        assertEquals(incomingPlayer.getAbility().getCurrent(), updatedPlayer.getAbility().getCurrent());
+        assertNotNull(updatedPlayer.getAbility());
         assertEquals(existingPlayerInCouchbase.getAbility().getHistory().size() + 1,
                 updatedPlayer.getAbility().getHistory().size());
         assertEquals(incomingPlayer.getRoles(), updatedPlayer.getRoles());
 
+        // assertions for general house-keeping fields
         assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
         assertEquals(CREATED_BY, updatedPlayer.getCreatedBy());
     }
