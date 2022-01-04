@@ -24,7 +24,12 @@ import java.util.stream.Collectors;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ATTRIBUTE_CATEGORY_MAP;
 
 public class PlayerService {
+    // TODO: 1/4/2022 remove suppression if and when we switch to using enum for attribute categories since we can
+    //  infer the number of categories from it
+    private static final int NUMBER_OF_ATTRIBUTE_CATEGORIES = 3;
+
     private final CouchbaseDAO<ResourceKey> couchbaseDAO;
+
     public PlayerService(CouchbaseDAO<ResourceKey> couchbaseDAO) {
         this.couchbaseDAO = couchbaseDAO;
     }
@@ -134,9 +139,6 @@ public class PlayerService {
         this.couchbaseDAO.deleteDocument(resourceKey);
     }
 
-    // TODO: 1/4/2022 remove suppression if and when we switch to using enum for attribute categories since we can
-    //  infer the number of categories from it
-    @SuppressWarnings("checkstyle:MagicNumber")
     private Integer calculateCurrentAbility(List<Attribute> playerAttributes) {
         double meanTechnicalAbility =  playerAttributes.stream()
                 .filter(attribute -> "Technical".equals(attribute.getCategory()))
@@ -159,6 +161,8 @@ public class PlayerService {
                 || Double.isNaN(meanMentalAbility)) {
             return null;
         }
-        return Math.toIntExact(Math.round((meanTechnicalAbility + meanPhysicalAbility + meanPhysicalAbility) / 3));
+        return Math.toIntExact(Math.round(
+                (meanTechnicalAbility + meanPhysicalAbility + meanPhysicalAbility) / NUMBER_OF_ATTRIBUTE_CATEGORIES
+        ));
     }
 }
