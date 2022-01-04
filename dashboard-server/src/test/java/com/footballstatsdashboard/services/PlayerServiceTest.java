@@ -1,17 +1,10 @@
 package com.footballstatsdashboard.services;
 
-import com.footballstatsdashboard.api.model.ImmutablePlayer;
+import com.footballstatsdashboard.PlayerDataProvider;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
-import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Attribute;
-import com.footballstatsdashboard.api.model.player.ImmutableAbility;
-import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
-import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
-import com.footballstatsdashboard.api.model.player.ImmutableRole;
-import com.footballstatsdashboard.api.model.player.Metadata;
-import com.footballstatsdashboard.api.model.player.Role;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
@@ -22,10 +15,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,9 +29,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class PlayerServiceTest {
-    private static final int PLAYER_AGE = 27;
-    private static final int CURRENT_PLAYER_ABILITY = 19;
-    private static final int CURRENT_PLAYER_SPRINT_SPEED = 85;
     private static final int UPDATED_PLAYER_ABILITY = 25;
     private static final int UPDATED_PLAYER_SPRINT_SPEED = 87;
     private static final List<String> PLAYER_ATTRIBUTE_CATEGORIES = ImmutableList.of("Technical", "Physical", "Mental");
@@ -72,7 +58,14 @@ public class PlayerServiceTest {
     public void getPlayerFetchesPlayerFromCouchbase() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = getPlayerDataStub(playerId, true, true, true);
+        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(playerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
         when(couchbaseDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
 
         // execute
@@ -108,7 +101,13 @@ public class PlayerServiceTest {
     @Test
     public void createPlayerPersistsPlayerInCouchbase() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, true, true, false);
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
         ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
         ArgumentCaptor<ResourceKey> clubResourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
         Club existingClub = ImmutableClub.builder()
@@ -160,49 +159,44 @@ public class PlayerServiceTest {
     @Test
     public void updatePlayerUpdatesPlayerInCouchbase() {
         // setup
+        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
+
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
-        Player incomingPlayerBase = getPlayerDataStub(existingPlayerId, true, true, false);
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
         when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
-        Metadata updatedMetadata = ImmutableMetadata.builder()
-                .from(incomingPlayerBase.getMetadata())
-                .name("Updated Name")
-                .build();
-        Ability updatedAbility = ImmutableAbility.builder()
-                .from(incomingPlayerBase.getAbility())
-                .current(UPDATED_PLAYER_ABILITY)
-                .build();
-        Role updatedRole = ImmutableRole.builder()
-                .from(incomingPlayerBase.getRoles().get(0))
-                .name("updated playerRole")
-                .build();
-        Attribute updatedAttribute = ImmutableAttribute.builder()
-                .from(incomingPlayerBase.getAttributes().get(0))
-                .value(UPDATED_PLAYER_SPRINT_SPEED)
-                .build();
-
-        Player incomingPlayer = ImmutablePlayer.builder()
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
                 .from(incomingPlayerBase)
-                .metadata(updatedMetadata)
-                .ability(updatedAbility)
-                .roles(ImmutableList.of(updatedRole))
-                .attributes(ImmutableList.of(updatedAttribute))
+                .withUpdatedNameInMetadata("updated name")
+                .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
+                .withUpdatedRoleName("updated role name")
+                .withUpdatedAttributeValue("sprint speed", UPDATED_PLAYER_SPRINT_SPEED)
                 .build();
-
-        ArgumentCaptor<Player> updatedPlayerCaptor = ArgumentCaptor.forClass(Player.class);
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
         Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(couchbaseDAO).updateDocument(resourceKeyCaptor.capture(), updatedPlayerCaptor.capture());
+        verify(couchbaseDAO).updateDocument(resourceKeyCaptor.capture(), any());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
 
-        Player updatedPlayerInCouchbase = updatedPlayerCaptor.getValue();
-        updatedPlayerInCouchbase.getAttributes().forEach(attribute -> {
+        updatedPlayer.getAttributes().forEach(attribute -> {
             Attribute existingPlayerAttribute = existingPlayerInCouchbase.getAttributes().stream()
                     .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
                     .findFirst().orElse(null);
@@ -215,14 +209,15 @@ public class PlayerServiceTest {
             assertEquals(ImmutableList.of(existingPlayerAttribute.getValue(), attribute.getValue()),
                     attribute.getHistory());
         });
-        assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(),
-                updatedPlayerInCouchbase.getLastModifiedDate());
-        assertEquals(CREATED_BY, updatedPlayerInCouchbase.getCreatedBy());
 
-        // TODO: 1/3/2022 consider removing these checks if seems to be redundant 
-        assertEquals(incomingPlayer.getMetadata(), updatedPlayer.getMetadata());
+        assertEquals(incomingPlayer.getMetadata().getName(), updatedPlayer.getMetadata().getName());
+        assertEquals(incomingPlayer.getAbility().getCurrent(), updatedPlayer.getAbility().getCurrent());
+        assertEquals(existingPlayerInCouchbase.getAbility().getHistory().size() + 1,
+                updatedPlayer.getAbility().getHistory().size());
         assertEquals(incomingPlayer.getRoles(), updatedPlayer.getRoles());
-        assertEquals(incomingPlayer.getAbility(), updatedPlayer.getAbility());
+
+        assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
+        assertEquals(CREATED_BY, updatedPlayer.getCreatedBy());
     }
 
     /**
@@ -259,57 +254,5 @@ public class PlayerServiceTest {
         // assert
         verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
         assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
-    }
-
-    // TODO: 1/3/2022 convert this to a test data creator method using builder pattern
-    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes,
-                                     boolean isExistingPlayer) {
-        Metadata playerMetadata = ImmutableMetadata.builder()
-                .name("fake player name")
-                .country("fake country name")
-                .age(PLAYER_AGE)
-                .club(isExistingPlayer ? "fake club name" : null)
-                .clubLogo(isExistingPlayer ? "fake club logo" : null)
-                .countryLogo(isExistingPlayer ? "fake country logo" : null)
-                .build();
-        Ability playerAbility = ImmutableAbility.builder()
-                .current(CURRENT_PLAYER_ABILITY)
-                .build();
-
-        ImmutablePlayer.Builder playerBuilder = ImmutablePlayer.builder()
-                .metadata(playerMetadata)
-                .ability(playerAbility);
-
-        if (playerId != null) {
-            playerBuilder.id(playerId);
-        }
-
-        if (isExistingPlayer) {
-            Instant currentInstant = Instant.now();
-            Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
-            playerBuilder.lastModifiedDate(LocalDate.ofInstant(olderInstant, ZoneId.systemDefault()));
-
-            playerBuilder.createdBy(CREATED_BY);
-        }
-
-        if (usePlayerRoles) {
-            Role playerRole = ImmutableRole.builder()
-                    .name("playerRole")
-                    .build();
-            playerBuilder.roles(ImmutableList.of(playerRole));
-        }
-
-        if (usePlayerAttributes) {
-            Attribute playerAttribute = ImmutableAttribute.builder()
-                    .name("sprint speed")
-                    .value(CURRENT_PLAYER_SPRINT_SPEED)
-                    .category(isExistingPlayer ? "Technical" : null)
-                    .group(isExistingPlayer ? "Speed" : null)
-                    .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_SPRINT_SPEED) : ImmutableList.of())
-                    .build();
-
-            playerBuilder.attributes(ImmutableList.of(playerAttribute));
-        }
-        return playerBuilder.clubId(UUID.randomUUID()).build();
     }
 }

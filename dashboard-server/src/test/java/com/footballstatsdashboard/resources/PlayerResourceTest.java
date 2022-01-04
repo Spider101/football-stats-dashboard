@@ -1,20 +1,11 @@
 package com.footballstatsdashboard.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.footballstatsdashboard.api.model.ImmutablePlayer;
+import com.footballstatsdashboard.PlayerDataProvider;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.player.Ability;
-import com.footballstatsdashboard.api.model.player.Attribute;
-import com.footballstatsdashboard.api.model.player.ImmutableAbility;
-import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
-import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
-import com.footballstatsdashboard.api.model.player.ImmutableRole;
-import com.footballstatsdashboard.api.model.player.Metadata;
-import com.footballstatsdashboard.api.model.player.Role;
 import com.footballstatsdashboard.services.PlayerService;
-import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
@@ -25,10 +16,6 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -46,9 +33,6 @@ import static org.mockito.Mockito.when;
  */
 public class PlayerResourceTest {
     private static final String URI_PATH = "/players";
-    private static final int PLAYER_AGE = 27;
-    private static final int CURRENT_PLAYER_ABILITY = 19;
-    private static final int CURRENT_PLAYER_SPRINT_SPEED = 85;
     private static final int UPDATED_PLAYER_ABILITY = 25;
     private static final int UPDATED_PLAYER_SPRINT_SPEED = 87;
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
@@ -89,7 +73,14 @@ public class PlayerResourceTest {
     public void getPlayerSuccessfullyFetchesPlayerData() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = getPlayerDataStub(playerId, true, true, false);
+        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(playerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
         when(playerService.getPlayer(eq(playerId))).thenReturn(playerFromCouchbase);
 
         // execute
@@ -112,8 +103,21 @@ public class PlayerResourceTest {
     @Test
     public void createPlayerPersistsPlayerData() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, true, true, false);
-        Player createdPlayer = getPlayerDataStub(incomingPlayer.getId(), true, true, true);
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Player createdPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(incomingPlayer.getId())
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
         when(playerService.createPlayer(any(), anyString())).thenReturn(createdPlayer);
 
         // execute
@@ -135,7 +139,13 @@ public class PlayerResourceTest {
     @Test
     public void createPlayerWhenPlayerRolesNotProvided() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, false, true, false);
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withAbility()
+                .withMetadata()
+                .withAbility()
+                .withAttributes()
+                .build();
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
@@ -154,7 +164,12 @@ public class PlayerResourceTest {
     @Test
     public void createPlayerWhenPlayerAttributesNotProvided() {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, true, false, false);
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .build();
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
@@ -172,37 +187,44 @@ public class PlayerResourceTest {
     @Test
     public void updatePlayerUpdatesPlayerData() {
         // setup
+        String updatedPlayerName = "updated name";
+        String updatedAttributeName = "sprint speed";
+        String updatedRoleName = "updated player role";
+
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
         when(playerService.getPlayer(any())).thenReturn(existingPlayerInCouchbase);
-        // TODO: 1/3/2022 replace this with proper test data creator method
-        Player updatedPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
+
+        Player updatedPlayerInCouchbase = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(existingPlayerInCouchbase)
+                .withUpdatedNameInMetadata(updatedPlayerName)
+                .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
+                .withUpdatedRoleName(updatedRoleName)
+                .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
         when(playerService.updatePlayer(any(), any(), any())).thenReturn(updatedPlayerInCouchbase);
 
-        Player incomingPlayerBase = getPlayerDataStub(existingPlayerId, true, true, false);
-        Metadata updatedMetadata = ImmutableMetadata.builder()
-                .from(incomingPlayerBase.getMetadata())
-                .name("Updated Name")
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
                 .build();
-        Ability updatedAbility = ImmutableAbility.builder()
-                .from(incomingPlayerBase.getAbility())
-                .current(UPDATED_PLAYER_ABILITY)
-                .build();
-        Role updatedRole = ImmutableRole.builder()
-                .from(incomingPlayerBase.getRoles().get(0))
-                .name("updated playerRole")
-                .build();
-        Attribute updatedAttribute = ImmutableAttribute.builder()
-                .from(incomingPlayerBase.getAttributes().get(0))
-                .value(UPDATED_PLAYER_SPRINT_SPEED)
-                .build();
-
-        Player incomingPlayer = ImmutablePlayer.builder()
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
                 .from(incomingPlayerBase)
-                .metadata(updatedMetadata)
-                .ability(updatedAbility)
-                .roles(ImmutableList.of(updatedRole))
-                .attributes(ImmutableList.of(updatedAttribute))
+                .withUpdatedNameInMetadata(updatedPlayerName)
+                .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
+                .withUpdatedRoleName(updatedRoleName)
+                .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
                 .build();
 
         // execute
@@ -216,11 +238,10 @@ public class PlayerResourceTest {
         assertNotNull(playerResponse.getEntity());
 
         Player playerInResponse = OBJECT_MAPPER.convertValue(playerResponse.getEntity(), Player.class);
-        // TODO: 1/3/2022 uncomment these when the TODO item above is resolved
-//        assertEquals(incomingPlayer.getId(), playerInResponse.getId());
-//        assertEquals(incomingPlayer.getMetadata(), playerInResponse.getMetadata());
-//        assertEquals(incomingPlayer.getRoles(), playerInResponse.getRoles());
-//        assertEquals(incomingPlayer.getAbility(), playerInResponse.getAbility());
+        assertEquals(updatedPlayerInCouchbase.getId(), playerInResponse.getId());
+        assertEquals(updatedPlayerInCouchbase.getMetadata(), playerInResponse.getMetadata());
+        assertEquals(updatedPlayerInCouchbase.getRoles(), playerInResponse.getRoles());
+        assertEquals(updatedPlayerInCouchbase.getAbility(), playerInResponse.getAbility());
         assertEquals(userPrincipal.getEmail(), playerInResponse.getCreatedBy());
     }
 
@@ -232,14 +253,24 @@ public class PlayerResourceTest {
     public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
         when(playerService.getPlayer(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
 
         UUID incomingPlayerId = UUID.randomUUID();
-        Player incomingPlayerBase = getPlayerDataStub(existingPlayerId, true, true, false);
-        Player incomingPlayer = ImmutablePlayer.builder()
-                .from(incomingPlayerBase)
-                .id(incomingPlayerId)
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(incomingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
                 .build();
 
         // execute
@@ -270,53 +301,4 @@ public class PlayerResourceTest {
     }
 
     // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
-
-    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes,
-                                     boolean isExistingPlayer) {
-        Metadata playerMetadata = ImmutableMetadata.builder()
-                .name("fake player name")
-                .country("fake country name")
-                .age(PLAYER_AGE)
-                .club(isExistingPlayer ? "fake club name" : null)
-                .clubLogo(isExistingPlayer ? "fake club logo" : null)
-                .countryLogo(isExistingPlayer ? "fake country logo" : null)
-                .build();
-        Ability playerAbility = ImmutableAbility.builder()
-                .current(CURRENT_PLAYER_ABILITY)
-                .build();
-
-        ImmutablePlayer.Builder playerBuilder = ImmutablePlayer.builder()
-                .metadata(playerMetadata)
-                .ability(playerAbility);
-
-        if (playerId != null) {
-            playerBuilder.id(playerId);
-        }
-
-        if (isExistingPlayer) {
-            Instant currentInstant = Instant.now();
-            Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
-            playerBuilder.lastModifiedDate(LocalDate.ofInstant(olderInstant, ZoneId.systemDefault()));
-        }
-
-        if (usePlayerRoles) {
-            Role playerRole = ImmutableRole.builder()
-                    .name("playerRole")
-                    .build();
-            playerBuilder.roles(ImmutableList.of(playerRole));
-        }
-
-        if (usePlayerAttributes) {
-            Attribute playerAttribute = ImmutableAttribute.builder()
-                    .name("sprint speed")
-                    .value(CURRENT_PLAYER_SPRINT_SPEED)
-                    .category(isExistingPlayer ? "Technical" : null)
-                    .group(isExistingPlayer ? "Speed" : null)
-                    .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_SPRINT_SPEED) : ImmutableList.of())
-                    .build();
-
-            playerBuilder.attributes(ImmutableList.of(playerAttribute));
-        }
-        return playerBuilder.clubId(UUID.randomUUID()).build();
-    }
 }
