@@ -3,27 +3,27 @@ package com.footballstatsdashboard.services;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Attribute;
+import com.footballstatsdashboard.api.model.player.ImmutableAbility;
 import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
 import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.tuple.Pair;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ATTRIBUTE_CATEGORY_MAP;
 
 public class PlayerService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
-
     private final CouchbaseDAO<ResourceKey> couchbaseDAO;
     public PlayerService(CouchbaseDAO<ResourceKey> couchbaseDAO) {
         this.couchbaseDAO = couchbaseDAO;
@@ -62,13 +62,18 @@ public class PlayerService {
                 })
                 .collect(Collectors.toList());
 
-        // TODO: calculate the player's current ability on the basis of the attributes
-        //  also initialize the ability history with that value
+        Integer currentAbility = calculateCurrentAbility(newPlayerAttributes);
+        // TODO: 1/4/2022 throw error if current ability is null
+        Ability newPlayerAbility = ImmutableAbility.builder()
+                .current(currentAbility)
+                .history(ImmutableList.of(currentAbility))
+                .build();
 
         LocalDate currentDate = LocalDate.now();
         Player newPlayer = ImmutablePlayer.builder()
                 .from(incomingPlayer)
                 .metadata(newPlayerMetadata)
+                .ability(newPlayerAbility)
                 .attributes(newPlayerAttributes)
                 .createdBy(createdBy)
                 .createdDate(currentDate)
@@ -101,10 +106,19 @@ public class PlayerService {
                     return incomingAttribute;
                 })
                 .collect(Collectors.toList());
+
+        Integer currentAbility = calculateCurrentAbility(updatedPlayerAttributes);
+        // TODO: 1/4/2022 throw error if current ability is null
+        Ability updatedPlayerAbility = ImmutableAbility.builder()
+                .from(Objects.requireNonNull(existingPlayer.getAbility()))
+                .current(currentAbility)
+                .addHistory(currentAbility)
+                .build();
+
         ImmutablePlayer.Builder updatedPlayerBuilder = ImmutablePlayer.builder()
                 .from(existingPlayer)
                 .metadata(incomingPlayer.getMetadata())
-                .ability(incomingPlayer.getAbility())
+                .ability(updatedPlayerAbility)
                 .roles(incomingPlayer.getRoles())
                 .attributes(updatedPlayerAttributes)
                 .lastModifiedDate(LocalDate.now());
@@ -118,5 +132,33 @@ public class PlayerService {
     public void deletePlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
         this.couchbaseDAO.deleteDocument(resourceKey);
+    }
+
+    // TODO: 1/4/2022 remove suppression if and when we switch to using enum for attribute categories since we can
+    //  infer the number of categories from it
+    @SuppressWarnings("checkstyle:MagicNumber")
+    private Integer calculateCurrentAbility(List<Attribute> playerAttributes) {
+        double meanTechnicalAbility =  playerAttributes.stream()
+                .filter(attribute -> "Technical".equals(attribute.getCategory()))
+                .mapToInt(Attribute::getValue)
+                .average()
+                .orElse(Double.NaN);
+
+        double meanPhysicalAbility = playerAttributes.stream()
+                .filter(attribute -> "Physical".equals(attribute.getCategory()))
+                .mapToInt(Attribute::getValue)
+                .average()
+                .orElse(Double.NaN);
+
+        double meanMentalAbility = playerAttributes.stream()
+                .filter(attribute -> "Mental".equals(attribute.getCategory()))
+                .mapToInt(Attribute::getValue)
+                .average()
+                .orElse(Double.NaN);
+        if (Double.isNaN(meanTechnicalAbility) || Double.isNaN(meanPhysicalAbility)
+                || Double.isNaN(meanMentalAbility)) {
+            return null;
+        }
+        return Math.toIntExact(Math.round((meanTechnicalAbility + meanPhysicalAbility + meanPhysicalAbility) / 3));
     }
 }
