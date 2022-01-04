@@ -25,6 +25,8 @@ public class PlayerDataProvider {
     private static final int PLAYER_AGE = 27;
     private static final int CURRENT_PLAYER_ABILITY = 19;
     private static final int CURRENT_PLAYER_SPRINT_SPEED = 85;
+    private static final int CURRENT_PLAYER_CROSSING = 80;
+    private static final int CURRENT_PLAYER_COMPOSURE = 75;
     private static final String CREATED_BY = "fake email";
 
     public static final class PlayerBuilder {
@@ -76,14 +78,30 @@ public class PlayerDataProvider {
         }
 
         public PlayerBuilder withAttributes() {
-            Attribute playerAttribute = ImmutableAttribute.builder()
+            Attribute technicalAttribute = ImmutableAttribute.builder()
+                    .name("crossing")
+                    .value(CURRENT_PLAYER_CROSSING)
+                    .category(isExistingPlayer ? "Technical" : null)
+                    .group(isExistingPlayer ? "Attacking" : null)
+                    .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_CROSSING) : ImmutableList.of())
+                    .build();
+
+            Attribute physicalAttribute = ImmutableAttribute.builder()
                     .name("sprint speed")
                     .value(CURRENT_PLAYER_SPRINT_SPEED)
-                    .category(isExistingPlayer ? "Technical" : null)
+                    .category(isExistingPlayer ? "Physical" : null)
                     .group(isExistingPlayer ? "Speed" : null)
                     .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_SPRINT_SPEED) : ImmutableList.of())
                     .build();
-            basePlayer.attributes(ImmutableList.of(playerAttribute));
+
+            Attribute mentalAttribute = ImmutableAttribute.builder()
+                    .name("composure")
+                    .value(CURRENT_PLAYER_COMPOSURE)
+                    .category(isExistingPlayer ? "Mental" : null)
+                    .group(isExistingPlayer ? "Attacking" : null)
+                    .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_COMPOSURE) : ImmutableList.of())
+                    .build();
+            basePlayer.attributes(ImmutableList.of(technicalAttribute, physicalAttribute, mentalAttribute));
             return this;
         }
 
