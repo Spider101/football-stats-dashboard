@@ -18,11 +18,11 @@ import { capitalizeLabel, nationalityFlagMap } from '../utils';
 
 // TODO: build this from the server lookup for roles and countries instead of hard-coding it here
 const roles = [
-    { value: 'defensiveCentralMidfielder', label: 'Defensive Central Midfielder' },
-    { value: 'falseNine', label: 'False Nine' },
-    { value: 'sweeperKeeper', label: 'Sweeper Keeper' },
+    { value: 'defensive central midfielder', label: 'Defensive Central Midfielder' },
+    { value: 'false nine', label: 'False Nine' },
+    { value: 'sweeper keeper', label: 'Sweeper Keeper' },
     { value: 'regista', label: 'Regista' },
-    { value: 'insideForward', label: 'Inside Forward' }
+    { value: 'inside forward', label: 'Inside Forward' }
 ];
 
 // TODO: build this from server lookup; dummy data for now
