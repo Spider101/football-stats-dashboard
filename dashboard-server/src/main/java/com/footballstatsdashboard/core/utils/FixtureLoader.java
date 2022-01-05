@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.core.utils;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.util.Resources;
 import org.slf4j.Logger;
@@ -17,8 +18,12 @@ public final class FixtureLoader {
         this.objectMapper = objectMapper;
     }
 
-    public <T> T loadFixture(String filePath, Class<T> entityType) throws IOException, IllegalArgumentException {
-        return this.objectMapper.readValue(getFixtureAsString(filePath), entityType);
+    public <T> T loadFixture(String filePath, Class<T> clazz) throws IOException, IllegalArgumentException {
+        return this.objectMapper.readValue(getFixtureAsString(filePath), clazz);
+    }
+
+    public <T> T loadFixture(String filePath, TypeReference<T> typeRef) throws IOException, IllegalArgumentException {
+        return this.objectMapper.readValue(getFixtureAsString(filePath), typeRef);
     }
 
     private String getFixtureAsString(String fileName) {
