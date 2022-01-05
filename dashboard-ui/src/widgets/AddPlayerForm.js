@@ -59,7 +59,7 @@ export const getStepper = activeStep => {
 };
 
 export const getAddPlayerFormSchema = () => ({
-    metadata: { name: '', age: '0', country: '' },
+    metadata: { name: '', age: '', country: '' },
     role: { name: '', associatedAttributes: [] },
     technicalAttributes: {
         freekickAccuracy: '0',
@@ -146,12 +146,14 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 helperText={newPlayerMetadataValidations.name}
             />
             <TextField
+                placeholder='Please enter age between 15 and 50'
                 name='age'
                 label='Age'
                 required
                 id='age'
                 type='number'
                 margin='normal'
+                inputProps={{ min: 15, max: 50 }}
                 fullWidth
                 value={newPlayerMetadata.age}
                 onChange={e => handleChangeFn(e)}

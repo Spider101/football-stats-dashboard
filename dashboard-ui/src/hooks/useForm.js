@@ -5,9 +5,11 @@ import { capitalizeLabel, convertCamelCaseToSnakeCase, formSubmission } from '..
 const getEmptyFieldValidation = fieldName =>
     `${capitalizeLabel(convertCamelCaseToSnakeCase(fieldName))} cannot be empty!`;
 const validateEmail = email => /\S+@\S+\.\S+/.test(email);
+const validatePlayerAge = playerAge => parseInt(playerAge) >= 15 && parseInt(playerAge) <= 50;
 
 const validateInput = (name, value, formData) => {
     if (typeof value === 'string' && !value.trim()) return getEmptyFieldValidation(name);
+    if (name === 'age' && !validatePlayerAge(value)) return 'Player age must be between 15 and 50 years!';
     if (name === 'email' && !validateEmail(value)) return 'Email format is incorrect!';
     if (name === 'newPassword' || name === 'confirmedPassword') {
         if (value.length < 6 || value.length > 12) return 'Password must be between 6 and 12 characters';
