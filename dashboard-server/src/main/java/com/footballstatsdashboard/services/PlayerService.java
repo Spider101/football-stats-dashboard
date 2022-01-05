@@ -1,5 +1,7 @@
 package com.footballstatsdashboard.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.footballstatsdashboard.api.model.CountryCodeMetadata;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.club.Club;
@@ -9,11 +11,14 @@ import com.footballstatsdashboard.api.model.player.ImmutableAbility;
 import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
 import com.footballstatsdashboard.api.model.player.Metadata;
+import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
+import io.dropwizard.jackson.Jackson;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +32,7 @@ public class PlayerService {
     // TODO: 1/4/2022 remove suppression if and when we switch to using enum for attribute categories since we can
     //  infer the number of categories from it
     private static final int NUMBER_OF_ATTRIBUTE_CATEGORIES = 3;
+    private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
 
     private final CouchbaseDAO<ResourceKey> couchbaseDAO;
 
@@ -39,13 +45,24 @@ public class PlayerService {
         return this.couchbaseDAO.getDocument(resourceKey, Player.class);
     }
 
-    public Player createPlayer(Player incomingPlayer, Club clubDataForNewPlayer, String createdBy) {
+    public Player createPlayer(Player incomingPlayer, Club clubDataForNewPlayer, String createdBy) throws IOException {
+        TypeReference<List<CountryCodeMetadata>> countryCodeMetadataTypeRef = new TypeReference<>() { };
+        List<CountryCodeMetadata> countryCodeMetadataList =
+                FIXTURE_LOADER.loadFixture("countryCodeMapping.json", countryCodeMetadataTypeRef);
+        String countryLogo = countryCodeMetadataList.stream()
+                .filter(countryCodeMetadata ->
+                        countryCodeMetadata.getCountryName().equals(incomingPlayer.getMetadata().getCountry()))
+                .findFirst()
+                .map(countryCodeMetadata ->
+                        String.format("https://flagcdn.com/w40/%s.png", countryCodeMetadata.getCountryCode()))
+                .orElse("");
+
         // add club information and other derived information to the metadata entity
         Metadata newPlayerMetadata = ImmutableMetadata.builder()
                 .from(incomingPlayer.getMetadata())
                 .club(clubDataForNewPlayer.getName())
                 .clubLogo("") // TODO: add club logo field here after updating club entity to include it
-                .countryLogo("") // TODO: populate this correctly after implementing client for country flag look up api
+                .countryLogo(countryLogo)
                 .build();
 
         // add category and group information to each attribute on the player entity

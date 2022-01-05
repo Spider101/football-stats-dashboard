@@ -24,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -61,7 +62,7 @@ public class PlayerResource {
     public Response createPlayer(
             @Auth User user,
             @Valid @NotNull Player incomingPlayer,
-            @Context UriInfo uriInfo) {
+            @Context UriInfo uriInfo) throws IOException {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("createPlayer() request.");
