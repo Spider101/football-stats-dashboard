@@ -1,17 +1,12 @@
 {
   "metadata": {
     "name": "Sander Gard Bolin Berge",
-    "dateOfBirth": "2020-04-18T19:51:19.285Z",
-    "club": "Sheffield United",
     "country": "Norway",
-    "photo": "http://lorempixel.com/640/480/people?random=7",
-    "clubLogo": "http://lorempixel.com/640/480/abstract?random=11",
-    "countryLogo": "https://s3.amazonaws.com/uifaces/faces/twitter/j04ntoh/128.jpg?random=1",
     "age": 22
   },
   "roles": [
     {
-      "name": "defensiveCentralMidfielder",
+      "name": "defensive central midfielder",
       "associatedAttributes": [
         "interceptions",
         "defensive awareness",
@@ -24,353 +19,108 @@
   ],
   "attributes": [
     {
-      "category": "Technical",
-      "group": "Attacking",
       "name": "freekick accuracy",
-      "value": 2,
-      "history": [
-        15,
-        20,
-        7,
-        18,
-        11
-      ]
+      "value": 2
     },
     {
-      "category": "Technical",
-      "groupName": "Attacking",
       "name": "penalties",
-      "value": 9,
-      "history": [
-        13,
-        0,
-        14,
-        7,
-        18
-      ]
+      "value": 9
     },
     {
-      "category": "Technical",
-      "group": "Aerial",
       "name": "heading accuracy",
-      "value": 3,
-      "history": [
-        18,
-        8,
-        17,
-        9,
-        7
-      ]
+      "value": 3
     },
     {
-      "category": "Technical",
-      "group": "Attacking",
       "name": "crossing",
-      "value": 1,
-      "history": [
-        5,
-        2,
-        17,
-        2,
-        14
-      ]
+      "value": 1
     },
     {
-      "category": "Technical",
-      "group": "Vision",
       "name": "short passing",
-      "value": 16,
-      "history": [
-        1,
-        0,
-        9,
-        15,
-        18
-      ]
+      "value": 16
     },
     {
-      "category": "Technical",
-      "group": "Vision",
       "name": "long passing",
-      "value": 19,
-      "history": [
-        2,
-        10,
-        20,
-        3,
-        14
-      ]
+      "value": 19
     },
     {
-      "category": "Technical",
-      "group": "Attacking",
       "name": "long shots",
-      "value": 16,
-      "history": [
-        16,
-        4,
-        5,
-        13,
-        2
-      ]
+      "value": 16
     },
     {
-      "category": "Technical",
-      "group": "Attacking",
       "name": "finishing",
-      "value": 2,
-      "history": [
-        0,
-        7,
-        5,
-        1,
-        6
-      ]
+      "value": 2
     },
     {
-      "category": "Technical",
-      "group": "Attacking",
       "name": "volleys",
-      "value": 18,
-      "history": [
-        16,
-        19,
-        12,
-        19,
-        10
-      ]
+      "value": 18
     },
     {
-      "category": "Technical",
-      "group": "Attacking",
       "name": "ball control",
-      "value": 9,
-      "history": [
-        17,
-        3,
-        13,
-        12,
-        3
-      ]
+      "value": 9
     },
     {
-      "category": "Technical",
-      "group": "Defending",
       "name": "standing tackle",
-      "value": 8,
-      "history": [
-        5,
-        17,
-        3,
-        8,
-        4
-      ]
+      "value": 8
     },
     {
-      "category": "Technical",
-      "group": "Defending",
       "name": "sliding tackle",
-      "value": 3,
-      "history": [
-        20,
-        3,
-        1,
-        16,
-        2
-      ]
+      "value": 3
     },
     {
-      "category": "Technical",
-      "group": "Attacking",
       "name": "dribbling",
-      "value": 7,
-      "history": [
-        6,
-        7,
-        2,
-        8,
-        5
-      ]
+      "value": 7
     },
     {
-      "category": "Technical",
-      "group": "Attacking",
       "name": "curve",
-      "value": 19,
-      "history": [
-        12,
-        1,
-        7,
-        7,
-        15
-      ]
+      "value": 19
     },
     {
-      "category": "Physical",
-      "group": "Defending",
       "name": "stamina",
-      "value": 19,
-      "history": [
-        13,
-        19,
-        4,
-        10,
-        6
-      ]
+      "value": 19
     },
     {
-      "category": "Physical",
-      "group": "Aerial",
       "name": "jumping",
-      "value": 14,
-      "history": [
-        7,
-        9,
-        0,
-        19,
-        12
-      ]
+      "value": 14
     },
     {
-      "category": "Physical",
-      "group": "Defending",
       "name": "strength",
-      "value": 17,
-      "history": [
-        18,
-        19,
-        6,
-        17,
-        6
-      ]
+      "value": 17
     },
     {
-      "category": "Physical",
-      "group": "Speed",
       "name": "sprint speed",
-      "value": 8,
-      "history": [
-        12,
-        1,
-        17,
-        19,
-        20
-      ]
+      "value": 8
     },
     {
-      "category": "Physical",
-      "group": "Speed",
       "name": "acceleration",
-      "value": 5,
-      "history": [
-        3,
-        5,
-        5,
-        1,
-        2
-      ]
+      "value": 5
     },
     {
-      "category": "Physical",
-      "group": "Speed",
       "name": "agility",
-      "value": 17,
-      "history": [
-        12,
-        8,
-        4,
-        10,
-        11
-      ]
+      "value": 17
     },
     {
-      "category": "Physical",
-      "group": "Speed",
       "name": "balance",
-      "value": 12,
-      "history": [
-        7,
-        9,
-        16,
-        19,
-        16
-      ]
+      "value": 12
     },
     {
-      "category": "Mental",
-      "group": "Attacking",
       "name": "aggression",
-      "value": 0,
-      "history": [
-        6,
-        6,
-        8,
-        12,
-        17
-      ]
+      "value": 0
     },
     {
-      "category": "Mental",
-      "group": "Vision",
       "name": "vision",
-      "value": 19,
-      "history": [
-        3,
-        11,
-        2,
-        3,
-        6
-      ]
+      "value": 19
     },
     {
-      "category": "Mental",
-      "group": "Attacking",
       "name": "composure",
-      "value": 10,
-      "history": [
-        1,
-        14,
-        3,
-        18,
-        12
-      ]
+      "value": 10
     },
     {
-      "category": "Mental",
-      "group": "Defending",
       "name": "defensive awareness",
-      "value": 11,
-      "history": [
-        12,
-        4,
-        17,
-        2,
-        4
-      ]
+      "value": 11
     },
     {
-      "category": "Mental",
-      "group": "Attacking",
       "name": "attacking position",
-      "value": 14,
-      "history": [
-        8,
-        7,
-        9,
-        7,
-        5
-      ]
+      "value": 14
     }
-  ],
-  "ability": {
-    "current": 97,
-    "history": [
-      75,
-      36,
-      56,
-      32,
-      18,
-      97
-    ]
-  }
+  ]
 }
