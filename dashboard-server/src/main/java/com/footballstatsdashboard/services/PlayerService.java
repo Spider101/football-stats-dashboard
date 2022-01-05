@@ -39,15 +39,11 @@ public class PlayerService {
         return this.couchbaseDAO.getDocument(resourceKey, Player.class);
     }
 
-    public Player createPlayer(Player incomingPlayer, String createdBy) {
-        // fetch details of club the incoming player belongs to
-        ResourceKey resourceKeyForClub = new ResourceKey(incomingPlayer.getClubId());
-        Club existingClub = this.couchbaseDAO.getDocument(resourceKeyForClub, Club.class);
-
+    public Player createPlayer(Player incomingPlayer, Club clubDataForNewPlayer, String createdBy) {
         // add club information and other derived information to the metadata entity
         Metadata newPlayerMetadata = ImmutableMetadata.builder()
                 .from(incomingPlayer.getMetadata())
-                .club(existingClub.getName())
+                .club(clubDataForNewPlayer.getName())
                 .clubLogo("") // TODO: add club logo field here after updating club entity to include it
                 .countryLogo("") // TODO: populate this correctly after implementing client for country flag look up api
                 .build();

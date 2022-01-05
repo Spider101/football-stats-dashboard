@@ -23,7 +23,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -107,7 +106,6 @@ public class PlayerServiceTest {
                 .withAttributes()
                 .build();
         ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
-        ArgumentCaptor<ResourceKey> clubResourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
         Club existingClub = ImmutableClub.builder()
                 .name("fake club name")
                 .expenditure(new BigDecimal("1000"))
@@ -115,16 +113,11 @@ public class PlayerServiceTest {
                 .transferBudget(new BigDecimal("500"))
                 .wageBudget(new BigDecimal("200"))
                 .build();
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingClub);
 
         // execute
-        Player createdPlayer = playerService.createPlayer(incomingPlayer, CREATED_BY);
+        Player createdPlayer = playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(couchbaseDAO).getDocument(clubResourceKeyCaptor.capture(), eq(Club.class));
-        ResourceKey capturedClubResourceKey = clubResourceKeyCaptor.getValue();
-        assertEquals(incomingPlayer.getClubId(), capturedClubResourceKey.getResourceId());
-
         verify(couchbaseDAO).insertDocument(any(), newPlayerCaptor.capture());
         Player newPlayer = newPlayerCaptor.getValue();
         assertEquals(createdPlayer, newPlayer);
