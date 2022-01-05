@@ -1,46 +1,35 @@
 package com.footballstatsdashboard.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.footballstatsdashboard.api.model.ImmutablePlayer;
+import com.footballstatsdashboard.PlayerDataProvider;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.player.Ability;
-import com.footballstatsdashboard.api.model.player.Attribute;
-import com.footballstatsdashboard.api.model.player.ImmutableAbility;
-import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
-import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
-import com.footballstatsdashboard.api.model.player.ImmutableRole;
-import com.footballstatsdashboard.api.model.player.Metadata;
-import com.footballstatsdashboard.api.model.player.Role;
+import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
-import com.google.common.collect.ImmutableList;
+import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,10 +38,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for player resource
  */
 public class PlayerResourceTest {
-
     private static final String URI_PATH = "/players";
-    private static final int CURRENT_PLAYER_ABILITY = 19;
-    private static final int CURRENT_PLAYER_SPRINT_SPEED = 85;
     private static final int UPDATED_PLAYER_ABILITY = 25;
     private static final int UPDATED_PLAYER_SPRINT_SPEED = 87;
     private static final ObjectMapper OBJECT_MAPPER = Jackson.newObjectMapper().copy();
@@ -61,7 +47,10 @@ public class PlayerResourceTest {
     private User userPrincipal;
 
     @Mock
-    private CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private PlayerService playerService;
+
+    @Mock
+    private CouchbaseDAO<ResourceKey> clubCouchbase;
 
     @Mock
     private UriInfo uriInfo;
@@ -76,7 +65,7 @@ public class PlayerResourceTest {
         UriBuilder uriBuilder = UriBuilder.fromPath(URI_PATH);
         when(uriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
 
-        playerResource = new PlayerResource(couchbaseDAO);
+        playerResource = new PlayerResource(playerService, clubCouchbase);
         userPrincipal = ImmutableUser.builder()
                 .email("fake email")
                 // other details are not required for the purposes of this test so using empty strings
@@ -87,21 +76,27 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given a valid player id, tests that the player entity is successfully fetched from couchbase server and
-     * returned in the response
+     * given a valid player id, tests that the player data is successfully fetched and returned in the response
      */
     @Test
-    public void getPlayerFetchesPlayerFromCouchbase() {
+    public void getPlayerSuccessfullyFetchesPlayerData() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = getPlayerDataStub(playerId, true, true, false);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
+        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(playerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerService.getPlayer(eq(playerId))).thenReturn(playerFromCouchbase);
 
         // execute
         Response playerResponse = playerResource.getPlayer(playerId);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
+        verify(playerService).getPlayer(any());
         assertEquals(HttpStatus.OK_200, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
 
@@ -109,44 +104,43 @@ public class PlayerResourceTest {
         assertEquals(playerId, playerFromResponse.getId());
     }
 
-    /**
-     * given a runtime exception is thrown by couchbase DAO when player entity is not found, verifies that the same
-     * exception is thrown by `getPlayer` resource method as well
-     */
-    @Test(expected = RuntimeException.class)
-    public void getPlayerWhenPlayerNotFoundInCouchbase() {
-        // setup
-        UUID invalidPlayerId = UUID.randomUUID();
-        when(couchbaseDAO.getDocument(any(), any()))
-                .thenThrow(new RuntimeException("Unable to find document with Id: " + invalidPlayerId));
-
-        // execute
-        playerResource.getPlayer(invalidPlayerId);
-
-        // assert
-        verify(couchbaseDAO).getDocument(any(), any());
-    }
+    // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
 
     /**
-     * given a valid player entity in the request, tests that the internal fields are set correctly on the entity and
-     * persisted in couchbase
+     * given a valid player entity in the request, tests that the player data is successfully persisted
      */
     @Test
-    public void createPlayerPersistsPlayerInCouchbase() {
+    public void createPlayerPersistsPlayerData() throws IOException {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, true, true, false);
-        ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Player createdPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(incomingPlayer.getId())
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Club existingClub = ImmutableClub.builder()
+                .name("fake club name")
+                .income(new BigDecimal("100"))
+                .expenditure(new BigDecimal("100"))
+                .wageBudget(new BigDecimal("100"))
+                .transferBudget(new BigDecimal("100"))
+                .build();
+        when(clubCouchbase.getDocument(any(), any())).thenReturn(existingClub);
+        when(playerService.createPlayer(any(), any(), anyString())).thenReturn(createdPlayer);
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(couchbaseDAO).insertDocument(any(), newPlayerCaptor.capture());
-        Player newPlayer = newPlayerCaptor.getValue();
-        assertNotNull(newPlayer.getCreatedDate());
-        assertNotNull(newPlayer.getLastModifiedDate());
-        assertEquals(userPrincipal.getEmail(), newPlayer.getCreatedBy());
-
+        verify(playerService).createPlayer(eq(incomingPlayer), eq(existingClub), eq(userPrincipal.getEmail()));
         assertEquals(HttpStatus.CREATED_201, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
         // a playerId is set on the player instance created despite not setting one explicitly due to the way the
@@ -155,215 +149,170 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given that the request contains a player entity without player roles, tests that the entity is never persisted
-     * to couchbase and a 422 response status is returned
+     * given that the request contains a player entity without player roles, tests that no data is persisted and a 422
+     * response status is returned
      */
     @Test
-    public void createPlayerWhenPlayerRolesNotProvided() {
+    public void createPlayerWhenPlayerRolesNotProvided() throws IOException {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, false, true, false);
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withAbility()
+                .withAttributes()
+                .build();
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(couchbaseDAO, never()).insertDocument(any(), any());
+        verify(clubCouchbase, never()).getDocument(any(), any());
+        verify(playerService, never()).createPlayer(any(), any(), anyString());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
         assertEquals(incomingPlayer, playerResponse.getEntity());
     }
 
     /**
-     * given that the request contains a player entity without player attributes, tests that the entity is never
-     * persisted to couchbase and a 422 response status is returned
+     * given that the request contains a player entity without player attributes, tests that no data is persisted and a
+     * 422 response status is returned
      */
     @Test
-    public void createPlayerWhenPlayerAttributesNotProvided() {
+    public void createPlayerWhenPlayerAttributesNotProvided() throws IOException {
         // setup
-        Player incomingPlayer = getPlayerDataStub(null, true, false, false);
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withRoles()
+                .build();
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(couchbaseDAO, never()).insertDocument(any(), any());
+        verify(clubCouchbase, never()).getDocument(any(), any());
+        verify(playerService, never()).createPlayer(any(), any(), anyString());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
         assertEquals(incomingPlayer, playerResponse.getEntity());
     }
 
     /**
-     * given a valid player entity in the request, tests that an updated player entity with updated internal fields
-     * is upserted in couchbase
+     * given a valid player entity in the request, tests that the corresponding player data is updated
      */
     @Test
-    public void updatePlayerUpdatesPlayerInCouchbase() {
+    public void updatePlayerUpdatesPlayerData() {
         // setup
+        String updatedPlayerName = "updated name";
+        String updatedAttributeName = "sprint speed";
+        String updatedRoleName = "updated player role";
+
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerService.getPlayer(any())).thenReturn(existingPlayerInCouchbase);
 
-        Metadata updatedMetadata = ImmutableMetadata.builder()
-                .from(existingPlayerInCouchbase.getMetadata())
-                .name("Updated Name")
-                .build();
-        Ability updatedAbility = ImmutableAbility.builder()
-                .from(existingPlayerInCouchbase.getAbility())
-                .current(UPDATED_PLAYER_ABILITY)
-                .build();
-        Role updatedRole = ImmutableRole.builder()
-                .from(existingPlayerInCouchbase.getRoles().get(0))
-                .name("updated playerRole")
-                .build();
-        Attribute updatedAttribute = ImmutableAttribute.builder()
-                .from(existingPlayerInCouchbase.getAttributes().get(0))
-                .history(ImmutableList.of(UPDATED_PLAYER_SPRINT_SPEED))
-                .build();
-
-        Player incomingPlayer = ImmutablePlayer.builder()
+        Player updatedPlayerInCouchbase = PlayerDataProvider.ModifiedPlayerBuilder.builder()
                 .from(existingPlayerInCouchbase)
-                .metadata(updatedMetadata)
-                .ability(updatedAbility)
-                .roles(ImmutableList.of(updatedRole))
-                .attributes(ImmutableList.of(updatedAttribute))
+                .withUpdatedNameInMetadata(updatedPlayerName)
+                .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
+                .withUpdatedRoleName(updatedRoleName)
+                .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
                 .build();
+        when(playerService.updatePlayer(any(), any(), any())).thenReturn(updatedPlayerInCouchbase);
 
-        ArgumentCaptor<Player> updatedPlayerCaptor = ArgumentCaptor.forClass(Player.class);
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata(updatedPlayerName)
+                .withUpdatedRoleName(updatedRoleName)
+                .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
 
         // execute
         Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
 
         // assert
-        verify(couchbaseDAO).getDocument(resourceKeyCaptor.capture(), any());
-        ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
-        assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
-
-        verify(couchbaseDAO).updateDocument(eq(capturedResourceKey), updatedPlayerCaptor.capture());
-        Player updatedPlayer = updatedPlayerCaptor.getValue();
-        assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
-        assertEquals(userPrincipal.getEmail(), updatedPlayer.getCreatedBy());
+        verify(playerService).getPlayer(eq(existingPlayerId));
+        verify(playerService).updatePlayer(any(), any(), eq(existingPlayerId));
 
         assertEquals(HttpStatus.OK_200, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
 
         Player playerInResponse = OBJECT_MAPPER.convertValue(playerResponse.getEntity(), Player.class);
-        assertEquals(incomingPlayer.getId(), playerInResponse.getId());
-        assertEquals(incomingPlayer.getMetadata(), playerInResponse.getMetadata());
-        assertEquals(incomingPlayer.getRoles(), playerInResponse.getRoles());
-        assertEquals(incomingPlayer.getAbility(), playerInResponse.getAbility());
-        assertEquals(incomingPlayer.getAttributes(), playerInResponse.getAttributes());
+        assertEquals(updatedPlayerInCouchbase.getId(), playerInResponse.getId());
+        assertEquals(updatedPlayerInCouchbase.getMetadata(), playerInResponse.getMetadata());
+        assertEquals(updatedPlayerInCouchbase.getRoles(), playerInResponse.getRoles());
+        assertEquals(updatedPlayerInCouchbase.getAbility(), playerInResponse.getAbility());
         assertEquals(userPrincipal.getEmail(), playerInResponse.getCreatedBy());
     }
 
     /**
      * given that the request contains a player entity whose ID does not match the existing player's ID, tests that
-     * the invalid entity is not upserted in couchbase and a server error response is returned
+     * the associated player data is not updated and a server error response is returned
      */
     @Test
     public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = getPlayerDataStub(existingPlayerId, true, true, true);
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerService.getPlayer(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
 
         UUID incomingPlayerId = UUID.randomUUID();
-        Player incomingPlayer = ImmutablePlayer.builder()
-                .from(existingPlayerInCouchbase)
-                .id(incomingPlayerId)
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(incomingPlayerId)
+                .withMetadata()
+                .withRoles()
+                .withAttributes()
                 .build();
 
         // execute
         Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
-        verify(couchbaseDAO, never()).updateDocument(any(), any());
+        verify(playerService).getPlayer(any());
+        verify(playerService, never()).updatePlayer(any(), any(), any());
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, playerResponse.getStatus());
         assertTrue(playerResponse.getEntity().toString().contains(incomingPlayerId.toString()));
     }
 
     /**
-     * given a valid player id, removes the player entity from couchbase
+     * given a valid player id, removes the player data and a 204 No Content response is returned
      */
     @Test
-    public void deletePlayerRemovesPlayerFromCouchbase() {
+    public void deletePlayerRemovesPlayerData() {
         // setup
         UUID playerId = UUID.randomUUID();
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
         Response playerResponse = playerResource.deletePlayer(playerId);
 
         // assert
-        verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
-        assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
-
+        verify(playerService).deletePlayer(eq(playerId));
         assertEquals(HttpStatus.NO_CONTENT_204, playerResponse.getStatus());
     }
 
-    /**
-     * given that the couchbase DAO throws a RuntimeException when it cannot find the player entity to remove, the
-     * same exception is propagated and thrown by the resource method as well
-     */
-    @Test(expected = RuntimeException.class)
-    public void deletePlayerWhenPlayerNotFound() {
-        // setup
-        UUID playerId = UUID.randomUUID();
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-        doThrow(new RuntimeException("player not found")).when(couchbaseDAO).deleteDocument(any());
-
-        // execute
-        playerResource.deletePlayer(playerId);
-
-        // assert
-        verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
-        assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
-    }
-
-    private Player getPlayerDataStub(UUID playerId, boolean usePlayerRoles, boolean usePlayerAttributes,
-                                     boolean isExistingPlayer) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-
-        Metadata playerMetadata = ImmutableMetadata.builder()
-                .dateOfBirth(LocalDate.parse("16/08/2006", formatter))
-                .build();
-        Ability playerAbility = ImmutableAbility.builder()
-                .current(CURRENT_PLAYER_ABILITY)
-                .build();
-
-        ImmutablePlayer.Builder playerBuilder = ImmutablePlayer.builder()
-                .metadata(playerMetadata)
-                .ability(playerAbility);
-
-        if (playerId != null) {
-            playerBuilder.id(playerId);
-        }
-
-        if (isExistingPlayer) {
-            Instant currentInstant = Instant.now();
-            Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
-            playerBuilder.lastModifiedDate(LocalDate.ofInstant(olderInstant, ZoneId.systemDefault()));
-        }
-
-        if (usePlayerRoles) {
-            Role playerRole = ImmutableRole.builder()
-                    .name("playerRole")
-                    .build();
-            playerBuilder.roles(ImmutableList.of(playerRole));
-        }
-
-        if (usePlayerAttributes) {
-            Attribute playerAttribute = ImmutableAttribute.builder()
-                    .name("Sprint Speed")
-                    .value(CURRENT_PLAYER_SPRINT_SPEED)
-                    .category("Technical")
-                    .group("Speed")
-                    .build();
-
-            playerBuilder.attributes(ImmutableList.of(playerAttribute));
-        }
-        return playerBuilder.clubId(UUID.randomUUID()).build();
-    }
+    // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
 }

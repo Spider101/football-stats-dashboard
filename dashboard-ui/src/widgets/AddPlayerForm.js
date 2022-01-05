@@ -18,11 +18,11 @@ import { capitalizeLabel, nationalityFlagMap } from '../utils';
 
 // TODO: build this from the server lookup for roles and countries instead of hard-coding it here
 const roles = [
-    { value: 'defensiveCentralMidfielder', label: 'Defensive Central Midfielder' },
-    { value: 'falseNine', label: 'False Nine' },
-    { value: 'sweeperKeeper', label: 'Sweeper Keeper' },
+    { value: 'defensive central midfielder', label: 'Defensive Central Midfielder' },
+    { value: 'false nine', label: 'False Nine' },
+    { value: 'sweeper keeper', label: 'Sweeper Keeper' },
     { value: 'regista', label: 'Regista' },
-    { value: 'insideForward', label: 'Inside Forward' }
+    { value: 'inside forward', label: 'Inside Forward' }
 ];
 
 // TODO: build this from server lookup; dummy data for now
@@ -59,7 +59,7 @@ export const getStepper = activeStep => {
 };
 
 export const getAddPlayerFormSchema = () => ({
-    metadata: { name: '', age: '0', country: '' },
+    metadata: { name: '', age: '', country: '' },
     role: { name: '', associatedAttributes: [] },
     technicalAttributes: {
         freekickAccuracy: '0',
@@ -146,12 +146,14 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 helperText={newPlayerMetadataValidations.name}
             />
             <TextField
+                placeholder='Please enter age between 15 and 50'
                 name='age'
                 label='Age'
                 required
                 id='age'
                 type='number'
                 margin='normal'
+                inputProps={{ min: 15, max: 50 }}
                 fullWidth
                 value={newPlayerMetadata.age}
                 onChange={e => handleChangeFn(e)}
@@ -261,7 +263,7 @@ const PlayerRoleForm = ({ newPlayerRoleData, newPlayerRoleValidations, handleCha
         <>
             <TextField
                 name='name'
-                label='Select Nationality'
+                label='Select Role'
                 required
                 id='name'
                 margin='normal'

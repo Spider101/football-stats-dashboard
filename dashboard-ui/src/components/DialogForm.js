@@ -37,10 +37,10 @@ export default function DialogForm({
                 )}
                 <Button
                     disabled={submitStatus !== formSubmission.READY}
-                    onClick={activeStep < numSteps ? handleNext : handleSubmit}
+                    onClick={numSteps === 1 || activeStep === numSteps ? handleSubmit : handleNext}
                     color='primary'
                 >
-                    {activeStep < numSteps ? 'Next' : 'Submit'}
+                    {numSteps === 1 || activeStep === numSteps ? 'Submit' : 'Next'}
                 </Button>
             </DialogActions>
         </Dialog>

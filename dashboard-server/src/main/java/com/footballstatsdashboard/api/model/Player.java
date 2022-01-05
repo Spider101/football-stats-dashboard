@@ -52,7 +52,9 @@ public interface Player {
     /**
      * Information about the player's ability, both current and past data
      */
-    @Valid Ability getAbility();
+    @Valid
+    @Nullable
+    Ability getAbility();
 
     /**
      * Information about the player's attributes

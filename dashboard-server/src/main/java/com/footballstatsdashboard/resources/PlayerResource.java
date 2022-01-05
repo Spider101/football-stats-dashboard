@@ -1,10 +1,11 @@
 package com.footballstatsdashboard.resources;
 
-import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.auth.Auth;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -23,8 +24,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.UUID;
 
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
@@ -36,11 +37,14 @@ import static com.footballstatsdashboard.core.utils.Constants.PLAYER_V1_BASE_PAT
 public class PlayerResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerResource.class);
 
-    private final CouchbaseDAO<ResourceKey> couchbaseDAO;
-    public PlayerResource(CouchbaseDAO<ResourceKey> couchbaseDAO) {
-        this.couchbaseDAO = couchbaseDAO;
+    private final PlayerService playerService;
+    private final CouchbaseDAO<ResourceKey> clubCouchbaseDAO;
+
+    public PlayerResource(PlayerService playerService, CouchbaseDAO<ResourceKey> clubCouchbaseDAO) {
+        this.playerService = playerService;
+        this.clubCouchbaseDAO = clubCouchbaseDAO;
     }
-    
+
     @GET
     @Path(PLAYER_ID_PATH)
     public Response getPlayer(
@@ -50,8 +54,7 @@ public class PlayerResource {
             LOGGER.info("getPlayer() request for player with ID: {}", playerId.toString());
         }
 
-        ResourceKey resourceKey = new ResourceKey(playerId);
-        Player player = this.couchbaseDAO.getDocument(resourceKey, Player.class);
+        Player player = this.playerService.getPlayer(playerId);
         return Response.ok(player).build();
     }
 
@@ -59,27 +62,23 @@ public class PlayerResource {
     public Response createPlayer(
             @Auth User user,
             @Valid @NotNull Player incomingPlayer,
-            @Context UriInfo uriInfo) {
+            @Context UriInfo uriInfo) throws IOException {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("createPlayer() request.");
         }
 
         if (incomingPlayer.getRoles().size() == 0 || incomingPlayer.getAttributes().size() == 0) {
+            LOGGER.warn("Player entity in request has empty roles or attributes list!");
             return Response.status(HttpStatus.UNPROCESSABLE_ENTITY_422).entity(incomingPlayer).build();
         }
 
-        // TODO: 17/04/21 add more internal data when business logic becomes complicated
-        LocalDate currentDate = LocalDate.now();
-        Player newPlayer = ImmutablePlayer.builder()
-                .from(incomingPlayer)
-                .createdBy(user.getEmail())
-                .createdDate(currentDate)
-                .lastModifiedDate(currentDate)
-                .build();
+        // fetch details of club the incoming player belongs to
+        // TODO: 1/5/2022 fetch club using club service when it is ready, instead of directly using DAO
+        ResourceKey resourceKeyForClub = new ResourceKey(incomingPlayer.getClubId());
+        Club clubDataForNewPlayer = this.clubCouchbaseDAO.getDocument(resourceKeyForClub, Club.class);
 
-        ResourceKey resourceKey = new ResourceKey(newPlayer.getId());
-        this.couchbaseDAO.insertDocument(resourceKey, newPlayer);
+        Player newPlayer = this.playerService.createPlayer(incomingPlayer, clubDataForNewPlayer, user.getEmail());
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newPlayer.getId().toString()).build();
         return Response.created(location).entity(newPlayer).build();
@@ -96,24 +95,11 @@ public class PlayerResource {
             LOGGER.info("updatePlayer() request for player with ID: {}", playerId.toString());
         }
 
-        ResourceKey resourceKey = new ResourceKey(playerId);
-        Player existingPlayer = this.couchbaseDAO.getDocument(resourceKey, Player.class);
-
+        Player existingPlayer = this.playerService.getPlayer(playerId);
         // incoming player's basic details should match with that of the existing player
         if (existingPlayer.getId().equals(incomingPlayer.getId())) {
-
             // TODO: 15/04/21 add validations by checking incoming player data against existing one
-            ImmutablePlayer.Builder updatedPlayerBuilder = ImmutablePlayer.builder()
-                    .from(existingPlayer)
-                    .metadata(incomingPlayer.getMetadata())
-                    .ability(incomingPlayer.getAbility())
-                    .roles(incomingPlayer.getRoles())
-                    .attributes(incomingPlayer.getAttributes())
-                    .lastModifiedDate(LocalDate.now())
-                    .createdBy(user.getEmail());
-
-            Player updatedPlayer = updatedPlayerBuilder.build();
-            this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer);
+            Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, existingPlayer, playerId);
             return Response.ok(updatedPlayer).build();
         }
         return Response.serverError()
@@ -130,9 +116,7 @@ public class PlayerResource {
             LOGGER.info("deletePlayer() request for player with ID: {}", playerId);
         }
 
-        ResourceKey resourceKey = new ResourceKey(playerId);
-        this.couchbaseDAO.deleteDocument(resourceKey);
-
+        this.playerService.deletePlayer(playerId);
         return Response.noContent().build();
     }
 }

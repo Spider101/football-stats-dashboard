@@ -2,10 +2,12 @@ import { useMutation, useQueryClient } from 'react-query';
 
 import { createNewPlayer } from '../clients/DashboardClient';
 import { useUserAuth } from '../context/authProvider';
+import { useCurrentClub } from '../context/clubProvider';
 import { queryKeys } from '../utils';
 
 export default function () {
     const { authData } = useUserAuth();
+    const { currentClubId } = useCurrentClub();
     const queryClient = useQueryClient();
 
     const { mutateAsync } = useMutation(createNewPlayer, {
@@ -16,8 +18,18 @@ export default function () {
 
     return {
         addNewPlayerAction: async newPlayerData => {
+            const { technicalAttributes, mentalAttributes, physicalAttributes, role, ...rest } = newPlayerData;
+            const attributes = [
+                ...Object.entries(technicalAttributes).map(([key, value]) => ({ name: key, value })),
+                ...Object.entries(physicalAttributes).map(([key, value]) => ({ name: key, value })),
+                ...Object.entries(mentalAttributes).map(([key, value]) => ({ name: key, value }))
+            ];
             try {
-                await mutateAsync({ newPlayerData, authToken: authData.id });
+                await mutateAsync({
+                    newPlayerData: { attributes, roles: [role], ...rest },
+                    clubId: currentClubId,
+                    authToken: authData.id
+                });
             } catch (err) {
                 if (err instanceof Error) {
                     return err.message;

@@ -2,7 +2,7 @@ package com.footballstatsdashboard.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.footballstatsdashboard.FixtureLoader;
+import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.api.model.ImmutableMatchPerformance;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.MatchPerformance;
