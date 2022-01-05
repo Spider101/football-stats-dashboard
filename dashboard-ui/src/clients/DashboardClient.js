@@ -8,6 +8,8 @@ export const createNewPlayer = async ({ newPlayerData, authToken }) => {
     } else if (res.status === httpStatus.BAD_STATUS) {
         const { message: errorMessage } = await res.json();
         throw new Error(errorMessage);
+    } else {
+        throw new Error('Something went wrong when trying to create new player!');
     }
 };
 
