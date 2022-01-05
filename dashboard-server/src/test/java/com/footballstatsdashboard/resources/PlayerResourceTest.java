@@ -5,6 +5,10 @@ import com.footballstatsdashboard.PlayerDataProvider;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ImmutableClub;
+import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.key.ResourceKey;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
@@ -16,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -44,6 +49,9 @@ public class PlayerResourceTest {
     private PlayerService playerService;
 
     @Mock
+    private CouchbaseDAO<ResourceKey> clubCouchbase;
+
+    @Mock
     private UriInfo uriInfo;
 
     /**
@@ -56,7 +64,7 @@ public class PlayerResourceTest {
         UriBuilder uriBuilder = UriBuilder.fromPath(URI_PATH);
         when(uriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
 
-        playerResource = new PlayerResource(playerService);
+        playerResource = new PlayerResource(playerService, clubCouchbase);
         userPrincipal = ImmutableUser.builder()
                 .email("fake email")
                 // other details are not required for the purposes of this test so using empty strings
@@ -117,13 +125,21 @@ public class PlayerResourceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerService.createPlayer(any(), anyString())).thenReturn(createdPlayer);
+        Club existingClub = ImmutableClub.builder()
+                .name("fake club name")
+                .income(new BigDecimal("100"))
+                .expenditure(new BigDecimal("100"))
+                .wageBudget(new BigDecimal("100"))
+                .transferBudget(new BigDecimal("100"))
+                .build();
+        when(clubCouchbase.getDocument(any(), any())).thenReturn(existingClub);
+        when(playerService.createPlayer(any(), any(), anyString())).thenReturn(createdPlayer);
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(playerService).createPlayer(eq(incomingPlayer), eq(userPrincipal.getEmail()));
+        verify(playerService).createPlayer(eq(incomingPlayer), eq(existingClub), eq(userPrincipal.getEmail()));
         assertEquals(HttpStatus.CREATED_201, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
         // a playerId is set on the player instance created despite not setting one explicitly due to the way the
@@ -149,7 +165,8 @@ public class PlayerResourceTest {
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(playerService, never()).createPlayer(any(), anyString());
+        verify(clubCouchbase, never()).getDocument(any(), any());
+        verify(playerService, never()).createPlayer(any(), any(), anyString());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
         assertEquals(incomingPlayer, playerResponse.getEntity());
@@ -172,7 +189,8 @@ public class PlayerResourceTest {
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(playerService, never()).createPlayer(any(), anyString());
+        verify(clubCouchbase, never()).getDocument(any(), any());
+        verify(playerService, never()).createPlayer(any(), any(), anyString());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
         assertEquals(incomingPlayer, playerResponse.getEntity());

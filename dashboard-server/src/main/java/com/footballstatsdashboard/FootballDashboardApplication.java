@@ -103,7 +103,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
 
         // setup resources
         environment.jersey().register(new UserResource(userCouchbaseDAO, authTokenDAO));
-        environment.jersey().register(new PlayerResource(playerService));
+        environment.jersey().register(new PlayerResource(playerService, clubCouchbaseDAO));
         environment.jersey().register(new ClubResource(clubCouchbaseDAO));
         environment.jersey().register(new MatchPerformanceResource(matchPerformanceDAO));
 

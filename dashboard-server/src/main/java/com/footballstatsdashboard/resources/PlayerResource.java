@@ -2,6 +2,9 @@ package com.footballstatsdashboard.resources;
 
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.key.ResourceKey;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.auth.Auth;
 import org.eclipse.jetty.http.HttpStatus;
@@ -34,8 +37,11 @@ public class PlayerResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerResource.class);
 
     private final PlayerService playerService;
-    public PlayerResource(PlayerService playerService) {
+    private final CouchbaseDAO<ResourceKey> clubCouchbaseDAO;
+
+    public PlayerResource(PlayerService playerService, CouchbaseDAO<ResourceKey> clubCouchbaseDAO) {
         this.playerService = playerService;
+        this.clubCouchbaseDAO = clubCouchbaseDAO;
     }
 
     @GET
@@ -62,11 +68,16 @@ public class PlayerResource {
         }
 
         if (incomingPlayer.getRoles().size() == 0 || incomingPlayer.getAttributes().size() == 0) {
+            LOGGER.warn("Player entity in request has empty roles or attributes list!");
             return Response.status(HttpStatus.UNPROCESSABLE_ENTITY_422).entity(incomingPlayer).build();
         }
 
-        // TODO: 17/04/21 add more internal data when business logic becomes complicated
-        Player newPlayer = this.playerService.createPlayer(incomingPlayer, user.getEmail());
+        // fetch details of club the incoming player belongs to
+        // TODO: 1/5/2022 fetch club using club service when it is ready, instead of directly using DAO
+        ResourceKey resourceKeyForClub = new ResourceKey(incomingPlayer.getClubId());
+        Club clubDataForNewPlayer = this.clubCouchbaseDAO.getDocument(resourceKeyForClub, Club.class);
+
+        Player newPlayer = this.playerService.createPlayer(incomingPlayer, clubDataForNewPlayer, user.getEmail());
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newPlayer.getId().toString()).build();
         return Response.created(location).entity(newPlayer).build();
