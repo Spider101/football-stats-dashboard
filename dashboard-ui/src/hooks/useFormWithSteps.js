@@ -28,9 +28,6 @@ const useFormWithSteps = (initialValues, callback, entity) => {
             severity: errorMessage != null ? 'error' : 'success',
             message: errorMessage || `Added ${entity} successfully!`
         });
-        if (errorMessage) {
-            setActiveStep(prevActiveStep => prevActiveStep + 1);
-        }
         setIsSubmitting(false);
     };
 
