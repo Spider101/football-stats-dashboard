@@ -18,8 +18,18 @@ export default function () {
 
     return {
         addNewPlayerAction: async newPlayerData => {
+            const { technicalAttributes, mentalAttributes, physicalAttributes, role, ...rest } = newPlayerData;
+            const attributes = [
+                ...Object.entries(technicalAttributes).map(([key, value]) => ({ name: key, value })),
+                ...Object.entries(physicalAttributes).map(([key, value]) => ({ name: key, value })),
+                ...Object.entries(mentalAttributes).map(([key, value]) => ({ name: key, value }))
+            ];
             try {
-                await mutateAsync({ newPlayerData, clubId: currentClubId, authToken: authData.id });
+                await mutateAsync({
+                    newPlayerData: { attributes, roles: [role], ...rest },
+                    clubId: currentClubId,
+                    authToken: authData.id
+                });
             } catch (err) {
                 if (err instanceof Error) {
                     return err.message;
