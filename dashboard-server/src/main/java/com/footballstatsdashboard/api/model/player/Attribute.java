@@ -50,6 +50,7 @@ public interface Attribute {
      * list of historical values of the attribute corresponding to each past month
      */
     @Valid
+    @Nullable
     @Size(min = 1)
     List<Integer> getHistory();
 }
