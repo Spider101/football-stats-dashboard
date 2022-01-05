@@ -1,4 +1,4 @@
-package com.footballstatsdashboard;
+package com.footballstatsdashboard.core.utils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.util.Resources;
@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 
 public final class FixtureLoader {
     private static final Logger LOG = LoggerFactory.getLogger(FixtureLoader.class);
-    private ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
 
     public FixtureLoader(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
