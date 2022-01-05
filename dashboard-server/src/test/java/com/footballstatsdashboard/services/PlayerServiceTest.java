@@ -1,19 +1,25 @@
 package com.footballstatsdashboard.services;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.footballstatsdashboard.PlayerDataProvider;
+import com.footballstatsdashboard.api.model.CountryCodeMetadata;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.player.Attribute;
+import com.footballstatsdashboard.api.model.player.Metadata;
+import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
+import io.dropwizard.jackson.Jackson;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -32,7 +38,8 @@ public class PlayerServiceTest {
     private static final List<String> PLAYER_ATTRIBUTE_CATEGORIES = ImmutableList.of("Technical", "Physical", "Mental");
     private static final List<String> PLAYER_ATTRIBUTE_GROUPS = ImmutableList.of("Attacking", "Aerial", "Vision",
             "Defending", "Speed");
-    public static final String CREATED_BY = "fake email";
+    private static final String CREATED_BY = "fake email";
+    private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
 
     private PlayerService playerService;
 
@@ -97,7 +104,7 @@ public class PlayerServiceTest {
      * persisted in couchbase
      */
     @Test
-    public void createPlayerPersistsPlayerInCouchbase() {
+    public void createPlayerPersistsPlayerInCouchbase() throws IOException {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -125,9 +132,7 @@ public class PlayerServiceTest {
         assertEquals(existingClub.getName(), createdPlayer.getMetadata().getClub());
         assertNotNull(createdPlayer.getMetadata().getClubLogo());
 
-        // TODO: add assertions to verify country logo property is correctly set on the basis of the country property
-        //  set on the incoming player
-        assertNotNull(createdPlayer.getMetadata().getCountryLogo());
+        assertCountryLogo(createdPlayer.getMetadata());
 
         assertNotNull(createdPlayer.getAbility().getCurrent());
         assertEquals(1, createdPlayer.getAbility().getHistory().size());
@@ -249,5 +254,19 @@ public class PlayerServiceTest {
         // assert
         verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
         assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
+    }
+
+    private void assertCountryLogo(Metadata createdPlayerMetadata) throws IOException {
+        TypeReference<List<CountryCodeMetadata>> countryCodeMetadataTypeRef = new TypeReference<>() { };
+        List<CountryCodeMetadata> countryCodeMetadataList =
+                FIXTURE_LOADER.loadFixture("countryCodeMapping.json", countryCodeMetadataTypeRef);
+        String countryCode = countryCodeMetadataList.stream()
+                .filter(countryCodeMetadata ->
+                        countryCodeMetadata.getCountryName().equals(createdPlayerMetadata.getCountry()))
+                .findFirst()
+                .map(CountryCodeMetadata::getCountryCode)
+                .orElse("");
+        assertNotNull(createdPlayerMetadata.getCountryLogo());
+        assertTrue(createdPlayerMetadata.getCountryLogo().contains(countryCode));
     }
 }

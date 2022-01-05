@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -109,7 +110,7 @@ public class PlayerResourceTest {
      * given a valid player entity in the request, tests that the player data is successfully persisted
      */
     @Test
-    public void createPlayerPersistsPlayerData() {
+    public void createPlayerPersistsPlayerData() throws IOException {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -152,7 +153,7 @@ public class PlayerResourceTest {
      * response status is returned
      */
     @Test
-    public void createPlayerWhenPlayerRolesNotProvided() {
+    public void createPlayerWhenPlayerRolesNotProvided() throws IOException {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -177,7 +178,7 @@ public class PlayerResourceTest {
      * 422 response status is returned
      */
     @Test
-    public void createPlayerWhenPlayerAttributesNotProvided() {
+    public void createPlayerWhenPlayerAttributesNotProvided() throws IOException {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
