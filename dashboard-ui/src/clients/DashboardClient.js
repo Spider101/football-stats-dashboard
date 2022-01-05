@@ -3,7 +3,7 @@ import { httpStatus } from '../utils';
 
 export const createNewPlayer = async ({ newPlayerData, clubId, authToken }) => {
     const res = await fetchDataFromEndpoint(
-        'player',
+        'players',
         'POST',
         { Authorization: `BEARER ${authToken}` },
         { clubId, ...newPlayerData }
