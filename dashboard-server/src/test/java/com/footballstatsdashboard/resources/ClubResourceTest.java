@@ -2,10 +2,10 @@ package com.footballstatsdashboard.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.Club;
-import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.services.ClubService;
@@ -21,15 +21,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -88,8 +83,12 @@ public class ClubResourceTest {
     public void getClubFetchesClubData() {
         // setup
         UUID clubId = UUID.randomUUID();
-        Club clubFromCouchbase = getClubDataStub(clubId, userPrincipal.getId(), true);
-        when(clubService.getClub(eq(clubId))).thenReturn(clubFromCouchbase);
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userPrincipal.getId())
+                .withId(clubId)
+                .build();
+        when(clubService.getClub(eq(clubId))).thenReturn(existingClub);
 
         // execute
         Response clubResponse = clubResource.getClub(clubId);
@@ -113,8 +112,14 @@ public class ClubResourceTest {
     @Test
     public void createClubPersistsClubData() {
         // setup
-        Club incomingClub = getClubDataStub(null, null, false);
-        Club createdClub = getClubDataStub(incomingClub.getId(), userPrincipal.getId(), true);
+        Club incomingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .build();
+        Club createdClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userPrincipal.getId())
+                .withId(incomingClub.getId())
+                .build();
         when(clubService.createClub(any(), any(), anyString())).thenReturn(createdClub);
 
         // execute
@@ -137,9 +142,9 @@ public class ClubResourceTest {
     @Test
     public void createClubWhenClubNameIsEmpty() {
         // setup
-        Club incomingClubWithNoName = ImmutableClub.builder()
-                .from(getClubDataStub(null, null, false))
-                .name("")
+        Club incomingClubWithNoName = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .customClubName("")
                 .build();
 
         // execute
@@ -158,37 +163,44 @@ public class ClubResourceTest {
     public void updateClubUpdatesClubData() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
-        when(clubService.getClub(any())).thenReturn(existingClubInCouchbase);
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userPrincipal.getId())
+                .withId(existingClubId)
+                .build();
+        when(clubService.getClub(any())).thenReturn(existingClub);
 
-        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(new BigDecimal("100"));
-        Club incomingClub = ImmutableClub.builder()
-                .from(getClubDataStub(existingClubId, null, false))
-                .wageBudget(updatedWageBudget)
+        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
                 .build();
-        Club updatedClubInCouchbase = ImmutableClub.builder()
-                .from(existingClubInCouchbase)
-                .wageBudget(updatedWageBudget)
-                .lastModifiedDate(LocalDate.now())
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedWageBudget(updatedWageBudget)
                 .build();
-        when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClubInCouchbase);
+
+        Club updatedClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(existingClub)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .build();
+        when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClub);
 
         // execute
         Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
 
         // assert
         verify(clubService).getClub(eq(existingClubId));
-        verify(clubService).updateClub(eq(incomingClub), eq(existingClubInCouchbase), eq(existingClubId));
+        verify(clubService).updateClub(eq(incomingClub), eq(existingClub), eq(existingClubId));
 
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
         Club clubInResponse = OBJECT_MAPPER.convertValue(clubResponse.getEntity(), Club.class);
-        assertEquals(existingClubInCouchbase.getId(), clubInResponse.getId());
+        assertEquals(existingClub.getId(), clubInResponse.getId());
         assertEquals(updatedWageBudget, clubInResponse.getWageBudget());
 
         assertEquals(userPrincipal.getId(), clubInResponse.getUserId());
-        assertEquals(userPrincipal.getEmail(), clubInResponse.getCreatedBy());
         assertEquals(userPrincipal.getEmail(), clubInResponse.getCreatedBy());
         assertEquals(LocalDate.now(), clubInResponse.getLastModifiedDate());
     }
@@ -201,13 +213,17 @@ public class ClubResourceTest {
     public void updateClubWhenIncomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
-        when(clubService.getClub(any())).thenReturn(existingClubInCouchbase);
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userPrincipal.getId())
+                .withId(existingClubId)
+                .build();
+        when(clubService.getClub(any())).thenReturn(existingClub);
 
         UUID incorrectIncomingClubId = UUID.randomUUID();
-        Club incomingClub = ImmutableClub.builder()
-                .from(existingClubInCouchbase)
-                .id(incorrectIncomingClubId) // override the incoming club data's ID to be incorrect
+        Club incomingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(incorrectIncomingClubId)
                 .build();
 
         // execute
@@ -240,15 +256,14 @@ public class ClubResourceTest {
     // TODO: 1/6/2022 add test when trying to delete a club not belonging to user
 
     /**
-     * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from
-     * couchbase and returned in the response
+     * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched and
+     * returned in the response
      */
     @Test
     public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
-        int numberOfClubs = 2;
         UUID userId = userPrincipal.getId();
-        List<Club> mockClubData = getBulkClubDataStub(numberOfClubs, userId);
+        List<Club> mockClubData = ClubDataProvider.getAllClubsForUser(userId);
         when(clubService.getClubsByUserId(any())).thenReturn(mockClubData);
 
         // execute
@@ -260,7 +275,8 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() { };
+        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() {
+        };
         List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
         assertFalse(clubList.isEmpty());
 
@@ -296,46 +312,10 @@ public class ClubResourceTest {
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<SquadPlayer>> squadPlayerListTypeRef = new TypeReference<>() { };
+        TypeReference<List<SquadPlayer>> squadPlayerListTypeRef = new TypeReference<>() {
+        };
         List<SquadPlayer> squadPlayersFromResponse = OBJECT_MAPPER.convertValue(response.getEntity(),
                 squadPlayerListTypeRef);
         assertFalse(squadPlayersFromResponse.isEmpty());
-    }
-
-    private Club getClubDataStub(UUID clubId, UUID userId, boolean isExisting) {
-        ImmutableClub.Builder clubBuilder = ImmutableClub.builder()
-                .name("fake club name")
-                .expenditure(new BigDecimal("1000"))
-                .income(new BigDecimal("2000"))
-                .transferBudget(new BigDecimal("500"))
-                .wageBudget(new BigDecimal("200"));
-
-        if (clubId != null) clubBuilder.id(clubId);
-
-        if (userId != null) {
-            clubBuilder.userId(userId);
-            clubBuilder.createdBy(USER_EMAIL);
-        }
-
-        if (isExisting) {
-            Instant currentInstant = Instant.now();
-            Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
-            clubBuilder.lastModifiedDate(LocalDate.ofInstant(olderInstant, ZoneId.systemDefault()));
-        }
-
-        return clubBuilder.build();
-    }
-
-    private List<Club> getBulkClubDataStub(int numClubs, UUID userId) {
-        return IntStream.range(0, numClubs).mapToObj(i ->
-                ImmutableClub.builder()
-                        .userId(userId)
-                        .name("fake club name " + i)
-                        .transferBudget(BigDecimal.ONE)
-                        .wageBudget(BigDecimal.ONE)
-                        .income(BigDecimal.ONE)
-                        .expenditure(BigDecimal.ONE)
-                        .build()
-        ).collect(Collectors.toList());
     }
 }

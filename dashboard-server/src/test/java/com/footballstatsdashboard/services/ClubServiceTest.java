@@ -1,7 +1,7 @@
 package com.footballstatsdashboard.services;
 
+import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.club.Club;
-import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
@@ -14,15 +14,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -62,7 +57,11 @@ public class ClubServiceTest {
     public void getClubFetchesClubFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
-        Club clubFromCouchbase = getClubDataStub(clubId, userId, false, null);
+        Club clubFromCouchbase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userId)
+                .withId(clubId)
+                .build();
         when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
 
         // execute
@@ -101,7 +100,9 @@ public class ClubServiceTest {
     @Test
     public void createClubPersistsClubInCouchbase() {
         // setup
-        Club incomingClub = getClubDataStub(null, null, false, null);
+        Club incomingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .build();
         ArgumentCaptor<Club> newClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
@@ -129,14 +130,22 @@ public class ClubServiceTest {
     public void updateClubUpdatesClubInCouchbase() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClubInCouchbase = getClubDataStub(existingClubId, userId, true, null);
-
-        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(new BigDecimal("100"));
-        Club incomingClub = ImmutableClub.builder()
-                .from(getClubDataStub(existingClubId, null, false, null))
-                .wageBudget(updatedWageBudget)
+        Club existingClubInCouchbase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userId)
+                .withId(existingClubId)
                 .build();
         when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
+
+        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(new BigDecimal("100"));
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .build();
 
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
@@ -182,10 +191,7 @@ public class ClubServiceTest {
     @Test
     public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
-        int numberOfClubs = 2;
-        List<Club> mockClubData = IntStream.range(0, numberOfClubs).mapToObj(idx ->
-                getClubDataStub(null, userId, true, "fake club name " + idx)
-        ).collect(Collectors.toList());
+        List<Club> mockClubData = ClubDataProvider.getAllClubsForUser(userId);
         when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
 
         // execute
@@ -247,29 +253,5 @@ public class ClubServiceTest {
             assertNotNull(squadPlayer);
             assertEquals(expectedSquadPlayer, squadPlayer);
         });
-    }
-
-    private Club getClubDataStub(UUID clubId, UUID userID, boolean isExisting, String clubName) {
-        ImmutableClub.Builder clubBuilder = ImmutableClub.builder()
-                .name(clubName != null ? clubName : "fake club name")
-                .expenditure(new BigDecimal("1000"))
-                .income(new BigDecimal("2000"))
-                .transferBudget(new BigDecimal("500"))
-                .wageBudget(new BigDecimal("200"));
-
-        if (clubId != null) clubBuilder.id(clubId);
-
-        if (userID != null) {
-            clubBuilder.userId(userID);
-            clubBuilder.createdBy(USER_EMAIL);
-        }
-
-        if (isExisting) {
-            Instant currentInstant = Instant.now();
-            Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
-            clubBuilder.lastModifiedDate(LocalDate.ofInstant(olderInstant, ZoneId.systemDefault()));
-        }
-
-        return clubBuilder.build();
     }
 }
