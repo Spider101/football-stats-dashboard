@@ -19,6 +19,7 @@ public final class ClubDataProvider {
     private static final int NUMBER_OF_CLUBS = 3;
 
     private ClubDataProvider() { }
+
     /**
      * Helps in building a club entity according to the needs of a test
      */

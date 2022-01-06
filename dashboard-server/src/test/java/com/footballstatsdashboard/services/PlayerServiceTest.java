@@ -1,11 +1,11 @@
 package com.footballstatsdashboard.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.PlayerDataProvider;
 import com.footballstatsdashboard.api.model.CountryCodeMetadata;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.club.Club;
-import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
@@ -20,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -113,12 +112,11 @@ public class PlayerServiceTest {
                 .withAttributes()
                 .build();
         ArgumentCaptor<Player> newPlayerCaptor = ArgumentCaptor.forClass(Player.class);
-        Club existingClub = ImmutableClub.builder()
-                .name("fake club name")
-                .expenditure(new BigDecimal("1000"))
-                .income(new BigDecimal("2000"))
-                .transferBudget(new BigDecimal("500"))
-                .wageBudget(new BigDecimal("200"))
+
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(UUID.randomUUID())
+                .withId(UUID.randomUUID())
                 .build();
 
         // execute
