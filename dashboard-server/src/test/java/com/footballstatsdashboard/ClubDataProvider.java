@@ -1,7 +1,9 @@
 package com.footballstatsdashboard;
 
 import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
+import com.footballstatsdashboard.api.model.club.ImmutableClubSummary;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -9,6 +11,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -59,9 +62,11 @@ public final class ClubDataProvider {
             // add some house-keeping fields if it is an existing club
             if (isExistingClub) {
                 Instant currentInstant = Instant.now();
-                Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
+                baseClub.createdDate(LocalDate.ofInstant(currentInstant, ZoneId.systemDefault()));
 
+                Instant olderInstant = currentInstant.minus(1, ChronoUnit.DAYS);
                 baseClub.lastModifiedDate(LocalDate.ofInstant(olderInstant, ZoneId.systemDefault()));
+
                 baseClub.createdBy(CREATED_BY);
                 baseClub.userId(this.existingUserId != null ? existingUserId : UUID.randomUUID());
             }
@@ -112,13 +117,18 @@ public final class ClubDataProvider {
      * @param userId ID of the user whose associated club data needs to be fetched
      * @return a fixed number of Club entities associated with the user whose ID passed in
      */
-    public static List<Club> getAllClubsForUser(UUID userId) {
-        return IntStream.range(0, NUMBER_OF_CLUBS).mapToObj(i ->
-                ClubBuilder.builder()
-                        .isExisting(true)
-                        .existingUserId(userId)
-                        .customClubName(DEFAULT_CLUB_NAME + i)
-                        .build()
-        ).collect(Collectors.toList());
+    public static List<ClubSummary> getAllClubSummariesForUser(UUID userId) {
+        return IntStream.range(0, NUMBER_OF_CLUBS).mapToObj(i -> {
+            Club existingClub = ClubBuilder.builder()
+                    .isExisting(true)
+                    .existingUserId(userId)
+                    .customClubName(DEFAULT_CLUB_NAME + i)
+                    .build();
+            return ImmutableClubSummary.builder()
+                    .clubId(existingClub.getId())
+                    .name(existingClub.getName())
+                    .createdDate(Objects.requireNonNull(existingClub.getCreatedDate()))
+                    .build();
+        }).collect(Collectors.toList());
     }
 }

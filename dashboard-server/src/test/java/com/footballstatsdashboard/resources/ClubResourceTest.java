@@ -6,6 +6,7 @@ import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.services.ClubService;
@@ -263,26 +264,25 @@ public class ClubResourceTest {
     public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
         UUID userId = userPrincipal.getId();
-        List<Club> mockClubData = ClubDataProvider.getAllClubsForUser(userId);
-        when(clubService.getClubsByUserId(any())).thenReturn(mockClubData);
+        List<ClubSummary> mockClubData = ClubDataProvider.getAllClubSummariesForUser(userId);
+        when(clubService.getClubSummariesByUserId(any())).thenReturn(mockClubData);
 
         // execute
         Response response = clubResource.getClubsByUserId(userPrincipal);
 
         // assert
-        verify(clubService).getClubsByUserId(eq(userId));
+        verify(clubService).getClubSummariesByUserId(eq(userId));
         assertNotNull(response);
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
 
-        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() {
+        TypeReference<List<ClubSummary>> clubSummaryListTypeRef = new TypeReference<>() {
         };
-        List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
-        assertFalse(clubList.isEmpty());
+        List<ClubSummary> clubSummaries = OBJECT_MAPPER.convertValue(response.getEntity(), clubSummaryListTypeRef);
+        assertFalse(clubSummaries.isEmpty());
 
-        for (int idx = 0; idx < clubList.size(); idx++) {
-            assertEquals(userId, clubList.get(idx).getUserId());
-            assertEquals(mockClubData.get(idx).getName(), clubList.get(idx).getName());
+        for (int idx = 0; idx < clubSummaries.size(); idx++) {
+            assertEquals(mockClubData.get(idx).getName(), clubSummaries.get(idx).getName());
         }
     }
 

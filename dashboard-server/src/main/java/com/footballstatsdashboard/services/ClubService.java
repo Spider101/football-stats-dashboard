@@ -1,6 +1,7 @@
 package com.footballstatsdashboard.services;
 
 import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
@@ -60,8 +61,8 @@ public class ClubService {
         this.clubDAO.deleteDocument(resourceKey);
     }
 
-    public List<Club> getClubsByUserId(UUID userId) {
-        return this.clubDAO.getClubsByUserId(userId);
+    public List<ClubSummary> getClubSummariesByUserId(UUID userId) {
+        return this.clubDAO.getClubSummariesByUserId(userId);
     }
 
     public List<SquadPlayer> getSquadPlayers(UUID clubId) {
