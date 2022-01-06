@@ -3,8 +3,7 @@ package com.footballstatsdashboard.resources;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.Club;
-import com.footballstatsdashboard.db.CouchbaseDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.auth.Auth;
 import org.eclipse.jetty.http.HttpStatus;
@@ -38,11 +37,11 @@ public class PlayerResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerResource.class);
 
     private final PlayerService playerService;
-    private final CouchbaseDAO<ResourceKey> clubCouchbaseDAO;
+    private final ClubService clubService;
 
-    public PlayerResource(PlayerService playerService, CouchbaseDAO<ResourceKey> clubCouchbaseDAO) {
+    public PlayerResource(PlayerService playerService, ClubService clubService) {
         this.playerService = playerService;
-        this.clubCouchbaseDAO = clubCouchbaseDAO;
+        this.clubService = clubService;
     }
 
     @GET
@@ -74,9 +73,7 @@ public class PlayerResource {
         }
 
         // fetch details of club the incoming player belongs to
-        // TODO: 1/5/2022 fetch club using club service when it is ready, instead of directly using DAO
-        ResourceKey resourceKeyForClub = new ResourceKey(incomingPlayer.getClubId());
-        Club clubDataForNewPlayer = this.clubCouchbaseDAO.getDocument(resourceKeyForClub, Club.class);
+        Club clubDataForNewPlayer = this.clubService.getClub(incomingPlayer.getClubId());
 
         Player newPlayer = this.playerService.createPlayer(incomingPlayer, clubDataForNewPlayer, user.getEmail());
 

@@ -1,14 +1,13 @@
 package com.footballstatsdashboard.resources;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.PlayerDataProvider;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.Club;
-import com.footballstatsdashboard.api.model.club.ImmutableClub;
-import com.footballstatsdashboard.db.CouchbaseDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
@@ -21,7 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
@@ -50,7 +49,7 @@ public class PlayerResourceTest {
     private PlayerService playerService;
 
     @Mock
-    private CouchbaseDAO<ResourceKey> clubCouchbase;
+    private ClubService clubService;
 
     @Mock
     private UriInfo uriInfo;
@@ -65,7 +64,7 @@ public class PlayerResourceTest {
         UriBuilder uriBuilder = UriBuilder.fromPath(URI_PATH);
         when(uriInfo.getAbsolutePathBuilder()).thenReturn(uriBuilder);
 
-        playerResource = new PlayerResource(playerService, clubCouchbase);
+        playerResource = new PlayerResource(playerService, clubService);
         userPrincipal = ImmutableUser.builder()
                 .email("fake email")
                 // other details are not required for the purposes of this test so using empty strings
@@ -126,15 +125,14 @@ public class PlayerResourceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        Club existingClub = ImmutableClub.builder()
-                .name("fake club name")
-                .income(new BigDecimal("100"))
-                .expenditure(new BigDecimal("100"))
-                .wageBudget(new BigDecimal("100"))
-                .transferBudget(new BigDecimal("100"))
-                .build();
-        when(clubCouchbase.getDocument(any(), any())).thenReturn(existingClub);
         when(playerService.createPlayer(any(), any(), anyString())).thenReturn(createdPlayer);
+
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userPrincipal.getId())
+                .withId(UUID.randomUUID())
+                .build();
+        when(clubService.getClub(any())).thenReturn(existingClub);
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
@@ -166,7 +164,7 @@ public class PlayerResourceTest {
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(clubCouchbase, never()).getDocument(any(), any());
+        verify(clubService, never()).getClub(any());
         verify(playerService, never()).createPlayer(any(), any(), anyString());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
@@ -190,7 +188,7 @@ public class PlayerResourceTest {
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
         // assert
-        verify(clubCouchbase, never()).getDocument(any(), any());
+        verify(clubService, never()).getClub(any());
         verify(playerService, never()).createPlayer(any(), any(), anyString());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
         assertNotNull(playerResponse.getEntity());
@@ -218,14 +216,14 @@ public class PlayerResourceTest {
                 .build();
         when(playerService.getPlayer(any())).thenReturn(existingPlayerInCouchbase);
 
-        Player updatedPlayerInCouchbase = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+        Player updatedPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
                 .from(existingPlayerInCouchbase)
                 .withUpdatedNameInMetadata(updatedPlayerName)
                 .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
                 .withUpdatedRoleName(updatedRoleName)
                 .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
                 .build();
-        when(playerService.updatePlayer(any(), any(), any())).thenReturn(updatedPlayerInCouchbase);
+        when(playerService.updatePlayer(any(), any(), any())).thenReturn(updatedPlayer);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -253,11 +251,13 @@ public class PlayerResourceTest {
         assertNotNull(playerResponse.getEntity());
 
         Player playerInResponse = OBJECT_MAPPER.convertValue(playerResponse.getEntity(), Player.class);
-        assertEquals(updatedPlayerInCouchbase.getId(), playerInResponse.getId());
-        assertEquals(updatedPlayerInCouchbase.getMetadata(), playerInResponse.getMetadata());
-        assertEquals(updatedPlayerInCouchbase.getRoles(), playerInResponse.getRoles());
-        assertEquals(updatedPlayerInCouchbase.getAbility(), playerInResponse.getAbility());
+        assertEquals(updatedPlayer.getId(), playerInResponse.getId());
+        assertEquals(updatedPlayer.getMetadata(), playerInResponse.getMetadata());
+        assertEquals(updatedPlayer.getRoles(), playerInResponse.getRoles());
+        assertEquals(updatedPlayer.getAbility(), playerInResponse.getAbility());
+
         assertEquals(userPrincipal.getEmail(), playerInResponse.getCreatedBy());
+        assertEquals(LocalDate.now(), playerInResponse.getLastModifiedDate());
     }
 
     /**
@@ -314,5 +314,5 @@ public class PlayerResourceTest {
         assertEquals(HttpStatus.NO_CONTENT_204, playerResponse.getStatus());
     }
 
-    // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
+    // TODO: 1/6/2022 add test when trying to delete a player from a club not belonging to user
 }

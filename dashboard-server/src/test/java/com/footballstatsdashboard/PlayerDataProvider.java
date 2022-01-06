@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class PlayerDataProvider {
-
     private static final int PLAYER_AGE = 27;
     private static final int CURRENT_PLAYER_ABILITY = 19;
     private static final int CURRENT_PLAYER_SPRINT_SPEED = 85;
@@ -29,9 +28,13 @@ public class PlayerDataProvider {
     private static final int CURRENT_PLAYER_COMPOSURE = 75;
     private static final String CREATED_BY = "fake email";
 
+    /**
+     * Helps in building a player entity according to the needs of a test
+     */
     public static final class PlayerBuilder {
         private boolean isExistingPlayer = false;
         private final ImmutablePlayer.Builder basePlayer = ImmutablePlayer.builder().clubId(UUID.randomUUID());
+
         private PlayerBuilder() { }
 
         public static PlayerBuilder builder() {
@@ -118,9 +121,14 @@ public class PlayerDataProvider {
         }
     }
 
+    /**
+     * Helps in building a player entity from an existing one and allows overriding certain properties according to the
+     * needs of a test
+     */
     public static final class ModifiedPlayerBuilder {
         private Player playerReference;
         private ImmutablePlayer.Builder basePlayer = ImmutablePlayer.builder();
+
         private ModifiedPlayerBuilder() { }
 
         public static ModifiedPlayerBuilder builder() {
@@ -183,7 +191,9 @@ public class PlayerDataProvider {
         }
 
         public Player build() {
-            return this.basePlayer.build();
+            return this.basePlayer
+                    .lastModifiedDate(LocalDate.now())
+                    .build();
         }
     }
 }

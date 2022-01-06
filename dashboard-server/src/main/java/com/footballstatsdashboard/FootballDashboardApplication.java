@@ -22,6 +22,7 @@ import com.footballstatsdashboard.resources.ClubResource;
 import com.footballstatsdashboard.resources.MatchPerformanceResource;
 import com.footballstatsdashboard.resources.PlayerResource;
 import com.footballstatsdashboard.resources.UserResource;
+import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -99,12 +100,13 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
                 new AuthTokenKeyProvider(), environment.getObjectMapper());
 
         // setup services
+        ClubService clubService = new ClubService(clubCouchbaseDAO);
         PlayerService playerService = new PlayerService(playerCouchbaseDAO);
 
         // setup resources
         environment.jersey().register(new UserResource(userCouchbaseDAO, authTokenDAO));
-        environment.jersey().register(new PlayerResource(playerService, clubCouchbaseDAO));
-        environment.jersey().register(new ClubResource(clubCouchbaseDAO));
+        environment.jersey().register(new PlayerResource(playerService, clubService));
+        environment.jersey().register(new ClubResource(clubService));
         environment.jersey().register(new MatchPerformanceResource(matchPerformanceDAO));
 
         // Register OAuth authentication

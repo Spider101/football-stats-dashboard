@@ -1,11 +1,9 @@
 package com.footballstatsdashboard.resources;
 
-import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.club.ImmutableClub;
+import com.footballstatsdashboard.api.model.club.Club;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
-import com.footballstatsdashboard.db.ClubDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.services.ClubService;
 import com.google.common.collect.ImmutableMap;
 import io.dropwizard.auth.Auth;
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +25,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -41,10 +38,11 @@ import static com.footballstatsdashboard.core.utils.Constants.CLUB_V1_BASE_PATH;
 public class ClubResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
-    private final ClubDAO<ResourceKey> clubDAO;
+//    private final ClubDAO<ResourceKey> clubDAO;
+    private final ClubService clubService;
 
-    public ClubResource(ClubDAO<ResourceKey> clubDAO) {
-        this.clubDAO = clubDAO;
+    public ClubResource(ClubService clubService) {
+        this.clubService = clubService;
     }
 
     @GET
@@ -56,8 +54,7 @@ public class ClubResource {
             LOGGER.info("getClub() request for club with ID: {}", clubId);
         }
 
-        ResourceKey resourceKey = new ResourceKey(clubId);
-        Club club = this.clubDAO.getDocument(resourceKey, Club.class);
+        Club club = this.clubService.getClub(clubId);
         return Response.ok().entity(club).build();
     }
 
@@ -83,17 +80,7 @@ public class ClubResource {
             return Response.status(statusCode).entity(params).build();
         }
 
-        LocalDate currentDate = LocalDate.now();
-        Club newClub = ImmutableClub.builder()
-                .from(incomingClub)
-                .userId(user.getId())
-                .createdDate(currentDate)
-                .lastModifiedDate(currentDate)
-                .createdBy(user.getEmail())
-                .build();
-
-        ResourceKey resourceKey = new ResourceKey(newClub.getId());
-        this.clubDAO.insertDocument(resourceKey, newClub);
+        Club newClub = this.clubService.createClub(incomingClub, user.getId(), user.getEmail());
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newClub.getId().toString()).build();
         return Response.created(location).entity(newClub).build();
@@ -109,23 +96,10 @@ public class ClubResource {
             LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
         }
 
-        ResourceKey resourceKey = new ResourceKey(existingClubId);
-        Club existingClub = this.clubDAO.getDocument(resourceKey, Club.class);
-
+        Club existingClub = this.clubService.getClub(existingClubId);
         if (existingClub.getId().equals(incomingClub.getId())) {
-
             // TODO: 15/04/21 add validations by checking incoming club data against existing one
-            Club updatedClub = ImmutableClub.builder()
-                    .from(existingClub)
-                    .name(incomingClub.getName())
-                    .income(incomingClub.getIncome())
-                    .expenditure(incomingClub.getExpenditure())
-                    .transferBudget(incomingClub.getTransferBudget())
-                    .wageBudget(incomingClub.getWageBudget())
-                    .lastModifiedDate(LocalDate.now())
-                    .build();
-
-            this.clubDAO.updateDocument(resourceKey, updatedClub);
+            Club updatedClub = this.clubService.updateClub(incomingClub, existingClub, existingClubId);
             return Response.ok().entity(updatedClub).build();
         }
 
@@ -145,9 +119,7 @@ public class ClubResource {
             LOGGER.info("deleteClub() request for club with ID: {}", clubId);
         }
 
-        ResourceKey resourceKey = new ResourceKey(clubId);
-        this.clubDAO.deleteDocument(resourceKey);
-
+        this.clubService.deleteClub(clubId);
         return Response.noContent().build();
     }
 
@@ -157,7 +129,8 @@ public class ClubResource {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getClubsByUserId() request for user");
         }
-        List<Club> clubsByUserId = clubDAO.getClubsByUserId(user.getId());
+
+        List<Club> clubsByUserId = this.clubService.getClubsByUserId(user.getId());
         return Response.ok().entity(clubsByUserId).build();
     }
 
@@ -168,7 +141,8 @@ public class ClubResource {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getSquadPlayers() request for club with ID: {}", clubId);
         }
-        List<SquadPlayer> squadPlayerList = clubDAO.getPlayersInClub(clubId);
+
+        List<SquadPlayer> squadPlayerList = this.clubService.getSquadPlayers(clubId);
         return Response.ok().entity(squadPlayerList).build();
     }
 }
