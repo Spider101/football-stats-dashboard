@@ -2,20 +2,18 @@ package com.footballstatsdashboard.resources;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.footballstatsdashboard.api.model.club.Club;
-import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
-import com.footballstatsdashboard.db.ClubDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.services.ClubService;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -38,6 +36,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -56,7 +55,7 @@ public class ClubResourceTest {
     private ClubResource clubResource;
 
     @Mock
-    private ClubDAO<ResourceKey> clubDAO;
+    private ClubService clubService;
 
     @Mock
     private UriInfo uriInfo;
@@ -79,25 +78,24 @@ public class ClubResourceTest {
                 .lastName("")
                 .build();
 
-        clubResource = new ClubResource(clubDAO);
+        clubResource = new ClubResource(clubService);
     }
 
     /**
-     * given a valid club id, tests that the club entity is successfully fetched from couchbase server and returned
-     * in the response
+     * given a valid club id, tests that the club entity is successfully fetched and returned in the response
      */
     @Test
-    public void getClubCetchesClubFromCouchbase() {
+    public void getClubFetchesClubData() {
         // setup
         UUID clubId = UUID.randomUUID();
-        Club clubFromCouchbase = getClubDataStub(clubId, userPrincipal.getId(), false);
-        when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
+        Club clubFromCouchbase = getClubDataStub(clubId, userPrincipal.getId(), true);
+        when(clubService.getClub(eq(clubId))).thenReturn(clubFromCouchbase);
 
         // execute
         Response clubResponse = clubResource.getClub(clubId);
 
         // assert
-        verify(clubDAO).getDocument(any(), any());
+        verify(clubService).getClub(any());
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
@@ -107,56 +105,35 @@ public class ClubResourceTest {
         assertEquals(userPrincipal.getId(), clubFromResponse.getUserId());
     }
 
-    /**
-     * given a runtime exception is thrown by couchbase DAO when club entity is not found, verifies that the same
-     * exception is thrown by `getClub` resource method as well
-     */
-    @Test(expected = RuntimeException.class)
-    public void getClubClubNotFoundInCouchbase() {
-        // setup
-        UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.getDocument(any(), any()))
-                .thenThrow(new RuntimeException("Unable to find document with ID: " + invalidClubId));
-
-        // execute
-        clubResource.getClub(invalidClubId);
-
-        // assert
-        verify(clubDAO).getDocument(any(), any());
-    }
+    // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
 
     /**
-     * given a valid club entity in the request, tests that the internal fields are set correctly on the entity and
-     * persisted in couchbase
+     * given a valid club entity in the request, tests that the club data is successfully persisted
      */
     @Test
-    public void createClubPersistsClubInCouchbase() {
+    public void createClubPersistsClubData() {
         // setup
         Club incomingClub = getClubDataStub(null, null, false);
-        ArgumentCaptor<Club> newClubCaptor = ArgumentCaptor.forClass(Club.class);
+        Club createdClub = getClubDataStub(incomingClub.getId(), userPrincipal.getId(), true);
+        when(clubService.createClub(any(), any(), anyString())).thenReturn(createdClub);
 
         // execute
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClub, uriInfo);
 
         // assert
-        verify(clubDAO).insertDocument(any(), newClubCaptor.capture());
-        Club newClub = newClubCaptor.getValue();
-        assertNotNull(newClub.getCreatedDate());
-        assertNotNull(newClub.getLastModifiedDate());
-        assertEquals(userPrincipal.getEmail(), newClub.getCreatedBy());
-        assertEquals(userPrincipal.getId(), newClub.getUserId());
-
+        verify(clubService).createClub(eq(incomingClub), eq(userPrincipal.getId()), eq(userPrincipal.getEmail()));
         assertEquals(HttpStatus.CREATED_201, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
         // a clubId is set on the club instance created despite not setting one explicitly due to the way the
         // interface has been set up
         assertEquals(URI_PATH + "/" + incomingClub.getId().toString(), clubResponse.getLocation().getPath());
-
-        Club createdClub = OBJECT_MAPPER.convertValue(clubResponse.getEntity(), Club.class);
-        assertEquals(incomingClub.getId(), createdClub.getId());
     }
 
+    /**
+     * given that the request contains a club entity with an empty club name, tests that no data is persisted and a 400
+     * Bad Request response status is returned
+     */
     @Test
     public void createClubWhenClubNameIsEmpty() {
         // setup
@@ -169,43 +146,39 @@ public class ClubResourceTest {
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoName, uriInfo);
 
         // assert
-        verify(clubDAO, never()).insertDocument(any(), any());
+        verify(clubService, never()).createClub(any(), any(), anyString());
         assertNotNull(clubResponse);
         assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
     }
 
     /**
-     * given a valid club entity in the request, tests that an updated club entity with update internal fields is
-     * upserted in couchbase
+     * given a valid club entity in the request, tests that the corresponding club data is updated
      */
     @Test
-    public void updateClubUpdatesClubInCouchbase() {
+    public void updateClubUpdatesClubData() {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
+        when(clubService.getClub(any())).thenReturn(existingClubInCouchbase);
+
         BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(new BigDecimal("100"));
         Club incomingClub = ImmutableClub.builder()
                 .from(getClubDataStub(existingClubId, null, false))
                 .wageBudget(updatedWageBudget)
                 .build();
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-        ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
-        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
+        Club updatedClubInCouchbase = ImmutableClub.builder()
+                .from(existingClubInCouchbase)
+                .wageBudget(updatedWageBudget)
+                .lastModifiedDate(LocalDate.now())
+                .build();
+        when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClubInCouchbase);
 
         // execute
         Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
 
         // assert
-        verify(clubDAO).getDocument(resourceKeyCaptor.capture(), any());
-        ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
-        assertEquals(existingClubId, capturedResourceKey.getResourceId());
-
-        verify(clubDAO).updateDocument(eq(capturedResourceKey), updatedClubCaptor.capture());
-        Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
-        assertNotNull(clubToBeUpdatedInCouchbase);
-        assertEquals(userPrincipal.getEmail(), clubToBeUpdatedInCouchbase.getCreatedBy());
-        assertEquals(userPrincipal.getId(), clubToBeUpdatedInCouchbase.getUserId());
-        assertEquals(LocalDate.now(), clubToBeUpdatedInCouchbase.getLastModifiedDate());
+        verify(clubService).getClub(eq(existingClubId));
+        verify(clubService).updateClub(eq(incomingClub), eq(existingClubInCouchbase), eq(existingClubId));
 
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
@@ -213,19 +186,23 @@ public class ClubResourceTest {
         Club clubInResponse = OBJECT_MAPPER.convertValue(clubResponse.getEntity(), Club.class);
         assertEquals(existingClubInCouchbase.getId(), clubInResponse.getId());
         assertEquals(updatedWageBudget, clubInResponse.getWageBudget());
+
+        assertEquals(userPrincipal.getId(), clubInResponse.getUserId());
         assertEquals(userPrincipal.getEmail(), clubInResponse.getCreatedBy());
+        assertEquals(userPrincipal.getEmail(), clubInResponse.getCreatedBy());
+        assertEquals(LocalDate.now(), clubInResponse.getLastModifiedDate());
     }
 
     /**
      * given that the request contains a club entity whose ID does not match the existing club's ID, tests that the
-     * invalid entity is not upserted in couchbase and a server error response is returned
+     * associated club data is not updated and a server error response is returned
      */
     @Test
     public void updateClubWhenIncomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubInCouchbase = getClubDataStub(existingClubId, userPrincipal.getId(), true);
-        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
+        when(clubService.getClub(any())).thenReturn(existingClubInCouchbase);
 
         UUID incorrectIncomingClubId = UUID.randomUUID();
         Club incomingClub = ImmutableClub.builder()
@@ -237,32 +214,30 @@ public class ClubResourceTest {
         Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
 
         // assert
-        verify(clubDAO).getDocument(any(), any());
-        verify(clubDAO, never()).updateDocument(any(), any());
+        verify(clubService).getClub(any());
+        verify(clubService, never()).updateClub(any(), any(), any());
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, clubResponse.getStatus());
         assertTrue(clubResponse.getEntity().toString().contains(incorrectIncomingClubId.toString()));
     }
 
     /**
-     * given a valid club ID, removes the club entity from couchbase
+     * given a valid club ID, removes the club data and a 204 No Content response is returned
      */
     @Test
-    public void deleteClubRemovesClubFromCouchbase() {
+    public void deleteClubRemovesClubData() {
         // setup
         UUID clubId = UUID.randomUUID();
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
         Response clubResponse = clubResource.deleteClub(clubId);
 
         // assert
-        verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
-        ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
-        assertEquals(clubId, capturedResourceKey.getResourceId());
-
+        verify(clubService).deleteClub(eq(clubId));
         assertEquals(HttpStatus.NO_CONTENT_204, clubResponse.getStatus());
     }
+
+    // TODO: 1/6/2022 add test when trying to delete a club not belonging to user
 
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from
@@ -274,13 +249,13 @@ public class ClubResourceTest {
         int numberOfClubs = 2;
         UUID userId = userPrincipal.getId();
         List<Club> mockClubData = getBulkClubDataStub(numberOfClubs, userId);
-        when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
+        when(clubService.getClubsByUserId(any())).thenReturn(mockClubData);
 
         // execute
         Response response = clubResource.getClubsByUserId(userPrincipal);
 
         // assert
-        verify(clubDAO).getClubsByUserId(eq(userId));
+        verify(clubService).getClubsByUserId(eq(userId));
         assertNotNull(response);
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
@@ -296,33 +271,10 @@ public class ClubResourceTest {
     }
 
     /**
-     * given a valid user entity as the auth principal but no there are no club entities associated with it, tests that
-     * an empty list is returned in the response
+     * given a valid club ID, fetches player data for all players associated with the club
      */
     @Test
-    public void getClubsByUserIdReturnsEmptyListWhenNoClubsAreAssociatedWithUser() {
-        // setup
-        int numberOfClubs = 0;
-        UUID userId = userPrincipal.getId();
-        List<Club> mockClubData = getBulkClubDataStub(numberOfClubs, userId);
-        when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
-
-        // execute
-        Response response = clubResource.getClubsByUserId(userPrincipal);
-
-        // assert
-        verify(clubDAO).getClubsByUserId(eq(userId));
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK_200, response.getStatus());
-        assertNotNull(response.getEntity());
-
-        TypeReference<List<Club>> clubListTypeRef = new TypeReference<>() { };
-        List<Club> clubList = OBJECT_MAPPER.convertValue(response.getEntity(), clubListTypeRef);
-        assertTrue(clubList.isEmpty());
-    }
-
-    @Test
-    public void getSquadPlayersFetchesPlayersFromCouchbase() {
+    public void getSquadPlayersFetchesAllPlayersInClub() {
         // setup
         UUID clubId = UUID.randomUUID();
         ImmutableSquadPlayer expectedSquadPlayer = ImmutableSquadPlayer.builder()
@@ -333,13 +285,13 @@ public class ClubResourceTest {
                 .recentForm(new ArrayList<>())
                 .playerId(UUID.randomUUID())
                 .build();
-        when(clubDAO.getPlayersInClub(eq(clubId))).thenReturn(ImmutableList.of(expectedSquadPlayer));
+        when(clubService.getSquadPlayers(eq(clubId))).thenReturn(ImmutableList.of(expectedSquadPlayer));
 
         // execute
         Response response = clubResource.getSquadPlayers(clubId);
 
         // assert
-        verify(clubDAO).getPlayersInClub(eq(clubId));
+        verify(clubService).getSquadPlayers(eq(clubId));
         assertNotNull(response);
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
@@ -348,10 +300,6 @@ public class ClubResourceTest {
         List<SquadPlayer> squadPlayersFromResponse = OBJECT_MAPPER.convertValue(response.getEntity(),
                 squadPlayerListTypeRef);
         assertFalse(squadPlayersFromResponse.isEmpty());
-        squadPlayersFromResponse.forEach(squadPlayerFromResponse -> {
-            assertNotNull(squadPlayerFromResponse);
-            assertEquals(expectedSquadPlayer, squadPlayerFromResponse);
-        });
     }
 
     private Club getClubDataStub(UUID clubId, UUID userId, boolean isExisting) {
