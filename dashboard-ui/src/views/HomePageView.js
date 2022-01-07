@@ -8,6 +8,8 @@ import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 
 const useStyles = makeStyles(theme => ({
@@ -32,10 +34,19 @@ export default function HomePageView({ clubSummaries, addClubWidget }) {
 
     const allCLubsView = (
         <List className={classes.clubs}>
-            {clubs.map(club => {
+            {clubSummaries.map(clubSummary => {
                 return (
-                    <ListItem key={club.id} button divider component={Link} to={`/club/${club.id}`}>
-                        <ListItemText primary={club.name} />
+                    <ListItem key={clubSummary.clubId} divider>
+                        <ListItemText
+                            primary={clubSummary.name}
+                            primaryTypographyProps={{ variant: 'h5' }}
+                            secondary={`Created: ${clubSummary.createdDate}`}
+                        />
+                        <ListItemSecondaryAction>
+                            <Button variant='outlined' component={Link} to={`/club/${clubSummary.clubId}`}>
+                                Open
+                            </Button>
+                        </ListItemSecondaryAction>
                     </ListItem>
                 );
             })}
