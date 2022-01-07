@@ -5,7 +5,7 @@ import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.PlayerDataProvider;
 import com.footballstatsdashboard.api.model.CountryCodeMetadata;
 import com.footballstatsdashboard.api.model.Player;
-import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.core.utils.FixtureLoader;

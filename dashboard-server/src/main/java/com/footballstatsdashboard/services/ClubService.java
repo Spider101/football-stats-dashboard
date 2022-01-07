@@ -1,8 +1,8 @@
 package com.footballstatsdashboard.services;
 
-import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
-import com.footballstatsdashboard.api.model.club.ImmutableClub;
+import com.footballstatsdashboard.api.model.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;

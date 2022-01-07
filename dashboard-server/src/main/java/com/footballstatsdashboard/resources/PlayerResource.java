@@ -2,7 +2,7 @@ package com.footballstatsdashboard.resources;
 
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.auth.Auth;
