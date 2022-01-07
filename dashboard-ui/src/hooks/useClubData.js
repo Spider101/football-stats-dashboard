@@ -1,16 +1,18 @@
 import { useQuery } from 'react-query';
-import { fetchAllClubs, fetchClub } from '../clients/ClubClient';
+import { fetchClubSummaries, fetchClub } from '../clients/ClubClient';
 import { useUserAuth } from '../context/authProvider';
 import { queryKeys } from '../utils';
 
-export function useAllClubData() {
+export function useClubSummariesData() {
     const { authData } = useUserAuth();
 
-    const { isLoading, data: allClubsData } = useQuery(queryKeys.ALL_CLUBS, fetchAllClubs, { meta: { authData }});
+    const { isLoading, data: clubSummariesData } = useQuery(queryKeys.ALL_CLUBS, fetchClubSummaries, {
+        meta: { authData }
+    });
 
     return {
         isLoading,
-        data: isLoading ? {} : allClubsData
+        data: isLoading ? {} : clubSummariesData
     };
 }
 

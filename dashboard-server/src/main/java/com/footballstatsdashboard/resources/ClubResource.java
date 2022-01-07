@@ -2,6 +2,7 @@ package com.footballstatsdashboard.resources;
 
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.services.ClubService;
 import com.google.common.collect.ImmutableMap;
@@ -130,7 +131,7 @@ public class ClubResource {
             LOGGER.info("getClubsByUserId() request for user");
         }
 
-        List<Club> clubsByUserId = this.clubService.getClubsByUserId(user.getId());
+        List<ClubSummary> clubsByUserId = this.clubService.getClubSummariesByUserId(user.getId());
         return Response.ok().entity(clubsByUserId).build();
     }
 

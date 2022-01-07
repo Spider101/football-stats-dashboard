@@ -282,6 +282,7 @@ export const getClubsData = (numClubs) => {
         wageBudget: getRandomNumberInRange(500000, 10000000),
         income: getRandomNumberInRange(500000, 10000000),
         expenditure: getRandomNumberInRange(500000, 10000000),
+        createdDate: '2021-20-12'
     }));
 };
 

@@ -1,7 +1,7 @@
 import fetchDataFromEndpoint from './utils';
 import { httpStatus } from '../utils';
 
-export const fetchAllClubs = async ({ meta: { authData } }) => {
+export const fetchClubSummaries = async ({ meta: { authData } }) => {
     const res = await fetchDataFromEndpoint('club/all', 'GET', {
         Authorization: `BEARER ${authData.id}`
     });

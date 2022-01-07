@@ -2,6 +2,7 @@ package com.footballstatsdashboard.services;
 
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
@@ -191,19 +192,18 @@ public class ClubServiceTest {
     @Test
     public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
-        List<Club> mockClubData = ClubDataProvider.getAllClubsForUser(userId);
-        when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
+        List<ClubSummary> mockClubData = ClubDataProvider.getAllClubSummariesForUser(userId);
+        when(clubDAO.getClubSummariesByUserId(any())).thenReturn(mockClubData);
 
         // execute
-        List<Club> clubList = clubService.getClubsByUserId(userId);
+        List<ClubSummary> clubSummaries = clubService.getClubSummariesByUserId(userId);
 
         // assert
-        verify(clubDAO).getClubsByUserId(eq(userId));
-        assertFalse(clubList.isEmpty());
+        verify(clubDAO).getClubSummariesByUserId(eq(userId));
+        assertFalse(clubSummaries.isEmpty());
 
-        for (int idx = 0; idx < clubList.size(); idx++) {
-            assertEquals(userId, clubList.get(idx).getUserId());
-            assertTrue(clubList.get(idx).getName().contains(String.valueOf(idx)));
+        for (int idx = 0; idx < clubSummaries.size(); idx++) {
+            assertTrue(clubSummaries.get(idx).getName().contains(String.valueOf(idx)));
         }
     }
 
@@ -214,14 +214,13 @@ public class ClubServiceTest {
     @Test
     public void getClubsByUserIdReturnsEmptyListWhenNoClubsAreAssociatedWithUser() {
         // setup
-        List<Club> mockClubData = new ArrayList<>();
-        when(clubDAO.getClubsByUserId(any())).thenReturn(mockClubData);
+        when(clubDAO.getClubSummariesByUserId(any())).thenReturn(new ArrayList<>());
 
         // execute
-        List<Club> clubList = clubService.getClubsByUserId(userId);
+        List<ClubSummary> clubList = clubService.getClubSummariesByUserId(userId);
 
         // assert
-        verify(clubDAO).getClubsByUserId(eq(userId));
+        verify(clubDAO).getClubSummariesByUserId(eq(userId));
         assertTrue(clubList.isEmpty());
     }
 

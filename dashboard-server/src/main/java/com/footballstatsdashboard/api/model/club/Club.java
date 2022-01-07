@@ -70,7 +70,7 @@ public interface Club {
 
     // TODO: 12/05/21 update all local date times to zoned date times to involve timezones as well
     /**
-     * timestamp when player data was created
+     * timestamp when club data was created
      */
     @Valid
     @Nullable
@@ -81,7 +81,7 @@ public interface Club {
     LocalDate getCreatedDate();
 
     /**
-     * timestamp when player data was last modified
+     * timestamp when club data was last modified
      */
     @Valid
     @Nullable
@@ -92,7 +92,7 @@ public interface Club {
     LocalDate getLastModifiedDate();
 
     /**
-     * represents entity that requested player data be created
+     * represents entity that requested club data be created
      */
     @Nullable
     @InternalField

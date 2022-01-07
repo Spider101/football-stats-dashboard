@@ -8,6 +8,8 @@ import Typography from '@material-ui/core/Typography';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
 
 const useStyles = makeStyles(theme => ({
@@ -21,7 +23,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function HomePageView({ clubs, addClubWidget }) {
+export default function HomePageView({ clubSummaries, addClubWidget }) {
     const classes = useStyles();
 
     const noClubsView = (
@@ -32,10 +34,19 @@ export default function HomePageView({ clubs, addClubWidget }) {
 
     const allCLubsView = (
         <List className={classes.clubs}>
-            {clubs.map(club => {
+            {clubSummaries.map(clubSummary => {
                 return (
-                    <ListItem key={club.id} button divider component={Link} to={`/club/${club.id}`}>
-                        <ListItemText primary={club.name} />
+                    <ListItem key={clubSummary.clubId} divider>
+                        <ListItemText
+                            primary={clubSummary.name}
+                            primaryTypographyProps={{ variant: 'h5' }}
+                            secondary={`Created: ${clubSummary.createdDate}`}
+                        />
+                        <ListItemSecondaryAction>
+                            <Button variant='outlined' component={Link} to={`/club/${clubSummary.clubId}`}>
+                                Open
+                            </Button>
+                        </ListItemSecondaryAction>
                     </ListItem>
                 );
             })}
@@ -46,7 +57,7 @@ export default function HomePageView({ clubs, addClubWidget }) {
         <Container>
             <Typography variant='h2'>Clubs</Typography>
             <Divider />
-            {clubs.length === 0 ? noClubsView : allCLubsView}
+            {clubSummaries.length === 0 ? noClubsView : allCLubsView}
             <div className={classes.fab}>
                 {addClubWidget}
             </div>
@@ -55,14 +66,11 @@ export default function HomePageView({ clubs, addClubWidget }) {
 }
 
 HomePageView.propTypes = {
-    clubs: PropTypes.arrayOf(
+    clubSummaries: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.string,
+            clubId: PropTypes.string,
             name: PropTypes.string,
-            transferBudget: PropTypes.number,
-            wageBudget: PropTypes.number,
-            income: PropTypes.number,
-            expenditure: PropTypes.number
+            createdDate: PropTypes.string
         })
     ),
     addClubWidget: PropTypes.node

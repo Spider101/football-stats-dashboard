@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -30,8 +30,9 @@ it('should render view with club data fetched from backend', async () => {
         </MemoryRouter>
     );
 
-    // verify that a listItem (role=button) is rendered with the club name as fetched from the backend
-    await waitFor(() => expect(screen.queryByRole('button', { name: 'Chelsea F.C' })).toBeInTheDocument());
+    // verify that a listItem is rendered with the club name as fetched from the backend
+    const listItem = await screen.findByRole('listitem');
+    expect(listItem).toHaveTextContent(/chelsea f.c/i);
 });
 
 it('should render success message when add new club form is submitted', async () => {

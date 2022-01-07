@@ -1,7 +1,7 @@
 import Typography from '@material-ui/core/Typography';
 
 import useUserData from '../hooks/useUserData';
-import { useAllClubData } from '../hooks/useClubData';
+import { useClubSummariesData } from '../hooks/useClubData';
 
 import HomePageView from '../views/HomePageView';
 import useAddNewClub from '../hooks/useAddNewClub';
@@ -29,13 +29,13 @@ const HomeContainer = () => {
     const { addNewClubAction } = useAddNewClub();
     const addClubWidget = <AddClub addClubAction={addNewClubAction} />;
 
-    const { isLoading, data: allClubsData } = useAllClubData();
+    const { isLoading, data: clubSummariesData } = useClubSummariesData();
 
     if (isLoading) {
         return <StyledLoadingCircle />;
     }
 
-    return <HomePageView clubs={allClubsData} addClubWidget={addClubWidget}/>;
+    return <HomePageView clubSummaries={clubSummariesData} addClubWidget={addClubWidget}/>;
 };
 
 export default Home;
