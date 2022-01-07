@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.footballstatsdashboard.api.model.club.Expenditure;
+import com.footballstatsdashboard.api.model.club.Income;
 import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
@@ -52,13 +54,15 @@ public interface Club {
      * club's income in a year
      */
     @Valid
-    BigDecimal getIncome();
+    @Nullable
+    Income getIncome();
 
     /**
      * club's expenditure in a year
      */
     @Valid
-    BigDecimal getExpenditure();
+    @Nullable
+    Expenditure getExpenditure();
 
     /**
      * ID of user the club belongs to
