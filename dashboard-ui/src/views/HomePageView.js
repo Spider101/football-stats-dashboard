@@ -21,7 +21,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function HomePageView({ clubs, addClubWidget }) {
+export default function HomePageView({ clubSummaries, addClubWidget }) {
     const classes = useStyles();
 
     const noClubsView = (
@@ -46,7 +46,7 @@ export default function HomePageView({ clubs, addClubWidget }) {
         <Container>
             <Typography variant='h2'>Clubs</Typography>
             <Divider />
-            {clubs.length === 0 ? noClubsView : allCLubsView}
+            {clubSummaries.length === 0 ? noClubsView : allCLubsView}
             <div className={classes.fab}>
                 {addClubWidget}
             </div>
@@ -55,14 +55,11 @@ export default function HomePageView({ clubs, addClubWidget }) {
 }
 
 HomePageView.propTypes = {
-    clubs: PropTypes.arrayOf(
+    clubSummaries: PropTypes.arrayOf(
         PropTypes.shape({
-            id: PropTypes.string,
+            clubId: PropTypes.string,
             name: PropTypes.string,
-            transferBudget: PropTypes.number,
-            wageBudget: PropTypes.number,
-            income: PropTypes.number,
-            expenditure: PropTypes.number
+            createdDate: PropTypes.string
         })
     ),
     addClubWidget: PropTypes.node

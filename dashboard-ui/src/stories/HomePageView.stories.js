@@ -31,12 +31,16 @@ const Template = args => <HomePageView {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-    clubs: getClubsData(5),
+    clubSummaries: getClubsData(5).map(club => ({
+        clubId: club.id,
+        name: club.name,
+        createdDate: club.createdDate
+    })),
     addClubWidget: <Success {...Success.args} />
 };
 
 export const NoClubs = Template.bind({});
 NoClubs.args = {
-    clubs: [],
+    clubSummaries: [],
     addClubWidget: <Success {...Success.args} />
 };

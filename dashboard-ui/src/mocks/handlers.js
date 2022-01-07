@@ -36,11 +36,17 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
         transferBudget: 5000000,
         wageBudget: 300000,
         income: 10000000,
-        expenditure: 100000
+        expenditure: 100000,
+        createdDate: '2021-02-20'
+    };
+    const dummyClubSummary = {
+        clubId: dummyClub.id,
+        name: dummyClub.name,
+        createdDate: dummyClub.createdDate
     };
     return [
         rest.get(`${baseUrl}/club/all`, (req, res, ctx) => {
-            return res(ctx.status(200), ctx.json([dummyClub]));
+            return res(ctx.status(200), ctx.json([dummyClubSummary]));
         }),
         rest.get(`${baseUrl}/club/${clubIdFragment}`, (req, res, ctx) => {
             return res(ctx.status(200), ctx.json(dummyClub));
