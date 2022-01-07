@@ -23,12 +23,12 @@ import java.util.stream.Collectors;
  * A Jackson module that filter out properties annotated with @InternalField
  */
 @Provider
-public class PlayerInternalModule extends Module {
-    private static final Logger LOGGER = LoggerFactory.getLogger(PlayerInternalModule.class);
+public class DashboardInternalModule extends Module {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DashboardInternalModule.class);
 
     @Override
     public String getModuleName() {
-        return "PlayerInternalModule";
+        return "DashboardInternalModule";
     }
 
     @Override
@@ -40,17 +40,17 @@ public class PlayerInternalModule extends Module {
     @Override
     public void setupModule(SetupContext setupContext) {
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("initializing PlayerInternalModule");
+            LOGGER.info("initializing DashboardInternalModule");
         }
 
-        setupContext.addBeanSerializerModifier(new PlayerInternalBeanSerializerModifier());
-        setupContext.addBeanDeserializerModifier(new PlayerInternalBeanDeserializerModifier());
+        setupContext.addBeanSerializerModifier(new DashboardInternalBeanSerializerModifier());
+        setupContext.addBeanDeserializerModifier(new DashboardInternalBeanDeserializerModifier());
     }
 
     /**
      * Filters out properties marked with @InternalField during Serialization
      */
-    public static class PlayerInternalBeanSerializerModifier extends BeanSerializerModifier {
+    public static class DashboardInternalBeanSerializerModifier extends BeanSerializerModifier {
 
         @Override
         public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDescription,
@@ -64,7 +64,7 @@ public class PlayerInternalModule extends Module {
     /**
      * Filters out properties marked with @InternalField during Deserialization
      */
-    public static class PlayerInternalBeanDeserializerModifier extends BeanDeserializerModifier {
+    public static class DashboardInternalBeanDeserializerModifier extends BeanDeserializerModifier {
 
         @Override
         public BeanDeserializerBuilder updateBuilder(DeserializationConfig deserializationConfig,
