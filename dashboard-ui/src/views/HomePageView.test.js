@@ -12,9 +12,25 @@ it('should render the club data passed in', () => {
     );
 
     expect(screen.queryByText(noClubViewText)).not.toBeInTheDocument();
-    Default.args.clubs.map(club => {
-        const clubItem = screen.getByRole('button', { name: club.name });
-        expect(clubItem).toHaveAttribute('href', `/club/${club.id}`);
+
+    const { clubSummaries } = Default.args;
+
+    const clubSummaryButtons = screen.getAllByRole('button', { name: 'Open' });
+    expect(clubSummaryButtons.length).toBe(clubSummaries.length);
+    clubSummaryButtons.forEach((clubSummaryButton, idx) => {
+        // assuming ordering is maintained between the prop data and the rendered elements
+        expect(clubSummaryButton).toHaveAttribute('href', `/club/${clubSummaries[idx].clubId}`);
+
+        // fallback assertion if above one fails due to any ordering issues
+        // expect(clubSummaryButton).toHaveAttribute('href', expect.stringContaining('/club/'));
+    });
+
+    const clubSummaryItems = screen.getAllByRole('listitem');
+    expect(clubSummaryItems.length).toBe(clubSummaries.length);
+    clubSummaryItems.forEach((clubSummaryItem, idx) => {
+        // assuming ordering is maintained between the prop data and the rendered elements
+        expect(clubSummaryItem).toHaveTextContent(clubSummaries[idx].name);
+        expect(clubSummaryItem).toHaveTextContent(clubSummaries[idx].createdDate);
     });
 });
 
