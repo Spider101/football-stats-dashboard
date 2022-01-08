@@ -129,6 +129,18 @@ public class ClubResource {
             LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
         }
 
+        if (incomingClub.getTransferBudget().add(incomingClub.getWageBudget())
+                .compareTo(incomingClub.getManagerFunds().getCurrent()) != 0) {
+            String errorMessage = "Transfer and wage budgets must add up to manager funds!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
+        }
+
         Club existingClub = this.clubService.getClub(existingClubId);
         if (existingClub.getId().equals(incomingClub.getId())) {
             // TODO: 15/04/21 add validations by checking incoming club data against existing one
