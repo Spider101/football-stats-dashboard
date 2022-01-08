@@ -3,6 +3,7 @@ package com.footballstatsdashboard.api.model.club;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.footballstatsdashboard.core.utils.Readonly;
 import org.immutables.value.Value;
 
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ public interface Expenditure {
      * list of all values of expenditure entity in the past, including the current value
      */
     @Valid
+    @Readonly
     @Size(min = 1)
     List<BigDecimal> getHistory();
 }
