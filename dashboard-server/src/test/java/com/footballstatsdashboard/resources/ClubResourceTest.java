@@ -218,6 +218,8 @@ public class ClubResourceTest {
                 .isExisting(true)
                 .existingUserId(userPrincipal.getId())
                 .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubService.getClub(any())).thenReturn(existingClub);
 
@@ -268,6 +270,8 @@ public class ClubResourceTest {
                 .isExisting(true)
                 .existingUserId(userPrincipal.getId())
                 .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubService.getClub(any())).thenReturn(existingClub);
 

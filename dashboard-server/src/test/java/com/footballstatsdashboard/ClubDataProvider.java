@@ -175,6 +175,9 @@ public final class ClubDataProvider {
                     .isExisting(true)
                     .existingUserId(userId)
                     .customClubName(DEFAULT_CLUB_NAME + i)
+                    .withId(UUID.randomUUID())
+                    .withIncome()
+                    .withExpenditure()
                     .build();
             return ImmutableClubSummary.builder()
                     .clubId(existingClub.getId())
