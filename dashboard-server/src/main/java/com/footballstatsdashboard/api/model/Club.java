@@ -8,6 +8,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.footballstatsdashboard.api.model.club.Expenditure;
 import com.footballstatsdashboard.api.model.club.Income;
+import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
@@ -37,6 +38,12 @@ public interface Club {
      */
     @Valid
     String getName();
+
+    /**
+     * funds allocated to the manager from the club's finances
+     */
+    @Valid
+    ManagerFunds getManagerFunds();
 
     /**
      * club's yearly transfer budget
