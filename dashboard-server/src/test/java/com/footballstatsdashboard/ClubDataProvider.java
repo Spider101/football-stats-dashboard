@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public final class ClubDataProvider {
+    public static final BigDecimal CURRENT_INCOME = new BigDecimal("1000");
+    public static final BigDecimal CURRENT_EXPENDITURE = new BigDecimal("2000");
     private static final String CREATED_BY = "fake email";
     private static final String DEFAULT_CLUB_NAME = "fake club name";
     private static final int NUMBER_OF_CLUBS = 3;
@@ -54,20 +56,18 @@ public final class ClubDataProvider {
         }
 
         public ClubBuilder withIncome() {
-            BigDecimal currentIncome = new BigDecimal("1000");
             Income clubIncome = ImmutableIncome.builder()
-                    .current(currentIncome)
-                    .history(isExistingClub ? ImmutableList.of(currentIncome) : ImmutableList.of())
+                    .current(CURRENT_INCOME)
+                    .history(isExistingClub ? ImmutableList.of(CURRENT_INCOME) : ImmutableList.of())
                     .build();
             baseClub.income(clubIncome);
             return this;
         }
 
         public ClubBuilder withExpenditure() {
-            BigDecimal currentExpenditure = new BigDecimal("2000");
             Expenditure clubExpenditure = ImmutableExpenditure.builder()
-                    .current(currentExpenditure)
-                    .history(isExistingClub ? ImmutableList.of(currentExpenditure) : ImmutableList.of())
+                    .current(CURRENT_EXPENDITURE)
+                    .history(isExistingClub ? ImmutableList.of(CURRENT_EXPENDITURE) : ImmutableList.of())
                     .build();
             baseClub.expenditure(clubExpenditure);
             return this;
@@ -111,6 +111,7 @@ public final class ClubDataProvider {
      */
     public static final class ModifiedClubBuilder {
         private ImmutableClub.Builder baseClub = ImmutableClub.builder();
+        private Club clubReference;
 
         private ModifiedClubBuilder() { }
 
@@ -119,12 +120,40 @@ public final class ClubDataProvider {
         }
 
         public ModifiedClubBuilder from(Club club) {
+            clubReference = club;
             baseClub = ImmutableClub.builder().from(club);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedName(String newName) {
+            baseClub.name(newName);
             return this;
         }
 
         public ModifiedClubBuilder withUpdatedWageBudget(BigDecimal newWageBudget) {
             baseClub.wageBudget(newWageBudget);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedIncome() {
+            BigDecimal updatedIncomeValue = CURRENT_INCOME.add(new BigDecimal("1000"));
+            Income updatedIncome = ImmutableIncome.builder()
+                    .from(Objects.requireNonNull(clubReference.getIncome()))
+                    .current(updatedIncomeValue)
+                    .addHistory(updatedIncomeValue)
+                    .build();
+            baseClub.income(updatedIncome);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedExpenditure() {
+            BigDecimal updatedExpenditureValue = CURRENT_EXPENDITURE.add(new BigDecimal("1000"));
+            Expenditure updatedExpenditure = ImmutableExpenditure.builder()
+                    .from(Objects.requireNonNull(clubReference.getExpenditure()))
+                    .current(updatedExpenditureValue)
+                    .addHistory(updatedExpenditureValue)
+                    .build();
+            baseClub.expenditure(updatedExpenditure);
             return this;
         }
 
