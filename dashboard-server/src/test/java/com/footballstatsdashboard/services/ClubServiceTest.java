@@ -74,6 +74,8 @@ public class ClubServiceTest {
         verify(clubDAO).getDocument(any(), any());
 
         assertEquals(clubId, club.getId());
+        assertNotNull(club.getIncome());
+        assertNotNull(club.getExpenditure());
         assertNotNull(club.getUserId());
         assertEquals(userId, club.getUserId());
     }
@@ -148,6 +150,8 @@ public class ClubServiceTest {
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
 
@@ -178,6 +182,60 @@ public class ClubServiceTest {
         assertEquals(USER_EMAIL, updatedClub.getCreatedBy());
         assertEquals(userId, updatedClub.getUserId());
         assertEquals(LocalDate.now(), updatedClub.getLastModifiedDate());
+    }
+
+    /**
+     * given a club entity with updated income and expenditure data in the request, tests that they are ignored while
+     * the rest of the club entity if updated and upserted in couchbase
+     */
+    @Test
+    public void updateClubIgnoresUpdatedIncomeAndExpenditure() {
+        // setup
+        String updatedClubName = "updated club name";
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClubInCouchbase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userId)
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
+
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedName(updatedClubName)
+                .withUpdatedIncome()
+                .withUpdatedExpenditure()
+                .build();
+
+        ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
+
+        // execute
+        Club updatedClub = clubService.updateClub(incomingClub, existingClubInCouchbase, existingClubId);
+
+        // assert
+        verify(clubDAO).updateDocument(any(), updatedClubCaptor.capture());
+        Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
+        assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
+
+        assertEquals(updatedClubName, updatedClub.getName());
+
+        assertNotNull(existingClubInCouchbase.getIncome());
+        assertNotNull(updatedClub.getIncome());
+        assertEquals(existingClubInCouchbase.getIncome().getCurrent(), updatedClub.getIncome().getCurrent());
+        assertEquals(existingClubInCouchbase.getIncome().getHistory(), updatedClub.getIncome().getHistory());
+
+        assertNotNull(existingClubInCouchbase.getExpenditure());
+        assertNotNull(updatedClub.getExpenditure());
+        assertEquals(existingClubInCouchbase.getExpenditure().getCurrent(), updatedClub.getExpenditure().getCurrent());
+        assertEquals(existingClubInCouchbase.getExpenditure().getHistory(), updatedClub.getExpenditure().getHistory());
     }
 
     /**

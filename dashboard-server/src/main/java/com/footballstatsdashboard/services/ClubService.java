@@ -61,8 +61,6 @@ public class ClubService {
         Club updatedClub = ImmutableClub.builder()
                 .from(existingClub)
                 .name(incomingClub.getName())
-                .income(incomingClub.getIncome())
-                .expenditure(incomingClub.getExpenditure())
                 .transferBudget(incomingClub.getTransferBudget())
                 .wageBudget(incomingClub.getWageBudget())
                 .lastModifiedDate(LocalDate.now())
