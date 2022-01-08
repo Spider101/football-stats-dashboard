@@ -1,14 +1,20 @@
 package com.footballstatsdashboard.services;
 
 import com.footballstatsdashboard.api.model.Club;
-import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.ImmutableClub;
+import com.footballstatsdashboard.api.model.club.ClubSummary;
+import com.footballstatsdashboard.api.model.club.Expenditure;
+import com.footballstatsdashboard.api.model.club.ImmutableExpenditure;
+import com.footballstatsdashboard.api.model.club.ImmutableIncome;
+import com.footballstatsdashboard.api.model.club.Income;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ClubService {
@@ -24,10 +30,22 @@ public class ClubService {
     }
 
     public Club createClub(Club incomingClub, UUID userId, String createdBy) {
+        Income newClubIncome = ImmutableIncome.builder()
+                .from(Objects.requireNonNull(incomingClub.getIncome()))
+                .history(Collections.singletonList(incomingClub.getIncome().getCurrent()))
+                .build();
+
+        Expenditure newClubExpenditure = ImmutableExpenditure.builder()
+                .from(Objects.requireNonNull(incomingClub.getExpenditure()))
+                .history(Collections.singletonList(incomingClub.getExpenditure().getCurrent()))
+                .build();
+
         LocalDate currentDate = LocalDate.now();
         Club newClub = ImmutableClub.builder()
                 .from(incomingClub)
                 .userId(userId)
+                .income(newClubIncome)
+                .expenditure(newClubExpenditure)
                 .createdDate(currentDate)
                 .lastModifiedDate(currentDate)
                 .createdBy(createdBy)

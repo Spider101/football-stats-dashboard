@@ -62,6 +62,8 @@ public class ClubServiceTest {
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(clubId)
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
 
@@ -103,6 +105,8 @@ public class ClubServiceTest {
         // setup
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
+                .withIncome()
+                .withExpenditure()
                 .build();
         ArgumentCaptor<Club> newClubCaptor = ArgumentCaptor.forClass(Club.class);
 
@@ -115,6 +119,15 @@ public class ClubServiceTest {
         assertEquals(createdClub, newClub);
 
         assertEquals(incomingClub.getId(), createdClub.getId());
+
+        // verify income and expenditure histories are initialized during creation
+        assertNotNull(createdClub.getIncome());
+        assertNotNull(createdClub.getIncome().getHistory());
+        assertEquals(1, createdClub.getIncome().getHistory().size());
+
+        assertNotNull(createdClub.getExpenditure());
+        assertNotNull(createdClub.getExpenditure().getHistory());
+        assertEquals(1, createdClub.getExpenditure().getHistory().size());
 
         // assertions for general house-keeping fields
         assertNotNull(createdClub.getCreatedDate());
