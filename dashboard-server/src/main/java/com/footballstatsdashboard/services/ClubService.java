@@ -13,6 +13,7 @@ import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -66,8 +67,23 @@ public class ClubService {
     }
 
     public Club updateClub(Club incomingClub, Club existingClub, UUID existingClubId) {
-        Club updatedClub = ImmutableClub.builder()
-                .from(existingClub)
+        ImmutableClub.Builder updatedClubBuilder = ImmutableClub.builder()
+                .from(existingClub);
+
+        // update manager funds entity only if the total budget no longer matches the existing manager fund value
+        // if they are equal, it implies that only the transfer and wage budget split has changed and therefore, there
+        // is no need to update the managerFunds entity
+        BigDecimal updatedBudget = incomingClub.getTransferBudget().add(incomingClub.getWageBudget());
+        if (existingClub.getManagerFunds().getCurrent().compareTo(updatedBudget) != 0) {
+            ManagerFunds updatedManagerFunds = ImmutableManagerFunds.builder()
+                    .from(existingClub.getManagerFunds())
+                    .current(incomingClub.getManagerFunds().getCurrent())
+                    .addHistory(incomingClub.getManagerFunds().getCurrent())
+                    .build();
+            updatedClubBuilder.managerFunds(updatedManagerFunds);
+        }
+
+        Club updatedClub = updatedClubBuilder
                 .name(incomingClub.getName())
                 .transferBudget(incomingClub.getTransferBudget())
                 .wageBudget(incomingClub.getWageBudget())
