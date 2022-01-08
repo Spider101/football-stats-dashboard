@@ -3,7 +3,12 @@ package com.footballstatsdashboard;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.ImmutableClub;
+import com.footballstatsdashboard.api.model.club.Expenditure;
 import com.footballstatsdashboard.api.model.club.ImmutableClubSummary;
+import com.footballstatsdashboard.api.model.club.ImmutableExpenditure;
+import com.footballstatsdashboard.api.model.club.ImmutableIncome;
+import com.footballstatsdashboard.api.model.club.Income;
+import com.google.common.collect.ImmutableList;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -48,6 +53,26 @@ public final class ClubDataProvider {
             return this;
         }
 
+        public ClubBuilder withIncome() {
+            BigDecimal currentIncome = new BigDecimal("1000");
+            Income clubIncome = ImmutableIncome.builder()
+                    .current(currentIncome)
+                    .history(isExistingClub ? ImmutableList.of(currentIncome) : ImmutableList.of())
+                    .build();
+            baseClub.income(clubIncome);
+            return this;
+        }
+
+        public ClubBuilder withExpenditure() {
+            BigDecimal currentExpenditure = new BigDecimal("2000");
+            Expenditure clubExpenditure = ImmutableExpenditure.builder()
+                    .current(currentExpenditure)
+                    .history(isExistingClub ? ImmutableList.of(currentExpenditure) : ImmutableList.of())
+                    .build();
+            baseClub.expenditure(clubExpenditure);
+            return this;
+        }
+
         public ClubBuilder customClubName(String clubName) {
             this.customClubName = clubName;
             return this;
@@ -74,8 +99,6 @@ public final class ClubDataProvider {
             // add the required fields which don't require dynamic values in test suites and build the club entity
             return this.baseClub
                     .name(this.customClubName != null ? this.customClubName : DEFAULT_CLUB_NAME)
-                    .expenditure(new BigDecimal("1000"))
-                    .income(new BigDecimal("2000"))
                     .transferBudget(new BigDecimal("500"))
                     .wageBudget(new BigDecimal("200"))
                     .build();
