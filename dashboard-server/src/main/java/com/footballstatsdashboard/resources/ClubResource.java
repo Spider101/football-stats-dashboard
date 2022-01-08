@@ -68,6 +68,7 @@ public class ClubResource {
             LOGGER.info("createClub() request.");
         }
 
+        // TODO: 1/8/2022 move all these validations into service once validation layer is ready
         if (StringUtils.isEmpty(incomingClub.getName())) {
             String errorMessage = "Empty club name is not allowed!";
             int statusCode = HttpStatus.BAD_REQUEST_400;
@@ -79,6 +80,17 @@ public class ClubResource {
             return Response.status(statusCode).entity(params).build();
         }
 
+        if (incomingClub.getTransferBudget().add(incomingClub.getWageBudget())
+                .compareTo(incomingClub.getManagerFunds().getCurrent()) != 0) {
+            String errorMessage = "Transfer and wage budgets must add up to manager funds!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
+        }
         if (incomingClub.getIncome() == null) {
             String errorMessage = "New club must have income data!";
             int statusCode = HttpStatus.BAD_REQUEST_400;
