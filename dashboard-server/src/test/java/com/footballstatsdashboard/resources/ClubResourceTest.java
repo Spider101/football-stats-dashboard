@@ -166,6 +166,53 @@ public class ClubResourceTest {
     }
 
     /**
+     * given that the request contains a club entity whose transfer and wage budgets is greater than the manager funds
+     * set, tests that no data is persisted and a 400 Bad Request response status is returned
+     */
+    @Test
+    public void createClubWithIncorrectBudget() {
+        // setup
+        Club incomingClubWithIncorrectBudget = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .customTransferBudget(new BigDecimal("5000"))
+                .customWageBudget(new BigDecimal("2000"))
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithIncorrectBudget, uriInfo);
+
+        // assert
+        verify(clubService, never()).createClub(any(), any(), anyString());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
+     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
+     * set, tests that no data is persisted and a 400 Bad Request response status is returned
+     */
+    @Test
+    public void createClubWithIncorrectManagerFunds() {
+        // setup
+        Club incomingClubWithIncorrectBudget = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .customManagerFunds(new BigDecimal("10000"))
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithIncorrectBudget, uriInfo);
+
+        // assert
+        verify(clubService, never()).createClub(any(), any(), anyString());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
      * given that the request contains a club entity without valid income data, tests that no data is persisted and a
      * 400 Bad Request response status is returned
      */

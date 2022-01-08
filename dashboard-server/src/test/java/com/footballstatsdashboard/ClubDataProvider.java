@@ -7,7 +7,9 @@ import com.footballstatsdashboard.api.model.club.Expenditure;
 import com.footballstatsdashboard.api.model.club.ImmutableClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableExpenditure;
 import com.footballstatsdashboard.api.model.club.ImmutableIncome;
+import com.footballstatsdashboard.api.model.club.ImmutableManagerFunds;
 import com.footballstatsdashboard.api.model.club.Income;
+import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.google.common.collect.ImmutableList;
 
 import java.math.BigDecimal;
@@ -22,11 +24,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public final class ClubDataProvider {
-    public static final BigDecimal CURRENT_INCOME = new BigDecimal("1000");
-    public static final BigDecimal CURRENT_EXPENDITURE = new BigDecimal("2000");
     private static final String CREATED_BY = "fake email";
-    private static final String DEFAULT_CLUB_NAME = "fake club name";
     private static final int NUMBER_OF_CLUBS = 3;
+    private static final BigDecimal CURRENT_INCOME = new BigDecimal("1000");
+    private static final BigDecimal CURRENT_EXPENDITURE = new BigDecimal("2000");
+    private static final String DEFAULT_CLUB_NAME = "fake club name";
+    private static final BigDecimal DEFAULT_TRANSFER_BUDGET = new BigDecimal("500");
+    private static final BigDecimal DEFAULT_WAGE_BUDGET = new BigDecimal("200");
 
     private ClubDataProvider() { }
 
@@ -37,6 +41,10 @@ public final class ClubDataProvider {
         private boolean isExistingClub = false;
         private String customClubName = null;
         private UUID existingUserId = null;
+        private BigDecimal customTransferBudget;
+        private BigDecimal customWageBudget;
+        private ManagerFunds customManagerFunds;
+
         private final ImmutableClub.Builder baseClub = ImmutableClub.builder();
 
         private ClubBuilder() { }
@@ -83,6 +91,23 @@ public final class ClubDataProvider {
             return this;
         }
 
+        public ClubBuilder customTransferBudget(BigDecimal transferBudget) {
+            this.customTransferBudget = transferBudget;
+            return this;
+        }
+
+        public ClubBuilder customWageBudget(BigDecimal wageBudget) {
+            this.customWageBudget = wageBudget;
+            return this;
+        }
+
+        public ClubBuilder customManagerFunds(BigDecimal managerFunds) {
+            this.customManagerFunds = ImmutableManagerFunds.builder()
+                    .current(managerFunds)
+                    .build();
+            return this;
+        }
+
         public Club build() {
             // add some house-keeping fields if it is an existing club
             if (isExistingClub) {
@@ -97,10 +122,15 @@ public final class ClubDataProvider {
             }
 
             // add the required fields which don't require dynamic values in test suites and build the club entity
+            ManagerFunds defaultManagerFunds = ImmutableManagerFunds.builder()
+                    .current(DEFAULT_TRANSFER_BUDGET.add(DEFAULT_WAGE_BUDGET))
+                    .build();
             return this.baseClub
                     .name(this.customClubName != null ? this.customClubName : DEFAULT_CLUB_NAME)
-                    .transferBudget(new BigDecimal("500"))
-                    .wageBudget(new BigDecimal("200"))
+                    .managerFunds(this.customManagerFunds != null ? this.customManagerFunds : defaultManagerFunds)
+                    .transferBudget(this.customTransferBudget != null ?
+                            this.customTransferBudget : DEFAULT_TRANSFER_BUDGET)
+                    .wageBudget(this.customWageBudget != null ? this.customWageBudget : DEFAULT_WAGE_BUDGET)
                     .build();
         }
     }

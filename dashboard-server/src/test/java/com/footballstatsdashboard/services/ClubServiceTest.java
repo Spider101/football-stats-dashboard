@@ -122,7 +122,10 @@ public class ClubServiceTest {
 
         assertEquals(incomingClub.getId(), createdClub.getId());
 
-        // verify income and expenditure histories are initialized during creation
+        // verify manager funds, income and expenditure histories are initialized during creation
+        assertNotNull(createdClub.getManagerFunds().getHistory());
+        assertEquals(1, createdClub.getManagerFunds().getHistory().size());
+
         assertNotNull(createdClub.getIncome());
         assertNotNull(createdClub.getIncome().getHistory());
         assertEquals(1, createdClub.getIncome().getHistory().size());
