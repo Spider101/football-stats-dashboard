@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.footballstatsdashboard.api.model.CountryCodeMetadata;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
-import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.ImmutableAbility;

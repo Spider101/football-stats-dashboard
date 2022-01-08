@@ -1,9 +1,16 @@
 package com.footballstatsdashboard;
 
-import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
-import com.footballstatsdashboard.api.model.club.ImmutableClub;
+import com.footballstatsdashboard.api.model.ImmutableClub;
+import com.footballstatsdashboard.api.model.club.Expenditure;
 import com.footballstatsdashboard.api.model.club.ImmutableClubSummary;
+import com.footballstatsdashboard.api.model.club.ImmutableExpenditure;
+import com.footballstatsdashboard.api.model.club.ImmutableIncome;
+import com.footballstatsdashboard.api.model.club.ImmutableManagerFunds;
+import com.footballstatsdashboard.api.model.club.Income;
+import com.footballstatsdashboard.api.model.club.ManagerFunds;
+import com.google.common.collect.ImmutableList;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -18,8 +25,12 @@ import java.util.stream.IntStream;
 
 public final class ClubDataProvider {
     private static final String CREATED_BY = "fake email";
-    private static final String DEFAULT_CLUB_NAME = "fake club name";
     private static final int NUMBER_OF_CLUBS = 3;
+    private static final BigDecimal CURRENT_INCOME = new BigDecimal("1000");
+    private static final BigDecimal CURRENT_EXPENDITURE = new BigDecimal("2000");
+    private static final String DEFAULT_CLUB_NAME = "fake club name";
+    private static final BigDecimal DEFAULT_TRANSFER_BUDGET = new BigDecimal("500");
+    private static final BigDecimal DEFAULT_WAGE_BUDGET = new BigDecimal("200");
 
     private ClubDataProvider() { }
 
@@ -30,6 +41,10 @@ public final class ClubDataProvider {
         private boolean isExistingClub = false;
         private String customClubName = null;
         private UUID existingUserId = null;
+        private BigDecimal customTransferBudget;
+        private BigDecimal customWageBudget;
+        private ManagerFunds customManagerFunds;
+
         private final ImmutableClub.Builder baseClub = ImmutableClub.builder();
 
         private ClubBuilder() { }
@@ -48,6 +63,24 @@ public final class ClubDataProvider {
             return this;
         }
 
+        public ClubBuilder withIncome() {
+            Income clubIncome = ImmutableIncome.builder()
+                    .current(CURRENT_INCOME)
+                    .history(isExistingClub ? ImmutableList.of(CURRENT_INCOME) : ImmutableList.of())
+                    .build();
+            baseClub.income(clubIncome);
+            return this;
+        }
+
+        public ClubBuilder withExpenditure() {
+            Expenditure clubExpenditure = ImmutableExpenditure.builder()
+                    .current(CURRENT_EXPENDITURE)
+                    .history(isExistingClub ? ImmutableList.of(CURRENT_EXPENDITURE) : ImmutableList.of())
+                    .build();
+            baseClub.expenditure(clubExpenditure);
+            return this;
+        }
+
         public ClubBuilder customClubName(String clubName) {
             this.customClubName = clubName;
             return this;
@@ -55,6 +88,23 @@ public final class ClubDataProvider {
 
         public ClubBuilder existingUserId(UUID userId) {
             this.existingUserId = userId;
+            return this;
+        }
+
+        public ClubBuilder customTransferBudget(BigDecimal transferBudget) {
+            this.customTransferBudget = transferBudget;
+            return this;
+        }
+
+        public ClubBuilder customWageBudget(BigDecimal wageBudget) {
+            this.customWageBudget = wageBudget;
+            return this;
+        }
+
+        public ClubBuilder customManagerFunds(BigDecimal managerFunds) {
+            this.customManagerFunds = ImmutableManagerFunds.builder()
+                    .current(managerFunds)
+                    .build();
             return this;
         }
 
@@ -72,12 +122,17 @@ public final class ClubDataProvider {
             }
 
             // add the required fields which don't require dynamic values in test suites and build the club entity
+            BigDecimal defaultTotalFunds = DEFAULT_TRANSFER_BUDGET.add(DEFAULT_WAGE_BUDGET);
+            ManagerFunds defaultManagerFunds = ImmutableManagerFunds.builder()
+                    .current(defaultTotalFunds)
+                    .history(isExistingClub ? ImmutableList.of(defaultTotalFunds) : ImmutableList.of())
+                    .build();
             return this.baseClub
                     .name(this.customClubName != null ? this.customClubName : DEFAULT_CLUB_NAME)
-                    .expenditure(new BigDecimal("1000"))
-                    .income(new BigDecimal("2000"))
-                    .transferBudget(new BigDecimal("500"))
-                    .wageBudget(new BigDecimal("200"))
+                    .managerFunds(this.customManagerFunds != null ? this.customManagerFunds : defaultManagerFunds)
+                    .transferBudget(this.customTransferBudget != null ?
+                            this.customTransferBudget : DEFAULT_TRANSFER_BUDGET)
+                    .wageBudget(this.customWageBudget != null ? this.customWageBudget : DEFAULT_WAGE_BUDGET)
                     .build();
         }
     }
@@ -88,6 +143,7 @@ public final class ClubDataProvider {
      */
     public static final class ModifiedClubBuilder {
         private ImmutableClub.Builder baseClub = ImmutableClub.builder();
+        private Club clubReference;
 
         private ModifiedClubBuilder() { }
 
@@ -96,12 +152,55 @@ public final class ClubDataProvider {
         }
 
         public ModifiedClubBuilder from(Club club) {
+            clubReference = club;
             baseClub = ImmutableClub.builder().from(club);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedName(String newName) {
+            baseClub.name(newName);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedTransferBudget(BigDecimal newTransferBudget) {
+            baseClub.transferBudget(newTransferBudget);
             return this;
         }
 
         public ModifiedClubBuilder withUpdatedWageBudget(BigDecimal newWageBudget) {
             baseClub.wageBudget(newWageBudget);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedManagerFunds(BigDecimal newManagerFunds) {
+            ManagerFunds updatedManagerFunds = ImmutableManagerFunds.builder()
+                    .from(clubReference.getManagerFunds())
+                    .current(newManagerFunds)
+                    .addHistory(newManagerFunds)
+                    .build();
+            baseClub.managerFunds(updatedManagerFunds);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedIncome() {
+            BigDecimal updatedIncomeValue = CURRENT_INCOME.add(new BigDecimal("1000"));
+            Income updatedIncome = ImmutableIncome.builder()
+                    .from(Objects.requireNonNull(clubReference.getIncome()))
+                    .current(updatedIncomeValue)
+                    .addHistory(updatedIncomeValue)
+                    .build();
+            baseClub.income(updatedIncome);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedExpenditure() {
+            BigDecimal updatedExpenditureValue = CURRENT_EXPENDITURE.add(new BigDecimal("1000"));
+            Expenditure updatedExpenditure = ImmutableExpenditure.builder()
+                    .from(Objects.requireNonNull(clubReference.getExpenditure()))
+                    .current(updatedExpenditureValue)
+                    .addHistory(updatedExpenditureValue)
+                    .build();
+            baseClub.expenditure(updatedExpenditure);
             return this;
         }
 
@@ -123,6 +222,9 @@ public final class ClubDataProvider {
                     .isExisting(true)
                     .existingUserId(userId)
                     .customClubName(DEFAULT_CLUB_NAME + i)
+                    .withId(UUID.randomUUID())
+                    .withIncome()
+                    .withExpenditure()
                     .build();
             return ImmutableClubSummary.builder()
                     .clubId(existingClub.getId())

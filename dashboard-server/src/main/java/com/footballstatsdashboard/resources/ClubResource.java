@@ -1,7 +1,7 @@
 package com.footballstatsdashboard.resources;
 
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.services.ClubService;
@@ -39,7 +39,6 @@ import static com.footballstatsdashboard.core.utils.Constants.CLUB_V1_BASE_PATH;
 public class ClubResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
-//    private final ClubDAO<ResourceKey> clubDAO;
     private final ClubService clubService;
 
     public ClubResource(ClubService clubService) {
@@ -69,9 +68,42 @@ public class ClubResource {
             LOGGER.info("createClub() request.");
         }
 
-        // TODO: 17/04/21 add more internal data when business logic becomes complicated
+        // TODO: 1/8/2022 move all these validations into service once validation layer is ready
         if (StringUtils.isEmpty(incomingClub.getName())) {
             String errorMessage = "Empty club name is not allowed!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
+        }
+
+        if (incomingClub.getTransferBudget().add(incomingClub.getWageBudget())
+                .compareTo(incomingClub.getManagerFunds().getCurrent()) != 0) {
+            String errorMessage = "Transfer and wage budgets must add up to manager funds!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
+        }
+        if (incomingClub.getIncome() == null) {
+            String errorMessage = "New club must have income data!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
+        }
+
+        if (incomingClub.getExpenditure() == null) {
+            String errorMessage = "New club must have expenditure data!";
             int statusCode = HttpStatus.BAD_REQUEST_400;
             LOGGER.error(errorMessage);
             Map<String, Object> params = ImmutableMap.of(
@@ -95,6 +127,18 @@ public class ClubResource {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
+        }
+
+        if (incomingClub.getTransferBudget().add(incomingClub.getWageBudget())
+                .compareTo(incomingClub.getManagerFunds().getCurrent()) != 0) {
+            String errorMessage = "Transfer and wage budgets must add up to manager funds!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
         }
 
         Club existingClub = this.clubService.getClub(existingClubId);

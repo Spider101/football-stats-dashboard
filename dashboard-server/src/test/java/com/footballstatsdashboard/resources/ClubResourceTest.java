@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.club.Club;
+import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
@@ -88,6 +88,8 @@ public class ClubResourceTest {
                 .isExisting(true)
                 .existingUserId(userPrincipal.getId())
                 .withId(clubId)
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubService.getClub(eq(clubId))).thenReturn(existingClub);
 
@@ -115,11 +117,15 @@ public class ClubResourceTest {
         // setup
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
+                .withIncome()
+                .withExpenditure()
                 .build();
         Club createdClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userPrincipal.getId())
                 .withId(incomingClub.getId())
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubService.createClub(any(), any(), anyString())).thenReturn(createdClub);
 
@@ -146,10 +152,101 @@ public class ClubResourceTest {
         Club incomingClubWithNoName = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .customClubName("")
+                .withIncome()
+                .withExpenditure()
                 .build();
 
         // execute
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoName, uriInfo);
+
+        // assert
+        verify(clubService, never()).createClub(any(), any(), anyString());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
+     * given that the request contains a club entity whose transfer and wage budgets is greater than the manager funds
+     * set, tests that no data is persisted and a 400 Bad Request response status is returned
+     */
+    @Test
+    public void createClubWithIncorrectBudget() {
+        // setup
+        Club incomingClubWithIncorrectBudget = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .customTransferBudget(new BigDecimal("5000"))
+                .customWageBudget(new BigDecimal("2000"))
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithIncorrectBudget, uriInfo);
+
+        // assert
+        verify(clubService, never()).createClub(any(), any(), anyString());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
+     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
+     * set, tests that no data is persisted and a 400 Bad Request response status is returned
+     */
+    @Test
+    public void createClubWithIncorrectManagerFunds() {
+        // setup
+        Club incomingClubWithIncorrectBudget = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .customManagerFunds(new BigDecimal("10000"))
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithIncorrectBudget, uriInfo);
+
+        // assert
+        verify(clubService, never()).createClub(any(), any(), anyString());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
+     * given that the request contains a club entity without valid income data, tests that no data is persisted and a
+     * 400 Bad Request response status is returned
+     */
+    @Test
+    public void createClubWithoutIncomeData() {
+        // setup
+        Club incomingClubWithNoIncomeData = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withExpenditure()
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoIncomeData, uriInfo);
+
+        // assert
+        verify(clubService, never()).createClub(any(), any(), anyString());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
+     * given that the request contains a club entity without valid income data, tests that no data is persisted and a
+     * 400 Bad Request response status is returned
+     */
+    @Test
+    public void createClubWithoutExpenditureData() {
+        // setup
+        Club incomingClubWithNoExpenditureData = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withIncome()
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoExpenditureData, uriInfo);
 
         // assert
         verify(clubService, never()).createClub(any(), any(), anyString());
@@ -168,22 +265,30 @@ public class ClubResourceTest {
                 .isExisting(true)
                 .existingUserId(userPrincipal.getId())
                 .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubService.getClub(any())).thenReturn(existingClub);
 
         BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .withId(existingClubId)
                 .build();
         Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
                 .from(incomingClubBase)
+                .withUpdatedTransferBudget(updatedTransferBudget)
                 .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedManagerFunds(totalFunds)
                 .build();
 
         Club updatedClub = ClubDataProvider.ModifiedClubBuilder.builder()
                 .from(existingClub)
+                .withUpdatedTransferBudget(updatedTransferBudget)
                 .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedManagerFunds(totalFunds)
                 .build();
         when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClub);
 
@@ -199,7 +304,6 @@ public class ClubResourceTest {
 
         Club clubInResponse = OBJECT_MAPPER.convertValue(clubResponse.getEntity(), Club.class);
         assertEquals(existingClub.getId(), clubInResponse.getId());
-        assertEquals(updatedWageBudget, clubInResponse.getWageBudget());
 
         assertEquals(userPrincipal.getId(), clubInResponse.getUserId());
         assertEquals(userPrincipal.getEmail(), clubInResponse.getCreatedBy());
@@ -218,6 +322,8 @@ public class ClubResourceTest {
                 .isExisting(true)
                 .existingUserId(userPrincipal.getId())
                 .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubService.getClub(any())).thenReturn(existingClub);
 
@@ -236,6 +342,68 @@ public class ClubResourceTest {
 
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, clubResponse.getStatus());
         assertTrue(clubResponse.getEntity().toString().contains(incorrectIncomingClubId.toString()));
+    }
+
+    /**
+     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
+     * set, tests that no data is updated and a 400 Bad Request response status is returned
+     */
+    @Test
+    public void updateClubWithIncorrectManagerFunds() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        BigDecimal updatedWageBudget = incomingClubBase.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = incomingClubBase.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal totalFunds = new BigDecimal("100");
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedWageBudget(updatedTransferBudget)
+                .withUpdatedManagerFunds(totalFunds)
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
+
+        // assert
+        verify(clubService, never()).getClub(any());
+        verify(clubService, never()).updateClub(any(), any(), any());
+
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
+     * given that the request contains a club entity  whose transfer and wage budgets is greater than the manager funds
+     * set, tests that no data is updated and a 400 Bad Request response status is returned
+     */
+    @Test
+    public void updateClubWithIncorrectBudget() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedWageBudget(new BigDecimal("5000"))
+                .withUpdatedWageBudget(new BigDecimal("1000"))
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
+
+        // assert
+        verify(clubService, never()).getClub(any());
+        verify(clubService, never()).updateClub(any(), any(), any());
+
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
     }
 
     /**

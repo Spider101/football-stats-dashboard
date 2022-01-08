@@ -5,7 +5,8 @@ import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.client.couchbase.config.ClusterConfiguration;
 import com.footballstatsdashboard.core.service.auth.CustomAuthenticator;
 import com.footballstatsdashboard.core.service.auth.CustomAuthorizer;
-import com.footballstatsdashboard.core.utils.PlayerInternalModule;
+import com.footballstatsdashboard.core.utils.DashboardInternalModule;
+import com.footballstatsdashboard.core.utils.DashboardReadonlyModule;
 import com.footballstatsdashboard.db.AuthTokenDAO;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.CouchbaseDAO;
@@ -59,8 +60,9 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
 
     @Override
     public void run(final FootballDashboardConfiguration configuration, final Environment environment) {
-
-        environment.getObjectMapper().registerModule(new PlayerInternalModule());
+        // initialize serialization modules
+        environment.getObjectMapper().registerModule(new DashboardInternalModule());
+        environment.getObjectMapper().registerModule(new DashboardReadonlyModule());
 
         // setup couchbase cluster and bucket
         CouchbaseClientManager couchbaseClientManager = new CouchbaseClientManager(getName(), environment,

@@ -1,4 +1,4 @@
-package com.footballstatsdashboard.api.model.club;
+package com.footballstatsdashboard.api.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.footballstatsdashboard.api.model.club.Expenditure;
+import com.footballstatsdashboard.api.model.club.Income;
+import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
@@ -37,6 +40,12 @@ public interface Club {
     String getName();
 
     /**
+     * funds allocated to the manager from the club's finances
+     */
+    @Valid
+    ManagerFunds getManagerFunds();
+
+    /**
      * club's yearly transfer budget
      */
     @Valid
@@ -52,13 +61,15 @@ public interface Club {
      * club's income in a year
      */
     @Valid
-    BigDecimal getIncome();
+    @Nullable
+    Income getIncome();
 
     /**
      * club's expenditure in a year
      */
     @Valid
-    BigDecimal getExpenditure();
+    @Nullable
+    Expenditure getExpenditure();
 
     /**
      * ID of user the club belongs to
