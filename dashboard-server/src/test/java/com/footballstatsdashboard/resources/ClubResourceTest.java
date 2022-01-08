@@ -88,6 +88,8 @@ public class ClubResourceTest {
                 .isExisting(true)
                 .existingUserId(userPrincipal.getId())
                 .withId(clubId)
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubService.getClub(eq(clubId))).thenReturn(existingClub);
 
@@ -115,11 +117,15 @@ public class ClubResourceTest {
         // setup
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
+                .withIncome()
+                .withExpenditure()
                 .build();
         Club createdClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userPrincipal.getId())
                 .withId(incomingClub.getId())
+                .withIncome()
+                .withExpenditure()
                 .build();
         when(clubService.createClub(any(), any(), anyString())).thenReturn(createdClub);
 
@@ -146,10 +152,54 @@ public class ClubResourceTest {
         Club incomingClubWithNoName = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .customClubName("")
+                .withIncome()
+                .withExpenditure()
                 .build();
 
         // execute
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoName, uriInfo);
+
+        // assert
+        verify(clubService, never()).createClub(any(), any(), anyString());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
+     * given that the request contains a club entity without valid income data, tests that no data is persisted and a
+     * 400 Bad Request response status is returned
+     */
+    @Test
+    public void createClubWithoutIncomeData() {
+        // setup
+        Club incomingClubWithNoIncomeData = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withExpenditure()
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoIncomeData, uriInfo);
+
+        // assert
+        verify(clubService, never()).createClub(any(), any(), anyString());
+        assertNotNull(clubResponse);
+        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
+    }
+
+    /**
+     * given that the request contains a club entity without valid income data, tests that no data is persisted and a
+     * 400 Bad Request response status is returned
+     */
+    @Test
+    public void createClubWithoutExpenditureData() {
+        // setup
+        Club incomingClubWithNoExpenditureData = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withIncome()
+                .build();
+
+        // execute
+        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoExpenditureData, uriInfo);
 
         // assert
         verify(clubService, never()).createClub(any(), any(), anyString());

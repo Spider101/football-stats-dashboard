@@ -39,7 +39,6 @@ import static com.footballstatsdashboard.core.utils.Constants.CLUB_V1_BASE_PATH;
 public class ClubResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
-//    private final ClubDAO<ResourceKey> clubDAO;
     private final ClubService clubService;
 
     public ClubResource(ClubService clubService) {
@@ -69,9 +68,30 @@ public class ClubResource {
             LOGGER.info("createClub() request.");
         }
 
-        // TODO: 17/04/21 add more internal data when business logic becomes complicated
         if (StringUtils.isEmpty(incomingClub.getName())) {
             String errorMessage = "Empty club name is not allowed!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
+        }
+
+        if (incomingClub.getIncome() == null) {
+            String errorMessage = "New club must have income data!";
+            int statusCode = HttpStatus.BAD_REQUEST_400;
+            LOGGER.error(errorMessage);
+            Map<String, Object> params = ImmutableMap.of(
+                    "status", statusCode,
+                    "message", errorMessage
+            );
+            return Response.status(statusCode).entity(params).build();
+        }
+
+        if (incomingClub.getExpenditure() == null) {
+            String errorMessage = "New club must have expenditure data!";
             int statusCode = HttpStatus.BAD_REQUEST_400;
             LOGGER.error(errorMessage);
             Map<String, Object> params = ImmutableMap.of(
