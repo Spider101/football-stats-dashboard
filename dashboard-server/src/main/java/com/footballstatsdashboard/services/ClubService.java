@@ -6,7 +6,9 @@ import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.Expenditure;
 import com.footballstatsdashboard.api.model.club.ImmutableExpenditure;
 import com.footballstatsdashboard.api.model.club.ImmutableIncome;
+import com.footballstatsdashboard.api.model.club.ImmutableManagerFunds;
 import com.footballstatsdashboard.api.model.club.Income;
+import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
@@ -30,6 +32,11 @@ public class ClubService {
     }
 
     public Club createClub(Club incomingClub, UUID userId, String createdBy) {
+        ManagerFunds newManagerFunds = ImmutableManagerFunds.builder()
+                .from(incomingClub.getManagerFunds())
+                .history(Collections.singletonList(incomingClub.getManagerFunds().getCurrent()))
+                .build();
+
         Income newClubIncome = ImmutableIncome.builder()
                 .from(Objects.requireNonNull(incomingClub.getIncome()))
                 .history(Collections.singletonList(incomingClub.getIncome().getCurrent()))
@@ -44,6 +51,7 @@ public class ClubService {
         Club newClub = ImmutableClub.builder()
                 .from(incomingClub)
                 .userId(userId)
+                .managerFunds(newManagerFunds)
                 .income(newClubIncome)
                 .expenditure(newClubExpenditure)
                 .createdDate(currentDate)
