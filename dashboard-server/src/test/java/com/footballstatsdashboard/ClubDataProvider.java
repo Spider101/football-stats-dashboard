@@ -122,8 +122,10 @@ public final class ClubDataProvider {
             }
 
             // add the required fields which don't require dynamic values in test suites and build the club entity
+            BigDecimal defaultTotalFunds = DEFAULT_TRANSFER_BUDGET.add(DEFAULT_WAGE_BUDGET);
             ManagerFunds defaultManagerFunds = ImmutableManagerFunds.builder()
-                    .current(DEFAULT_TRANSFER_BUDGET.add(DEFAULT_WAGE_BUDGET))
+                    .current(defaultTotalFunds)
+                    .history(isExistingClub ? ImmutableList.of(defaultTotalFunds) : ImmutableList.of())
                     .build();
             return this.baseClub
                     .name(this.customClubName != null ? this.customClubName : DEFAULT_CLUB_NAME)
@@ -160,8 +162,23 @@ public final class ClubDataProvider {
             return this;
         }
 
+        public ModifiedClubBuilder withUpdatedTransferBudget(BigDecimal newTransferBudget) {
+            baseClub.transferBudget(newTransferBudget);
+            return this;
+        }
+
         public ModifiedClubBuilder withUpdatedWageBudget(BigDecimal newWageBudget) {
             baseClub.wageBudget(newWageBudget);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedManagerFunds(BigDecimal newManagerFunds) {
+            ManagerFunds updatedManagerFunds = ImmutableManagerFunds.builder()
+                    .from(clubReference.getManagerFunds())
+                    .current(newManagerFunds)
+                    .addHistory(newManagerFunds)
+                    .build();
+            baseClub.managerFunds(updatedManagerFunds);
             return this;
         }
 

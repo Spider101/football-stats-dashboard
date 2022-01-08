@@ -159,13 +159,17 @@ public class ClubServiceTest {
         when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
 
         BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClubInCouchbase.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .withId(existingClubId)
                 .build();
         Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
                 .from(incomingClubBase)
+                .withUpdatedTransferBudget(updatedTransferBudget)
                 .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedManagerFunds(totalFunds)
                 .build();
 
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
@@ -179,12 +183,63 @@ public class ClubServiceTest {
         assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
 
         assertEquals(existingClubInCouchbase.getId(), updatedClub.getId());
+        assertEquals(updatedTransferBudget, updatedClub.getTransferBudget());
         assertEquals(updatedWageBudget, updatedClub.getWageBudget());
+        assertEquals(totalFunds, updatedClub.getManagerFunds().getCurrent());
+        assertEquals(existingClubInCouchbase.getManagerFunds().getHistory().size() + 1,
+                updatedClub.getManagerFunds().getHistory().size());
 
         // assertions for general house-keeping fields
         assertEquals(USER_EMAIL, updatedClub.getCreatedBy());
         assertEquals(userId, updatedClub.getUserId());
         assertEquals(LocalDate.now(), updatedClub.getLastModifiedDate());
+    }
+
+    /**
+     * given a valid club entity where only the transfer and wage budget split has changes, tests that the manager funds
+     * entity is left unchanged when the club data is upserted in couchbase
+     */
+    @Test
+    public void updateClubWhenTransferAndWageBudgetSplitChanges() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClubCouchbase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userId)
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubCouchbase);
+
+        // decrease transfer budget by 100 and increase wage budget by the same amount
+        BigDecimal updatedTransferBudget = existingClubCouchbase.getTransferBudget()
+                .subtract(new BigDecimal("100"));
+        BigDecimal updatedWageBudget = existingClubCouchbase.getWageBudget().add(new BigDecimal("100"));
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedTransferBudget(updatedTransferBudget)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .build();
+
+        ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
+
+        // execute
+        Club updatedClub = clubService.updateClub(incomingClub, existingClubCouchbase, existingClubId);
+
+        // assert
+        verify(clubDAO).updateDocument(any(), updatedClubCaptor.capture());
+        Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
+        assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
+
+        assertEquals(updatedTransferBudget, updatedClub.getTransferBudget());
+        assertEquals(updatedWageBudget, updatedClub.getWageBudget());
+        assertEquals(existingClubCouchbase.getManagerFunds(), updatedClub.getManagerFunds());
     }
 
     /**
