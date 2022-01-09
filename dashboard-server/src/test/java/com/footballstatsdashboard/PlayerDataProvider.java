@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+// TODO: 1/9/2022 set `history` properties to null when isExisting is false
 public class PlayerDataProvider {
     private static final int PLAYER_AGE = 27;
     private static final int CURRENT_PLAYER_ABILITY = 19;

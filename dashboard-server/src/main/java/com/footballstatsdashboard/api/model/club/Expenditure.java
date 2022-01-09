@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.footballstatsdashboard.core.utils.Readonly;
 import org.immutables.value.Value;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
@@ -27,6 +28,7 @@ public interface Expenditure {
      */
     @Valid
     @Readonly
+    @Nullable
     @Size(min = 1)
     List<BigDecimal> getHistory();
 }
