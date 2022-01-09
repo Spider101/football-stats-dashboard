@@ -66,7 +66,7 @@ public final class ClubDataProvider {
         public ClubBuilder withIncome() {
             Income clubIncome = ImmutableIncome.builder()
                     .current(CURRENT_INCOME)
-                    .history(isExistingClub ? ImmutableList.of(CURRENT_INCOME) : ImmutableList.of())
+                    .history(isExistingClub ? ImmutableList.of(CURRENT_INCOME) : null)
                     .build();
             baseClub.income(clubIncome);
             return this;
@@ -75,7 +75,7 @@ public final class ClubDataProvider {
         public ClubBuilder withExpenditure() {
             Expenditure clubExpenditure = ImmutableExpenditure.builder()
                     .current(CURRENT_EXPENDITURE)
-                    .history(isExistingClub ? ImmutableList.of(CURRENT_EXPENDITURE) : ImmutableList.of())
+                    .history(isExistingClub ? ImmutableList.of(CURRENT_EXPENDITURE) : null)
                     .build();
             baseClub.expenditure(clubExpenditure);
             return this;
@@ -125,7 +125,7 @@ public final class ClubDataProvider {
             BigDecimal defaultTotalFunds = DEFAULT_TRANSFER_BUDGET.add(DEFAULT_WAGE_BUDGET);
             ManagerFunds defaultManagerFunds = ImmutableManagerFunds.builder()
                     .current(defaultTotalFunds)
-                    .history(isExistingClub ? ImmutableList.of(defaultTotalFunds) : ImmutableList.of())
+                    .history(isExistingClub ? ImmutableList.of(defaultTotalFunds) : null)
                     .build();
             return this.baseClub
                     .name(this.customClubName != null ? this.customClubName : DEFAULT_CLUB_NAME)
