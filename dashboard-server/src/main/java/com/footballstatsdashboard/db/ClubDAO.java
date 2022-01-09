@@ -27,7 +27,8 @@ public class ClubDAO<K> extends CouchbaseDAO<K> {
     }
 
     public List<ClubSummary> getClubSummariesByUserId(UUID userId) {
-        String query = String.format("Select club.* from `%s` club where club.type = 'Club' and club.userId = $userId",
+        String query = String.format("Select club.id as clubId, club.name, club.createdDate from `%s` club" +
+                        " where club.type = 'Club' and club.userId = $userId",
                 this.getBucketNameResolver().get());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("userId", userId.toString())
