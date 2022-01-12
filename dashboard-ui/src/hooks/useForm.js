@@ -36,16 +36,16 @@ const useForm = (defaultFormValues, callback) => {
         } else {
             setSubmitStatus(formSubmission.NOT_READY);
         }
-        setFormValidations({
+        setFormValidations(formValidations => ({
             ...formValidations,
             [name]: validation || null
-        });
+        }));
 
         // update form field data
-        setFormData({
+        setFormData(formData => ({
             ...formData,
             [name]: value
-        });
+        }));
     };
 
     const handleSubmitFn = e => {
