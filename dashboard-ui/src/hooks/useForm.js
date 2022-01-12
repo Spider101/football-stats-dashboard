@@ -27,15 +27,7 @@ const useForm = (defaultFormValues, callback) => {
 
         // validate the input
         const validation = validateInput(name, value, formData);
-        if (!validation) {
-            // the current validation returned as falsy, so set submit status to READY if the remaining fields do not
-            // have any validations either
-            if (Object.values(formValidations).filter(validation => validation === null).length === (numFields - 1)) {
-                setSubmitStatus(formSubmission.READY);
-            }
-        } else {
-            setSubmitStatus(formSubmission.NOT_READY);
-        }
+
         setFormValidations(formValidations => ({
             ...formValidations,
             [name]: validation || null
@@ -81,7 +73,17 @@ const useForm = (defaultFormValues, callback) => {
         if (submitStatus === formSubmission.INPROGRESS) {
             postFormData(callback);
         }
-    }, [formValidations, submitStatus, callback, postFormData]);
+    }, [submitStatus, callback, postFormData]);
+
+    useEffect(() => {
+        const numFieldsWithNoValidations = Object.values(formValidations)
+            .filter(validation => validation === null).length;
+        if (numFieldsWithNoValidations === numFields) {
+            setSubmitStatus(formSubmission.READY);
+        } else {
+            setSubmitStatus(formSubmission.NOT_READY);
+        }
+    }, [formValidations]);
 
     return {
         handleChangeFn,
