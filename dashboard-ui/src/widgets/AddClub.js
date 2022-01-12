@@ -73,7 +73,7 @@ export default function AddClub({ addClubAction }) {
             <CustomSlider
                 sliderTitle='Budget Split'
                 splitMetadata={{
-                    valueToSplit: addNewClubData.managerFunds,
+                    valueToSplit: Number(addNewClubData.managerFunds),
                     entitiesToSplit: [
                         { name: 'transferBudget', handleChange: handleChangeFn },
                         { name: 'wageBudget', handleChange: handleChangeFn },

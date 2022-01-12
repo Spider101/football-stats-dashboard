@@ -15,10 +15,15 @@ export default function () {
 
     return {
         addNewClubAction: async newClubData => {
-            const { income, expenditure, ...rest } = newClubData;
+            const { income, expenditure, managerFunds, ...rest } = newClubData;
             try {
                 await mutateAsync({
-                    newClubData: { ...rest, income: { current: income }, expenditure: { current: expenditure } },
+                    newClubData: {
+                        ...rest,
+                        income: { current: Number(income) },
+                        expenditure: { current: Number(expenditure) },
+                        managerFunds: Number(managerFunds)
+                    },
                     authToken: authData.id
                 });
             } catch (err) {
