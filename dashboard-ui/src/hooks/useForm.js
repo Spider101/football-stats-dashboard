@@ -55,7 +55,6 @@ const useForm = (defaultFormValues, callback) => {
         async authAction => {
             const formErrorMessage = await authAction(formData);
             if (formErrorMessage != null) {
-                setSubmitStatus(formSubmission.NOT_READY);
                 setFormValidations(formValidations => ({
                     ...formValidations,
                     form: formErrorMessage

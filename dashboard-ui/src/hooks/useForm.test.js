@@ -221,7 +221,7 @@ describe('useForm hook -', () => {
             expect(formValidations.form).toEqual('Something went wrong!');
 
             // submit status is changed from INPROGRESS to null again because there is an error on the form now
-            expect(submitStatusAfterClientCall).toEqual(formSubmission.NOT_READY);
+            expect(submitStatusAfterClientCall).not.toBe(formSubmission.COMPLETE);
         });
     });
 });
