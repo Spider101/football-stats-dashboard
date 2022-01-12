@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import Slider from '@material-ui/core/Slider';
@@ -26,11 +26,12 @@ const useStyles = makeStyles(theme => ({
 }));
 const INITIAL_PERCENTAGE = 100;
 export default function CustomSlider({ sliderTitle, splitMetadata: { valueToSplit, entitiesToSplit } }) {
+    const classes = useStyles();
+    const isFirstUpdate = useRef(true);
     const [sliderData, setSliderData] = useState({
         currentPercentage: INITIAL_PERCENTAGE,
         components: getSplitComponents(valueToSplit, INITIAL_PERCENTAGE)
     });
-    const classes = useStyles();
 
     const handleChangeFn = (_, newValue) => {
         const updatedComponents = getSplitComponents(valueToSplit, newValue);
@@ -45,9 +46,18 @@ export default function CustomSlider({ sliderTitle, splitMetadata: { valueToSpli
 
     // update the slider data when the valueToSplit prop changes
     useEffect(() => {
+        // skip updating state and invoking change handlers if this is being called on mount, i.e. not on user input
+        if (isFirstUpdate.current) {
+            isFirstUpdate.current = false;
+            return;
+        }
+        const splitComponents = getSplitComponents(valueToSplit, sliderData.currentPercentage);
         setSliderData({
             ...sliderData,
-            components: getSplitComponents(valueToSplit, sliderData.currentPercentage)
+            components: splitComponents
+        });
+        splitComponents.forEach((component, idx) => {
+            entitiesToSplit[idx].handleChange({ target: { name: entitiesToSplit[idx].name, value: component }});
         });
     }, [valueToSplit]);
 
