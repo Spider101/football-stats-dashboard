@@ -15,8 +15,12 @@ export default function () {
 
     return {
         addNewClubAction: async newClubData => {
+            const { income, expenditure, ...rest } = newClubData;
             try {
-                await mutateAsync({ newClubData, authToken: authData.id });
+                await mutateAsync({
+                    newClubData: { ...rest, income: { current: income }, expenditure: { current: expenditure } },
+                    authToken: authData.id
+                });
             } catch (err) {
                 if (err instanceof Error) {
                     return err.message;
