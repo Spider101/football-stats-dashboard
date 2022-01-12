@@ -75,9 +75,14 @@ export const formSubmission = {
     INPROGRESS: 'INPROGRESS'
 };
 
-export const capitalizeLabel = label => {
-    return label
-        .split('_')
+export const capitalizeLabel = (label, format = 'snakecase') => {
+    let tokens;
+    if (format === 'snakecase') {
+        tokens = label.split('_');
+    } else {
+        tokens = label.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().split(' ');
+    }
+    return tokens
         .map(word => word[0].toUpperCase() + word.slice(1))
         .join(' ');
 };

@@ -203,7 +203,7 @@ const PlayerAttributeForm = ({ newPlayerAttributeData, newPlayerAttributeValidat
                 autoFocus={index === 0}
                 key={attrDataName}
                 name={attrDataName}
-                label={capitalizeLabel(attrDataName)}
+                label={capitalizeLabel(attrDataName, 'camelcase')}
                 required
                 id={attrDataName}
                 type='number'
