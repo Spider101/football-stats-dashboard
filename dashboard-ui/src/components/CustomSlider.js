@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 const getSplitComponents = (total, percentage) => (
     [
         Math.trunc(total * percentage / 100),
-        Math.trunc(total * (1 - percentage / 100))
+        Math.ceil(total * (1 - percentage / 100))
     ]
 );
 
