@@ -20,8 +20,9 @@ describe('useForm hook -', () => {
             expect(firstNameEmptyValidation).toBe('First Name cannot be empty!');
 
             // the validations are reset when correct values are passed in.
+            const { handleChangeFn: handleChangeOnFixingFirstName } = result.current;
             act(() => {
-                handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
+                handleChangeOnFixingFirstName({ target: { name: 'firstName', value: 'fake first name' } });
             });
             const {
                 formValidations: { firstName: firstNameValidation },
@@ -46,8 +47,9 @@ describe('useForm hook -', () => {
             expect(emailFormatValidation).toBe('Email format is incorrect!');
 
             // the validations are reset when correct values are passed in.
+            const { handleChangeFn: handleChangeOnFixingEmail } = result.current;
             act(() => {
-                handleChangeFn({ target: { name: 'email', value: 'fake@email.com' } });
+                handleChangeOnFixingEmail({ target: { name: 'email', value: 'fake@email.com' } });
             });
             const {
                 formValidations: { email: emailValidation }
@@ -71,8 +73,9 @@ describe('useForm hook -', () => {
             expect(passwordLengthValidation).toBe('Password must be between 6 and 12 characters');
 
             // the validations are reset when correct values are passed in.
+            const { handleChangeFn: handleChangeOnFixingPassword } = result.current;
             act(() => {
-                handleChangeFn({ target: { name: 'newPassword', value: '123456' } });
+                handleChangeOnFixingPassword({ target: { name: 'newPassword', value: '123456' } });
             });
             const {
                 formValidations: { newPassword: passwordValidation }
@@ -98,8 +101,9 @@ describe('useForm hook -', () => {
             expect(passwordNotMatchingValidation).toBe('Passwords must match!');
 
             // the validations are reset when correct values are passed in.
+            const { handleChangeFn: handleChangeOnFixingPassword } = result.current;
             act(() => {
-                handleChangeFn({ target: { name: 'confirmedPassword', value: '123456' } });
+                handleChangeOnFixingPassword({ target: { name: 'confirmedPassword', value: '123456' } });
             });
             const {
                 formValidations: { confirmedPassword: passwordMatchingValidation }
