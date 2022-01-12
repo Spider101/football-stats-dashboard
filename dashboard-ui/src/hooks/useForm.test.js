@@ -106,6 +106,45 @@ describe('useForm hook -', () => {
             } = result.current;
             expect(passwordMatchingValidation).toBeNull();
         });
+
+        it('validates form data with multiple fields', async () => {
+            const { result } = renderHook(() => useForm({ firstName: '', lastName: '' }, jest.fn()));
+            const { handleChangeFn, formValidations } = result.current;
+            expect(formValidations.firstName).toBeUndefined();
+            expect(formValidations.lastName).toBeUndefined();
+
+            act(() => {
+                handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
+            });
+            const {
+                formValidations: { firstName: firstNameValidation }
+            } = result.current;
+            expect(firstNameValidation).toBeDefined();
+            expect(result.current.submitStatus).toBe(formSubmission.NOT_READY);
+
+            // updating the same field with valid input should result in the same state as before
+            const { handleChangeFn: handleChangeOnFirstNameUpdate } = result.current;
+            act(() => {
+                handleChangeOnFirstNameUpdate({ target: { name: 'firstName', value: 'updated fake first name' } });
+            });
+            const {
+                formValidations: { firstName: updatedFirstNameValidation }
+            } = result.current;
+            expect(updatedFirstNameValidation).toBeDefined();
+            expect(result.current.submitStatus).toBe(formSubmission.NOT_READY);
+
+            // updating the last field in the form with valid input should result in the form submit status to change
+            // to READY
+            const { handleChangeFn: handleChangeOnLastNameInput } = result.current;
+            act(() => {
+                handleChangeOnLastNameInput({ target: { name: 'lastName', value: 'fake last name' } });
+            });
+            const {
+                formValidations: { lastName: lastNameValidation }
+            } = result.current;
+            expect(lastNameValidation).toBeDefined();
+            expect(result.current.submitStatus).toBe(formSubmission.READY);
+        });
     });
 
     describe('handle form submission', () => {
