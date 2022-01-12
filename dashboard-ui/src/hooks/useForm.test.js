@@ -32,7 +32,7 @@ describe('useForm hook -', () => {
         });
 
         it('validates email format', async () => {
-            const { result } = renderHook(() => useForm({ email: '', password: '' }, jest.fn()));
+            const { result } = renderHook(() => useForm({ email: '' }, jest.fn()));
             const { handleChangeFn, formValidations } = result.current;
             expect(formValidations.email).toBeUndefined();
 
@@ -56,7 +56,7 @@ describe('useForm hook -', () => {
         });
 
         it('validates password length', async () => {
-            const { result } = renderHook(() => useForm({ email: '', newPassword: '' }, jest.fn()));
+            const { result } = renderHook(() => useForm({ newPassword: '' }, jest.fn()));
             const { handleChangeFn, formValidations } = result.current;
             expect(formValidations.newPassword).toBeUndefined();
 
@@ -82,7 +82,7 @@ describe('useForm hook -', () => {
 
         it('validates that passwords are matching', async () => {
             const { result } = renderHook(() =>
-                useForm({ email: '', newPassword: '123456', confirmedPassword: '' }, jest.fn())
+                useForm({ newPassword: '123456', confirmedPassword: '' }, jest.fn())
             );
             const { handleChangeFn, formValidations } = result.current;
             expect(formValidations.confirmedPassword).toBeUndefined();
