@@ -15,14 +15,6 @@ const getSanitizedProps = ({ players, ...rest }) => {
     };
 };
 
-it('should render the add player widget', () => {
-    render(
-        <MemoryRouter>
-            <Default {...getSanitizedProps(Default.args)} />
-        </MemoryRouter>
-    );
-});
-
 it('should render the player data when passed in', () => {
     render(
         <MemoryRouter>
