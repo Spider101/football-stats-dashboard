@@ -1,9 +1,8 @@
 import { useState, useCallback, useEffect } from 'react';
 
-import { capitalizeLabel, convertCamelCaseToSnakeCase, formSubmission } from '../utils';
+import { capitalizeLabel, formSubmission } from '../utils';
 
-const getEmptyFieldValidation = fieldName =>
-    `${capitalizeLabel(convertCamelCaseToSnakeCase(fieldName))} cannot be empty!`;
+const getEmptyFieldValidation = fieldName => `${capitalizeLabel(fieldName, 'camelcase')} cannot be empty!`;
 const validateEmail = email => /\S+@\S+\.\S+/.test(email);
 const validatePlayerAge = playerAge => parseInt(playerAge) >= 15 && parseInt(playerAge) <= 50;
 
@@ -28,25 +27,17 @@ const useForm = (defaultFormValues, callback) => {
 
         // validate the input
         const validation = validateInput(name, value, formData);
-        if (!validation) {
-            // the current validation returned as falsy, so set submit status to READY if the remaining fields do not
-            // have any validations either
-            if (Object.values(formValidations).filter(validation => validation === null).length === (numFields - 1)) {
-                setSubmitStatus(formSubmission.READY);
-            }
-        } else {
-            setSubmitStatus(formSubmission.NOT_READY);
-        }
-        setFormValidations({
+
+        setFormValidations(formValidations => ({
             ...formValidations,
             [name]: validation || null
-        });
+        }));
 
         // update form field data
-        setFormData({
+        setFormData(formData => ({
             ...formData,
             [name]: value
-        });
+        }));
     };
 
     const handleSubmitFn = e => {
@@ -64,7 +55,6 @@ const useForm = (defaultFormValues, callback) => {
         async authAction => {
             const formErrorMessage = await authAction(formData);
             if (formErrorMessage != null) {
-                setSubmitStatus(formSubmission.NOT_READY);
                 setFormValidations(formValidations => ({
                     ...formValidations,
                     form: formErrorMessage
@@ -82,7 +72,17 @@ const useForm = (defaultFormValues, callback) => {
         if (submitStatus === formSubmission.INPROGRESS) {
             postFormData(callback);
         }
-    }, [formValidations, submitStatus, callback, postFormData]);
+    }, [submitStatus, callback, postFormData]);
+
+    useEffect(() => {
+        const numFieldsWithNoValidations = Object.values(formValidations)
+            .filter(validation => validation === null).length;
+        if (numFieldsWithNoValidations === numFields) {
+            setSubmitStatus(formSubmission.READY);
+        } else {
+            setSubmitStatus(formSubmission.NOT_READY);
+        }
+    }, [formValidations]);
 
     return {
         handleChangeFn,

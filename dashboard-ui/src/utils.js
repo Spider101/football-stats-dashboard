@@ -75,9 +75,14 @@ export const formSubmission = {
     INPROGRESS: 'INPROGRESS'
 };
 
-export const capitalizeLabel = label => {
-    return label
-        .split('_')
+export const capitalizeLabel = (label, format = 'snakecase') => {
+    let tokens;
+    if (format === 'snakecase') {
+        tokens = label.split('_');
+    } else {
+        tokens = label.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().split(' ');
+    }
+    return tokens
         .map(word => word[0].toUpperCase() + word.slice(1))
         .join(' ');
 };
@@ -141,6 +146,9 @@ export const stableSortList = (array, sortOrder, columnNameToOrderBy) => {
 
 export const convertCamelCaseToSnakeCase = camelCaseString =>
     camelCaseString.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+
+export const formatNumberWithCommas = number =>
+    number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 
 // key for storing the auth token data in localstorage
 export const AUTH_DATA_LS_KEY = 'auth-data';

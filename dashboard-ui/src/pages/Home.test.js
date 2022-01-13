@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -53,12 +53,20 @@ it('should render success message when add new club form is submitted', async ()
 
     const inputValue = 'Aston Villa FC';
     userEvent.type(screen.getByLabelText(/club name/i), inputValue);
-    userEvent.type(screen.getByLabelText(/transfer budget/i), '1');
-    userEvent.type(screen.getByLabelText(/wage budget/i), '1');
+    userEvent.type(screen.getByLabelText(/manager funds/i), '10');
+
+    // shift focus to the slider and hit left arrow key to set transfer and wage budget values
+    const slider = screen.getByRole('slider');
+    slider.focus();
+    // userEvent does not support keyboard events in this version of react-testing-library
+    // so using fireEvent instead
+    fireEvent.keyDown(document.activeElement, { key: 'ArrowLeft' });
+
     userEvent.type(screen.getByLabelText(/income/i), '1');
     userEvent.type(screen.getByLabelText(/expenditure/i), '1');
 
     const submitButton = screen.getByRole('button', { name: 'Submit' });
+    expect(submitButton).not.toBeDisabled();
     userEvent.click(submitButton);
 
     await screen.findByText('New Club Added Successfully!');

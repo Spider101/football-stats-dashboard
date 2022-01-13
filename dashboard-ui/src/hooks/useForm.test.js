@@ -17,22 +17,23 @@ describe('useForm hook -', () => {
                 formValidations: { firstName: firstNameEmptyValidation }
             } = result.current;
             expect(firstNameEmptyValidation).toBeDefined();
-            expect(firstNameEmptyValidation).toEqual('First Name cannot be empty!');
+            expect(firstNameEmptyValidation).toBe('First Name cannot be empty!');
 
             // the validations are reset when correct values are passed in.
+            const { handleChangeFn: handleChangeOnFixingFirstName } = result.current;
             act(() => {
-                handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
+                handleChangeOnFixingFirstName({ target: { name: 'firstName', value: 'fake first name' } });
             });
             const {
                 formValidations: { firstName: firstNameValidation },
                 submitStatus
             } = result.current;
             expect(firstNameValidation).toBeNull();
-            expect(submitStatus).toEqual(formSubmission.READY);
+            expect(submitStatus).toBe(formSubmission.READY);
         });
 
         it('validates email format', async () => {
-            const { result } = renderHook(() => useForm({ email: '', password: '' }, jest.fn()));
+            const { result } = renderHook(() => useForm({ email: '' }, jest.fn()));
             const { handleChangeFn, formValidations } = result.current;
             expect(formValidations.email).toBeUndefined();
 
@@ -43,11 +44,12 @@ describe('useForm hook -', () => {
                 formValidations: { email: emailFormatValidation }
             } = result.current;
             expect(emailFormatValidation).toBeDefined();
-            expect(emailFormatValidation).toEqual('Email format is incorrect!');
+            expect(emailFormatValidation).toBe('Email format is incorrect!');
 
             // the validations are reset when correct values are passed in.
+            const { handleChangeFn: handleChangeOnFixingEmail } = result.current;
             act(() => {
-                handleChangeFn({ target: { name: 'email', value: 'fake@email.com' } });
+                handleChangeOnFixingEmail({ target: { name: 'email', value: 'fake@email.com' } });
             });
             const {
                 formValidations: { email: emailValidation }
@@ -56,7 +58,7 @@ describe('useForm hook -', () => {
         });
 
         it('validates password length', async () => {
-            const { result } = renderHook(() => useForm({ email: '', newPassword: '' }, jest.fn()));
+            const { result } = renderHook(() => useForm({ newPassword: '' }, jest.fn()));
             const { handleChangeFn, formValidations } = result.current;
             expect(formValidations.newPassword).toBeUndefined();
 
@@ -68,11 +70,12 @@ describe('useForm hook -', () => {
                 formValidations: { newPassword: passwordLengthValidation }
             } = result.current;
             expect(passwordLengthValidation).toBeDefined();
-            expect(passwordLengthValidation).toEqual('Password must be between 6 and 12 characters');
+            expect(passwordLengthValidation).toBe('Password must be between 6 and 12 characters');
 
             // the validations are reset when correct values are passed in.
+            const { handleChangeFn: handleChangeOnFixingPassword } = result.current;
             act(() => {
-                handleChangeFn({ target: { name: 'newPassword', value: '123456' } });
+                handleChangeOnFixingPassword({ target: { name: 'newPassword', value: '123456' } });
             });
             const {
                 formValidations: { newPassword: passwordValidation }
@@ -82,7 +85,7 @@ describe('useForm hook -', () => {
 
         it('validates that passwords are matching', async () => {
             const { result } = renderHook(() =>
-                useForm({ email: '', newPassword: '123456', confirmedPassword: '' }, jest.fn())
+                useForm({ newPassword: '123456', confirmedPassword: '' }, jest.fn())
             );
             const { handleChangeFn, formValidations } = result.current;
             expect(formValidations.confirmedPassword).toBeUndefined();
@@ -95,16 +98,56 @@ describe('useForm hook -', () => {
                 formValidations: { confirmedPassword: passwordNotMatchingValidation }
             } = result.current;
             expect(passwordNotMatchingValidation).toBeDefined();
-            expect(passwordNotMatchingValidation).toEqual('Passwords must match!');
+            expect(passwordNotMatchingValidation).toBe('Passwords must match!');
 
             // the validations are reset when correct values are passed in.
+            const { handleChangeFn: handleChangeOnFixingPassword } = result.current;
             act(() => {
-                handleChangeFn({ target: { name: 'confirmedPassword', value: '123456' } });
+                handleChangeOnFixingPassword({ target: { name: 'confirmedPassword', value: '123456' } });
             });
             const {
                 formValidations: { confirmedPassword: passwordMatchingValidation }
             } = result.current;
             expect(passwordMatchingValidation).toBeNull();
+        });
+
+        it('validates form data with multiple fields', async () => {
+            const { result } = renderHook(() => useForm({ firstName: '', lastName: '' }, jest.fn()));
+            const { handleChangeFn, formValidations } = result.current;
+            expect(formValidations.firstName).toBeUndefined();
+            expect(formValidations.lastName).toBeUndefined();
+
+            act(() => {
+                handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
+            });
+            const {
+                formValidations: { firstName: firstNameValidation }
+            } = result.current;
+            expect(firstNameValidation).toBeDefined();
+            expect(result.current.submitStatus).toBe(formSubmission.NOT_READY);
+
+            // updating the same field with valid input should result in the same state as before
+            const { handleChangeFn: handleChangeOnFirstNameUpdate } = result.current;
+            act(() => {
+                handleChangeOnFirstNameUpdate({ target: { name: 'firstName', value: 'updated fake first name' } });
+            });
+            const {
+                formValidations: { firstName: updatedFirstNameValidation }
+            } = result.current;
+            expect(updatedFirstNameValidation).toBeDefined();
+            expect(result.current.submitStatus).toBe(formSubmission.NOT_READY);
+
+            // updating the last field in the form with valid input should result in the form submit status to change
+            // to READY
+            const { handleChangeFn: handleChangeOnLastNameInput } = result.current;
+            act(() => {
+                handleChangeOnLastNameInput({ target: { name: 'lastName', value: 'fake last name' } });
+            });
+            const {
+                formValidations: { lastName: lastNameValidation }
+            } = result.current;
+            expect(lastNameValidation).toBeDefined();
+            expect(result.current.submitStatus).toBe(formSubmission.READY);
         });
     });
 
@@ -139,14 +182,14 @@ describe('useForm hook -', () => {
 
             const { result, waitForNextUpdate } = renderHook(() => useForm({ firstName: '' }, mockCallback));
             const { handleChangeFn, submitStatus } = result.current;
-            expect(submitStatus).toEqual(formSubmission.NOT_READY);
+            expect(submitStatus).toBe(formSubmission.NOT_READY);
 
             act(() => {
                 handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
             });
 
             const { handleSubmitFn, submitStatus: submitStatusAfterFieldUpdate } = result.current;
-            expect(submitStatusAfterFieldUpdate).toEqual(formSubmission.READY);
+            expect(submitStatusAfterFieldUpdate).toBe(formSubmission.READY);
 
             act(() => {
                 handleSubmitFn({ preventDefault: jest.fn() });
@@ -155,7 +198,7 @@ describe('useForm hook -', () => {
             expect(mockCallback).toBeCalledTimes(1);
 
             const { submitStatus: submitStatusAfterClientCall } = result.current;
-            expect(submitStatusAfterClientCall).toEqual(formSubmission.COMPLETE);
+            expect(submitStatusAfterClientCall).toBe(formSubmission.COMPLETE);
         });
 
         it('form submit status is not changed to COMPLETE if client returns error', async () => {
@@ -164,7 +207,7 @@ describe('useForm hook -', () => {
 
             const { result, waitForNextUpdate } = renderHook(() => useForm({ firstName: '' }, mockCallback));
             const { handleChangeFn, submitStatus } = result.current;
-            expect(submitStatus).toEqual(formSubmission.NOT_READY);
+            expect(submitStatus).toBe(formSubmission.NOT_READY);
 
             act(() => {
                 handleChangeFn({ target: { name: 'firstName', value: 'fake first name' } });
@@ -179,10 +222,10 @@ describe('useForm hook -', () => {
 
             const { formValidations, submitStatus: submitStatusAfterClientCall } = result.current;
             expect(formValidations.form).toBeDefined();
-            expect(formValidations.form).toEqual('Something went wrong!');
+            expect(formValidations.form).toBe('Something went wrong!');
 
             // submit status is changed from INPROGRESS to null again because there is an error on the form now
-            expect(submitStatusAfterClientCall).toEqual(formSubmission.NOT_READY);
+            expect(submitStatusAfterClientCall).not.toBe(formSubmission.COMPLETE);
         });
     });
 });

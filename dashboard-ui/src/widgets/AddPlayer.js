@@ -11,7 +11,7 @@ import Alert from '../components/Alert';
 import DialogForm from '../components/DialogForm';
 import PageAction from '../components/PageAction';
 
-import { capitalizeLabel, convertCamelCaseToSnakeCase } from '../utils';
+import { capitalizeLabel } from '../utils';
 import useFormWithSteps from '../hooks/useFormWithSteps';
 import AddPlayerForm, { getAddPlayerFormSchema, getStepper } from './AddPlayerForm';
 
@@ -51,7 +51,7 @@ export default function AddPlayer({ addPlayerAction }) {
                 <>
                     <Typography variant='h5' align='center'>Confirm Details</Typography>
                     {Object.entries(nestedFormData).map(([sectionName, formDataInSection]) => {
-                        const sectionTitle = capitalizeLabel(convertCamelCaseToSnakeCase(sectionName));
+                        const sectionTitle = capitalizeLabel(sectionName, 'camelcase');
                         return (
                             <>
                                 <Typography variant='h6' color='textSecondary'>{sectionTitle}</Typography>
@@ -59,7 +59,8 @@ export default function AddPlayer({ addPlayerAction }) {
                                 <List key={sectionName}>
                                     {Object.entries(formDataInSection).map(([fieldName, fieldValue]) => {
                                         const formDataText = `${capitalizeLabel(
-                                            convertCamelCaseToSnakeCase(fieldName)
+                                            fieldName,
+                                            'camelcase'
                                         )}: ${fieldValue}`;
                                         return (
                                             // TODO: figure out how to display this as field name aligned to the left

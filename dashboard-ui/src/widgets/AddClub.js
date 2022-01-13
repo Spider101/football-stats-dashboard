@@ -10,6 +10,7 @@ import PageAction from '../components/PageAction';
 
 import { formSubmission } from '../utils';
 import useForm from '../hooks/useForm';
+import CustomSlider from '../components/CustomSlider';
 
 export default function AddClub({ addClubAction }) {
     const {
@@ -21,10 +22,11 @@ export default function AddClub({ addClubAction }) {
     } = useForm(
         {
             name: '',
-            transferBudget: 0,
-            wageBudget: 0,
-            income: 0,
-            expenditure: 0
+            managerFunds: '0',
+            transferBudget: '0',
+            wageBudget: '0',
+            income: '0',
+            expenditure: '0'
         },
         useCallback(newClubData => addClubAction(newClubData), [])
     );
@@ -52,37 +54,30 @@ export default function AddClub({ addClubAction }) {
                 helperText={addNewClubValidations.name}
             />
             <TextField
-                name='transferBudget'
-                label='Transfer Budget'
+                name='managerFunds'
+                label='Manager Funds'
                 required
-                id='transferBudget'
+                id='managerFunds'
                 type='number'
                 margin='normal'
                 fullWidth
-                value={addNewClubData.transferBudget}
+                value={addNewClubData.managerFunds}
                 disabled={submitStatus === formSubmission.INPROGRESS}
                 onChange={e => handleChangeFn(e)}
-                error={!!addNewClubValidations.transferBudget}
-                helperText={addNewClubValidations.transferBudget}
+                error={!!addNewClubValidations.managerFunds}
+                helperText={addNewClubValidations.managerFunds}
                 InputProps={{
                     startAdornment: <InputAdornment position='start'>$</InputAdornment>
                 }}
             />
-            <TextField
-                name='wageBudget'
-                label='Wage Budget'
-                required
-                id='wageBudget'
-                type='number'
-                margin='normal'
-                fullWidth
-                value={addNewClubData.wageBudget}
-                disabled={submitStatus === formSubmission.INPROGRESS}
-                onChange={e => handleChangeFn(e)}
-                error={!!addNewClubValidations.wageBudget}
-                helperText={addNewClubValidations.wageBudget}
-                InputProps={{
-                    startAdornment: <InputAdornment position='start'>$</InputAdornment>
+            <CustomSlider
+                sliderTitle='Budget Split'
+                splitMetadata={{
+                    valueToSplit: Number(addNewClubData.managerFunds),
+                    entitiesToSplit: [
+                        { name: 'transferBudget', handleChange: handleChangeFn },
+                        { name: 'wageBudget', handleChange: handleChangeFn },
+                    ]
                 }}
             />
             <TextField
