@@ -28,6 +28,12 @@ public interface SquadPlayer {
     String getCountry();
 
     /**
+     * Image url for flag representing player's nationality
+     */
+    @Valid
+    String getCountryFlag();
+
+    /**
      * Player's role
      */
     @Valid

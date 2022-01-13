@@ -1,16 +1,20 @@
 [
   {
-    "id": "700eb034-91e2-49a9-8608-5cbd3fa853ba",
+    "playerId": "700eb034-91e2-49a9-8608-5cbd3fa853ba",
     "name": "Sander Gard Bolin Berge",
     "country": "Norway",
+    "countryFlag": "https://flagcdn.com/w40/nr.png",
     "role": "defensiveCentralMidfielder",
+    "recentForm": [],
     "currentAbility": 97
   },
   {
-    "id": "11bc7344-b5f1-4039-b083-7851ac495153",
+    "playerId": "11bc7344-b5f1-4039-b083-7851ac495153",
     "name": "Paul Pogba",
     "country": "France",
+    "countryFlag": "https://flagcdn.com/w40/fr.png",
     "role": "centralMidfielder",
+    "recentForm": [],
     "currentAbility": 92
   }
 ]
