@@ -5,7 +5,6 @@ import _ from 'lodash';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import flagCodes from '../flagCodes';
 import { squadTableHeaderDisplayTypeMap, moraleIconsMap } from '../utils';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
@@ -19,9 +18,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 // TODO: define a more appropriate method for this
-const getSortValueForForm = matchRatingsList => matchRatingsList[0];
-
-const getFlagImageFromCountryName = countryName => `https://flagcdn.com/w40/${flagCodes[countryName]}.png`;
+const getSortValueForForm = matchRatingsList => matchRatingsList.length > 0 && matchRatingsList[0];
 
 const buildHeaderDataForSquadTable = headerNames =>
     headerNames
@@ -47,8 +44,8 @@ const buildRowDataForSquadTable = players => {
                 row = {
                     id: key,
                     type: 'image',
-                    data: getFlagImageFromCountryName(value),
-                    metadata: { sortValue: value }
+                    data: value['flagURL'],
+                    metadata: { sortValue: value['countryName'] }
                 };
                 break;
             case 'morale':
@@ -72,7 +69,7 @@ const buildRowDataForSquadTable = players => {
                             }
                         ]
                     },
-                    metadata: { sortValue: getSortValueForForm(value) }
+                    metadata: { sortValue: getSortValueForForm(value) || 0 }
                 };
                 break;
             case 'name':

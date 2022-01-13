@@ -20,7 +20,7 @@ exports[`should always render add club widget 1`] = `
       No clubs have been created yet! Please create a club to proceed.
     </h5>
     <div
-      class="makeStyles-fab-5"
+      class="makeStyles-fab"
     >
       <button
         aria-label="add"

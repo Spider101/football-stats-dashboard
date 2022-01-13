@@ -34,6 +34,20 @@ const allMatchPerformanceTableHeaders = [
     { id: 'average_rating', type: 'number' }
 ];
 
+const nationalityList = [{
+    countryName: 'France',
+    flagURL: 'https://flagcdn.com/w40/fr.png'
+}, {
+    countryName: 'Germany',
+    flagURL: 'https://flagcdn.com/w40/de.png'
+}, {
+    countryName: 'Netherlands',
+    flagURL: 'https://flagcdn.com/w40/nl.png'
+}, {
+    countryName: 'Spain',
+    flagURL: 'https://flagcdn.com/w40/es.png'
+}];
+
 const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * (upper - lower)) + lower;
 
 export const getAttributeItemData = (attributeName, highlightedAttributes = []) => ({
@@ -159,10 +173,10 @@ export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
     }));
 };
 
-export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap, withLink = false) => ({
+export const getSquadHubTableData = (numRows, moraleIconsMap, withLink = false) => ({
     headers: allSquadHubTableHeaders,
     rows: [ ...Array(numRows) ].map((_0, idx) => {
-        const country = _.sample(nationalityFlagMap);
+        const nationalityMetadata = _.sample(nationalityList);
         const moraleEntity = _.sample(moraleIconsMap);
         const chartData = {
             type: 'bar',
@@ -173,9 +187,14 @@ export const getSquadHubTableData = (numRows, nationalityFlagMap, moraleIconsMap
         };
 
         const tableData = [
-            { id: 'nationality', type: 'image', data: country.flag, metadata: { sortValue: country.nationality } },
+            {
+                id: 'nationality',
+                type: 'image',
+                data: nationalityMetadata.flagURL,
+                metadata: { sortValue: nationalityMetadata.countryName }
+            },
             { id: 'role', type: 'string', data: faker.hacker.noun() },
-            { id: 'wages', type: 'string', data: '$' + getRandomNumberInRange(1000, 100) + 'K'},
+            { id: 'wages', type: 'string', data: '$' + getRandomNumberInRange(1000, 100) + 'K' },
             { id: 'form', type: 'chart', data: chartData, metadata: { sortValue: getRandomNumberInRange(10, 1) } },
             { id: 'morale', type: 'icon', data: moraleEntity.icon, metadata: { sortValue: moraleEntity.morale } },
             { id: 'current_ability', type: 'number', data: getRandomNumberInRange(MAX_OVERALL_VALUE, 1) }
@@ -212,12 +231,12 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
     })
 });
 
-export const getSquadHubPlayerData = (numPlayers, nationsList, moraleList) => {
+export const getSquadHubPlayerData = (numPlayers, moraleList) => {
     return {
         players: [ ...Array(numPlayers) ].map((_0, idx) => ({
             playerId: idx,
             name: faker.name.findName(),
-            nationality: _.sample(nationsList),
+            nationality: _.sample(nationalityList),
             role: faker.hacker.noun(),
             wages: getRandomNumberInRange(1000, 100),
             form: [ ...Array(5) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE)),

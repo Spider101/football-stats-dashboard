@@ -99,6 +99,9 @@ public class PlayerResource {
             Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, existingPlayer, playerId);
             return Response.ok(updatedPlayer).build();
         }
+
+        LOGGER.error("Incoming player ID: {} does not match ID of existing player entity in couchbase: {}. " +
+                "Aborting operation!", incomingPlayer.getId(), existingPlayer.getId());
         return Response.serverError()
                 .entity("Unable to update player with ID: " + incomingPlayer.getId().toString())
                 .build();

@@ -59,11 +59,12 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
                 ctx.status(200),
                 ctx.json([
                     {
-                        id: '700eb034-91e2-49a9-8608-5cbd3fa853ba',
                         name: 'Sander Gard Bolin Berge',
                         country: 'Norway',
+                        countryFlag: 'https://flagcdn.com/w40/no.png',
                         role: 'Defensive Central Midfielder',
                         currentAbility: 97,
+                        recentForm: [],
                         playerId: '03b3d2be-0e71-4d25-8ed6-f7a204779dbb'
                     }
                 ])
