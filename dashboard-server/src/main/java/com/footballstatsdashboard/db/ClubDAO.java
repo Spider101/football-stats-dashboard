@@ -39,8 +39,8 @@ public class ClubDAO<K> extends CouchbaseDAO<K> {
 
     public List<SquadPlayer> getPlayersInClub(UUID clubId) {
         String query = String.format("Select player.metadata.name, player.metadata.country, player.id," +
-                        " player.ability.`current` as currentAbility, player.roles," +
-                        " matchPerformance.matchRating.history as matchRatingHistory" +
+                        " player.metadata.countryLogo as countryFlag, player.ability.`current` as currentAbility," +
+                        " player.roles, matchPerformance.matchRating.history as matchRatingHistory" +
                         " from `%s` player left join `%s` matchPerformance on player.id = matchPerformance.playerId" +
                         " where player.type = 'Player' and player.clubId = $clubId",
                 this.getBucketNameResolver().get(), this.getBucketNameResolver().get());
@@ -66,6 +66,7 @@ public class ClubDAO<K> extends CouchbaseDAO<K> {
             return ImmutableSquadPlayer.builder()
                     .name(row.get("name").toString())
                     .country(row.get("country").toString())
+                    .countryFlag(row.get("countryFlag").toString())
                     .currentAbility((int) row.get("currentAbility"))
                     .recentForm(recentForm)
                     .role(roles.getObject(0).getString("name"))
