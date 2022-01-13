@@ -363,6 +363,7 @@ public class ClubServiceTest {
         ImmutableSquadPlayer expectedSquadPlayer = ImmutableSquadPlayer.builder()
                 .name("fake player name")
                 .country("fake player country")
+                .countryFlag("fake country flag url")
                 .role("fake player role")
                 .currentAbility(CURRENT_PLAYER_ABILITY)
                 .recentForm(new ArrayList<>())
