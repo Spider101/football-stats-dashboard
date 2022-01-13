@@ -52,15 +52,11 @@ it('should render success message when add new club form is submitted', async ()
     expect(screen.queryByRole('dialog')).toBeInTheDocument();
 
     const inputValue = 'Aston Villa FC';
-    const managerFundsValue = '100';
     userEvent.type(screen.getByLabelText(/club name/i), inputValue);
-    userEvent.type(screen.getByLabelText(/manager funds/i), managerFundsValue);
-
-    // verify that the initial value on the slider gets set when manager funds is changed above
-    const slider = screen.getByRole('slider');
-    expect(slider).toHaveAttribute('aria-valuenow', managerFundsValue);
+    userEvent.type(screen.getByLabelText(/manager funds/i), '10');
 
     // shift focus to the slider and hit left arrow key to set transfer and wage budget values
+    const slider = screen.getByRole('slider');
     slider.focus();
     // userEvent does not support keyboard events in this version of react-testing-library
     // so using fireEvent instead
