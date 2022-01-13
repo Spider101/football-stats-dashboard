@@ -9,7 +9,7 @@ exports[`should always render add player widget 1`] = `
       class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6"
     >
       <div
-        class="MuiFormControl-root makeStyles-formControl-30"
+        class="MuiFormControl-root makeStyles-formControl"
       >
         <label
           class="MuiFormLabel-root MuiInputLabel-root MuiInputLabel-formControl MuiInputLabel-animated MuiInputLabel-shrink MuiFormLabel-filled"
@@ -30,10 +30,10 @@ exports[`should always render add player widget 1`] = `
             tabindex="0"
           >
             <div
-              class="makeStyles-chips-31"
+              class="makeStyles-chips"
             >
               <div
-                class="MuiChip-root makeStyles-chip-32"
+                class="MuiChip-root makeStyles-chip"
               >
                 <span
                   class="MuiChip-label"
@@ -66,7 +66,7 @@ exports[`should always render add player widget 1`] = `
       class="MuiGrid-root MuiGrid-item MuiGrid-grid-xs-6"
     >
       <div
-        class="MuiFormControl-root makeStyles-formControl-30"
+        class="MuiFormControl-root makeStyles-formControl"
         style="float: right;"
       >
         <label
@@ -117,7 +117,7 @@ exports[`should always render add player widget 1`] = `
         class="MuiTableContainer-root"
       >
         <table
-          class="MuiTable-root makeStyles-table-33"
+          class="MuiTable-root makeStyles-table"
         >
           <thead
             class="MuiTableHead-root"
@@ -127,24 +127,24 @@ exports[`should always render add player widget 1`] = `
             >
               <th
                 aria-sort="ascending"
-                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root MuiTableCell-head WithStyles(ForwardRef(TableCell))-head MuiTableCell-alignLeft"
                 scope="col"
               >
                 <span
                   aria-disabled="false"
-                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40 MuiTableSortLabel-active WithStyles(ForwardRef(TableSortLabel))-active-41"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root MuiTableSortLabel-active WithStyles(ForwardRef(TableSortLabel))-active"
                   role="button"
                   tabindex="0"
                 >
                   Name
                   <span
-                    class="makeStyles-visuallyHidden-36"
+                    class="makeStyles-visuallyHidden"
                   >
                     sorted ascending
                   </span>
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon MuiTableSortLabel-iconDirectionAsc"
                     focusable="false"
                     viewBox="0 0 24 24"
                   >
@@ -155,19 +155,19 @@ exports[`should always render add player widget 1`] = `
                 </span>
               </th>
               <th
-                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root MuiTableCell-head WithStyles(ForwardRef(TableCell))-head MuiTableCell-alignLeft"
                 scope="col"
               >
                 <span
                   aria-disabled="false"
-                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root"
                   role="button"
                   tabindex="0"
                 >
                   Nationality
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon MuiTableSortLabel-iconDirectionAsc"
                     focusable="false"
                     viewBox="0 0 24 24"
                   >
@@ -178,19 +178,19 @@ exports[`should always render add player widget 1`] = `
                 </span>
               </th>
               <th
-                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root MuiTableCell-head WithStyles(ForwardRef(TableCell))-head MuiTableCell-alignLeft"
                 scope="col"
               >
                 <span
                   aria-disabled="false"
-                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root"
                   role="button"
                   tabindex="0"
                 >
                   Role
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon MuiTableSortLabel-iconDirectionAsc"
                     focusable="false"
                     viewBox="0 0 24 24"
                   >
@@ -201,19 +201,19 @@ exports[`should always render add player widget 1`] = `
                 </span>
               </th>
               <th
-                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root MuiTableCell-head WithStyles(ForwardRef(TableCell))-head MuiTableCell-alignLeft"
                 scope="col"
               >
                 <span
                   aria-disabled="false"
-                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root"
                   role="button"
                   tabindex="0"
                 >
                   Wages
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon MuiTableSortLabel-iconDirectionAsc"
                     focusable="false"
                     viewBox="0 0 24 24"
                   >
@@ -224,19 +224,19 @@ exports[`should always render add player widget 1`] = `
                 </span>
               </th>
               <th
-                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root MuiTableCell-head WithStyles(ForwardRef(TableCell))-head MuiTableCell-alignLeft"
                 scope="col"
               >
                 <span
                   aria-disabled="false"
-                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root"
                   role="button"
                   tabindex="0"
                 >
                   Form
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon MuiTableSortLabel-iconDirectionAsc"
                     focusable="false"
                     viewBox="0 0 24 24"
                   >
@@ -247,19 +247,19 @@ exports[`should always render add player widget 1`] = `
                 </span>
               </th>
               <th
-                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignLeft"
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root MuiTableCell-head WithStyles(ForwardRef(TableCell))-head MuiTableCell-alignLeft"
                 scope="col"
               >
                 <span
                   aria-disabled="false"
-                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root"
                   role="button"
                   tabindex="0"
                 >
                   Morale
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon MuiTableSortLabel-iconDirectionAsc"
                     focusable="false"
                     viewBox="0 0 24 24"
                   >
@@ -270,19 +270,19 @@ exports[`should always render add player widget 1`] = `
                 </span>
               </th>
               <th
-                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root-37 MuiTableCell-head WithStyles(ForwardRef(TableCell))-head-38 MuiTableCell-alignRight"
+                class="MuiTableCell-root WithStyles(ForwardRef(TableCell))-root MuiTableCell-head WithStyles(ForwardRef(TableCell))-head MuiTableCell-alignRight"
                 scope="col"
               >
                 <span
                   aria-disabled="false"
-                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root-40"
+                  class="MuiButtonBase-root MuiTableSortLabel-root WithStyles(ForwardRef(TableSortLabel))-root"
                   role="button"
                   tabindex="0"
                 >
                   Current Ability
                   <svg
                     aria-hidden="true"
-                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon-42 MuiTableSortLabel-iconDirectionAsc"
+                    class="MuiSvgIcon-root MuiTableSortLabel-icon WithStyles(ForwardRef(TableSortLabel))-icon MuiTableSortLabel-iconDirectionAsc"
                     focusable="false"
                     viewBox="0 0 24 24"
                   >
@@ -312,7 +312,7 @@ exports[`should always render add player widget 1`] = `
     </div>
   </div>
   <div
-    class="makeStyles-fab-29"
+    class="makeStyles-fab"
   >
     <button
       aria-label="add"

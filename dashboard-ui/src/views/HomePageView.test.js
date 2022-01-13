@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 
 import { Default, NoClubs } from '../stories/HomePageView.stories';
+import { snapshotFriendlyRender } from '../testUtils';
 
 const noClubViewText = 'No clubs have been created yet! Please create a club to proceed.';
 it('should render the club data passed in', () => {
@@ -44,7 +45,7 @@ it('should render helpful text when no club data is passed in', () => {
 });
 
 it('should always render add club widget', () => {
-    const { rerender, container } = render(
+    const { rerender, container } = snapshotFriendlyRender(
         <MemoryRouter>
             <NoClubs {...NoClubs.args} />
         </MemoryRouter>
