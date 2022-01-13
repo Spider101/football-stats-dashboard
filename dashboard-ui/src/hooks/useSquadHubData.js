@@ -20,7 +20,11 @@ export default function() {
         data: isLoading ? [] : squadPlayersData.map(squadPlayerData => ({
             playerId: squadPlayerData.playerId,
             name: squadPlayerData.name,
-            nationality: squadPlayerData.country,
+            nationality: {
+                countryName: squadPlayerData.country,
+                flagURL: squadPlayerData.countryFlag
+            },
+            form: squadPlayerData.recentForm,
             current_ability: squadPlayerData.currentAbility,
             role: squadPlayerData.role
         }))
