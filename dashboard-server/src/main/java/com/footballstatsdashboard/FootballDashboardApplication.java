@@ -3,6 +3,7 @@ package com.footballstatsdashboard;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.client.couchbase.config.ClusterConfiguration;
+import com.footballstatsdashboard.core.exceptions.ServiceExceptionMapper;
 import com.footballstatsdashboard.core.service.auth.CustomAuthenticator;
 import com.footballstatsdashboard.core.service.auth.CustomAuthorizer;
 import com.footballstatsdashboard.core.utils.DashboardInternalModule;
@@ -125,7 +126,9 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         // setup health checks
         environment.healthChecks().register(this.getName(), new FootballDashboardHealthCheck());
 
-        // add exception mapper so that json errors are show in detail
+        // setup exception mappers
+        environment.jersey().register(new ServiceExceptionMapper());
+        // this ensures json errors are shown in detail
         environment.jersey().register(new JsonProcessingExceptionMapper(true));
 
         LOGGER.info("All resources added for {}", getName());
