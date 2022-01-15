@@ -5,6 +5,7 @@ import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
@@ -26,6 +27,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -80,6 +82,7 @@ public class ClubServiceTest {
         assertEquals(userId, club.getUserId());
     }
 
+    // TODO: 1/15/2022 verify that a 404 is thrown here instead of a raw runtime exception
     /**
      * given a runtime exception is thrown by couchbase DAO when club entity is not found, verifies that the same
      * exception is thrown by `getClub` resource method as well
@@ -142,6 +145,108 @@ public class ClubServiceTest {
     }
 
     /**
+     * given that the request contains a club entity with an empty club name, tests that no data is persisted in
+     * couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createClubWhenClubNameIsEmpty() {
+        // setup
+        Club incomingClubWithNoName = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .customClubName("")
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        // execute
+        clubService.createClub(incomingClubWithNoName, userId, USER_EMAIL);
+
+        // assert
+        verify(clubDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
+     * given that the request contains a club entity without valid income data, tests that no data is persisted in
+     * couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createClubWithoutIncomeData() {
+        // setup
+        Club incomingClubWithNoIncomeData = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withExpenditure()
+                .build();
+
+        // execute
+        clubService.createClub(incomingClubWithNoIncomeData, userId, USER_EMAIL);
+
+        // assert
+        verify(clubDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
+     * given that the request contains a club entity without valid expenditure data, tests that no data is persisted in
+     * couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createClubWithoutExpenditureData() {
+        // setup
+        Club incomingClubWithNoExpenditureData = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withIncome()
+                .build();
+
+        // execute
+        clubService.createClub(incomingClubWithNoExpenditureData, userId, USER_EMAIL);
+
+        // assert
+        verify(clubDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
+     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
+     * set, tests that no data is persisted in couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createClubWithIncorrectManagerFunds() {
+        // setup
+        Club incomingClubWithIncorrectManagerFunds = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .customManagerFunds(new BigDecimal("10000"))
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        // execute
+        clubService.createClub(incomingClubWithIncorrectManagerFunds, userId, USER_EMAIL);
+
+        // assert
+        verify(clubDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
+     * given that the request contains a club entity whose transfer and wage budgets is greater than the manager funds
+     * set, tests that no data is persisted in couchbase and a service exception is thrown
+     */
+    @Test(expected = ServiceException.class)
+    public void createClubWithIncorrectBudget() {
+        // setup
+        Club incomingClubWithIncorrectBudget = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .customTransferBudget(new BigDecimal("5000"))
+                .customWageBudget(new BigDecimal("2000"))
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        // execute
+        clubService.createClub(incomingClubWithIncorrectBudget, userId, USER_EMAIL);
+
+        // assert
+        verify(clubDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
      * given a valid club entity in the request, tests that an updated club entity with update internal fields is
      * upserted in couchbase
      */
@@ -149,17 +254,16 @@ public class ClubServiceTest {
     public void updateClubUpdatesClubInCouchbase() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClubInCouchbase = ClubDataProvider.ClubBuilder.builder()
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(existingClubId)
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
 
-        BigDecimal updatedWageBudget = existingClubInCouchbase.getWageBudget().add(new BigDecimal("100"));
-        BigDecimal updatedTransferBudget = existingClubInCouchbase.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
         BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
@@ -175,18 +279,18 @@ public class ClubServiceTest {
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
-        Club updatedClub = clubService.updateClub(incomingClub, existingClubInCouchbase, existingClubId);
+        Club updatedClub = clubService.updateClub(incomingClub, existingClub, existingClubId);
 
         // assert
         verify(clubDAO).updateDocument(any(), updatedClubCaptor.capture());
         Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
         assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
 
-        assertEquals(existingClubInCouchbase.getId(), updatedClub.getId());
+        assertEquals(existingClub.getId(), updatedClub.getId());
         assertEquals(updatedTransferBudget, updatedClub.getTransferBudget());
         assertEquals(updatedWageBudget, updatedClub.getWageBudget());
         assertEquals(totalFunds, updatedClub.getManagerFunds().getCurrent());
-        assertEquals(existingClubInCouchbase.getManagerFunds().getHistory().size() + 1,
+        assertEquals(existingClub.getManagerFunds().getHistory().size() + 1,
                 updatedClub.getManagerFunds().getHistory().size());
 
         // assertions for general house-keeping fields
@@ -203,19 +307,18 @@ public class ClubServiceTest {
     public void updateClubWhenTransferAndWageBudgetSplitChanges() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClubCouchbase = ClubDataProvider.ClubBuilder.builder()
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(existingClubId)
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubCouchbase);
 
         // decrease transfer budget by 100 and increase wage budget by the same amount
-        BigDecimal updatedTransferBudget = existingClubCouchbase.getTransferBudget()
+        BigDecimal updatedTransferBudget = existingClub.getTransferBudget()
                 .subtract(new BigDecimal("100"));
-        BigDecimal updatedWageBudget = existingClubCouchbase.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .withId(existingClubId)
@@ -230,7 +333,7 @@ public class ClubServiceTest {
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
-        Club updatedClub = clubService.updateClub(incomingClub, existingClubCouchbase, existingClubId);
+        Club updatedClub = clubService.updateClub(incomingClub, existingClub, existingClubId);
 
         // assert
         verify(clubDAO).updateDocument(any(), updatedClubCaptor.capture());
@@ -239,7 +342,76 @@ public class ClubServiceTest {
 
         assertEquals(updatedTransferBudget, updatedClub.getTransferBudget());
         assertEquals(updatedWageBudget, updatedClub.getWageBudget());
-        assertEquals(existingClubCouchbase.getManagerFunds(), updatedClub.getManagerFunds());
+        assertEquals(existingClub.getManagerFunds(), updatedClub.getManagerFunds());
+    }
+
+    /**
+     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
+     * set, tests that no data is updated in couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updateClubWithIncorrectManagerFunds() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userId)
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        BigDecimal updatedWageBudget = incomingClubBase.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = incomingClubBase.getTransferBudget().add(new BigDecimal("100"));
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedWageBudget(updatedTransferBudget)
+                .withUpdatedManagerFunds(new BigDecimal("100")) // set manager funds to an arbitrary value
+                .build();
+
+        // execute
+        clubService.updateClub(incomingClub, existingClub, existingClubId);
+
+        // assert
+        verify(clubDAO, never()).updateDocument(any(), any());
+    }
+
+    /**
+     * given that the request contains a club entity  whose transfer and wage budgets is greater than the manager funds
+     * set, tests that no data is updated in couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updateClubWithIncorrectBudget() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userId)
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                // set wage and transfer budgets to arbitrary values which do not match the existing manager funds
+                .withUpdatedWageBudget(new BigDecimal("5000"))
+                .withUpdatedWageBudget(new BigDecimal("1000"))
+                .build();
+
+        // execute
+        clubService.updateClub(incomingClub, existingClub, existingClubId);
+
+        // assert
+        verify(clubDAO, never()).updateDocument(any(), any());
     }
 
     /**
