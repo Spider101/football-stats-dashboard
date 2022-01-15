@@ -1,13 +1,12 @@
 package com.footballstatsdashboard.resources;
 
-import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.Club;
+import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
-import com.google.common.collect.ImmutableMap;
 import io.dropwizard.auth.Auth;
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static com.footballstatsdashboard.core.utils.Constants.CLUB_ID;
@@ -68,51 +66,6 @@ public class ClubResource {
             LOGGER.info("createClub() request.");
         }
 
-        // TODO: 1/8/2022 move all these validations into service once validation layer is ready
-        if (StringUtils.isEmpty(incomingClub.getName())) {
-            String errorMessage = "Empty club name is not allowed!";
-            int statusCode = HttpStatus.BAD_REQUEST_400;
-            LOGGER.error(errorMessage);
-            Map<String, Object> params = ImmutableMap.of(
-                    "status", statusCode,
-                    "message", errorMessage
-            );
-            return Response.status(statusCode).entity(params).build();
-        }
-
-        if (incomingClub.getTransferBudget().add(incomingClub.getWageBudget())
-                .compareTo(incomingClub.getManagerFunds().getCurrent()) != 0) {
-            String errorMessage = "Transfer and wage budgets must add up to manager funds!";
-            int statusCode = HttpStatus.BAD_REQUEST_400;
-            LOGGER.error(errorMessage);
-            Map<String, Object> params = ImmutableMap.of(
-                    "status", statusCode,
-                    "message", errorMessage
-            );
-            return Response.status(statusCode).entity(params).build();
-        }
-        if (incomingClub.getIncome() == null) {
-            String errorMessage = "New club must have income data!";
-            int statusCode = HttpStatus.BAD_REQUEST_400;
-            LOGGER.error(errorMessage);
-            Map<String, Object> params = ImmutableMap.of(
-                    "status", statusCode,
-                    "message", errorMessage
-            );
-            return Response.status(statusCode).entity(params).build();
-        }
-
-        if (incomingClub.getExpenditure() == null) {
-            String errorMessage = "New club must have expenditure data!";
-            int statusCode = HttpStatus.BAD_REQUEST_400;
-            LOGGER.error(errorMessage);
-            Map<String, Object> params = ImmutableMap.of(
-                    "status", statusCode,
-                    "message", errorMessage
-            );
-            return Response.status(statusCode).entity(params).build();
-        }
-
         Club newClub = this.clubService.createClub(incomingClub, user.getId(), user.getEmail());
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newClub.getId().toString()).build();
@@ -129,30 +82,18 @@ public class ClubResource {
             LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
         }
 
-        if (incomingClub.getTransferBudget().add(incomingClub.getWageBudget())
-                .compareTo(incomingClub.getManagerFunds().getCurrent()) != 0) {
-            String errorMessage = "Transfer and wage budgets must add up to manager funds!";
-            int statusCode = HttpStatus.BAD_REQUEST_400;
-            LOGGER.error(errorMessage);
-            Map<String, Object> params = ImmutableMap.of(
-                    "status", statusCode,
-                    "message", errorMessage
-            );
-            return Response.status(statusCode).entity(params).build();
-        }
-
         Club existingClub = this.clubService.getClub(existingClubId);
-        if (existingClub.getId().equals(incomingClub.getId())) {
-            // TODO: 15/04/21 add validations by checking incoming club data against existing one
-            Club updatedClub = this.clubService.updateClub(incomingClub, existingClub, existingClubId);
-            return Response.ok().entity(updatedClub).build();
+        if (!existingClub.getId().equals(incomingClub.getId())) {
+            String errorMessage = String.format(
+                    "Incoming club entity ID: %s does not match ID of existing club entity %s.",
+                    incomingClub.getId(), existingClub.getId()
+            );
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
         }
 
-        LOGGER.error("Incoming club entity ID: {} does not match ID of existing club entity in couchbase: {}. " +
-                "Aborting operation!", incomingClub.getId(), existingClub.getId());
-        return Response.serverError()
-                .entity("Unable to update club with ID: " + incomingClub.getId().toString())
-                .build();
+        Club updatedClub = this.clubService.updateClub(incomingClub, existingClub, existingClubId);
+        return Response.ok().entity(updatedClub).build();
     }
 
     @DELETE
