@@ -3,12 +3,13 @@ package com.footballstatsdashboard.resources;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.footballstatsdashboard.ClubDataProvider;
+import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
@@ -30,7 +31,6 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -143,118 +143,6 @@ public class ClubResourceTest {
     }
 
     /**
-     * given that the request contains a club entity with an empty club name, tests that no data is persisted and a 400
-     * Bad Request response status is returned
-     */
-    @Test
-    public void createClubWhenClubNameIsEmpty() {
-        // setup
-        Club incomingClubWithNoName = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(false)
-                .customClubName("")
-                .withIncome()
-                .withExpenditure()
-                .build();
-
-        // execute
-        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoName, uriInfo);
-
-        // assert
-        verify(clubService, never()).createClub(any(), any(), anyString());
-        assertNotNull(clubResponse);
-        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
-    }
-
-    /**
-     * given that the request contains a club entity whose transfer and wage budgets is greater than the manager funds
-     * set, tests that no data is persisted and a 400 Bad Request response status is returned
-     */
-    @Test
-    public void createClubWithIncorrectBudget() {
-        // setup
-        Club incomingClubWithIncorrectBudget = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(false)
-                .customTransferBudget(new BigDecimal("5000"))
-                .customWageBudget(new BigDecimal("2000"))
-                .withIncome()
-                .withExpenditure()
-                .build();
-
-        // execute
-        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithIncorrectBudget, uriInfo);
-
-        // assert
-        verify(clubService, never()).createClub(any(), any(), anyString());
-        assertNotNull(clubResponse);
-        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
-    }
-
-    /**
-     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
-     * set, tests that no data is persisted and a 400 Bad Request response status is returned
-     */
-    @Test
-    public void createClubWithIncorrectManagerFunds() {
-        // setup
-        Club incomingClubWithIncorrectBudget = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(false)
-                .customManagerFunds(new BigDecimal("10000"))
-                .withIncome()
-                .withExpenditure()
-                .build();
-
-        // execute
-        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithIncorrectBudget, uriInfo);
-
-        // assert
-        verify(clubService, never()).createClub(any(), any(), anyString());
-        assertNotNull(clubResponse);
-        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
-    }
-
-    /**
-     * given that the request contains a club entity without valid income data, tests that no data is persisted and a
-     * 400 Bad Request response status is returned
-     */
-    @Test
-    public void createClubWithoutIncomeData() {
-        // setup
-        Club incomingClubWithNoIncomeData = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(false)
-                .withExpenditure()
-                .build();
-
-        // execute
-        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoIncomeData, uriInfo);
-
-        // assert
-        verify(clubService, never()).createClub(any(), any(), anyString());
-        assertNotNull(clubResponse);
-        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
-    }
-
-    /**
-     * given that the request contains a club entity without valid income data, tests that no data is persisted and a
-     * 400 Bad Request response status is returned
-     */
-    @Test
-    public void createClubWithoutExpenditureData() {
-        // setup
-        Club incomingClubWithNoExpenditureData = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(false)
-                .withIncome()
-                .build();
-
-        // execute
-        Response clubResponse = clubResource.createClub(userPrincipal, incomingClubWithNoExpenditureData, uriInfo);
-
-        // assert
-        verify(clubService, never()).createClub(any(), any(), anyString());
-        assertNotNull(clubResponse);
-        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
-    }
-
-    /**
      * given a valid club entity in the request, tests that the corresponding club data is updated
      */
     @Test
@@ -312,9 +200,9 @@ public class ClubResourceTest {
 
     /**
      * given that the request contains a club entity whose ID does not match the existing club's ID, tests that the
-     * associated club data is not updated and a server error response is returned
+     * associated club data is not updated and a service exception is thrown instead
      */
-    @Test
+    @Test(expected = ServiceException.class)
     public void updateClubWhenIncomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
@@ -334,76 +222,11 @@ public class ClubResourceTest {
                 .build();
 
         // execute
-        Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
+        clubResource.updateClub(existingClubId, incomingClub);
 
         // assert
         verify(clubService).getClub(any());
         verify(clubService, never()).updateClub(any(), any(), any());
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, clubResponse.getStatus());
-        assertTrue(clubResponse.getEntity().toString().contains(incorrectIncomingClubId.toString()));
-    }
-
-    /**
-     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
-     * set, tests that no data is updated and a 400 Bad Request response status is returned
-     */
-    @Test
-    public void updateClubWithIncorrectManagerFunds() {
-        // setup
-        UUID existingClubId = UUID.randomUUID();
-        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(false)
-                .withId(existingClubId)
-                .build();
-        BigDecimal updatedWageBudget = incomingClubBase.getWageBudget().add(new BigDecimal("100"));
-        BigDecimal updatedTransferBudget = incomingClubBase.getTransferBudget().add(new BigDecimal("100"));
-        BigDecimal totalFunds = new BigDecimal("100");
-        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
-                .from(incomingClubBase)
-                .withUpdatedWageBudget(updatedWageBudget)
-                .withUpdatedWageBudget(updatedTransferBudget)
-                .withUpdatedManagerFunds(totalFunds)
-                .build();
-
-        // execute
-        Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
-
-        // assert
-        verify(clubService, never()).getClub(any());
-        verify(clubService, never()).updateClub(any(), any(), any());
-
-        assertNotNull(clubResponse);
-        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
-    }
-
-    /**
-     * given that the request contains a club entity  whose transfer and wage budgets is greater than the manager funds
-     * set, tests that no data is updated and a 400 Bad Request response status is returned
-     */
-    @Test
-    public void updateClubWithIncorrectBudget() {
-        // setup
-        UUID existingClubId = UUID.randomUUID();
-        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(false)
-                .withId(existingClubId)
-                .build();
-        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
-                .from(incomingClubBase)
-                .withUpdatedWageBudget(new BigDecimal("5000"))
-                .withUpdatedWageBudget(new BigDecimal("1000"))
-                .build();
-
-        // execute
-        Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
-
-        // assert
-        verify(clubService, never()).getClub(any());
-        verify(clubService, never()).updateClub(any(), any(), any());
-
-        assertNotNull(clubResponse);
-        assertEquals(HttpStatus.BAD_REQUEST_400, clubResponse.getStatus());
     }
 
     /**

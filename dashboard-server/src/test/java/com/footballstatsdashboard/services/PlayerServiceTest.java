@@ -8,6 +8,7 @@ import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.Metadata;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
@@ -29,6 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -152,6 +154,86 @@ public class PlayerServiceTest {
     }
 
     /**
+     * given that the request contains a player entity without player roles, tests that no data is persisted in
+     * couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createPlayerWhenPlayerRolesAreNotProvided() throws IOException {
+        // setup
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withAbility()
+                .withAttributes()
+                .build();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(UUID.randomUUID())
+                .withId(UUID.randomUUID())
+                .build();
+
+        // execute
+        playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
+
+        // assert
+        verify(couchbaseDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
+     * given that the request contains a player entity without player attributes, tests that no data is persisted in
+     * couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createPlayerWhenPlayerAttributesAreNotProvided() throws IOException {
+        // setup
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .build();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(UUID.randomUUID())
+                .withId(UUID.randomUUID())
+                .build();
+
+        // execute
+        playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
+
+        // assert
+        verify(couchbaseDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
+     * given that the request contains a player entity without attributes of a particular category like TECHNICAL,
+     * tests that no data is persisted in couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createPlayerWhenTechnicalPlayerAttributesAreNotProvided() throws IOException {
+        // setup
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withAbility()
+                .withPhysicalAttributes()
+                .withMentalAttributes()
+                .withRoles()
+                .build();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(UUID.randomUUID())
+                .withId(UUID.randomUUID())
+                .build();
+
+        // execute
+        playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
+
+        // assert
+        verify(couchbaseDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
      * given a valid player entity in the request, tests that an updated player entity with updated internal fields
      * is upserted in couchbase
      */
@@ -169,6 +251,8 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
                 .withId(existingPlayerId)
@@ -176,8 +260,6 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
-
         Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
                 .from(incomingPlayerBase)
                 .withUpdatedNameInMetadata("updated name")
@@ -216,6 +298,177 @@ public class PlayerServiceTest {
         // assertions for general house-keeping fields
         assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
         assertEquals(CREATED_BY, updatedPlayer.getCreatedBy());
+    }
+
+    /**
+     * given a player entity with attributes having invalid category and group information in the request, tests that
+     * the category and group names are derived from the existing data in couchbase instead of what is present in the
+     * request before updating the player data in couchbase
+     */
+    @Test
+    public void updatePlayerWithAttributesHavingInvalidCategoryAndGroupNames() {
+        // setup
+        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
+
+        UUID existingPlayerId = UUID.randomUUID();
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .hasAttributeWithInvalidCategory(true)
+                .hasAttributeWithInvalidGroup(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withRoles()
+                .withTechnicalAttributes()
+                .withPhysicalAttributes()
+                .withMentalAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata("updated name")
+                .withUpdatedRoleName("updated role name")
+                .withUpdatedAttributeValue("sprint speed", UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
+
+        // execute
+        Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+
+        // assert
+        verify(couchbaseDAO).updateDocument(resourceKeyCaptor.capture(), any());
+        ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
+        assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
+
+        updatedPlayer.getAttributes().forEach(attribute -> {
+            Attribute existingPlayerAttribute = existingPlayerInCouchbase.getAttributes().stream()
+                    .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
+                    .findFirst()
+                    .orElse(null);
+            assertNotNull(existingPlayerAttribute);
+            assertEquals(existingPlayerAttribute.getCategory(), attribute.getCategory());
+            assertEquals(existingPlayerAttribute.getGroup(), attribute.getGroup());
+        });
+    }
+
+    /**
+     * given a player entity without roles data in the request, tests that the corresponding player data in couchbase is
+     * not updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updatePlayerWhenPlayerRolesAreNotProvided() {
+        // setup
+        UUID existingPlayerId = UUID.randomUUID();
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata("updated name")
+                .withUpdatedAttributeValue("sprint speed", UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
+
+        // execute
+        playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+
+        // assert
+        verify(couchbaseDAO, never()).updateDocument(any(), any());
+    }
+
+    /**
+     * given a player entity without attributes data in the request, tests that the corresponding player data in
+     * couchbase is not updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updatePlayerWhenPlayerAttributesAreNotProvided() {
+        // setup
+        UUID existingPlayerId = UUID.randomUUID();
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withRoles()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata("updated name")
+                .withUpdatedRoleName("updated role name")
+                .build();
+
+        // execute
+        playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+
+        // assert
+        verify(couchbaseDAO, never()).updateDocument(any(), any());
+    }
+
+    /**
+     * given a player entity with an invalid attribute in the request, tests that the corresponding player data in
+     * couchbase is not updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updatePlayerWhenPlayerAttributeIncludesInvalidAttribute() {
+        // setup
+        UUID existingPlayerId = UUID.randomUUID();
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAttributes()
+                .withInvalidAttributes()
+                .withRoles()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata("updated name")
+                .withUpdatedRoleName("updated role name")
+                .build();
+
+        // execute
+        playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+
+        // assert
+        verify(couchbaseDAO, never()).updateDocument(any(), any());
     }
 
     /**

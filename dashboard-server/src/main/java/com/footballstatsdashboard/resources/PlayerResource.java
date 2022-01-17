@@ -3,6 +3,7 @@ package com.footballstatsdashboard.resources;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.Club;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.auth.Auth;
@@ -67,11 +68,6 @@ public class PlayerResource {
             LOGGER.info("createPlayer() request.");
         }
 
-        if (incomingPlayer.getRoles().size() == 0 || incomingPlayer.getAttributes().size() == 0) {
-            LOGGER.warn("Player entity in request has empty roles or attributes list!");
-            return Response.status(HttpStatus.UNPROCESSABLE_ENTITY_422).entity(incomingPlayer).build();
-        }
-
         // fetch details of club the incoming player belongs to
         Club clubDataForNewPlayer = this.clubService.getClub(incomingPlayer.getClubId());
 
@@ -93,18 +89,17 @@ public class PlayerResource {
         }
 
         Player existingPlayer = this.playerService.getPlayer(playerId);
-        // incoming player's basic details should match with that of the existing player
-        if (existingPlayer.getId().equals(incomingPlayer.getId())) {
-            // TODO: 15/04/21 add validations by checking incoming player data against existing one
-            Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, existingPlayer, playerId);
-            return Response.ok(updatedPlayer).build();
+        if (!existingPlayer.getId().equals(incomingPlayer.getId())) {
+            String errorMessage = String.format(
+                    "Incoming player ID: %s does not match ID of existing player entity in couchbase: %s.",
+                    incomingPlayer.getId(), existingPlayer.getId()
+            );
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
         }
 
-        LOGGER.error("Incoming player ID: {} does not match ID of existing player entity in couchbase: {}. " +
-                "Aborting operation!", incomingPlayer.getId(), existingPlayer.getId());
-        return Response.serverError()
-                .entity("Unable to update player with ID: " + incomingPlayer.getId().toString())
-                .build();
+        Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, existingPlayer, playerId);
+        return Response.ok(updatedPlayer).build();
     }
 
     @DELETE

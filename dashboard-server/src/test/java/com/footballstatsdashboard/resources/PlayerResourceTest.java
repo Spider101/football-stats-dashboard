@@ -7,6 +7,7 @@ import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.Club;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.jackson.Jackson;
@@ -25,7 +26,6 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -147,55 +147,6 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given that the request contains a player entity without player roles, tests that no data is persisted and a 422
-     * response status is returned
-     */
-    @Test
-    public void createPlayerWhenPlayerRolesNotProvided() throws IOException {
-        // setup
-        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(false)
-                .withMetadata()
-                .withAbility()
-                .withAttributes()
-                .build();
-
-        // execute
-        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
-
-        // assert
-        verify(clubService, never()).getClub(any());
-        verify(playerService, never()).createPlayer(any(), any(), anyString());
-        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
-        assertNotNull(playerResponse.getEntity());
-        assertEquals(incomingPlayer, playerResponse.getEntity());
-    }
-
-    /**
-     * given that the request contains a player entity without player attributes, tests that no data is persisted and a
-     * 422 response status is returned
-     */
-    @Test
-    public void createPlayerWhenPlayerAttributesNotProvided() throws IOException {
-        // setup
-        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(false)
-                .withMetadata()
-                .withRoles()
-                .build();
-
-        // execute
-        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
-
-        // assert
-        verify(clubService, never()).getClub(any());
-        verify(playerService, never()).createPlayer(any(), any(), anyString());
-        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
-        assertNotNull(playerResponse.getEntity());
-        assertEquals(incomingPlayer, playerResponse.getEntity());
-    }
-
-    /**
      * given a valid player entity in the request, tests that the corresponding player data is updated
      */
     @Test
@@ -262,9 +213,9 @@ public class PlayerResourceTest {
 
     /**
      * given that the request contains a player entity whose ID does not match the existing player's ID, tests that
-     * the associated player data is not updated and a server error response is returned
+     * the associated player data is not updated and a service exception is thrown instead
      */
-    @Test
+    @Test(expected = ServiceException.class)
     public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
@@ -293,9 +244,6 @@ public class PlayerResourceTest {
         // assert
         verify(playerService).getPlayer(any());
         verify(playerService, never()).updatePlayer(any(), any(), any());
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, playerResponse.getStatus());
-        assertTrue(playerResponse.getEntity().toString().contains(incomingPlayerId.toString()));
     }
 
     /**

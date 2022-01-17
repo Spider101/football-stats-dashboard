@@ -10,17 +10,26 @@ import com.footballstatsdashboard.api.model.club.ImmutableManagerFunds;
 import com.footballstatsdashboard.api.model.club.Income;
 import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
+import com.footballstatsdashboard.core.validations.Validation;
+import com.footballstatsdashboard.core.validations.ValidationSeverity;
 import com.footballstatsdashboard.db.ClubDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 public class ClubService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClubService.class);
     private final ClubDAO<ResourceKey> clubDAO;
 
     public ClubService(ClubDAO<ResourceKey> clubDAO) {
@@ -33,6 +42,14 @@ public class ClubService {
     }
 
     public Club createClub(Club incomingClub, UUID userId, String createdBy) {
+        List<Validation> validationList = validateIncomingClub(incomingClub, true);
+        if (!validationList.isEmpty()) {
+            LOGGER.error("Unable to create new club! Found errors: {}", validationList);
+            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, "Invalid incoming club data.",
+                    validationList);
+        }
+
+        // process and persist the club data if no validations found
         ManagerFunds newManagerFunds = ImmutableManagerFunds.builder()
                 .from(incomingClub.getManagerFunds())
                 .history(Collections.singletonList(incomingClub.getManagerFunds().getCurrent()))
@@ -67,6 +84,14 @@ public class ClubService {
     }
 
     public Club updateClub(Club incomingClub, Club existingClub, UUID existingClubId) {
+        List<Validation> validationList = validateIncomingClub(incomingClub, false);
+        if (!validationList.isEmpty()) {
+            LOGGER.error("Unable to update club! Found errors: {}", validationList);
+            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, "Invalid incoming club entity.",
+                    validationList);
+        }
+
+        // process and update the club data if no validations are found
         ImmutableClub.Builder updatedClubBuilder = ImmutableClub.builder()
                 .from(existingClub);
 
@@ -107,5 +132,30 @@ public class ClubService {
 
     public List<SquadPlayer> getSquadPlayers(UUID clubId) {
         return this.clubDAO.getPlayersInClub(clubId);
+    }
+
+    private List<Validation> validateIncomingClub(Club incomingClub, boolean isForNewClub) {
+        List<Validation> validationList = new ArrayList<>();
+        if (isForNewClub) {
+            if (StringUtils.isEmpty(incomingClub.getName())) {
+                validationList.add(new Validation(ValidationSeverity.ERROR, "Empty club name is not allowed!"));
+            }
+
+            if (incomingClub.getIncome() == null) {
+                validationList.add(new Validation(ValidationSeverity.ERROR, "New club must have income data!"));
+            }
+
+            if (incomingClub.getExpenditure() == null) {
+                validationList.add(new Validation(ValidationSeverity.ERROR, "New club must have expenditure data!"));
+            }
+        }
+
+        BigDecimal totalBudget = incomingClub.getTransferBudget().add(incomingClub.getWageBudget());
+        if (totalBudget.compareTo(incomingClub.getManagerFunds().getCurrent()) != 0) {
+            validationList.add(new Validation(ValidationSeverity.ERROR,
+                    "Transfer and wage budget must add up to manager funds!"));
+        }
+
+        return validationList;
     }
 }
