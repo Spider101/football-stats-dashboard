@@ -11,15 +11,23 @@ import com.footballstatsdashboard.api.model.player.ImmutableAbility;
 import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
 import com.footballstatsdashboard.api.model.player.Metadata;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
+import com.footballstatsdashboard.core.validations.Validation;
+import com.footballstatsdashboard.core.validations.ValidationSeverity;
 import com.footballstatsdashboard.db.CouchbaseDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.jetty.http.HttpStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -33,6 +41,7 @@ public class PlayerService {
     //  infer the number of categories from it
     private static final int NUMBER_OF_ATTRIBUTE_CATEGORIES = 3;
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
+    private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
 
     private final CouchbaseDAO<ResourceKey> couchbaseDAO;
 
@@ -46,6 +55,14 @@ public class PlayerService {
     }
 
     public Player createPlayer(Player incomingPlayer, Club clubDataForNewPlayer, String createdBy) throws IOException {
+        List<Validation> validationList = validateIncomingPlayer(incomingPlayer, null);
+        if (!validationList.isEmpty()) {
+            LOGGER.error("Unable to create new player! Found errors: {}", validationList);
+            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, "Invalid incoming player data",
+                    validationList);
+        }
+
+        // process and persist the player data if no validations found
         TypeReference<List<CountryCodeMetadata>> countryCodeMetadataTypeRef = new TypeReference<>() { };
         List<CountryCodeMetadata> countryCodeMetadataList =
                 FIXTURE_LOADER.loadFixture("countryCodeMapping.json", countryCodeMetadataTypeRef);
@@ -105,8 +122,14 @@ public class PlayerService {
     }
 
     public Player updatePlayer(Player incomingPlayer, Player existingPlayer, UUID playerId) {
-        ResourceKey resourceKey = new ResourceKey(playerId);
+        List<Validation> validationList = validateIncomingPlayer(incomingPlayer, existingPlayer);
+        if (!validationList.isEmpty()) {
+            LOGGER.error("Unable to create new player! Found errors: {}", validationList);
+            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, "Invalid incoming player data",
+                    validationList);
+        }
 
+        // process and persist the player data if no validations found
         List<Attribute> updatedPlayerAttributes = incomingPlayer.getAttributes().stream()
                 .map(incomingAttribute -> {
                     Attribute existingPlayerAttribute = existingPlayer.getAttributes().stream()
@@ -142,6 +165,8 @@ public class PlayerService {
                 .lastModifiedDate(LocalDate.now());
 
         Player updatedPlayer = updatedPlayerBuilder.build();
+
+        ResourceKey resourceKey = new ResourceKey(playerId);
         this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer);
         return updatedPlayer;
     }
@@ -150,6 +175,34 @@ public class PlayerService {
     public void deletePlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
         this.couchbaseDAO.deleteDocument(resourceKey);
+    }
+
+    private List<Validation> validateIncomingPlayer(Player incomingPlayer, Player existingPlayer) {
+        List<Validation> validationList = new ArrayList<>();
+        if (incomingPlayer.getRoles().size() == 0) {
+            validationList.add(
+                    new Validation(ValidationSeverity.ERROR, "Player must have list of roles associated with it!")
+            );
+        }
+
+        if (incomingPlayer.getAttributes().size() == 0) {
+            validationList.add(
+                    new Validation(ValidationSeverity.ERROR, "Player must have list of associated attributes!")
+            );
+        }
+
+        // validate that the attribute names for the incoming player data matches the existing player data
+        if (existingPlayer != null) {
+            List<String> existingPlayerAttributeNames = existingPlayer.getAttributes().stream()
+                    .map(Attribute::getName)
+                    .collect(Collectors.toList());
+            if (incomingPlayer.getAttributes().stream()
+                    .anyMatch(attribute -> !existingPlayerAttributeNames.contains(attribute.getName()))) {
+                validationList.add(new Validation(ValidationSeverity.ERROR,
+                        "Incoming Player attribute names must match existing player data"));
+            }
+        }
+        return validationList;
     }
 
     private Integer calculateCurrentAbility(List<Attribute> playerAttributes) {
