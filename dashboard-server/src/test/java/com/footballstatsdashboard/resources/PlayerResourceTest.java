@@ -147,55 +147,6 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given that the request contains a player entity without player roles, tests that no data is persisted and a 422
-     * response status is returned
-     */
-    @Test
-    public void createPlayerWhenPlayerRolesNotProvided() throws IOException {
-        // setup
-        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(false)
-                .withMetadata()
-                .withAbility()
-                .withAttributes()
-                .build();
-
-        // execute
-        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
-
-        // assert
-        verify(clubService, never()).getClub(any());
-        verify(playerService, never()).createPlayer(any(), any(), anyString());
-        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
-        assertNotNull(playerResponse.getEntity());
-        assertEquals(incomingPlayer, playerResponse.getEntity());
-    }
-
-    /**
-     * given that the request contains a player entity without player attributes, tests that no data is persisted and a
-     * 422 response status is returned
-     */
-    @Test
-    public void createPlayerWhenPlayerAttributesNotProvided() throws IOException {
-        // setup
-        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(false)
-                .withMetadata()
-                .withRoles()
-                .build();
-
-        // execute
-        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
-
-        // assert
-        verify(clubService, never()).getClub(any());
-        verify(playerService, never()).createPlayer(any(), any(), anyString());
-        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, playerResponse.getStatus());
-        assertNotNull(playerResponse.getEntity());
-        assertEquals(incomingPlayer, playerResponse.getEntity());
-    }
-
-    /**
      * given a valid player entity in the request, tests that the corresponding player data is updated
      */
     @Test
