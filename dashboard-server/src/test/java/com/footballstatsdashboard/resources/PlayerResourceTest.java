@@ -7,6 +7,7 @@ import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.Club;
+import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.jackson.Jackson;
@@ -25,7 +26,6 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -213,9 +213,9 @@ public class PlayerResourceTest {
 
     /**
      * given that the request contains a player entity whose ID does not match the existing player's ID, tests that
-     * the associated player data is not updated and a server error response is returned
+     * the associated player data is not updated and a service exception is thrown instead
      */
-    @Test
+    @Test(expected = ServiceException.class)
     public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
@@ -244,9 +244,6 @@ public class PlayerResourceTest {
         // assert
         verify(playerService).getPlayer(any());
         verify(playerService, never()).updatePlayer(any(), any(), any());
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR_500, playerResponse.getStatus());
-        assertTrue(playerResponse.getEntity().toString().contains(incomingPlayerId.toString()));
     }
 
     /**
