@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalDouble;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -114,7 +115,6 @@ public class PlayerService {
         }
 
         Integer currentAbility = calculateCurrentAbility(newPlayerAttributes);
-        // TODO: 1/4/2022 throw error if current ability is null
         Ability newPlayerAbility = ImmutableAbility.builder()
                 .current(currentAbility)
                 .history(ImmutableList.of(currentAbility))
@@ -165,7 +165,6 @@ public class PlayerService {
                 .collect(Collectors.toList());
 
         Integer currentAbility = calculateCurrentAbility(updatedPlayerAttributes);
-        // TODO: 1/4/2022 throw error if current ability is null
         Ability updatedPlayerAbility = ImmutableAbility.builder()
                 .from(Objects.requireNonNull(existingPlayer.getAbility()))
                 .current(currentAbility)
@@ -222,29 +221,27 @@ public class PlayerService {
     }
 
     private Integer calculateCurrentAbility(List<Attribute> playerAttributes) {
-        double meanTechnicalAbility =  playerAttributes.stream()
-                .filter(attribute -> "Technical".equals(attribute.getCategory()))
-                .mapToInt(Attribute::getValue)
-                .average()
-                .orElse(Double.NaN);
-
-        double meanPhysicalAbility = playerAttributes.stream()
-                .filter(attribute -> "Physical".equals(attribute.getCategory()))
-                .mapToInt(Attribute::getValue)
-                .average()
-                .orElse(Double.NaN);
-
-        double meanMentalAbility = playerAttributes.stream()
-                .filter(attribute -> "Mental".equals(attribute.getCategory()))
-                .mapToInt(Attribute::getValue)
-                .average()
-                .orElse(Double.NaN);
-        if (Double.isNaN(meanTechnicalAbility) || Double.isNaN(meanPhysicalAbility)
-                || Double.isNaN(meanMentalAbility)) {
-            return null;
+        List<OptionalDouble> meanAttributeByCategories = ATTRIBUTE_CATEGORIES.stream()
+                .map(attributeCategory -> playerAttributes.stream()
+                        .filter(attribute -> attributeCategory.equals(attribute.getCategory()))
+                        .mapToInt(Attribute::getValue)
+                        .average())
+                .collect(Collectors.toList());
+        OptionalDouble weightedMeanAttributes = meanAttributeByCategories.stream()
+                // this should be true always because we throw validation unless there is at least one attribute for
+                // each category
+                .filter(OptionalDouble::isPresent)
+                .mapToDouble(OptionalDouble::getAsDouble)
+                .average();
+        if (weightedMeanAttributes.isPresent()) {
+            return (int) weightedMeanAttributes.getAsDouble();
+        } else {
+            // this else block should never be entered because we throw validation unless there is at least one
+            // attribute for each category; investigate if it does
+            LOGGER.error("Unable to calculate the current ability of the player from its attributes {}",
+                    playerAttributes);
+            throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR_500,
+                    "Something went wrong trying to calculate current ability of player");
         }
-        return Math.toIntExact(Math.round(
-                (meanTechnicalAbility + meanPhysicalAbility + meanPhysicalAbility) / NUMBER_OF_ATTRIBUTE_CATEGORIES
-        ));
     }
 }
