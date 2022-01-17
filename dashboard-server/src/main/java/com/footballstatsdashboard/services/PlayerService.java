@@ -147,21 +147,16 @@ public class PlayerService {
 
         // process and persist the player data if no validations found
         List<Attribute> updatedPlayerAttributes = incomingPlayer.getAttributes().stream()
-                .map(incomingAttribute -> {
-                    Attribute existingPlayerAttribute = existingPlayer.getAttributes().stream()
-                            .filter(attribute -> attribute.getName().equals(incomingAttribute.getName()))
-                            .findFirst().orElse(null);
-                    if (existingPlayerAttribute != null) {
-                        return ImmutableAttribute.builder()
+                .map(incomingAttribute -> existingPlayer.getAttributes().stream()
+                        .filter(attribute -> attribute.getName().equals(incomingAttribute.getName()))
+                        .map(existingPlayerAttribute ->  ImmutableAttribute.builder()
                                 .from(existingPlayerAttribute)
                                 .name(incomingAttribute.getName())
                                 .value(incomingAttribute.getValue())
                                 .addHistory(incomingAttribute.getValue())
-                                .build();
-                    }
-                    // TODO: 1/2/2022 figure out if an error should be thrown if existing player attribute is null
-                    return incomingAttribute;
-                })
+                                .build()
+                        ).collect(Collectors.toList()))
+                .flatMap(Collection::stream)
                 .collect(Collectors.toList());
 
         Integer currentAbility = calculateCurrentAbility(updatedPlayerAttributes);
