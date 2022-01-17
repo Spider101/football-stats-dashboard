@@ -8,15 +8,13 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Attribute;
+import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.api.model.player.Role;
 import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
-import com.footballstatsdashboard.api.model.player.Metadata;
-
 import javax.annotation.Nullable;
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -60,7 +58,6 @@ public interface Player {
      * Information about the player's attributes
      */
     @Valid
-    @Size(min = 1)
     List<Attribute> getAttributes();
 
     /**
