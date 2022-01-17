@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.footballstatsdashboard.core.validations.Validation;
 import io.dropwizard.jackson.Jackson;
-import org.eclipse.jetty.util.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ public class ServiceException extends RuntimeException {
     }
 
     private String getCustomResponseBody() {
-        if (StringUtil.isBlank(this.getMessage())) {
+        if (StringUtils.isBlank(this.getMessage())) {
             return null;
         }
         Map<String, Object> params = new HashMap<>();
