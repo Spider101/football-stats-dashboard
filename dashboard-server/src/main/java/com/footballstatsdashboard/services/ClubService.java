@@ -45,11 +45,11 @@ public class ClubService {
         List<Validation> validationList = validateIncomingClub(incomingClub, true);
         if (validationList.size() > 0) {
             LOGGER.error("Unable to create new club! Found errors: {}", validationList);
-            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, "Invalid incoming club entity.",
+            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, "Invalid incoming club data.",
                     validationList);
         }
 
-        // process and persist the club if no validations found
+        // process and persist the club data if no validations found
         ManagerFunds newManagerFunds = ImmutableManagerFunds.builder()
                 .from(incomingClub.getManagerFunds())
                 .history(Collections.singletonList(incomingClub.getManagerFunds().getCurrent()))
