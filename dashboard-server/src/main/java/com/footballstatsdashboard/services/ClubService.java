@@ -43,7 +43,7 @@ public class ClubService {
 
     public Club createClub(Club incomingClub, UUID userId, String createdBy) {
         List<Validation> validationList = validateIncomingClub(incomingClub, true);
-        if (validationList.size() > 0) {
+        if (!validationList.isEmpty()) {
             LOGGER.error("Unable to create new club! Found errors: {}", validationList);
             throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, "Invalid incoming club data.",
                     validationList);
@@ -85,7 +85,7 @@ public class ClubService {
 
     public Club updateClub(Club incomingClub, Club existingClub, UUID existingClubId) {
         List<Validation> validationList = validateIncomingClub(incomingClub, false);
-        if (validationList.size() > 0) {
+        if (!validationList.isEmpty()) {
             LOGGER.error("Unable to update club! Found errors: {}", validationList);
             throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, "Invalid incoming club entity.",
                     validationList);
