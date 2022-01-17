@@ -433,6 +433,45 @@ public class PlayerServiceTest {
     }
 
     /**
+     * given a player entity with an invalid attribute in the request, tests that the corresponding player data in
+     * couchbase is not updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updatePlayerWhenPlayerAttributeIncludesInvalidAttribute() {
+        // setup
+        UUID existingPlayerId = UUID.randomUUID();
+        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAttributes()
+                .withInvalidAttributes()
+                .withRoles()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata("updated name")
+                .withUpdatedRoleName("updated role name")
+                .build();
+
+        // execute
+        playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+
+        // assert
+        verify(couchbaseDAO, never()).updateDocument(any(), any());
+    }
+
+    /**
      * given a valid player id, removes the player entity from couchbase
      */
     @Test
