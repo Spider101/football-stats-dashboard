@@ -206,6 +206,34 @@ public class PlayerServiceTest {
     }
 
     /**
+     * given that the request contains a player entity without attributes of a particular category like TECHNICAL,
+     * tests that no data is persisted in couchbase and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createPlayerWhenTechnicalPlayerAttributesAreNotProvided() throws IOException {
+        // setup
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withAbility()
+                .withPhysicalAttributes()
+                .withMentalAttributes()
+                .withRoles()
+                .build();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(UUID.randomUUID())
+                .withId(UUID.randomUUID())
+                .build();
+
+        // execute
+        playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
+
+        // assert
+        verify(couchbaseDAO, never()).insertDocument(any(), any());
+    }
+
+    /**
      * given a valid player entity in the request, tests that an updated player entity with updated internal fields
      * is upserted in couchbase
      */

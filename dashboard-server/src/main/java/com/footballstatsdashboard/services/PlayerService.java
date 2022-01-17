@@ -37,9 +37,8 @@ import java.util.stream.Collectors;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ATTRIBUTE_CATEGORY_MAP;
 
 public class PlayerService {
-    // TODO: 1/4/2022 remove suppression if and when we switch to using enum for attribute categories since we can
-    //  infer the number of categories from it
-    private static final int NUMBER_OF_ATTRIBUTE_CATEGORIES = 3;
+    // TODO: 1/4/2022 remove constant if and when we switch to using enum for attribute categories
+    private static final List<String> ATTRIBUTE_CATEGORIES = ImmutableList.of("Technical", "Mental", "Physical");
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
 
@@ -96,6 +95,23 @@ public class PlayerService {
                             .build();
                 })
                 .collect(Collectors.toList());
+
+        // validate player attributes after adding category information
+        ATTRIBUTE_CATEGORIES.forEach(attributeCategory -> {
+            if (newPlayerAttributes.stream()
+                    .noneMatch(attribute -> attributeCategory.equals(attribute.getCategory()))) {
+                validationList.add(new Validation(ValidationSeverity.ERROR,
+                        String.format("Player has no attributes associated to %s category", attributeCategory)));
+            }
+        });
+
+        // early exit by throwing exception if any validations against the player attributes fail
+        if (!validationList.isEmpty()) {
+            String errorMessage = String.format("Player must have at least one attribute from each of %s categories",
+                    ATTRIBUTE_CATEGORIES);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, errorMessage, validationList);
+        }
 
         Integer currentAbility = calculateCurrentAbility(newPlayerAttributes);
         // TODO: 1/4/2022 throw error if current ability is null
