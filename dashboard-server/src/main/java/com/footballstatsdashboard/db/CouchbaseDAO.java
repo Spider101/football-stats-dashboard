@@ -44,14 +44,7 @@ public class CouchbaseDAO<K> {
 
     public <D> D getDocument(K key, Class<D> clazz) {
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        GetResult result;
-
-        try {
-            result = bucketContainer.getBucket().defaultCollection().get(documentKey);
-        } catch (DocumentNotFoundException docEx) {
-            throw new RuntimeException("Unable to find document with Id: " + documentKey);
-        }
-
+        GetResult result = bucketContainer.getBucket().defaultCollection().get(documentKey);
         return result.contentAs(clazz);
     }
 
