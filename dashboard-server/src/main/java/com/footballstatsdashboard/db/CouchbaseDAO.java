@@ -1,6 +1,5 @@
 package com.footballstatsdashboard.db;
 
-import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.kv.GetResult;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
@@ -50,10 +49,6 @@ public class CouchbaseDAO<K> {
 
     public void deleteDocument(K key) {
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        try {
-            this.bucketContainer.getBucket().defaultCollection().remove(documentKey);
-        } catch (DocumentNotFoundException docEx) {
-            throw new RuntimeException("Unable to find document with Id: " + documentKey);
-        }
+        this.bucketContainer.getBucket().defaultCollection().remove(documentKey);
     }
 }
