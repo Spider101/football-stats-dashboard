@@ -489,22 +489,22 @@ public class PlayerServiceTest {
     }
 
     /**
-     * given that the couchbase DAO throws a RuntimeException when it cannot find the player entity to remove, the
-     * same exception is propagated and thrown by the resource method as well
+     * given an invalid player id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * ServiceException is thrown instead
      */
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ServiceException.class)
     public void deletePlayerWhenPlayerNotFound() {
         // setup
-        UUID playerId = UUID.randomUUID();
+        UUID invalidPlayerId = UUID.randomUUID();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-        doThrow(new RuntimeException("player not found")).when(couchbaseDAO).deleteDocument(any());
+        doThrow(ServiceException.class).when(couchbaseDAO).deleteDocument(any());
 
         // execute
-        playerService.deletePlayer(playerId);
+        playerService.deletePlayer(invalidPlayerId);
 
         // assert
         verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
-        assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
+        assertEquals(invalidPlayerId, resourceKeyCaptor.getValue().getResourceId());
     }
 
     private void assertCountryLogo(Metadata createdPlayerMetadata) throws IOException {

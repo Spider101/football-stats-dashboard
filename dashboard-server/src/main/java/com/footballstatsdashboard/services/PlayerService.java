@@ -192,7 +192,13 @@ public class PlayerService {
     // TODO: 1/3/2022 add checks to make sure player being deleted belongs to the club and user making the request
     public void deletePlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
-        this.couchbaseDAO.deleteDocument(resourceKey);
+        try {
+            this.couchbaseDAO.deleteDocument(resourceKey);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            LOGGER.error("No player entity found for ID: {}", playerId);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404,
+                    String.format("Cannot delete player (ID: %s) that does not exist", playerId));
+        }
     }
 
     private List<Validation> validateIncomingPlayer(Player incomingPlayer, Player existingPlayer) {
