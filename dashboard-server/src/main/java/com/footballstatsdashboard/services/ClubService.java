@@ -131,7 +131,13 @@ public class ClubService {
 
     public void deleteClub(UUID clubId) {
         ResourceKey resourceKey = new ResourceKey(clubId);
-        this.clubDAO.deleteDocument(resourceKey);
+        try {
+            this.clubDAO.deleteDocument(resourceKey);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            LOGGER.error("No club entity found for ID: {}", clubId);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404,
+                    String.format("Cannot delete club (ID: %s) that does not exist", clubId));
+        }
     }
 
     public List<ClubSummary> getClubSummariesByUserId(UUID userId) {

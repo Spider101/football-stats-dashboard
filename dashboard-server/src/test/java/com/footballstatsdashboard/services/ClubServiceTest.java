@@ -28,6 +28,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -483,6 +484,25 @@ public class ClubServiceTest {
         verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(clubId, capturedResourceKey.getResourceId());
+    }
+
+    /**
+     * given an invalid club id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * ServiceException is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void deleteClubWhenClubNotFoundInCouchbase() {
+        // setup
+        UUID invalidClubId = UUID.randomUUID();
+        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
+        doThrow(DocumentNotFoundException.class).when(clubDAO).deleteDocument(any());
+
+        // execute
+        clubService.deleteClub(invalidClubId);
+
+        // assert
+        verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
+        assertEquals(invalidClubId, resourceKeyCaptor.getValue().getResourceId());
     }
 
     /**
