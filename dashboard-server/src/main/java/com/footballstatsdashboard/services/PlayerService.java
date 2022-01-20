@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.services;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.footballstatsdashboard.api.model.CountryCodeMetadata;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
@@ -51,7 +52,14 @@ public class PlayerService {
 
     public Player getPlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
-        return this.couchbaseDAO.getDocument(resourceKey, Player.class);
+
+        try {
+            return this.couchbaseDAO.getDocument(resourceKey, Player.class);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            String errorMessage = String.format("No player entity found for ID: %s", playerId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
     }
 
     public Player createPlayer(Player incomingPlayer, Club clubDataForNewPlayer, String createdBy) throws IOException {

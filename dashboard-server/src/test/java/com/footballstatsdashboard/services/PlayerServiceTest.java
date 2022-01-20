@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.services;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.PlayerDataProvider;
@@ -83,15 +84,14 @@ public class PlayerServiceTest {
     }
 
     /**
-     * given a runtime exception is thrown by couchbase DAO when player entity is not found, verifies that the same
-     * exception is thrown by `getPlayer` resource method as well
+     * given an invalid player id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * ServiceException is thrown instead
      */
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ServiceException.class)
     public void getPlayerWhenPlayerNotFoundInCouchbase() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
-        when(couchbaseDAO.getDocument(any(), any()))
-                .thenThrow(new RuntimeException("Unable to find document with Id: " + invalidPlayerId));
+        when(couchbaseDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
 
         // execute
         playerService.getPlayer(invalidPlayerId);
