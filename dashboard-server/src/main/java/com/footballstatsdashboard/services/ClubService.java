@@ -43,8 +43,8 @@ public class ClubService {
         try {
             return this.clubDAO.getDocument(resourceKey, Club.class);
         } catch (DocumentNotFoundException documentNotFoundException) {
-            String errorMessage = "No club entity found for ID: {}";
-            LOGGER.error(errorMessage, clubId);
+            String errorMessage = String.format("No club entity found for ID: %s", clubId);
+            LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
     }
