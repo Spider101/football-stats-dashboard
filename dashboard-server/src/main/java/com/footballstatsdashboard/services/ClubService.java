@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.services;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
@@ -38,7 +39,14 @@ public class ClubService {
 
     public Club getClub(UUID clubId) {
         ResourceKey resourceKey = new ResourceKey(clubId);
-        return this.clubDAO.getDocument(resourceKey, Club.class);
+
+        try {
+            return this.clubDAO.getDocument(resourceKey, Club.class);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            String errorMessage = "No club entity found for ID: {}";
+            LOGGER.error(errorMessage, clubId);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
     }
 
     public Club createClub(Club incomingClub, UUID userId, String createdBy) {

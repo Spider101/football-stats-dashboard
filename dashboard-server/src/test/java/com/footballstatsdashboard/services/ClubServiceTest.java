@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.services;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
@@ -82,17 +83,15 @@ public class ClubServiceTest {
         assertEquals(userId, club.getUserId());
     }
 
-    // TODO: 1/15/2022 verify that a 404 is thrown here instead of a raw runtime exception
     /**
-     * given a runtime exception is thrown by couchbase DAO when club entity is not found, verifies that the same
-     * exception is thrown by `getClub` resource method as well
+     * given an invalid club id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * ServiceException is thrown instead
      */
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ServiceException.class)
     public void getClubWhenClubNotFoundInCouchbase() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.getDocument(any(), any()))
-                .thenThrow(new RuntimeException("Unable to find document with ID: " + invalidClubId));
+        when(clubDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
 
         // execute
         clubService.getClub(invalidClubId);
