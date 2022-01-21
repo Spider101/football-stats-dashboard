@@ -230,6 +230,45 @@ public class ClubResourceTest {
     }
 
     /**
+     * given that the request contains a club that does not belong to the current user, tests that the club data is not
+     * updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updateClubWhenClubDoesNotBelongToUser() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userPrincipal.getId())
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubService.getClub(eq(existingClubId), eq(userPrincipal.getId()))).thenThrow(ServiceException.class);
+
+        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedTransferBudget(updatedTransferBudget)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedManagerFunds(totalFunds)
+                .build();
+
+        // execute
+        clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
+
+        // assert
+        verify(clubService).getClub(any(), any());
+        verify(clubService, never()).updateClub(any(), any(), any());
+    }
+
+    /**
      * given a valid club ID, removes the club data and a 204 No Content response is returned
      */
     @Test
