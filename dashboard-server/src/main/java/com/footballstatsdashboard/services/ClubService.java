@@ -136,7 +136,15 @@ public class ClubService {
         return updatedClub;
     }
 
-    public void deleteClub(UUID clubId) {
+    public void deleteClub(UUID clubId, Club existingClub, UUID authorizedUserId) {
+        // ensure user has access to the club that is being requested to be deleted
+        if (existingClub.getUserId() != authorizedUserId) {
+            LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
+                    clubId, authorizedUserId);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403,
+                    "User does not have access to this club!");
+        }
+
         ResourceKey resourceKey = new ResourceKey(clubId);
         try {
             this.clubDAO.deleteDocument(resourceKey);

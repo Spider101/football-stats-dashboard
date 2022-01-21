@@ -28,7 +28,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -499,10 +498,17 @@ public class ClubServiceTest {
     public void deleteClubRemovesClubFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .withId(clubId)
+                .existingUserId(userId)
+                .withIncome()
+                .withExpenditure()
+                .build();
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
-        clubService.deleteClub(clubId);
+        clubService.deleteClub(clubId, existingClub, userId);
 
         // assert
         verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
@@ -511,22 +517,26 @@ public class ClubServiceTest {
     }
 
     /**
-     * given an invalid club id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
-     * ServiceException is thrown instead
+     * given an ID to a club not belong to a user, tests that the club data is not deleted from couchbase and a service
+     * exception is thrown instead
      */
     @Test(expected = ServiceException.class)
-    public void deleteClubWhenClubNotFoundInCouchbase() {
+    public void deleteClubWhenClubDoesNotBelongToUser() {
         // setup
-        UUID invalidClubId = UUID.randomUUID();
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-        doThrow(DocumentNotFoundException.class).when(clubDAO).deleteDocument(any());
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .withId(existingClubId)
+                .existingUserId(UUID.randomUUID())
+                .withIncome()
+                .withExpenditure()
+                .build();
 
         // execute
-        clubService.deleteClub(invalidClubId);
+        clubService.deleteClub(existingClubId, existingClub, userId);
 
         // assert
-        verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
-        assertEquals(invalidClubId, resourceKeyCaptor.getValue().getResourceId());
+        verify(clubDAO, never()).deleteDocument(any());
     }
 
     /**
