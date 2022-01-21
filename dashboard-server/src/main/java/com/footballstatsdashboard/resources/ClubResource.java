@@ -101,13 +101,15 @@ public class ClubResource {
     @DELETE
     @Path(CLUB_ID_PATH)
     public Response deleteClub(
-            @Auth @PathParam(CLUB_ID) UUID clubId) {
+            @Auth User user,
+            @PathParam(CLUB_ID) UUID clubId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("deleteClub() request for club with ID: {}", clubId);
         }
 
-        this.clubService.deleteClub(clubId);
+        Club existingClub = this.clubService.getClub(clubId, user.getId());
+        this.clubService.deleteClub(clubId, existingClub, user.getId());
         return Response.noContent().build();
     }
 

@@ -269,22 +269,43 @@ public class ClubResourceTest {
     }
 
     /**
-     * given a valid club ID, removes the club data and a 204 No Content response is returned
+     * given a valid club ID, tests that the club data is removed and a 204 No Content response is returned
      */
     @Test
     public void deleteClubRemovesClubData() {
         // setup
         UUID clubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .withId(clubId)
+                .existingUserId(UUID.randomUUID())
+                .build();
+        when(clubService.getClub(eq(clubId), eq(userPrincipal.getId()))).thenReturn(existingClub);
 
         // execute
-        Response clubResponse = clubResource.deleteClub(clubId);
+        Response clubResponse = clubResource.deleteClub(userPrincipal, clubId);
 
         // assert
-        verify(clubService).deleteClub(eq(clubId));
+        verify(clubService).getClub(any(), any());
+        verify(clubService).deleteClub(any(), any(), any());
         assertEquals(HttpStatus.NO_CONTENT_204, clubResponse.getStatus());
     }
 
-    // TODO: 1/6/2022 add test when trying to delete a club not belonging to user
+    /**
+     * given an invalid club id, tests that no data is deleted and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void deleteClubWhenClubNotFoundInCouchbase() {
+        // setup
+        UUID invalidClubId = UUID.randomUUID();
+        when(clubService.getClub(eq(invalidClubId), eq(userPrincipal.getId()))).thenThrow(ServiceException.class);
+
+        // execute
+        clubResource.deleteClub(userPrincipal, invalidClubId);
+
+        // assert
+        verify(clubService, never()).deleteClub(any(), any(), any());
+    }
 
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched and
