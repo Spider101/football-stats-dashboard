@@ -91,13 +91,13 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(eq(clubId))).thenReturn(existingClub);
+        when(clubService.getClub(eq(clubId), any())).thenReturn(existingClub);
 
         // execute
-        Response clubResponse = clubResource.getClub(clubId);
+        Response clubResponse = clubResource.getClub(userPrincipal, clubId);
 
         // assert
-        verify(clubService).getClub(any());
+        verify(clubService).getClub(any(), any());
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
@@ -156,7 +156,7 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(any())).thenReturn(existingClub);
+        when(clubService.getClub(any(), any())).thenReturn(existingClub);
 
         BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
         BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
@@ -181,10 +181,10 @@ public class ClubResourceTest {
         when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClub);
 
         // execute
-        Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
+        Response clubResponse = clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
 
         // assert
-        verify(clubService).getClub(eq(existingClubId));
+        verify(clubService).getClub(eq(existingClubId), any());
         verify(clubService).updateClub(eq(incomingClub), eq(existingClub), eq(existingClubId));
 
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
@@ -213,7 +213,7 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(any())).thenReturn(existingClub);
+        when(clubService.getClub(any(), any())).thenReturn(existingClub);
 
         UUID incorrectIncomingClubId = UUID.randomUUID();
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
@@ -222,10 +222,10 @@ public class ClubResourceTest {
                 .build();
 
         // execute
-        clubResource.updateClub(existingClubId, incomingClub);
+        clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
 
         // assert
-        verify(clubService).getClub(any());
+        verify(clubService).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
     }
 

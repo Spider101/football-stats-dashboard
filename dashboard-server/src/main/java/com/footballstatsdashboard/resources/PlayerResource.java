@@ -69,7 +69,7 @@ public class PlayerResource {
         }
 
         // fetch details of club the incoming player belongs to
-        Club clubDataForNewPlayer = this.clubService.getClub(incomingPlayer.getClubId());
+        Club clubDataForNewPlayer = this.clubService.getClub(incomingPlayer.getClubId(), user.getId());
 
         Player newPlayer = this.playerService.createPlayer(incomingPlayer, clubDataForNewPlayer, user.getEmail());
 

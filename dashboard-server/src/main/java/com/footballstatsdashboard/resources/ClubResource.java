@@ -46,13 +46,14 @@ public class ClubResource {
     @GET
     @Path(CLUB_ID_PATH)
     public Response getClub(
-            @Auth @PathParam(CLUB_ID) UUID clubId) {
+            @Auth User user,
+            @PathParam(CLUB_ID) UUID clubId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getClub() request for club with ID: {}", clubId);
         }
 
-        Club club = this.clubService.getClub(clubId);
+        Club club = this.clubService.getClub(clubId, user.getId());
         return Response.ok().entity(club).build();
     }
 
@@ -75,14 +76,15 @@ public class ClubResource {
     @PUT
     @Path(CLUB_ID_PATH)
     public Response updateClub(
-            @Auth @PathParam(CLUB_ID) UUID existingClubId,
+            @Auth User user,
+            @PathParam(CLUB_ID) UUID existingClubId,
             @Valid @NotNull Club incomingClub) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
         }
 
-        Club existingClub = this.clubService.getClub(existingClubId);
+        Club existingClub = this.clubService.getClub(existingClubId, user.getId());
         if (!existingClub.getId().equals(incomingClub.getId())) {
             String errorMessage = String.format(
                     "Incoming club entity ID: %s does not match ID of existing club entity %s.",

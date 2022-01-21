@@ -132,7 +132,7 @@ public class PlayerResourceTest {
                 .existingUserId(userPrincipal.getId())
                 .withId(UUID.randomUUID())
                 .build();
-        when(clubService.getClub(any())).thenReturn(existingClub);
+        when(clubService.getClub(any(), any())).thenReturn(existingClub);
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
