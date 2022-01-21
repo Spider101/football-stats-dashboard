@@ -45,8 +45,7 @@ public class ClubService {
             if (club.getUserId() != authorizedUserId) {
                 LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
                         clubId, authorizedUserId);
-                throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422,
-                        "User does not have access to this club!");
+                throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
             }
             return club;
         } catch (DocumentNotFoundException documentNotFoundException) {
@@ -141,8 +140,7 @@ public class ClubService {
         if (existingClub.getUserId() != authorizedUserId) {
             LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
                     clubId, authorizedUserId);
-            throw new ServiceException(HttpStatus.FORBIDDEN_403,
-                    "User does not have access to this club!");
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
         }
 
         ResourceKey resourceKey = new ResourceKey(clubId);
