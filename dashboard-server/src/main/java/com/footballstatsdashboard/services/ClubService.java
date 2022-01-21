@@ -39,20 +39,23 @@ public class ClubService {
 
     public Club getClub(UUID clubId, UUID authorizedUserId) {
         ResourceKey resourceKey = new ResourceKey(clubId);
-
+        Club club;
         try {
-            Club club = this.clubDAO.getDocument(resourceKey, Club.class);
-            if (club.getUserId() != authorizedUserId) {
-                LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
-                        clubId, authorizedUserId);
-                throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
-            }
-            return club;
+            club = this.clubDAO.getDocument(resourceKey, Club.class);
         } catch (DocumentNotFoundException documentNotFoundException) {
             String errorMessage = String.format("No club entity found for ID: %s", clubId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
+
+        // validate that the user has access to the club data being fetched
+        if (club.getUserId() != authorizedUserId) {
+            LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
+                    clubId, authorizedUserId);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
+        }
+
+        return club;
     }
 
     public Club createClub(Club incomingClub, UUID userId, String createdBy) {
