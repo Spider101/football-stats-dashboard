@@ -44,17 +44,17 @@ public class PlayerService {
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
 
-    private final CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private final CouchbaseDAO<ResourceKey> playerDAO;
 
-    public PlayerService(CouchbaseDAO<ResourceKey> couchbaseDAO) {
-        this.couchbaseDAO = couchbaseDAO;
+    public PlayerService(CouchbaseDAO<ResourceKey> playerDAO) {
+        this.playerDAO = playerDAO;
     }
 
     public Player getPlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
 
         try {
-            return this.couchbaseDAO.getDocument(resourceKey, Player.class);
+            return this.playerDAO.getDocument(resourceKey, Player.class);
         } catch (DocumentNotFoundException documentNotFoundException) {
             String errorMessage = String.format("No player entity found for ID: %s", playerId);
             LOGGER.error(errorMessage);
@@ -140,7 +140,7 @@ public class PlayerService {
                 .build();
 
         ResourceKey resourceKey = new ResourceKey(newPlayer.getId());
-        this.couchbaseDAO.insertDocument(resourceKey, newPlayer);
+        this.playerDAO.insertDocument(resourceKey, newPlayer);
 
         return newPlayer;
     }
@@ -185,7 +185,7 @@ public class PlayerService {
         Player updatedPlayer = updatedPlayerBuilder.build();
 
         ResourceKey resourceKey = new ResourceKey(playerId);
-        this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer);
+        this.playerDAO.updateDocument(resourceKey, updatedPlayer);
         return updatedPlayer;
     }
 
@@ -193,7 +193,7 @@ public class PlayerService {
     public void deletePlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
         try {
-            this.couchbaseDAO.deleteDocument(resourceKey);
+            this.playerDAO.deleteDocument(resourceKey);
         } catch (DocumentNotFoundException documentNotFoundException) {
             LOGGER.error("No player entity found for ID: {}", playerId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
