@@ -72,7 +72,7 @@ public class ClubServiceTest {
         when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
 
         // execute
-        Club club = clubService.getClub(clubId);
+        Club club = clubService.getClub(clubId, userId);
 
         // assert
         verify(clubDAO).getDocument(any(), any());
@@ -95,7 +95,31 @@ public class ClubServiceTest {
         when(clubDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
 
         // execute
-        clubService.getClub(invalidClubId);
+        clubService.getClub(invalidClubId, userId);
+
+        // assert
+        verify(clubDAO).getDocument(any(), any());
+    }
+
+    /**
+     * given a club id for a club the user does not have access to, tests that the club data is not returned and a
+     * service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void getClubWhenClubDoesNotBelongToUser() {
+        // setup
+        UUID clubId = UUID.randomUUID();
+        Club clubFromCouchbase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(UUID.randomUUID())
+                .withId(clubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
+
+        // execute
+        clubService.getClub(clubId, userId);
 
         // assert
         verify(clubDAO).getDocument(any(), any());

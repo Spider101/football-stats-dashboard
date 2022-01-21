@@ -37,11 +37,18 @@ public class ClubService {
         this.clubDAO = clubDAO;
     }
 
-    public Club getClub(UUID clubId) {
+    public Club getClub(UUID clubId, UUID authorizedUserId) {
         ResourceKey resourceKey = new ResourceKey(clubId);
 
         try {
-            return this.clubDAO.getDocument(resourceKey, Club.class);
+            Club club = this.clubDAO.getDocument(resourceKey, Club.class);
+            if (club.getUserId() != authorizedUserId) {
+                LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
+                        clubId, authorizedUserId);
+                throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422,
+                        "User does not have access to this club!");
+            }
+            return club;
         } catch (DocumentNotFoundException documentNotFoundException) {
             String errorMessage = String.format("No club entity found for ID: %s", clubId);
             LOGGER.error(errorMessage);
