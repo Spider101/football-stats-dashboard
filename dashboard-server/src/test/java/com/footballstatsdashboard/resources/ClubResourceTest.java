@@ -273,36 +273,13 @@ public class ClubResourceTest {
     public void deleteClubRemovesClubData() {
         // setup
         UUID clubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(true)
-                .withId(clubId)
-                .existingUserId(UUID.randomUUID())
-                .build();
-        when(clubService.getClub(eq(clubId), eq(userPrincipal.getId()))).thenReturn(existingClub);
 
         // execute
         Response clubResponse = clubResource.deleteClub(userPrincipal, clubId);
 
         // assert
-        verify(clubService).getClub(any(), any());
-        verify(clubService).deleteClub(any(), any(), any());
+        verify(clubService).deleteClub(any(), any());
         assertEquals(HttpStatus.NO_CONTENT_204, clubResponse.getStatus());
-    }
-
-    /**
-     * given an invalid club id, tests that no data is deleted and a service exception is thrown instead
-     */
-    @Test(expected = ServiceException.class)
-    public void deleteClubWhenClubDataDoesNotExist() {
-        // setup
-        UUID invalidClubId = UUID.randomUUID();
-        when(clubService.getClub(eq(invalidClubId), eq(userPrincipal.getId()))).thenThrow(ServiceException.class);
-
-        // execute
-        clubResource.deleteClub(userPrincipal, invalidClubId);
-
-        // assert
-        verify(clubService, never()).deleteClub(any(), any(), any());
     }
 
     /**

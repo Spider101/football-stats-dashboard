@@ -505,12 +505,14 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
+        when(clubDAO.getDocument(any(), any())).thenReturn(existingClub);
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
-        clubService.deleteClub(clubId, existingClub, userId);
+        clubService.deleteClub(clubId, userId);
 
         // assert
+        verify(clubDAO).getDocument(any(), any());
         verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(clubId, capturedResourceKey.getResourceId());
@@ -531,14 +533,31 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
+        when(clubDAO.getDocument(any(), any())).thenReturn(existingClub);
 
         // execute
-        clubService.deleteClub(existingClubId, existingClub, userId);
+        clubService.deleteClub(existingClubId, userId);
+
+        // assert
+        verify(clubDAO).getDocument(any(), any());
+        verify(clubDAO, never()).deleteDocument(any());
+    }
+
+    /**
+     * given an invalid club id, tests that no data is deleted and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void deleteClubWhenClubDataDoesNotExist() {
+        // setup
+        UUID invalidClubId = UUID.randomUUID();
+        when(clubDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
+
+        // execute
+        clubService.deleteClub(invalidClubId, userId);
 
         // assert
         verify(clubDAO, never()).deleteDocument(any());
     }
-
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from
      * couchbase

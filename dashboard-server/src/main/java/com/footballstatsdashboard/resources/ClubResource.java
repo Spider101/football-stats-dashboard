@@ -108,8 +108,7 @@ public class ClubResource {
             LOGGER.info("deleteClub() request for club with ID: {}", clubId);
         }
 
-        Club existingClub = this.clubService.getClub(clubId, user.getId());
-        this.clubService.deleteClub(clubId, existingClub, user.getId());
+        this.clubService.deleteClub(clubId, user.getId());
         return Response.noContent().build();
     }
 
