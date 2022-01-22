@@ -30,7 +30,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -478,12 +477,22 @@ public class PlayerServiceTest {
     public void deletePlayerRemovesPlayerFromCouchbase() {
         // setup
         UUID playerId = UUID.randomUUID();
+        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(playerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
         playerService.deletePlayer(playerId, clubId -> true);
 
         // assert
+        verify(playerDAO).getDocument(any(), any());
         verify(playerDAO).deleteDocument(resourceKeyCaptor.capture());
         assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
     }
@@ -496,14 +505,15 @@ public class PlayerServiceTest {
     public void deletePlayerWhenPlayerNotFound() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
+        when(playerDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-        doThrow(ServiceException.class).when(playerDAO).deleteDocument(any());
 
         // execute
         playerService.deletePlayer(invalidPlayerId, clubId -> true);
 
         // assert
-        verify(playerDAO).deleteDocument(resourceKeyCaptor.capture());
+        verify(playerDAO).getDocument(resourceKeyCaptor.capture(), any());
+        verify(playerDAO, never()).deleteDocument(any());
         assertEquals(invalidPlayerId, resourceKeyCaptor.getValue().getResourceId());
     }
 
