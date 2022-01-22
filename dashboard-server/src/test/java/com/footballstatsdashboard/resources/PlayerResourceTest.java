@@ -103,8 +103,6 @@ public class PlayerResourceTest {
         assertEquals(playerId, playerFromResponse.getId());
     }
 
-    // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
-
     /**
      * given a valid player entity in the request, tests that the player data is successfully persisted
      */
@@ -144,6 +142,54 @@ public class PlayerResourceTest {
         // a playerId is set on the player instance created despite not setting one explicitly due to the way the
         // interface has been set up
         assertEquals(URI_PATH + "/" + incomingPlayer.getId().toString(), playerResponse.getLocation().getPath());
+    }
+
+    /**
+     * given a valid player entity in the request with a club id for a club that doesn't exist, tests that no player
+     * data is created and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createPlayerWhenClubForPlayerDoesNotExist() throws IOException {
+        // setup
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(clubService.getClub(eq(incomingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
+
+        // execute
+        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
+
+        // assert
+        verify(clubService).getClub(any(), any());
+        verify(playerService, never()).createPlayer(any(), any(), anyString());
+    }
+
+    /**
+     * given a valid player entity in the request with a club id for a club that the current user doesn't have access
+     * to, tests that no player data is created and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createPlayerWhenClubForPlayerIsNotAccessible() throws IOException {
+        // setup
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(clubService.getClub(eq(incomingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
+
+        // execute
+        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
+
+        // assert
+        verify(clubService).getClub(any(), any());
+        verify(playerService, never()).createPlayer(any(), any(), anyString());
     }
 
     /**
