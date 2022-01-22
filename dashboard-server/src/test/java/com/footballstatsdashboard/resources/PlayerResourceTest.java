@@ -81,7 +81,7 @@ public class PlayerResourceTest {
     public void getPlayerSuccessfullyFetchesPlayerData() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player playerToBeFetched = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(playerId)
                 .withMetadata()
@@ -89,7 +89,7 @@ public class PlayerResourceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerService.getPlayer(eq(playerId))).thenReturn(playerFromCouchbase);
+        when(playerService.getPlayer(eq(playerId))).thenReturn(playerToBeFetched);
 
         // execute
         Response playerResponse = playerResource.getPlayer(playerId);

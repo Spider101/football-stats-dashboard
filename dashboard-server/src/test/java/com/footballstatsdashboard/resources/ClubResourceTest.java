@@ -107,8 +107,6 @@ public class ClubResourceTest {
         assertEquals(userPrincipal.getId(), clubFromResponse.getUserId());
     }
 
-    // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
-
     /**
      * given a valid club entity in the request, tests that the club data is successfully persisted
      */
@@ -295,7 +293,7 @@ public class ClubResourceTest {
      * given an invalid club id, tests that no data is deleted and a service exception is thrown instead
      */
     @Test(expected = ServiceException.class)
-    public void deleteClubWhenClubNotFoundInCouchbase() {
+    public void deleteClubWhenClubDataDoesNotExist() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
         when(clubService.getClub(eq(invalidClubId), eq(userPrincipal.getId()))).thenThrow(ServiceException.class);
