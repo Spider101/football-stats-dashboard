@@ -400,9 +400,7 @@ public class PlayerResourceTest {
         Response playerResponse = playerResource.deletePlayer(userPrincipal, playerId);
 
         // assert
-        verify(playerService).deletePlayer(eq(playerId));
+        verify(playerService).deletePlayer(eq(playerId), any());
         assertEquals(HttpStatus.NO_CONTENT_204, playerResponse.getStatus());
     }
-
-    // TODO: 1/6/2022 add test when trying to delete a player from a club not belonging to user
 }

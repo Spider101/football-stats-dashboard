@@ -481,7 +481,7 @@ public class PlayerServiceTest {
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
-        playerService.deletePlayer(playerId);
+        playerService.deletePlayer(playerId, clubId -> true);
 
         // assert
         verify(playerDAO).deleteDocument(resourceKeyCaptor.capture());
@@ -500,11 +500,36 @@ public class PlayerServiceTest {
         doThrow(ServiceException.class).when(playerDAO).deleteDocument(any());
 
         // execute
-        playerService.deletePlayer(invalidPlayerId);
+        playerService.deletePlayer(invalidPlayerId, clubId -> true);
 
         // assert
         verify(playerDAO).deleteDocument(resourceKeyCaptor.capture());
         assertEquals(invalidPlayerId, resourceKeyCaptor.getValue().getResourceId());
+    }
+
+    /**
+     * given an id for a player that the user does not have access to, tests that the player data is not deleted and a
+     * service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void deletePlayerWhenUserDoesNotHaveAccessToPlayer() {
+        // setup
+        UUID playerId = UUID.randomUUID();
+        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(playerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
+
+        // execute
+        playerService.deletePlayer(playerId, clubId -> false);
+
+        // assert
+        verify(playerDAO, never()).deleteDocument(any());
     }
 
     private void assertCountryLogo(Metadata createdPlayerMetadata) throws IOException {

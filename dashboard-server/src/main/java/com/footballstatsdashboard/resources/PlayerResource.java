@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID_PATH;
@@ -123,7 +124,8 @@ public class PlayerResource {
             LOGGER.info("deletePlayer() request for player with ID: {}", playerId);
         }
 
-        this.playerService.deletePlayer(playerId);
+        Predicate<UUID> doesClubBelongsToUser = clubId -> this.clubService.doesClubBelongToUser(clubId, user.getId());
+        this.playerService.deletePlayer(playerId, doesClubBelongsToUser);
         return Response.noContent().build();
     }
 }
