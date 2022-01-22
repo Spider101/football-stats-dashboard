@@ -389,7 +389,7 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given a valid player id, removes the player data and a 204 No Content response is returned
+     * given a valid player id, tests that the player data is removed and a 204 No Content response is returned
      */
     @Test
     public void deletePlayerRemovesPlayerData() {
@@ -397,7 +397,7 @@ public class PlayerResourceTest {
         UUID playerId = UUID.randomUUID();
 
         // execute
-        Response playerResponse = playerResource.deletePlayer(playerId);
+        Response playerResponse = playerResource.deletePlayer(userPrincipal, playerId);
 
         // assert
         verify(playerService).deletePlayer(eq(playerId));

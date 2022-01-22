@@ -116,7 +116,8 @@ public class PlayerResource {
     @DELETE
     @Path(PLAYER_ID_PATH)
     public Response deletePlayer(
-            @Auth @PathParam(PLAYER_ID) UUID playerId) {
+            @Auth User user,
+            @PathParam(PLAYER_ID) UUID playerId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("deletePlayer() request for player with ID: {}", playerId);
