@@ -37,16 +37,14 @@ public class ClubService {
         this.clubDAO = clubDAO;
     }
 
+    // TODO: 1/22/2022 add some tests for this
+    public boolean doesClubBelongToUser(UUID clubId, UUID authorizedUserId) {
+        Club club = fetchClubData(clubId);
+        return authorizedUserId.equals(club.getUserId());
+    }
+
     public Club getClub(UUID clubId, UUID authorizedUserId) {
-        ResourceKey resourceKey = new ResourceKey(clubId);
-        Club club;
-        try {
-            club = this.clubDAO.getDocument(resourceKey, Club.class);
-        } catch (DocumentNotFoundException documentNotFoundException) {
-            String errorMessage = String.format("No club entity found for ID: %s", clubId);
-            LOGGER.error(errorMessage);
-            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
-        }
+        Club club = fetchClubData(clubId);
 
         // validate that the user has access to the club data being fetched
         if (club.getUserId() != authorizedUserId) {
@@ -162,6 +160,19 @@ public class ClubService {
 
     public List<SquadPlayer> getSquadPlayers(UUID clubId) {
         return this.clubDAO.getPlayersInClub(clubId);
+    }
+
+    private Club fetchClubData(UUID clubId) {
+        ResourceKey resourceKey = new ResourceKey(clubId);
+        Club club;
+        try {
+            club = this.clubDAO.getDocument(resourceKey, Club.class);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            String errorMessage = String.format("No club entity found for ID: %s", clubId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
+        return club;
     }
 
     private List<Validation> validateIncomingClub(Club incomingClub, boolean isForNewClub) {

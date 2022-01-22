@@ -89,6 +89,8 @@ public class PlayerResource {
         }
 
         Player existingPlayer = this.playerService.getPlayer(playerId);
+
+        // verify that player id matches between the existing and incoming data
         if (!existingPlayer.getId().equals(incomingPlayer.getId())) {
             String errorMessage = String.format(
                     "Incoming player ID: %s does not match ID of existing player entity in couchbase: %s.",
@@ -96,6 +98,15 @@ public class PlayerResource {
             );
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
+        }
+
+        // verify that the current user has access to the player they are trying to update
+        // since a player cannot belong to more than one club, we can transitively check the user's access to the player
+        // by checking their access to the club the user belongs to
+        if (!clubService.doesClubBelongToUser(existingPlayer.getClubId(), user.getId())) {
+            LOGGER.error("Player with ID: {} does not belong to user making request (ID: {})",
+                    existingPlayer.getId(), user.getId());
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
         }
 
         Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, existingPlayer, playerId);

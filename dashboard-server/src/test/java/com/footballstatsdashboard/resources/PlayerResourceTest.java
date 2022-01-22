@@ -203,7 +203,7 @@ public class PlayerResourceTest {
         String updatedRoleName = "updated player role";
 
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(existingPlayerId)
                 .withMetadata()
@@ -211,10 +211,13 @@ public class PlayerResourceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerService.getPlayer(any())).thenReturn(existingPlayerInCouchbase);
+        when(playerService.getPlayer(any())).thenReturn(existingPlayer);
+
+        when(clubService.doesClubBelongToUser(eq(existingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenReturn(true);
 
         Player updatedPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
-                .from(existingPlayerInCouchbase)
+                .from(existingPlayer)
                 .withUpdatedNameInMetadata(updatedPlayerName)
                 .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
                 .withUpdatedRoleName(updatedRoleName)
@@ -242,6 +245,7 @@ public class PlayerResourceTest {
 
         // assert
         verify(playerService).getPlayer(eq(existingPlayerId));
+        verify(clubService).doesClubBelongToUser(any(), any());
         verify(playerService).updatePlayer(any(), any(), eq(existingPlayerId));
 
         assertEquals(HttpStatus.OK_200, playerResponse.getStatus());
@@ -258,14 +262,57 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given that the request contains a player entity whose ID does not match the existing player's ID, tests that
-     * the associated player data is not updated and a service exception is thrown instead
+     * given a valid player entity in the request, tests that if the player data does not already exist, no player data
+     * is updated and a service exception is thrown instead
      */
     @Test(expected = ServiceException.class)
-    public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
+    public void updatePlayerWhenPlayerDoesNotExist() {
         // setup
+        String updatedPlayerName = "updated name";
+        String updatedAttributeName = "sprint speed";
+        String updatedRoleName = "updated player role";
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+
+        when(playerService.getPlayer(eq(existingPlayerId)))
+                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No Player found!"));
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata(updatedPlayerName)
+                .withUpdatedRoleName(updatedRoleName)
+                .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
+
+        // execute
+        Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
+
+        // assert
+        verify(playerService).getPlayer(any());
+        verify(clubService, never()).doesClubBelongToUser(any(), any());
+        verify(playerService, never()).updatePlayer(any(), any(), any());
+    }
+
+    /**
+     * given a valid player entity in the request, tests that if the user does not have access to the player, no player
+     * data is updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updatePlayerWhenPlayerDoesNotBelongToUser() {
+        // setup
+        String updatedPlayerName = "updated name";
+        String updatedAttributeName = "sprint speed";
+        String updatedRoleName = "updated player role";
+        UUID existingPlayerId = UUID.randomUUID();
+
+        Player existingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(existingPlayerId)
                 .withMetadata()
@@ -273,7 +320,55 @@ public class PlayerResourceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerService.getPlayer(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
+        when(playerService.getPlayer(any())).thenReturn(existingPlayer);
+
+        when(clubService.doesClubBelongToUser(eq(existingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenReturn(false);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata(updatedPlayerName)
+                .withUpdatedRoleName(updatedRoleName)
+                .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
+
+        // execute
+        playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
+
+        // assert
+        verify(playerService).getPlayer(any());
+        verify(clubService).doesClubBelongToUser(any(), any());
+        verify(playerService, never()).updatePlayer(any(), any(), any());
+    }
+
+    /**
+     * given that the request contains a player entity whose ID does not match the existing player's ID, tests that
+     * the associated player data is not updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
+        // setup
+        UUID existingPlayerId = UUID.randomUUID();
+        Player existingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerService.getPlayer(eq(existingPlayerId))).thenReturn(existingPlayer);
+
+        when(clubService.doesClubBelongToUser(eq(existingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenReturn(true);
 
         UUID incomingPlayerId = UUID.randomUUID();
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
@@ -289,6 +384,7 @@ public class PlayerResourceTest {
 
         // assert
         verify(playerService).getPlayer(any());
+        verify(clubService).doesClubBelongToUser(any(), any());
         verify(playerService, never()).updatePlayer(any(), any(), any());
     }
 
