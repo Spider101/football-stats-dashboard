@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.services;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
@@ -70,7 +71,7 @@ public class ClubServiceTest {
         when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
 
         // execute
-        Club club = clubService.getClub(clubId);
+        Club club = clubService.getClub(clubId, userId);
 
         // assert
         verify(clubDAO).getDocument(any(), any());
@@ -82,20 +83,42 @@ public class ClubServiceTest {
         assertEquals(userId, club.getUserId());
     }
 
-    // TODO: 1/15/2022 verify that a 404 is thrown here instead of a raw runtime exception
     /**
-     * given a runtime exception is thrown by couchbase DAO when club entity is not found, verifies that the same
-     * exception is thrown by `getClub` resource method as well
+     * given an invalid club id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * ServiceException is thrown instead
      */
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ServiceException.class)
     public void getClubWhenClubNotFoundInCouchbase() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.getDocument(any(), any()))
-                .thenThrow(new RuntimeException("Unable to find document with ID: " + invalidClubId));
+        when(clubDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
 
         // execute
-        clubService.getClub(invalidClubId);
+        clubService.getClub(invalidClubId, userId);
+
+        // assert
+        verify(clubDAO).getDocument(any(), any());
+    }
+
+    /**
+     * given a club id for a club the user does not have access to, tests that the club data is not returned and a
+     * service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void getClubWhenClubDoesNotBelongToUser() {
+        // setup
+        UUID clubId = UUID.randomUUID();
+        Club clubFromCouchbase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(UUID.randomUUID())
+                .withId(clubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
+
+        // execute
+        clubService.getClub(clubId, userId);
 
         // assert
         verify(clubDAO).getDocument(any(), any());
@@ -475,17 +498,66 @@ public class ClubServiceTest {
     public void deleteClubRemovesClubFromCouchbase() {
         // setup
         UUID clubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .withId(clubId)
+                .existingUserId(userId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubDAO.getDocument(any(), any())).thenReturn(existingClub);
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
-        clubService.deleteClub(clubId);
+        clubService.deleteClub(clubId, userId);
 
         // assert
+        verify(clubDAO).getDocument(any(), any());
         verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(clubId, capturedResourceKey.getResourceId());
     }
 
+    /**
+     * given an ID to a club not belong to a user, tests that the club data is not deleted from couchbase and a service
+     * exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void deleteClubWhenClubDoesNotBelongToUser() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .withId(existingClubId)
+                .existingUserId(UUID.randomUUID())
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubDAO.getDocument(any(), any())).thenReturn(existingClub);
+
+        // execute
+        clubService.deleteClub(existingClubId, userId);
+
+        // assert
+        verify(clubDAO).getDocument(any(), any());
+        verify(clubDAO, never()).deleteDocument(any());
+    }
+
+    /**
+     * given an invalid club id, tests that no data is deleted and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void deleteClubWhenClubDataDoesNotExist() {
+        // setup
+        UUID invalidClubId = UUID.randomUUID();
+        when(clubDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
+
+        // execute
+        clubService.deleteClub(invalidClubId, userId);
+
+        // assert
+        verify(clubDAO, never()).deleteDocument(any());
+    }
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from
      * couchbase

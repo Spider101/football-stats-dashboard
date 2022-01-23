@@ -91,13 +91,13 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(eq(clubId))).thenReturn(existingClub);
+        when(clubService.getClub(eq(clubId), any())).thenReturn(existingClub);
 
         // execute
-        Response clubResponse = clubResource.getClub(clubId);
+        Response clubResponse = clubResource.getClub(userPrincipal, clubId);
 
         // assert
-        verify(clubService).getClub(any());
+        verify(clubService).getClub(any(), any());
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
@@ -106,8 +106,6 @@ public class ClubResourceTest {
         assertNotNull(clubFromResponse.getUserId());
         assertEquals(userPrincipal.getId(), clubFromResponse.getUserId());
     }
-
-    // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
 
     /**
      * given a valid club entity in the request, tests that the club data is successfully persisted
@@ -156,7 +154,7 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(any())).thenReturn(existingClub);
+        when(clubService.getClub(any(), any())).thenReturn(existingClub);
 
         BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
         BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
@@ -181,10 +179,10 @@ public class ClubResourceTest {
         when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClub);
 
         // execute
-        Response clubResponse = clubResource.updateClub(existingClubId, incomingClub);
+        Response clubResponse = clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
 
         // assert
-        verify(clubService).getClub(eq(existingClubId));
+        verify(clubService).getClub(eq(existingClubId), any());
         verify(clubService).updateClub(eq(incomingClub), eq(existingClub), eq(existingClubId));
 
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
@@ -213,7 +211,7 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(any())).thenReturn(existingClub);
+        when(clubService.getClub(any(), any())).thenReturn(existingClub);
 
         UUID incorrectIncomingClubId = UUID.randomUUID();
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
@@ -222,15 +220,54 @@ public class ClubResourceTest {
                 .build();
 
         // execute
-        clubResource.updateClub(existingClubId, incomingClub);
+        clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
 
         // assert
-        verify(clubService).getClub(any());
+        verify(clubService).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
     }
 
     /**
-     * given a valid club ID, removes the club data and a 204 No Content response is returned
+     * given that the request contains a club that does not belong to the current user, tests that the club data is not
+     * updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updateClubWhenClubDoesNotBelongToUser() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userPrincipal.getId())
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubService.getClub(eq(existingClubId), eq(userPrincipal.getId()))).thenThrow(ServiceException.class);
+
+        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedTransferBudget(updatedTransferBudget)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedManagerFunds(totalFunds)
+                .build();
+
+        // execute
+        clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
+
+        // assert
+        verify(clubService).getClub(any(), any());
+        verify(clubService, never()).updateClub(any(), any(), any());
+    }
+
+    /**
+     * given a valid club ID, tests that the club data is removed and a 204 No Content response is returned
      */
     @Test
     public void deleteClubRemovesClubData() {
@@ -238,14 +275,12 @@ public class ClubResourceTest {
         UUID clubId = UUID.randomUUID();
 
         // execute
-        Response clubResponse = clubResource.deleteClub(clubId);
+        Response clubResponse = clubResource.deleteClub(userPrincipal, clubId);
 
         // assert
-        verify(clubService).deleteClub(eq(clubId));
+        verify(clubService).deleteClub(any(), any());
         assertEquals(HttpStatus.NO_CONTENT_204, clubResponse.getStatus());
     }
-
-    // TODO: 1/6/2022 add test when trying to delete a club not belonging to user
 
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched and

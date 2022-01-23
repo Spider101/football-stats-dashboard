@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.services;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
@@ -36,9 +37,23 @@ public class ClubService {
         this.clubDAO = clubDAO;
     }
 
-    public Club getClub(UUID clubId) {
-        ResourceKey resourceKey = new ResourceKey(clubId);
-        return this.clubDAO.getDocument(resourceKey, Club.class);
+    // TODO: 1/22/2022 add some tests for this
+    public boolean doesClubBelongToUser(UUID clubId, UUID authorizedUserId) {
+        Club club = fetchClubData(clubId);
+        return authorizedUserId.equals(club.getUserId());
+    }
+
+    public Club getClub(UUID clubId, UUID authorizedUserId) {
+        Club club = fetchClubData(clubId);
+
+        // validate that the user has access to the club data being fetched
+        if (!authorizedUserId.equals(club.getUserId())) {
+            LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
+                    clubId, authorizedUserId);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
+        }
+
+        return club;
     }
 
     public Club createClub(Club incomingClub, UUID userId, String createdBy) {
@@ -121,9 +136,22 @@ public class ClubService {
         return updatedClub;
     }
 
-    public void deleteClub(UUID clubId) {
+    public void deleteClub(UUID clubId, UUID authorizedUserId) {
+        // ensure user has access to the club that is being requested to be deleted
+        if (!doesClubBelongToUser(clubId, authorizedUserId)) {
+            LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
+                    clubId, authorizedUserId);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
+        }
+
         ResourceKey resourceKey = new ResourceKey(clubId);
-        this.clubDAO.deleteDocument(resourceKey);
+        try {
+            this.clubDAO.deleteDocument(resourceKey);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            LOGGER.error("No club entity found for ID: {}", clubId);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404,
+                    String.format("Cannot delete club (ID: %s) that does not exist", clubId));
+        }
     }
 
     public List<ClubSummary> getClubSummariesByUserId(UUID userId) {
@@ -132,6 +160,19 @@ public class ClubService {
 
     public List<SquadPlayer> getSquadPlayers(UUID clubId) {
         return this.clubDAO.getPlayersInClub(clubId);
+    }
+
+    private Club fetchClubData(UUID clubId) {
+        ResourceKey resourceKey = new ResourceKey(clubId);
+        Club club;
+        try {
+            club = this.clubDAO.getDocument(resourceKey, Club.class);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            String errorMessage = String.format("No club entity found for ID: %s", clubId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
+        return club;
     }
 
     private List<Validation> validateIncomingClub(Club incomingClub, boolean isForNewClub) {

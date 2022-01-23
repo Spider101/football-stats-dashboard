@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.services;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.footballstatsdashboard.api.model.CountryCodeMetadata;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ATTRIBUTE_CATEGORY_MAP;
@@ -43,15 +45,15 @@ public class PlayerService {
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
 
-    private final CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private final CouchbaseDAO<ResourceKey> playerDAO;
 
-    public PlayerService(CouchbaseDAO<ResourceKey> couchbaseDAO) {
-        this.couchbaseDAO = couchbaseDAO;
+    public PlayerService(CouchbaseDAO<ResourceKey> playerDAO) {
+        this.playerDAO = playerDAO;
     }
 
     public Player getPlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
-        return this.couchbaseDAO.getDocument(resourceKey, Player.class);
+        return fetchPlayerData(playerId, resourceKey);
     }
 
     public Player createPlayer(Player incomingPlayer, Club clubDataForNewPlayer, String createdBy) throws IOException {
@@ -132,7 +134,7 @@ public class PlayerService {
                 .build();
 
         ResourceKey resourceKey = new ResourceKey(newPlayer.getId());
-        this.couchbaseDAO.insertDocument(resourceKey, newPlayer);
+        this.playerDAO.insertDocument(resourceKey, newPlayer);
 
         return newPlayer;
     }
@@ -177,14 +179,29 @@ public class PlayerService {
         Player updatedPlayer = updatedPlayerBuilder.build();
 
         ResourceKey resourceKey = new ResourceKey(playerId);
-        this.couchbaseDAO.updateDocument(resourceKey, updatedPlayer);
+        this.playerDAO.updateDocument(resourceKey, updatedPlayer);
         return updatedPlayer;
     }
 
-    // TODO: 1/3/2022 add checks to make sure player being deleted belongs to the club and user making the request
-    public void deletePlayer(UUID playerId) {
+    public void deletePlayer(UUID playerId, Predicate<UUID> doesClubBelongToUser) {
         ResourceKey resourceKey = new ResourceKey(playerId);
-        this.couchbaseDAO.deleteDocument(resourceKey);
+
+        // verify that the current user has access to the player they are trying to delete
+        // since a player cannot belong to more than one club, we can transitively check the user's access to the player
+        // by checking their access to the club the user belongs to
+        Player player = fetchPlayerData(playerId, resourceKey);
+        if (!doesClubBelongToUser.test(player.getClubId())) {
+            LOGGER.error("Player with ID: {} does not belong to user making request", player.getId());
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
+        }
+
+        try {
+            this.playerDAO.deleteDocument(resourceKey);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            LOGGER.error("No player entity found for ID: {}", playerId);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404,
+                    String.format("Cannot delete player (ID: %s) that does not exist", playerId));
+        }
     }
 
     private List<Validation> validateIncomingPlayer(Player incomingPlayer, Player existingPlayer) {
@@ -237,6 +254,16 @@ public class PlayerService {
                     playerAttributes);
             throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Something went wrong trying to calculate current ability of player");
+        }
+    }
+
+    private Player fetchPlayerData(UUID playerId, ResourceKey resourceKey) {
+        try {
+            return this.playerDAO.getDocument(resourceKey, Player.class);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            String errorMessage = String.format("No player entity found for ID: %s", playerId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
     }
 }

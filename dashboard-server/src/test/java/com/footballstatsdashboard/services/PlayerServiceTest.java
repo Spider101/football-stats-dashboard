@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.services;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.PlayerDataProvider;
@@ -29,7 +30,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,7 +45,7 @@ public class PlayerServiceTest {
     private PlayerService playerService;
 
     @Mock
-    private CouchbaseDAO<ResourceKey> couchbaseDAO;
+    private CouchbaseDAO<ResourceKey> playerDAO;
 
     /**
      * set up test data before each test case is run
@@ -53,7 +53,7 @@ public class PlayerServiceTest {
     @Before
     public void initialize() {
         MockitoAnnotations.openMocks(this);
-        playerService = new PlayerService(couchbaseDAO);
+        playerService = new PlayerService(playerDAO);
     }
 
     /**
@@ -72,32 +72,31 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
+        when(playerDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
 
         // execute
         Player player = playerService.getPlayer(playerId);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
+        verify(playerDAO).getDocument(any(), any());
         assertEquals(playerId, player.getId());
     }
 
     /**
-     * given a runtime exception is thrown by couchbase DAO when player entity is not found, verifies that the same
-     * exception is thrown by `getPlayer` resource method as well
+     * given an invalid player id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * ServiceException is thrown instead
      */
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ServiceException.class)
     public void getPlayerWhenPlayerNotFoundInCouchbase() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
-        when(couchbaseDAO.getDocument(any(), any()))
-                .thenThrow(new RuntimeException("Unable to find document with Id: " + invalidPlayerId));
+        when(playerDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
 
         // execute
         playerService.getPlayer(invalidPlayerId);
 
         // assert
-        verify(couchbaseDAO).getDocument(any(), any());
+        verify(playerDAO).getDocument(any(), any());
     }
 
     /**
@@ -125,7 +124,7 @@ public class PlayerServiceTest {
         Player createdPlayer = playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(couchbaseDAO).insertDocument(any(), newPlayerCaptor.capture());
+        verify(playerDAO).insertDocument(any(), newPlayerCaptor.capture());
         Player newPlayer = newPlayerCaptor.getValue();
         assertEquals(createdPlayer, newPlayer);
 
@@ -176,7 +175,7 @@ public class PlayerServiceTest {
         playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(couchbaseDAO, never()).insertDocument(any(), any());
+        verify(playerDAO, never()).insertDocument(any(), any());
     }
 
     /**
@@ -202,7 +201,7 @@ public class PlayerServiceTest {
         playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(couchbaseDAO, never()).insertDocument(any(), any());
+        verify(playerDAO, never()).insertDocument(any(), any());
     }
 
     /**
@@ -230,7 +229,7 @@ public class PlayerServiceTest {
         playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(couchbaseDAO, never()).insertDocument(any(), any());
+        verify(playerDAO, never()).insertDocument(any(), any());
     }
 
     /**
@@ -251,7 +250,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -271,7 +270,7 @@ public class PlayerServiceTest {
         Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(couchbaseDAO).updateDocument(resourceKeyCaptor.capture(), any());
+        verify(playerDAO).updateDocument(resourceKeyCaptor.capture(), any());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
 
@@ -319,7 +318,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -343,7 +342,7 @@ public class PlayerServiceTest {
         Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(couchbaseDAO).updateDocument(resourceKeyCaptor.capture(), any());
+        verify(playerDAO).updateDocument(resourceKeyCaptor.capture(), any());
         ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
         assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
 
@@ -374,7 +373,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -392,7 +391,7 @@ public class PlayerServiceTest {
         playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(couchbaseDAO, never()).updateDocument(any(), any());
+        verify(playerDAO, never()).updateDocument(any(), any());
     }
 
     /**
@@ -411,7 +410,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -429,7 +428,7 @@ public class PlayerServiceTest {
         playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(couchbaseDAO, never()).updateDocument(any(), any());
+        verify(playerDAO, never()).updateDocument(any(), any());
     }
 
     /**
@@ -448,7 +447,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(couchbaseDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -468,7 +467,7 @@ public class PlayerServiceTest {
         playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(couchbaseDAO, never()).updateDocument(any(), any());
+        verify(playerDAO, never()).updateDocument(any(), any());
     }
 
     /**
@@ -478,33 +477,69 @@ public class PlayerServiceTest {
     public void deletePlayerRemovesPlayerFromCouchbase() {
         // setup
         UUID playerId = UUID.randomUUID();
+        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(playerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
 
         // execute
-        playerService.deletePlayer(playerId);
+        playerService.deletePlayer(playerId, clubId -> true);
 
         // assert
-        verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
+        verify(playerDAO).getDocument(any(), any());
+        verify(playerDAO).deleteDocument(resourceKeyCaptor.capture());
         assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
     }
 
     /**
-     * given that the couchbase DAO throws a RuntimeException when it cannot find the player entity to remove, the
-     * same exception is propagated and thrown by the resource method as well
+     * given an invalid player id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * ServiceException is thrown instead
      */
-    @Test(expected = RuntimeException.class)
+    @Test(expected = ServiceException.class)
     public void deletePlayerWhenPlayerNotFound() {
         // setup
-        UUID playerId = UUID.randomUUID();
+        UUID invalidPlayerId = UUID.randomUUID();
+        when(playerDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
         ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-        doThrow(new RuntimeException("player not found")).when(couchbaseDAO).deleteDocument(any());
 
         // execute
-        playerService.deletePlayer(playerId);
+        playerService.deletePlayer(invalidPlayerId, clubId -> true);
 
         // assert
-        verify(couchbaseDAO).deleteDocument(resourceKeyCaptor.capture());
-        assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
+        verify(playerDAO).getDocument(resourceKeyCaptor.capture(), any());
+        verify(playerDAO, never()).deleteDocument(any());
+        assertEquals(invalidPlayerId, resourceKeyCaptor.getValue().getResourceId());
+    }
+
+    /**
+     * given an id for a player that the user does not have access to, tests that the player data is not deleted and a
+     * service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void deletePlayerWhenUserDoesNotHaveAccessToPlayer() {
+        // setup
+        UUID playerId = UUID.randomUUID();
+        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(playerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
+
+        // execute
+        playerService.deletePlayer(playerId, clubId -> false);
+
+        // assert
+        verify(playerDAO, never()).deleteDocument(any());
     }
 
     private void assertCountryLogo(Metadata createdPlayerMetadata) throws IOException {

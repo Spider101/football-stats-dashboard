@@ -81,7 +81,7 @@ public class PlayerResourceTest {
     public void getPlayerSuccessfullyFetchesPlayerData() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player playerToBeFetched = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(playerId)
                 .withMetadata()
@@ -89,7 +89,7 @@ public class PlayerResourceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerService.getPlayer(eq(playerId))).thenReturn(playerFromCouchbase);
+        when(playerService.getPlayer(eq(playerId))).thenReturn(playerToBeFetched);
 
         // execute
         Response playerResponse = playerResource.getPlayer(playerId);
@@ -102,8 +102,6 @@ public class PlayerResourceTest {
         Player playerFromResponse = OBJECT_MAPPER.convertValue(playerResponse.getEntity(), Player.class);
         assertEquals(playerId, playerFromResponse.getId());
     }
-
-    // TODO: 1/3/2022 test that the runtime exception thrown when a couchbase document is not found results in a 404
 
     /**
      * given a valid player entity in the request, tests that the player data is successfully persisted
@@ -132,7 +130,7 @@ public class PlayerResourceTest {
                 .existingUserId(userPrincipal.getId())
                 .withId(UUID.randomUUID())
                 .build();
-        when(clubService.getClub(any())).thenReturn(existingClub);
+        when(clubService.getClub(any(), any())).thenReturn(existingClub);
 
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
@@ -147,6 +145,54 @@ public class PlayerResourceTest {
     }
 
     /**
+     * given a valid player entity in the request with a club id for a club that doesn't exist, tests that no player
+     * data is created and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createPlayerWhenClubForPlayerDoesNotExist() throws IOException {
+        // setup
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(clubService.getClub(eq(incomingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
+
+        // execute
+        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
+
+        // assert
+        verify(clubService).getClub(any(), any());
+        verify(playerService, never()).createPlayer(any(), any(), anyString());
+    }
+
+    /**
+     * given a valid player entity in the request with a club id for a club that the current user doesn't have access
+     * to, tests that no player data is created and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void createPlayerWhenClubForPlayerIsNotAccessible() throws IOException {
+        // setup
+        Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withMetadata()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(clubService.getClub(eq(incomingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
+
+        // execute
+        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
+
+        // assert
+        verify(clubService).getClub(any(), any());
+        verify(playerService, never()).createPlayer(any(), any(), anyString());
+    }
+
+    /**
      * given a valid player entity in the request, tests that the corresponding player data is updated
      */
     @Test
@@ -157,7 +203,7 @@ public class PlayerResourceTest {
         String updatedRoleName = "updated player role";
 
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(existingPlayerId)
                 .withMetadata()
@@ -165,10 +211,13 @@ public class PlayerResourceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerService.getPlayer(any())).thenReturn(existingPlayerInCouchbase);
+        when(playerService.getPlayer(any())).thenReturn(existingPlayer);
+
+        when(clubService.doesClubBelongToUser(eq(existingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenReturn(true);
 
         Player updatedPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
-                .from(existingPlayerInCouchbase)
+                .from(existingPlayer)
                 .withUpdatedNameInMetadata(updatedPlayerName)
                 .withUpdatedCurrentAbility(UPDATED_PLAYER_ABILITY)
                 .withUpdatedRoleName(updatedRoleName)
@@ -196,6 +245,7 @@ public class PlayerResourceTest {
 
         // assert
         verify(playerService).getPlayer(eq(existingPlayerId));
+        verify(clubService).doesClubBelongToUser(any(), any());
         verify(playerService).updatePlayer(any(), any(), eq(existingPlayerId));
 
         assertEquals(HttpStatus.OK_200, playerResponse.getStatus());
@@ -212,14 +262,57 @@ public class PlayerResourceTest {
     }
 
     /**
-     * given that the request contains a player entity whose ID does not match the existing player's ID, tests that
-     * the associated player data is not updated and a service exception is thrown instead
+     * given a valid player entity in the request, tests that if the player data does not already exist, no player data
+     * is updated and a service exception is thrown instead
      */
     @Test(expected = ServiceException.class)
-    public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
+    public void updatePlayerWhenPlayerDoesNotExist() {
         // setup
+        String updatedPlayerName = "updated name";
+        String updatedAttributeName = "sprint speed";
+        String updatedRoleName = "updated player role";
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+
+        when(playerService.getPlayer(eq(existingPlayerId)))
+                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No Player found!"));
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata(updatedPlayerName)
+                .withUpdatedRoleName(updatedRoleName)
+                .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
+
+        // execute
+        Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
+
+        // assert
+        verify(playerService).getPlayer(any());
+        verify(clubService, never()).doesClubBelongToUser(any(), any());
+        verify(playerService, never()).updatePlayer(any(), any(), any());
+    }
+
+    /**
+     * given a valid player entity in the request, tests that if the user does not have access to the player, no player
+     * data is updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updatePlayerWhenPlayerDoesNotBelongToUser() {
+        // setup
+        String updatedPlayerName = "updated name";
+        String updatedAttributeName = "sprint speed";
+        String updatedRoleName = "updated player role";
+        UUID existingPlayerId = UUID.randomUUID();
+
+        Player existingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(existingPlayerId)
                 .withMetadata()
@@ -227,7 +320,55 @@ public class PlayerResourceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerService.getPlayer(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
+        when(playerService.getPlayer(any())).thenReturn(existingPlayer);
+
+        when(clubService.doesClubBelongToUser(eq(existingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenReturn(false);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata(updatedPlayerName)
+                .withUpdatedRoleName(updatedRoleName)
+                .withUpdatedAttributeValue(updatedAttributeName, UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
+
+        // execute
+        playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
+
+        // assert
+        verify(playerService).getPlayer(any());
+        verify(clubService).doesClubBelongToUser(any(), any());
+        verify(playerService, never()).updatePlayer(any(), any(), any());
+    }
+
+    /**
+     * given that the request contains a player entity whose ID does not match the existing player's ID, tests that
+     * the associated player data is not updated and a service exception is thrown instead
+     */
+    @Test(expected = ServiceException.class)
+    public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
+        // setup
+        UUID existingPlayerId = UUID.randomUUID();
+        Player existingPlayer = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerService.getPlayer(eq(existingPlayerId))).thenReturn(existingPlayer);
+
+        when(clubService.doesClubBelongToUser(eq(existingPlayer.getClubId()), eq(userPrincipal.getId())))
+                .thenReturn(true);
 
         UUID incomingPlayerId = UUID.randomUUID();
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
@@ -243,11 +384,12 @@ public class PlayerResourceTest {
 
         // assert
         verify(playerService).getPlayer(any());
+        verify(clubService).doesClubBelongToUser(any(), any());
         verify(playerService, never()).updatePlayer(any(), any(), any());
     }
 
     /**
-     * given a valid player id, removes the player data and a 204 No Content response is returned
+     * given a valid player id, tests that the player data is removed and a 204 No Content response is returned
      */
     @Test
     public void deletePlayerRemovesPlayerData() {
@@ -255,12 +397,10 @@ public class PlayerResourceTest {
         UUID playerId = UUID.randomUUID();
 
         // execute
-        Response playerResponse = playerResource.deletePlayer(playerId);
+        Response playerResponse = playerResource.deletePlayer(userPrincipal, playerId);
 
         // assert
-        verify(playerService).deletePlayer(eq(playerId));
+        verify(playerService).deletePlayer(eq(playerId), any());
         assertEquals(HttpStatus.NO_CONTENT_204, playerResponse.getStatus());
     }
-
-    // TODO: 1/6/2022 add test when trying to delete a player from a club not belonging to user
 }

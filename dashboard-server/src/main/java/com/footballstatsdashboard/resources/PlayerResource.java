@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID_PATH;
@@ -69,7 +70,7 @@ public class PlayerResource {
         }
 
         // fetch details of club the incoming player belongs to
-        Club clubDataForNewPlayer = this.clubService.getClub(incomingPlayer.getClubId());
+        Club clubDataForNewPlayer = this.clubService.getClub(incomingPlayer.getClubId(), user.getId());
 
         Player newPlayer = this.playerService.createPlayer(incomingPlayer, clubDataForNewPlayer, user.getEmail());
 
@@ -89,6 +90,8 @@ public class PlayerResource {
         }
 
         Player existingPlayer = this.playerService.getPlayer(playerId);
+
+        // verify that player id matches between the existing and incoming data
         if (!existingPlayer.getId().equals(incomingPlayer.getId())) {
             String errorMessage = String.format(
                     "Incoming player ID: %s does not match ID of existing player entity in couchbase: %s.",
@@ -98,6 +101,15 @@ public class PlayerResource {
             throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
         }
 
+        // verify that the current user has access to the player they are trying to update
+        // since a player cannot belong to more than one club, we can transitively check the user's access to the player
+        // by checking their access to the club the user belongs to
+        if (!clubService.doesClubBelongToUser(existingPlayer.getClubId(), user.getId())) {
+            LOGGER.error("Player with ID: {} does not belong to user making request (ID: {})",
+                    existingPlayer.getId(), user.getId());
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
+        }
+
         Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, existingPlayer, playerId);
         return Response.ok(updatedPlayer).build();
     }
@@ -105,13 +117,15 @@ public class PlayerResource {
     @DELETE
     @Path(PLAYER_ID_PATH)
     public Response deletePlayer(
-            @Auth @PathParam(PLAYER_ID) UUID playerId) {
+            @Auth User user,
+            @PathParam(PLAYER_ID) UUID playerId) {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("deletePlayer() request for player with ID: {}", playerId);
         }
 
-        this.playerService.deletePlayer(playerId);
+        Predicate<UUID> doesClubBelongsToUser = clubId -> this.clubService.doesClubBelongToUser(clubId, user.getId());
+        this.playerService.deletePlayer(playerId, doesClubBelongsToUser);
         return Response.noContent().build();
     }
 }
