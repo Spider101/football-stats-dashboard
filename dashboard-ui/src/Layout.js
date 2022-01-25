@@ -6,12 +6,11 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles } from '@material-ui/core/styles';
 
 import AppBarMenu from './components/AppBarMenu';
-import StyledLoadingCircle from './components/StyledLoadingCircle';
 import Sidebar from './widgets/Sidebar';
 import UserAuth from './pages/UserAuth';
 import routingData from './routing/routingData';
-import useUserData from './hooks/useUserData';
 import PrivateRoute from './routing/PrivateRoute';
+import { useUserAuth } from './context/authProvider';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -96,18 +95,12 @@ AppContainer.propTypes = {
 export default function Layout() {
     const classes = useStyles();
 
-    const { isLoading, isLoggedIn } = useUserData();
+    const { isUserLoggedIn } = useUserAuth();
 
     return (
         <div className={classes.root}>
             <CssBaseline />
-            {isLoading ? (
-                <StyledLoadingCircle />
-            ) : isLoggedIn ? (
-                <AppContainer classes={classes} />
-            ) : (
-                <UserAuth classes={classes} />
-            )}
+            {isUserLoggedIn() ? <AppContainer classes={classes} /> : <UserAuth classes={classes} />}
         </div>
     );
 }
