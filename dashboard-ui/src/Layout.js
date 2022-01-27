@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link, Route, Switch } from 'react-router-dom';
+import { Link, Redirect, Route, Switch } from 'react-router-dom';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles } from '@material-ui/core/styles';
@@ -10,7 +10,6 @@ import Sidebar from './widgets/Sidebar';
 import UserAuth from './pages/UserAuth';
 import routingData from './routing/routingData';
 import PrivateRoute from './routing/PrivateRoute';
-import { useUserAuth } from './context/authProvider';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -69,18 +68,15 @@ const AppContainer = ({ classes }) => {
             <main className={classes.content}>
                 <div className={classes.view}>
                     <Switch>
-                        {routingData.map((sidebarItemData, _idx) => {
-                            return sidebarItemData.disabledPaths ? (
-                                <PrivateRoute path={sidebarItemData.routePath} component={sidebarItemData.component} />
-                            ) : (
-                                <Route
-                                    exact={sidebarItemData.isExact}
-                                    key={_idx}
-                                    path={sidebarItemData.routePath}
-                                    component={sidebarItemData.component}
-                                />
-                            );
-                        })}
+                        {routingData.map((sidebarItemData, idx) => (
+                            <PrivateRoute
+                                key={idx}
+                                exact={sidebarItemData.isExact}
+                                path={sidebarItemData.routePath}
+                                component={sidebarItemData.component}
+                            />
+                        ))}
+                        <Redirect to='/' />
                     </Switch>
                 </div>
             </main>
@@ -95,12 +91,15 @@ AppContainer.propTypes = {
 export default function Layout() {
     const classes = useStyles();
 
-    const { isUserLoggedIn } = useUserAuth();
-
     return (
         <div className={classes.root}>
             <CssBaseline />
-            {isUserLoggedIn() ? <AppContainer classes={classes} /> : <UserAuth classes={classes} />}
+            <Switch>
+                <Route path='/auth'>
+                    <UserAuth classes={classes} />
+                </Route>
+                <PrivateRoute path='/' component={AppContainer} componentProps={{ classes }}/>
+            </Switch>
         </div>
     );
 }
