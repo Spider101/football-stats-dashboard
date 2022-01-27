@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { Route, Switch } from 'react-router-dom';
+import { Redirect, Route, Switch, useRouteMatch } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 import SignIn from '../components/SignIn';
@@ -9,16 +9,18 @@ import useForm from '../hooks/useForm';
 import { useUserAuth } from '../context/authProvider';
 
 export default function UserAuth({ classes }) {
+    const { path } = useRouteMatch();
     return (
         <div className={classes.content}>
             <div className={classes.formContainer}>
                 <Switch>
-                    <Route exact path='/'>
+                    <Route path={`${path}/signIn`}>
                         <SignInContainer />
                     </Route>
-                    <Route path='/signUp'>
+                    <Route path={`${path}/signUp`}>
                         <SignUpContainer />
                     </Route>
+                    <Redirect to='/' />
                 </Switch>
             </div>
         </div>

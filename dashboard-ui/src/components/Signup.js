@@ -157,7 +157,7 @@ export default function Signup({ values, handleChange, handleSubmit, validations
                 </Button>
                 <Grid container justifyContent='flex-end'>
                     <Grid item>
-                        <Link to='/' component={RouterLink} variant='body2'>
+                        <Link to='/auth/signIn' component={RouterLink} variant='body2'>
                             Already have an account? Sign In
                         </Link>
                     </Grid>
