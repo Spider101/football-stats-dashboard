@@ -1,25 +1,26 @@
 import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useUserAuth } from '../context/authProvider';
 
-import { useCurrentClub } from '../context/clubProvider';
-
-export default function PrivateRoute({ component: Component, ...rest }) {
+export default function PrivateRoute({ component: Component, componentProps, ...rest }) {
     // TODO: pass a access flag instead of tight coupling with club page visibility logic
-    const { currentClubId } = useCurrentClub();
+    const { isUserLoggedIn } = useUserAuth();
     return (
         <Route
             {...rest}
-            render={() => {
-                if (currentClubId) {
-                    return <Component />;
+            render={props => {
+                if (isUserLoggedIn()) {
+                    return <Component {...componentProps}/>;
                 }
 
-                return <Redirect to='/' />;
+                // eslint-disable-next-line react/prop-types
+                return <Redirect to={{ pathname: '/auth/signIn', state: { from: props.location } }}/>;
             }}
         />
     );
 }
 
 PrivateRoute.propTypes = {
-    component: PropTypes.node
+    component: PropTypes.node,
+    componentProps: PropTypes.object
 };
