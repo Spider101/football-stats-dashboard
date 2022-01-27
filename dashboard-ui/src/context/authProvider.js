@@ -33,6 +33,7 @@ function AuthContextProvider({ children }) {
             localStorage.setItem(AUTH_DATA_LS_KEY, JSON.stringify(authData));
             queryClient.invalidateQueries(queryKeys.USER_DATA);
             setAuthData(authData);
+            history.push('/');
         }
 
         return errorMessage;
