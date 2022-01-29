@@ -38,6 +38,7 @@ const buildRowDataForSquadTable = players => {
             let row = null;
             switch (key) {
             case 'wages':
+                // TODO: maybe avoid using M and K formatting here.
                 row = { id: key, type: 'string', data: '$' + value + 'K' };
                 break;
             case 'nationality':

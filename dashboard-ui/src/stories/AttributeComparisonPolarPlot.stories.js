@@ -21,10 +21,10 @@ const Template = args => <AttributeComparisonPolarPlot { ...args } />;
 export const Default = Template.bind({});
 Default.args = {
     playersWithAttributes: [{
-        name: faker.name.lastName(1),
+        name: faker.name.lastName(),
         attributes: getAttrGroupData(5)
     }, {
-        name: faker.name.lastName(1),
+        name: faker.name.lastName(),
         attributes: getAttrGroupData(5)
     }]
 };
@@ -32,7 +32,7 @@ Default.args = {
 export const SinglePlayer = Template.bind({});
 SinglePlayer.args = {
     playersWithAttributes: [{
-        name: faker.name.lastName(1),
+        name: faker.name.lastName(),
         attributes: getAttrGroupData(5)
     }]
 };

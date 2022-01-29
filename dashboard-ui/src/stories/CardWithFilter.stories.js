@@ -27,7 +27,7 @@ const Template = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-    allPossibleValues: [...Array(10)].map((_, _idx) => ({ id: _idx, text: faker.hacker.noun() })),
+    allPossibleValues: [...Array(10)].map((_, _idx) => ({ id: _idx, text: faker.name.findName() })),
     currentValue: -1,
     handleChangeFn: x => x,
     labelIdFragment: 'players',
