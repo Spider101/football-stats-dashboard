@@ -59,6 +59,7 @@
     ]
   },
   "devDependencies": {
+    "@faker-js/faker": "^6.0.0-alpha.5",
     "@storybook/addon-actions": "~6.4.7",
     "@storybook/addon-essentials": "~6.4.7",
     "@storybook/addon-links": "~6.4.7",
@@ -66,7 +67,6 @@
     "@storybook/preset-create-react-app": "~3.1.5",
     "@storybook/react": "~6.4.7",
     "@testing-library/react-hooks": "^7.0.2",
-    "faker": "^4.1.0",
     "json-server": "^0.16.3",
     "msw": "^0.35.0"
   }

@@ -1,4 +1,4 @@
-import faker from 'faker';
+import { faker } from '@faker-js/faker';
 import _ from 'lodash';
 
 import { playerAttributes } from '../../utils';
@@ -48,11 +48,9 @@ const nationalityList = [{
     flagURL: 'https://flagcdn.com/w40/es.png'
 }];
 
-const getRandomNumberInRange = (upper, lower = 0) => Math.round(Math.random() * (upper - lower)) + lower;
-
 export const getAttributeItemData = (attributeName, highlightedAttributes = []) => ({
     attributeName,
-    attributeValue: getRandomNumberInRange(MAX_ATTR_VALUE),
+    attributeValue: faker.datatype.number(MAX_ATTR_VALUE),
     highlightedAttributes,
     growthIndicator: _.sample(GROWTH_INDICATOR_LIST)
 });
@@ -62,8 +60,8 @@ export const getAttrComparisonItemData = (attributeName, numPlayers = 2, isHighl
         attrValues: [ ...Array(numPlayers) ].map((_, idx) => {
             const sign = idx % 2 === 0 ? -1 : 1;
             return {
-                name: faker.name.lastName(1),
-                data: [ sign * getRandomNumberInRange(MAX_ATTR_VALUE) ]
+                name: faker.name.lastName(),
+                data: [ sign * faker.datatype.number(MAX_ATTR_VALUE) ]
             };
         }),
         label: attributeName
@@ -73,8 +71,8 @@ export const getAttrComparisonItemData = (attributeName, numPlayers = 2, isHighl
 
 const getAttrComparisonTableMetaData = (numGroups) => ({
     groups: [ ...Array(numGroups) ].map(() => ({
-        name: faker.lorem.word(),
-        numAttr: getRandomNumberInRange(9, 1)
+        name: faker.hacker.ingverb(),
+        numAttr: faker.datatype.number({ max: 9, min: 1 })
     }))
 });
 
@@ -82,7 +80,7 @@ export const getAttributeNamesList = (totalNumOfAttributes) =>
     [ ...Array(totalNumOfAttributes) ].map(() => faker.hacker.noun());
 
 const getPlayerRolesMap = (numOfRoles, attributeList) => {
-    const roles = faker.lorem.words(numOfRoles).split(' ');
+    const roles = [ ...Array(numOfRoles) ].map(() => faker.name.jobType());
     return roles.map(role => ({
         name: role,
         associatedAttributes: _.sampleSize(attributeList, 6)
@@ -120,7 +118,7 @@ export const getAttributeComparisonTableData = (getAttrItemData) => {
 export const getAttrGroupData = (numGroups) => (
     [ ...Array(numGroups) ].map(() => ({
         groupName: _.sample(playerAttributes.GROUPS),
-        attributesInGroup: [ ...Array(10) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE))
+        attributesInGroup: [ ...Array(10) ].map(() => faker.datatype.number(MAX_ATTR_VALUE))
     }))
 );
 
@@ -129,16 +127,16 @@ export const getPlayerMetadata = () => ({
     dateOfBirth: faker.date.past().toJSON(),
     club: faker.company.companyName(),
     country: faker.address.country(),
-    photo: `${faker.image.people()}?random=${getRandomNumberInRange(20)}`,
-    clubLogo: `${faker.image.abstract()}?random=${getRandomNumberInRange(20)}`,
-    countryLogo: `${faker.image.avatar()}?random=${getRandomNumberInRange(20)}`,
-    age:  faker.random.number({ 'min': 16, 'max': 35 })
+    photo: `${faker.image.people()}?random=${faker.datatype.number(20)}`,
+    clubLogo: `${faker.image.abstract()}?random=${faker.datatype.number(20)}`,
+    countryLogo: `${faker.image.avatar()}?random=${faker.datatype.number(20)}`,
+    age:  faker.datatype.number({ min: 16, max: 35 })
 });
 
 
 const getAttributes = (numAttributes, categories, groups, attributeList, hasHistory) => attributeList.map(attribute => {
-    const attributeValue = getRandomNumberInRange(MAX_ATTR_VALUE);
-    const attributeHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE));
+    const attributeValue = faker.datatype.number(MAX_ATTR_VALUE);
+    const attributeHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_ATTR_VALUE));
     return {
         name: attribute,
         category: _.sample(categories),
@@ -149,8 +147,8 @@ const getAttributes = (numAttributes, categories, groups, attributeList, hasHist
 });
 
 export const getPlayerData = (attributeNamesList, hasHistory = false) => {
-    const currentPlayerOverall = getRandomNumberInRange(MAX_OVERALL_VALUE);
-    const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => getRandomNumberInRange(MAX_OVERALL_VALUE));
+    const currentPlayerOverall = faker.datatype.number(MAX_OVERALL_VALUE);
+    const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_OVERALL_VALUE));
 
     const categories = ['Technical', 'Physical', 'Mental'];
     const categoryGroups = ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial'];
@@ -169,13 +167,13 @@ export const getPlayerData = (attributeNamesList, hasHistory = false) => {
 export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
     return [ ...Array(numAttributes) ].map(() => ({
         name: keyName || faker.hacker.noun(),
-        data: [ ...Array(6) ].map(() => getRandomNumberInRange(maxValue))
+        data: [ ...Array(6) ].map(() => faker.datatype.number(maxValue))
     }));
 };
 
 export const getSquadHubTableData = (numRows, moraleIconsMap, withLink = false) => ({
     headers: allSquadHubTableHeaders,
-    rows: [ ...Array(numRows) ].map((_0, idx) => {
+    rows: [ ...Array(numRows) ].map(() => {
         const nationalityMetadata = _.sample(nationalityList);
         const moraleEntity = _.sample(moraleIconsMap);
         const chartData = {
@@ -193,14 +191,14 @@ export const getSquadHubTableData = (numRows, moraleIconsMap, withLink = false) 
                 data: nationalityMetadata.flagURL,
                 metadata: { sortValue: nationalityMetadata.countryName }
             },
-            { id: 'role', type: 'string', data: faker.hacker.noun() },
-            { id: 'wages', type: 'string', data: '$' + getRandomNumberInRange(1000, 100) + 'K' },
-            { id: 'form', type: 'chart', data: chartData, metadata: { sortValue: getRandomNumberInRange(10, 1) } },
+            { id: 'role', type: 'string', data: faker.name.jobType() },
+            { id: 'wages', type: 'string', data: faker.finance.amount(100000, 1000000, 0, '$', true)},
+            { id: 'form', type: 'chart', data: chartData, metadata: { sortValue: faker.datatype.number(10, 1) } },
             { id: 'morale', type: 'icon', data: moraleEntity.icon, metadata: { sortValue: moraleEntity.morale } },
-            { id: 'current_ability', type: 'number', data: getRandomNumberInRange(MAX_OVERALL_VALUE, 1) }
+            { id: 'current_ability', type: 'number', data: faker.datatype.number({ max: MAX_OVERALL_VALUE, min: 1 }) }
         ];
         const nameColumnData = withLink
-            ? { id: 'name', type: 'link', data: faker.name.findName(), metadata: { playerId: idx} }
+            ? { id: 'name', type: 'link', data: faker.name.findName(), metadata: { playerId: faker.datatype.uuid() } }
             : { id: 'name', type: 'string', data: faker.name.findName() };
 
         return [
@@ -214,35 +212,34 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
     headers: allMatchPerformanceTableHeaders,
     rows: [ ...Array(numCompetitions) ].map(() => {
         return [
-            { id: 'competition', type: 'string', data: faker.hacker.noun() },
-            { id: 'apps', type: 'number', data: getRandomNumberInRange(30) },
-            { id: 'goals', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'pens', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'assts', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'pom', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'yel', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'red', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'tck', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'pas%', type: 'string', data: getRandomNumberInRange(25) + '%' },
-            { id: 'drb', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'fouls', type: 'number', data: getRandomNumberInRange(25) },
-            { id: 'avr', type: 'number', data: getRandomNumberInRange(25) }
+            { id: 'competition', type: 'string', data: faker.commerce.productName() },
+            { id: 'apps', type: 'number', data: faker.datatype.number(30) },
+            { id: 'goals', type: 'number', data: faker.datatype.number(25) },
+            { id: 'pens', type: 'number', data: faker.datatype.number(25) },
+            { id: 'assts', type: 'number', data: faker.datatype.number(25) },
+            { id: 'pom', type: 'number', data: faker.datatype.number(25) },
+            { id: 'yel', type: 'number', data: faker.datatype.number(25) },
+            { id: 'red', type: 'number', data: faker.datatype.number(25) },
+            { id: 'tck', type: 'number', data: faker.datatype.number(25) },
+            { id: 'pas%', type: 'string', data: faker.datatype.number(25) + '%' },
+            { id: 'drb', type: 'number', data: faker.datatype.number(25) },
+            { id: 'fouls', type: 'number', data: faker.datatype.number(25) },
+            { id: 'avr', type: 'number', data: faker.datatype.number(25) }
         ];
     })
 });
 
 export const getSquadHubPlayerData = (numPlayers, moraleList) => {
     return {
-        players: [ ...Array(numPlayers) ].map((_0, idx) => ({
-            // TODO: either install uuidv4 or try using the fake uuid generator when faker migration is complete
-            playerId: idx.toString(),
+        players: [ ...Array(numPlayers) ].map(() => ({
+            playerId: faker.datatype.uuid(),
             name: faker.name.findName(),
             nationality: _.sample(nationalityList),
-            role: faker.hacker.noun(),
-            wages: getRandomNumberInRange(1000, 100),
-            form: [ ...Array(5) ].map(() => getRandomNumberInRange(MAX_ATTR_VALUE)),
+            role: faker.name.jobType(),
+            wages: faker.datatype.number({ max: 1000, min: 100 }),
+            form: [ ...Array(5) ].map(() => faker.datatype.number(MAX_ATTR_VALUE)),
             morale: _.sample(moraleList),
-            current_ability: getRandomNumberInRange(MAX_OVERALL_VALUE, 1)
+            current_ability: faker.datatype.number({ max: MAX_OVERALL_VALUE, min: 1 })
         }))
     };
 };
@@ -250,26 +247,26 @@ export const getSquadHubPlayerData = (numPlayers, moraleList) => {
 export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) => ({
     competitions: [ ...Array(numCompetitions) ].map(() => {
         const competitionData = {
-            id: faker.hacker.noun(),
-            appearances: getRandomNumberInRange(30),
-            goals: getRandomNumberInRange(30),
-            penalties: getRandomNumberInRange(25),
-            assists: getRandomNumberInRange(25),
-            playerOfTheMatch: getRandomNumberInRange(10),
-            yellowCards: getRandomNumberInRange(25),
-            redCards: getRandomNumberInRange(25),
-            tackles: getRandomNumberInRange(25),
-            passCompletionRate: getRandomNumberInRange(25),
-            dribbles: getRandomNumberInRange(25),
-            fouls: getRandomNumberInRange(25)
+            id: faker.commerce.productName(), // this is the competition name being used as and ID
+            appearances: faker.datatype.number(30),
+            goals: faker.datatype.number(30),
+            penalties: faker.datatype.number(25),
+            assists: faker.datatype.number(25),
+            playerOfTheMatch: faker.datatype.number(10),
+            yellowCards: faker.datatype.number(25),
+            redCards: faker.datatype.number(25),
+            tackles: faker.datatype.number(25),
+            passCompletionRate: faker.datatype.number(25),
+            dribbles: faker.datatype.number(25),
+            fouls: faker.datatype.number(25)
         };
 
         return numMatches === 0 ? {
             ...competitionData,
-            averageRating: getRandomNumberInRange(10),
+            averageRating: faker.datatype.number(10),
         } : {
             ...competitionData,
-            matchRatingHistory: [ ...Array(numMatches) ].map(() => getRandomNumberInRange(10)),
+            matchRatingHistory: [ ...Array(numMatches) ].map(() => faker.datatype.number(10)),
         };
     })
 });
@@ -287,28 +284,29 @@ export const getMatchPerformanceBreakDown = (numCompetitions, numMatches = 0) =>
 export const getLeagueTableData = (numTeams) => {
     return [ ...Array(numTeams)].map(() => ({
         team: faker.company.companyName(),
-        gamesPlayed: getRandomNumberInRange(35, 30),
-        goalsFor: getRandomNumberInRange(30, 10),
-        goalsAgainst: getRandomNumberInRange(30, 10),
-        points: getRandomNumberInRange(80, 50)
+        gamesPlayed: faker.datatype.number({ max: 35, min: 30 }),
+        goalsFor: faker.datatype.number({ max: 30, min: 10 }),
+        goalsAgainst: faker.datatype.number({ max: 30, min: 10 }),
+        points: faker.datatype.number({ max: 80, min: 50 })
     }));
 };
 
+// TODO: return a single club and add a data gen for club summaries
 export const getClubsData = (numClubs) => {
-    return [ ...Array(numClubs) ].map((_, idx) => ({
-        id: idx.toString(),
+    return [ ...Array(numClubs) ].map(() => ({
+        id: faker.datatype.uuid(),
         name: faker.company.companyName(),
-        transferBudget: getRandomNumberInRange(500000, 10000000),
-        wageBudget: getRandomNumberInRange(500000, 10000000),
-        income: getRandomNumberInRange(500000, 10000000),
-        expenditure: getRandomNumberInRange(500000, 10000000),
+        transferBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
+        wageBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
+        income: faker.datatype.number({ max: 500000, min: 10000000 }),
+        expenditure: faker.datatype.number({ max: 500000, min: 10000000 }),
         createdDate: '2021-20-12'
     }));
 };
 
 export const getBoardObjectives = (numObjectives = 5) =>
-    [...Array(numObjectives)].map((_0, idx) => ({
-        id: 'fake id ' + idx,
+    [...Array(numObjectives)].map(() => ({
+        id: faker.datatype.uuid(),
         title: faker.lorem.sentence(),
         description: faker.lorem.paragraph(),
         isCompleted: false
