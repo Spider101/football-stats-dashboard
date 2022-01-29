@@ -14,6 +14,8 @@ function AuthContextProvider({ children }) {
     const [authData, setAuthData] = useState(existingAuthData);
     const queryClient = useQueryClient();
 
+    const isUserLoggedIn = () => !!authData;
+
     const login = async ({ email, password }, setAuthData) => {
         let authData;
         let errorMessage = null;
@@ -31,6 +33,7 @@ function AuthContextProvider({ children }) {
             localStorage.setItem(AUTH_DATA_LS_KEY, JSON.stringify(authData));
             queryClient.invalidateQueries(queryKeys.USER_DATA);
             setAuthData(authData);
+            history.push('/');
         }
 
         return errorMessage;
@@ -67,6 +70,7 @@ function AuthContextProvider({ children }) {
     const value = {
         authData,
         setAuthData,
+        isUserLoggedIn,
         login,
         createAccount,
         logOut

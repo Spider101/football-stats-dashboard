@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { StylesProvider } from '@material-ui/core';
 import { render } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 const snapshotFriendlyClassNameGenerator = (rule, styleSheet) => `${styleSheet.options.classNamePrefix}-${rule.key}`;
 
@@ -16,3 +17,15 @@ export const snapshotFriendlyRender = (ui, options = {}) =>
         wrapper: SnapshotFriendlyStylesProvider,
         ...options
     });
+
+export const createQueryWrapper = children => {
+    // creates a new QueryClient instance for each test
+    const queryClient = new QueryClient({
+        defaultOptions: {
+            queries: {
+                retry: false
+            }
+        }
+    });
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+};

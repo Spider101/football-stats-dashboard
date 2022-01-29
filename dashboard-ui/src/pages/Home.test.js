@@ -1,23 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { QueryClient, QueryClientProvider } from 'react-query';
 import { MemoryRouter } from 'react-router-dom';
 
 import { AuthContextProvider } from '../context/authProvider';
+import { createQueryWrapper } from '../testUtils';
 import Home from './Home';
-
-const createQueryWrapper = children => {
-    // creates a new QueryClient instance for each test
-    const queryClient = new QueryClient({
-        defaultOptions: {
-            queries: {
-                retry: false
-            }
-        }
-    });
-    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
-};
 
 it('should render view with club data fetched from backend', async () => {
     render(

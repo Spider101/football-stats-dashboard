@@ -123,7 +123,7 @@ export default function SignIn({ values, handleChange, handleSubmit, validations
                         </Link>
                     </Grid> */}
                     <Grid item>
-                        <Link to='/signUp' component={RouterLink} variant='body2'>
+                        <Link to='/auth/signUp' component={RouterLink} variant='body2'>
                             Don&apos;t have an account? Sign Up
                         </Link>
                     </Grid>
