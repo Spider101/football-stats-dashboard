@@ -234,7 +234,8 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
 export const getSquadHubPlayerData = (numPlayers, moraleList) => {
     return {
         players: [ ...Array(numPlayers) ].map((_0, idx) => ({
-            playerId: idx,
+            // TODO: either install uuidv4 or try using the fake uuid generator when faker migration is complete
+            playerId: idx.toString(),
             name: faker.name.findName(),
             nationality: _.sample(nationalityList),
             role: faker.hacker.noun(),
