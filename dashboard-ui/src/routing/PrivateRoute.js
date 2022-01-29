@@ -21,6 +21,7 @@ export default function PrivateRoute({ component: Component, componentProps, ...
 }
 
 PrivateRoute.propTypes = {
-    component: PropTypes.node,
+    // TODO: figure out what should be the proptype for this
+    component: PropTypes.any,
     componentProps: PropTypes.object
 };
