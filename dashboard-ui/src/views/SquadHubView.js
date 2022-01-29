@@ -173,7 +173,10 @@ SquadHubView.propTypes = {
         PropTypes.shape({
             playerId: PropTypes.string,
             name: PropTypes.string,
-            nationality: PropTypes.string,
+            nationality: PropTypes.shape({
+                countryName: PropTypes.string,
+                flagURL: PropTypes.string
+            }),
             role: PropTypes.string,
             wages: PropTypes.number,
             form: PropTypes.arrayOf(PropTypes.number),
