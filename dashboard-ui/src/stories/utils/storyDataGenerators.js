@@ -291,16 +291,21 @@ export const getLeagueTableData = (numTeams) => {
     }));
 };
 
-// TODO: return a single club and add a data gen for club summaries
-export const getClubsData = (numClubs) => {
+export const getClubData = () => ({
+    id: faker.datatype.uuid(),
+    name: faker.company.companyName(),
+    transferBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
+    wageBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
+    income: faker.datatype.number({ max: 500000, min: 10000000 }),
+    expenditure: faker.datatype.number({ max: 500000, min: 10000000 }),
+    createdDate: faker.date.recent().toLocaleDateString()
+});
+
+export const getClubSummaryData = numClubs => {
     return [ ...Array(numClubs) ].map(() => ({
-        id: faker.datatype.uuid(),
+        clubId: faker.datatype.uuid(),
         name: faker.company.companyName(),
-        transferBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
-        wageBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
-        income: faker.datatype.number({ max: 500000, min: 10000000 }),
-        expenditure: faker.datatype.number({ max: 500000, min: 10000000 }),
-        createdDate: '2021-20-12'
+        createdDate: faker.date.recent().toLocaleDateString()
     }));
 };
 
