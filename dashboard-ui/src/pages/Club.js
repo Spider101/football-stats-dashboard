@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { useClubData } from '../hooks/useClubData';
@@ -11,12 +12,14 @@ export default function Club() {
     const { clubId } = useParams();
     const { isLoading, data: clubData } = useClubData(clubId);
 
+    useEffect(() => {
+        if(clubData && clubData.id !== currentClubId) {
+            setCurrentClubId(clubData.id);
+        }
+    });
+
     if (isLoading) {
         return <StyledLoadingCircle />;
-    }
-
-    if(clubData && clubData.id !== currentClubId) {
-        setCurrentClubId(clubData.id);
     }
 
     return <ClubPageView club={clubData} />;
