@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { useUserAuth } from '../context/authProvider';
 
 export default function PrivateRoute({ component: Component, componentProps, ...rest }) {
-    // TODO: pass a access flag instead of tight coupling with club page visibility logic
     const { isUserLoggedIn } = useUserAuth();
     return (
         <Route
@@ -21,7 +20,6 @@ export default function PrivateRoute({ component: Component, componentProps, ...
 }
 
 PrivateRoute.propTypes = {
-    // TODO: figure out what should be the proptype for this
-    component: PropTypes.any,
+    component: PropTypes.elementType,
     componentProps: PropTypes.object
 };
