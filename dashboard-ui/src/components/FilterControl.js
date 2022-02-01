@@ -29,7 +29,7 @@ export default function FilterControl({ currentValue, allPossibleValues, handleC
                 value={ currentValue }
                 onChange={ handleChangeFn }
             >
-                <MenuItem aria-label="None" value={ -1 }><em>None</em></MenuItem>
+                <MenuItem aria-label="None" value={ '-1' }><em>None</em></MenuItem>
                 {
                     allPossibleValues.map(value => (
                         <MenuItem key={ value.id } value={ value.id }>{ capitalizeLabel(value.text) }</MenuItem>
