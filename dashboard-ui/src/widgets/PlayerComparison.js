@@ -107,5 +107,5 @@ PlayerComparison.propTypes = {
         name: PropTypes.string,
         attributes: PlayerProgressionView.propTypes.playerAttributes
     }),
-    playerRoles: PropTypes.arrayOf(PlayerProgressionView.propTypes.playerRoles)
+    playerRoles: PlayerProgressionView.propTypes.playerRoles
 };

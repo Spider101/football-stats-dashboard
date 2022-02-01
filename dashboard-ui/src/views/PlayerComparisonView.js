@@ -12,7 +12,7 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
     // filter out any non-existent player data
     const players = [ basePlayer, comparedPlayer ].filter(player => !_.isEmpty(player));
 
-    const playerRoles = players.map(player => player.playerRoles);
+    const playerRoles = players.map(player => player.playerRoles).flat();
     const basePlayerData = { name: basePlayer.playerMetadata.name, attributes: basePlayer.playerAttributes };
     const comparedPlayerData = _.isEmpty(comparedPlayer) ? null : {
         name: comparedPlayer.playerMetadata.name,
@@ -52,7 +52,7 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
 }
 
 PlayerComparisonView.propTypes = {
-    basePlayer: PlayerProgressionView.propTypes,
-    comparedPlayer: PlayerProgressionView.propTypes,
+    basePlayer: PropTypes.shape(PlayerProgressionView.propTypes),
+    comparedPlayer: PropTypes.shape(PlayerProgressionView.propTypes),
     filterControl: PropTypes.element,
 };

@@ -28,8 +28,8 @@ Default.args = {
         attributes: TwoPlayersView.args.comparedPlayer.playerAttributes
     },
     playerRoles: [
-        TwoPlayersView.args.basePlayer.playerMetadata.name,
-        TwoPlayersView.args.comparedPlayer.playerMetadata.name
+        ...TwoPlayersView.args.basePlayer.playerRoles,
+        ...TwoPlayersView.args.comparedPlayer.playerRoles
     ]
 };
 
@@ -41,6 +41,6 @@ SinglePlayer.args = {
     },
     comparedPlayerData: null,
     playerRoles: [
-        SinglePlayerView.args.basePlayer.playerMetadata.name
+        ...SinglePlayerView.args.basePlayer.playerRoles
     ]
 };
