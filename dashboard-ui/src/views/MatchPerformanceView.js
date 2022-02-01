@@ -7,8 +7,24 @@ import Grid from '@material-ui/core/Grid';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
-import { convertCamelCaseToSnakeCase, matchPerformanceTableHeaderDisplayTypeMap } from '../utils';
+import { convertCamelCaseToSnakeCase } from '../utils';
 import { useGlobalChartOptions } from '../context/chartOptionsProvider';
+
+const matchPerformanceTableHeaderDisplayTypeMap = {
+    competition: 'string',
+    appearances: 'number',
+    goals: 'number',
+    penalties: 'number',
+    assists: 'number',
+    player_of_the_match: 'number',
+    yellow_cards: 'number',
+    red_cards: 'number',
+    tackles: 'number',
+    pass_completion_rate: 'string',
+    dribbles: 'number',
+    fouls: 'number',
+    average_rating: 'number'
+};
 
 const buildHeaderDataForMatchPerformanceTable = headerNames =>
     headerNames.map(name => ({

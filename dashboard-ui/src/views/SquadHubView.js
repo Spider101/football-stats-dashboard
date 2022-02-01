@@ -17,6 +17,16 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+const squadTableHeaderDisplayTypeMap = {
+    name: 'string',
+    nationality: 'image',
+    role: 'string',
+    wages: 'string',
+    form: 'chart',
+    morale: 'icon',
+    current_ability: 'number'
+};
+
 // TODO: define a more appropriate method for this
 const getSortValueForForm = matchRatingsList => matchRatingsList.length > 0 && matchRatingsList[0];
 
