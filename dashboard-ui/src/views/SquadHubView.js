@@ -194,5 +194,5 @@ SquadHubView.propTypes = {
             currentAbility: PropTypes.number
         })
     ),
-    addPlayerWidget: PropTypes.node
+    addPlayerWidget: PropTypes.element
 };

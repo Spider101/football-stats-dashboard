@@ -35,5 +35,5 @@ export default function PageAction({ dialog, actionType }) {
 
 PageAction.propTypes = {
     actionType: PropTypes.string,
-    dialog: PropTypes.node
+    dialog: PropTypes.element
 };

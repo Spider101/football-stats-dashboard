@@ -27,7 +27,7 @@ export default function MenuItem({ text, icon, clsName, selectedItem, menuItemIn
 
 MenuItem.propTypes = {
     text: PropTypes.string,
-    icon: PropTypes.node,
+    icon: PropTypes.element,
     clsName: PropTypes.string,
     isDisabled: PropTypes.bool,
     selectedItem: PropTypes.number,

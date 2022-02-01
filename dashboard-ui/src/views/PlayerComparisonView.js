@@ -54,5 +54,5 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
 PlayerComparisonView.propTypes = {
     basePlayer: PlayerProgressionView.propTypes,
     comparedPlayer: PlayerProgressionView.propTypes,
-    filterControl: PropTypes.node,
+    filterControl: PropTypes.element,
 };
