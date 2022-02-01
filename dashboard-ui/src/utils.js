@@ -152,3 +152,23 @@ export const formatNumberWithCommas = number =>
 
 // key for storing the auth token data in localstorage
 export const AUTH_DATA_LS_KEY = 'auth-data';
+
+export const transformIntoTabularData = (rawData, headers, filterByColumnNameFn, tranformToRowDataFn) => {
+    const tabularData = headers.map(columnName =>
+        rawData.filter(item => filterByColumnNameFn(item, columnName))
+            .map(childData => tranformToRowDataFn(childData))
+    );
+
+    const maxRows = Math.max(...tabularData.map(row => row.length));
+
+    const rows = [...Array(maxRows)].map((_, i) =>
+        [...Array(headers.length)].map((_, j) =>
+            i >= tabularData[j].length ? null : tabularData[j][i]
+        )
+    );
+
+    return {
+        headers,
+        rows
+    };
+};

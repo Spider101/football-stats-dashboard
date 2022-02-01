@@ -6,6 +6,7 @@ import PlayerAttributesTable from '../components/PlayerAttributesTable';
 import AttributeItem from '../components/AttributeItem';
 import PlayerBioCard from '../components/PlayerBioCard';
 import PlayerProgressionCharts from '../widgets/PlayerProgressionCharts';
+import { transformIntoTabularData } from '../utils';
 
 const getGrowthIndicator = history => {
     const value = history[history.length - 1];
@@ -19,35 +20,6 @@ const getGrowthIndicator = history => {
     }
 };
 
-/**
- * convert the attributes collection into a format that can be fed into a table DOM structure
- * @param {array} attributes
- * @returns
- */
-const buildAttributeTableData = attributes => {
-    const categories = Array.from(new Set(attributes.map(attribute => attribute.category)));
-    const data = categories.map(category =>
-        attributes
-            .filter(attribute => attribute.category === category)
-            .map(attribute => ({
-                attributeName: attribute.name,
-                attributeValue: attribute.value,
-                highlightedAttributes: [],
-                growthIndicator: getGrowthIndicator(attribute.history)
-            }))
-    );
-    const maxRows = Math.max(...data.map(row => row.length));
-
-    // transpose the attribute data so that each column corresponds to a given attribute category
-    const rows = [...Array(maxRows)].map((_, i) =>
-        [...Array(categories.length)].map((_, j) => (i > data[j].length ? null : data[j][i]))
-    );
-    return {
-        headers: categories,
-        rows
-    };
-};
-
 const buildAttributeProgressChartData = attributeData => {
     const attributeProgressChartData = attributeData
         .map(attribute => ({ name: attribute.name, data: attribute.history }));
@@ -59,8 +31,16 @@ const buildOverallProgressChartData = ({ history: overallHistory }) => ({
 });
 
 export default function PlayerProgressionView({ playerMetadata, playerRoles, playerOverall, playerAttributes }) {
+    const categories = Array.from(new Set(playerAttributes.map(attribute => attribute.category)));
+    const buildAttributeData = attribute => ({
+        attributeName: attribute.name,
+        attributeValue: attribute.value,
+        highlightedAttributes: [],
+        growthIndicator: getGrowthIndicator(attribute.history)
+    });
+    const filterByCategory = (attribute, categoryName) => attribute.category === categoryName;
     const attributeTableData = {
-        ...buildAttributeTableData(playerAttributes),
+        ...transformIntoTabularData(playerAttributes, categories, filterByCategory, buildAttributeData),
         roles: playerRoles
     };
 
