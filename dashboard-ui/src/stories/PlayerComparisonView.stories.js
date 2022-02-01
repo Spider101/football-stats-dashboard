@@ -15,8 +15,10 @@ export default {
     }
 };
 
-const basePlayerData = getPlayerData(getAttributeNamesList(3 * 10));
-const comparedPlayerData = getPlayerData(getAttributeNamesList(3 * 10));
+// since the attributes are randomized but always belonging to one of the three categories,
+// there maybe a lot of `empty` data. This won't be the case in the actual application though.
+const basePlayerData = getPlayerData(getAttributeNamesList(3 * 10), true);
+const comparedPlayerData = getPlayerData(getAttributeNamesList(3 * 10), true);
 
 const Template = args => <PlayerComparisonView {...args} />;
 

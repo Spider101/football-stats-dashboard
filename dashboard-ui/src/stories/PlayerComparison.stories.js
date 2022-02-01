@@ -1,5 +1,5 @@
 import PlayerComparison from '../widgets/PlayerComparison';
-import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerators';
+import { Default as TwoPlayersView, SinglePlayer as SinglePlayerView } from './PlayerComparisonView.stories';
 
 export default {
     component: PlayerComparison,
@@ -19,13 +19,28 @@ const Template = args => <PlayerComparison { ...args } />;
 
 export const Default = Template.bind({});
 Default.args = {
-    players: [
-        getPlayerData(getAttributeNamesList(3 * 10)),
-        getPlayerData(getAttributeNamesList(3 * 10))
+    basePlayerData: {
+        name: TwoPlayersView.args.basePlayer.playerMetadata.name,
+        attributes: TwoPlayersView.args.basePlayer.playerAttributes
+    },
+    comparedPlayerData: {
+        name: TwoPlayersView.args.comparedPlayer.playerMetadata.name,
+        attributes: TwoPlayersView.args.comparedPlayer.playerAttributes
+    },
+    playerRoles: [
+        TwoPlayersView.args.basePlayer.playerMetadata.name,
+        TwoPlayersView.args.comparedPlayer.playerMetadata.name
     ]
 };
 
 export const SinglePlayer = Template.bind({});
 SinglePlayer.args = {
-    players: [ getPlayerData(getAttributeNamesList(3 * 10)) ]
+    basePlayerData: {
+        name: SinglePlayerView.args.basePlayer.playerMetadata.name,
+        attributes: SinglePlayerView.args.basePlayer.playerAttributes
+    },
+    comparedPlayerData: null,
+    playerRoles: [
+        SinglePlayerView.args.basePlayer.playerMetadata.name
+    ]
 };
