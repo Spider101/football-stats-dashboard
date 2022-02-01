@@ -16,7 +16,7 @@ import StyledLoadingCircle from '../components/StyledLoadingCircle';
 import useSquadHub from '../hooks/useSquadHubData';
 import usePlayerData from '../hooks/usePlayerData';
 import usePlayerPerfData from '../hooks/usePlayerPerfData';
-import { queryKeys } from '../utils';
+import { queryKeys } from '../constants';
 
 const useStyles = makeStyles((theme) => ({
     topMenu: {

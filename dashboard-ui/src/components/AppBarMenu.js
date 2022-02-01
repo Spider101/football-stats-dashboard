@@ -16,7 +16,7 @@ import SearchIcon from '@material-ui/icons/Search';
 
 import { alpha, makeStyles } from '@material-ui/core/styles';
 
-import { DRAWER_WIDTH } from '../utils';
+import { DRAWER_WIDTH } from '../constants';
 import { useUserAuth } from '../context/authProvider';
 
 const useStyles = makeStyles((theme) => ({

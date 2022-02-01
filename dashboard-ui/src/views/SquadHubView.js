@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { squadTableHeaderDisplayTypeMap, moraleIconsMap } from '../utils';
+import { moraleIconsMap } from '../constants';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
@@ -28,7 +28,6 @@ const buildHeaderDataForSquadTable = headerNames =>
             type: squadTableHeaderDisplayTypeMap[name]
         }));
 
-// TODO: move this into a hook
 const buildRowDataForSquadTable = players => {
     return players.map(player => {
         const keys = Object.keys(player);

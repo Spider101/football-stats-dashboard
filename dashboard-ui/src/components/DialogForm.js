@@ -7,7 +7,7 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Divider from '@material-ui/core/Divider';
 
-import { formSubmission } from '../utils';
+import { formSubmission } from '../constants';
 
 export default function DialogForm({
     children,

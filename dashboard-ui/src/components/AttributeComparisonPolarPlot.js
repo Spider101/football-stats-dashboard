@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import ReactApexChart from 'react-apexcharts';
 
 import { useGlobalChartOptions } from '../context/chartOptionsProvider';
-import { playerAttributes } from '../utils';
+import { playerAttributes } from '../constants';
 
 export default function AttributeComparisonPolarPlot({ playersWithAttributes }) {
     const globalChartOptions = useGlobalChartOptions();

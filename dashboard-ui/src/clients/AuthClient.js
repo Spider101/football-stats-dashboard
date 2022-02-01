@@ -1,4 +1,4 @@
-import { httpStatus } from '../utils';
+import { httpStatus } from '../constants';
 import fetchDataFromEndpoint from './utils';
 import UnauthorizedError from '../errors/UnauthorizedError';
 

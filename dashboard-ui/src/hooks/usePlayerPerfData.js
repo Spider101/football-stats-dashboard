@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 
 import { fetchPlayerPerformanceData } from '../clients/DashboardClient';
 import { useUserAuth } from '../context/authProvider';
-import { queryKeys } from '../utils';
+import { queryKeys } from '../constants';
 
 export default function (playerId) {
     const { authData } = useUserAuth();

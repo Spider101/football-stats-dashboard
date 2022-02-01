@@ -1,80 +1,3 @@
-import MoodIcon from '@material-ui/icons/Mood';
-import MoodBadIcon from '@material-ui/icons/MoodBad';
-
-export const httpStatus = {
-    OK: 200,
-    BAD_REQUEST: 400,
-    UNAUTHORIZED: 401,
-    CREATED: 201,
-    CONFLICT: 409
-};
-
-export const queryKeys = {
-    SQUAD_DATA: 'squadData',
-    PLAYER_DATA: 'playerData',
-    COMPARED_PLAYER_DATA: 'comparedPlayerData',
-    PLAYER_PERFORMANCE_DATA: 'playerPerformance',
-    ALL_CLUBS: 'allClubsData',
-    USER_DATA: 'userData'
-};
-
-export const squadTableHeaderDisplayTypeMap = {
-    name: 'string',
-    nationality: 'image',
-    role: 'string',
-    wages: 'string',
-    form: 'chart',
-    morale: 'icon',
-    current_ability: 'number'
-};
-
-export const matchPerformanceTableHeaderDisplayTypeMap = {
-    competition: 'string',
-    appearances: 'number',
-    goals: 'number',
-    penalties: 'number',
-    assists: 'number',
-    player_of_the_match: 'number',
-    yellow_cards: 'number',
-    red_cards: 'number',
-    tackles: 'number',
-    pass_completion_rate: 'string',
-    dribbles: 'number',
-    fouls: 'number',
-    average_rating: 'number'
-};
-
-export const playerAttributes = {
-    CATEGORIES: ['Technical', 'Physical', 'Mental'],
-    GROUPS: ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial']
-};
-
-export const DRAWER_WIDTH = 240;
-
-export const nationalityFlagMap = [
-    { nationality: 'France', flag: 'https://upload.wikimedia.org/wikipedia/commons/6/62/Flag_of_France.png' },
-    { nationality: 'Germany', flag: 'https://freepngimg.com/thumb/germany_flag/1-2-germany-flag-picture.png' },
-    { nationality: 'Spain', flag: 'https://freepngimg.com/thumb/spain/5-2-spain-flag-picture.png' },
-    {
-        nationality: 'Netherlands',
-        flag:
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/' +
-            'Flag_of_the_Netherlands.svg/125px-Flag_of_the_Netherlands.svg.png'
-    }
-];
-
-export const moraleIconsMap = [
-    { morale: 'Angry', icon: <MoodBadIcon /> },
-    { morale: 'Happy', icon: <MoodIcon /> }
-];
-
-export const formSubmission = {
-    COMPLETE: 'COMPLETE',
-    READY: 'READY',
-    NOT_READY: 'NOT_READY',
-    INPROGRESS: 'INPROGRESS'
-};
-
 export const capitalizeLabel = (label, format = 'snakecase') => {
     let tokens;
     if (format === 'snakecase') {
@@ -149,9 +72,6 @@ export const convertCamelCaseToSnakeCase = camelCaseString =>
 
 export const formatNumberWithCommas = number =>
     number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-// key for storing the auth token data in localstorage
-export const AUTH_DATA_LS_KEY = 'auth-data';
 
 export const transformIntoTabularData = (rawData, headers, filterByColumnNameFn, tranformToRowDataFn) => {
     const tabularData = headers.map(columnName =>

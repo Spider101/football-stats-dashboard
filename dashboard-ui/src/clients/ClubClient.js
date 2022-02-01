@@ -1,5 +1,5 @@
 import fetchDataFromEndpoint from './utils';
-import { httpStatus } from '../utils';
+import { httpStatus } from '../constants';
 
 export const fetchClubSummaries = async ({ meta: { authData } }) => {
     const res = await fetchDataFromEndpoint('club/all', 'GET', {

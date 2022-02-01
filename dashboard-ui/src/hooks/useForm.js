@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 
-import { capitalizeLabel, formSubmission } from '../utils';
+import { capitalizeLabel } from '../utils';
+import { formSubmission } from '../constants';
 
 const getEmptyFieldValidation = fieldName => `${capitalizeLabel(fieldName, 'camelcase')} cannot be empty!`;
 const validateEmail = email => /\S+@\S+\.\S+/.test(email);

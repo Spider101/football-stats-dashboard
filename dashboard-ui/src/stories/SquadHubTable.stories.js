@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import SortableTable from '../widgets/SortableTable';
 
 import { getSquadHubTableData } from './utils/storyDataGenerators';
-import { moraleIconsMap } from '../utils';
+import { moraleIconsMap } from '../constants';
 
 export default {
     component: SortableTable,

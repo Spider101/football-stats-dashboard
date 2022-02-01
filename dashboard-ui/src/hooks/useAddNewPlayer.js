@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from 'react-query';
 import { createNewPlayer } from '../clients/DashboardClient';
 import { useUserAuth } from '../context/authProvider';
 import { useCurrentClub } from '../context/clubProvider';
-import { queryKeys } from '../utils';
+import { queryKeys } from '../constants';
 
 export default function () {
     const { authData } = useUserAuth();

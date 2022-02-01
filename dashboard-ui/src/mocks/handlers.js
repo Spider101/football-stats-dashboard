@@ -1,6 +1,6 @@
 import { rest } from 'msw';
 
-import { AUTH_DATA_LS_KEY } from '../utils';
+import { AUTH_DATA_LS_KEY } from '../constants';
 
 const mockAuthData = {
     id: 'fakeAuthToken',

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from 'react-query';
 import { createNewClub } from '../clients/ClubClient';
 import { useUserAuth } from '../context/authProvider';
-import { queryKeys } from '../utils';
+import { queryKeys } from '../constants';
 
 export default function () {
     const { authData } = useUserAuth();

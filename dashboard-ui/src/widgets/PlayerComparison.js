@@ -10,7 +10,7 @@ import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolar
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
 import { transformIntoTabularData } from '../utils';
-import { playerAttributes } from '../utils';
+import { playerAttributes } from '../constants';
 
 export default function PlayerComparison({ basePlayerData, comparedPlayerData, playerRoles }) {
     const [tabValue, setTabValue] = useState(0);
