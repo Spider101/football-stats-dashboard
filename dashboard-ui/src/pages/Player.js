@@ -129,6 +129,11 @@ const PlayerComparisonContainer = ({ playerId }) => {
     };
 
     const squadDataQuery = useSquadHub();
+
+    if (squadDataQuery.isLoading || basePlayerDataQuery.isLoading) {
+        return <StyledLoadingCircle />;
+    }
+
     const squadPlayers = squadDataQuery.data.filter(d => d.playerId !== playerId)
         .map(d => ({ id: d.playerId, text: d.name }));
 
@@ -152,10 +157,6 @@ const PlayerComparisonContainer = ({ playerId }) => {
         comparedPlayer,
         filterControl
     };
-
-    if (squadDataQuery.isLoading || basePlayerDataQuery.isLoading) {
-        return <StyledLoadingCircle />;
-    }
 
     return <PlayerComparisonView { ...playerComparisonViewData } />;
 };
