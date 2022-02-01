@@ -3,9 +3,11 @@ import _ from 'lodash';
 
 import { playerAttributes } from '../../utils';
 
-const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
+// TODO: 31/01/22 remove all usage of these constants from stories and then remove the export keyword
 export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
+
+const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 const NUM_MONTHS = 6;
 
 const allSquadHubTableHeaders = [
@@ -134,33 +136,34 @@ export const getPlayerMetadata = () => ({
 });
 
 
-const getAttributes = (numAttributes, categories, groups, attributeList, hasHistory) => attributeList.map(attribute => {
-    const attributeValue = faker.datatype.number(MAX_ATTR_VALUE);
-    const attributeHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_ATTR_VALUE));
-    return {
-        name: attribute,
-        category: _.sample(categories),
-        group: _.sample(groups),
-        value: attributeValue,
-        ...(hasHistory && { history: [ ...attributeHistory, attributeValue ] })
-    };
-});
+export const getAttributes = (attributeList, hasHistory) =>
+    attributeList.map(attribute => {
+        const attributeValue = faker.datatype.number(MAX_ATTR_VALUE);
+        const attributeHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_ATTR_VALUE));
+        return {
+            name: attribute,
+            category: _.sample(playerAttributes.CATEGORIES),
+            group: _.sample(playerAttributes.GROUPS),
+            value: attributeValue,
+            ...(hasHistory && { history: [ ...attributeHistory, attributeValue ] })
+        };
+    });
 
 export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     const currentPlayerOverall = faker.datatype.number(MAX_OVERALL_VALUE);
     const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_OVERALL_VALUE));
-
-    const categories = ['Technical', 'Physical', 'Mental'];
-    const categoryGroups = ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial'];
 
     return {
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
         playerOverall: {
             currentValue: currentPlayerOverall,
-            history: [ ...playerOverallHistory, currentPlayerOverall ],
+            history: [...playerOverallHistory, currentPlayerOverall]
         },
-        playerAttributes: getAttributes(30, categories, categoryGroups, attributeNamesList, hasHistory)
+        playerAttributes: getAttributes(
+            attributeNamesList,
+            hasHistory
+        )
     };
 };
 
