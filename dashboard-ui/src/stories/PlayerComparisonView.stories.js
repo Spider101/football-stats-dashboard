@@ -1,10 +1,13 @@
 import PlayerComparisonView from '../views/PlayerComparisonView';
-import { Selected as CardWithFilter } from './CardWithFilter.stories';
+import { Default as CardWithFilter } from './CardWithFilter.stories';
 import { getAttributeNamesList, getPlayerData } from './utils/storyDataGenerators';
 
 export default {
     component: PlayerComparisonView,
     title: 'Views/PlayerComparisonView',
+    argTypes: {
+        filterControl: { control: { disable: true } }
+    },
     parameters: {
         docs: {
             description: {
