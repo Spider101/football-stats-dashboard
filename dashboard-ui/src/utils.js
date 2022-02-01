@@ -10,12 +10,7 @@ export const capitalizeLabel = (label, format = 'snakecase') => {
         .join(' ');
 };
 
-// TODO: update this to remove redundant code
-const iconMetadataComparator = (x, y) =>
-    x.metadata.sortValue < y.metadata.sortValue ? -1 : x.metadata.sortValue > y.metadata.sortValue ? 1 : 0;
-const imageMetadataComparator = (x, y) =>
-    x.metadata.sortValue < y.metadata.sortValue ? -1 : x.metadata.sortValue > y.metadata.sortValue ? 1 : 0;
-const chartMetadataComparator = (x, y) =>
+const metadataComparator = (x, y) =>
     x.metadata.sortValue < y.metadata.sortValue ? -1 : x.metadata.sortValue > y.metadata.sortValue ? 1 : 0;
 const defaultComparator = (x, y) => (x.data < y.data ? -1 : x.data > y.data ? 1 : 0);
 
@@ -29,13 +24,9 @@ const compare = (row1, row2, sortOrder, cellLabel) => {
     // so we can just take the comparator method from one of them
     switch (cell1.type) {
     case 'icon':
-        comparator = iconMetadataComparator;
-        break;
     case 'image':
-        comparator = imageMetadataComparator;
-        break;
     case 'chart':
-        comparator = chartMetadataComparator;
+        comparator = metadataComparator;
         break;
     default:
         comparator = defaultComparator;
