@@ -12,7 +12,7 @@ import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
 import { transformIntoTabularData } from '../utils';
 import { playerAttributes } from '../utils';
 
-export default function PlayerComparison({ players }) {
+export default function PlayerComparison({ basePlayerData, comparedPlayerData, playerRoles }) {
     const [tabValue, setTabValue] = useState(0);
 
     const handleTabChange = (_, newTabValue) => {
@@ -26,46 +26,46 @@ export default function PlayerComparison({ players }) {
             .filter(attribute => filterByCategory(attribute, categoryName))
             .find(attribute => attribute.name === basePlayerAttributeName);
 
-    const getAttributeComparisonDataFn = (playerNames, [comparedPlayerAttributes]) => basePlayerAttribute => {
-        const [basePlayerName, ...otherPlayerNames] = playerNames;
-
-        // assuming the playerMetadata and playerAttributes data is in sync
-        const comparedPlayerName = otherPlayerNames.length > 0 && otherPlayerNames[0];
-        const comparedPlayerAttributeItemData = otherPlayerNames.length > 0 &&
-            getComparedPlayerAttributeItemData(
-                comparedPlayerAttributes,
-                basePlayerAttribute.name,
-                basePlayerAttribute.category
-            );
-        return {
-            attrComparisonItem: {
-                attrValues: [
-                    { name: basePlayerName, data: [-1 * basePlayerAttribute.value] },
-                    ...(comparedPlayerAttributeItemData ? [
-                        { name: comparedPlayerName, data: [comparedPlayerAttributeItemData.value] }
-                    ] : [])
-                ],
-                label: basePlayerAttribute.name
-            }
+    const getAttributeComparisonDataFn = (basePlayerName, comparedPlayerName, comparedPlayerAttributes) =>
+        basePlayerAttribute => {
+            const comparedPlayerAttributeItemData = comparedPlayerAttributes &&
+                getComparedPlayerAttributeItemData(
+                    comparedPlayerAttributes,
+                    basePlayerAttribute.name,
+                    basePlayerAttribute.category
+                );
+            return {
+                attrComparisonItem: {
+                    attrValues: [
+                        { name: basePlayerName, data: [-1 * basePlayerAttribute.value] },
+                        ...(comparedPlayerAttributeItemData
+                            ? [{ name: comparedPlayerName, data: [comparedPlayerAttributeItemData.value] }]
+                            : [])
+                    ],
+                    label: basePlayerAttribute.name
+                }
+            };
         };
-    };
 
-    const [basePlayerAttributes, ...otherPlayerAttributes] = players.map(player => player.playerAttributes);
     const playerComparisonTableData = transformIntoTabularData(
-        basePlayerAttributes,
+        basePlayerData.attributes,
         playerAttributes.CATEGORIES,
         filterByCategory,
-        getAttributeComparisonDataFn(players.map(player => player.playerMetadata.name), otherPlayerAttributes)
+        getAttributeComparisonDataFn(basePlayerData.name, comparedPlayerData?.name, comparedPlayerData?.attributes)
     );
     const attributeComparisonTableData = {
-        roles: players.map(player => player.playerRoles).flat(),
+        roles: playerRoles,
         ...playerComparisonTableData
     };
 
+    const playerAttributeData = [
+        { name: basePlayerData.name, attributeData: basePlayerData.attributes },
+        ...(comparedPlayerData ? [{ name: comparedPlayerData.name, attributeData: comparedPlayerData.attributes }] : [])
+    ];
     const attributePolarPlotData = {
-        playersWithAttributes: players.map(player => ({
-            name: player.playerMetadata.name,
-            attributes: Object.entries(_.groupBy(player.playerAttributes, attribute => attribute.group)).map(
+        playersWithAttributes: playerAttributeData.map(playerData => ({
+            name: playerData.name,
+            attributes: Object.entries(_.groupBy(playerData.attributeData, attribute => attribute.group)).map(
                 ([groupName, attributes]) => ({
                     groupName,
                     attributesInGroup: attributes.map(attribute => attribute.value)
@@ -99,5 +99,13 @@ export default function PlayerComparison({ players }) {
 }
 
 PlayerComparison.propTypes = {
-    players: PropTypes.arrayOf(PropTypes.shape(PlayerProgressionView.propTypes))
+    basePlayerData: PropTypes.shape({
+        name: PropTypes.string,
+        attributes: PlayerProgressionView.propTypes.playerAttributes
+    }),
+    comparedPlayerData: PropTypes.shape({
+        name: PropTypes.string,
+        attributes: PlayerProgressionView.propTypes.playerAttributes
+    }),
+    playerRoles: PropTypes.arrayOf(PlayerProgressionView.propTypes.playerRoles)
 };

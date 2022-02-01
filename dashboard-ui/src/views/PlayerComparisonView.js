@@ -6,11 +6,17 @@ import Grid from '@material-ui/core/Grid';
 import PlayerBioCard from '../components/PlayerBioCard';
 import PlayerComparison from '../widgets/PlayerComparison';
 import CardWithFilter from '../widgets/CardWithFilter';
+import PlayerProgressionView from './PlayerProgressionView';
 
 export default function PlayerComparisonView({ basePlayer, comparedPlayer, filterControl }) {
     // filter out any non-existent player data
-    const playerData = {
-        players: [ basePlayer, comparedPlayer ].filter(player => !_.isEmpty(player))
+    const players = [ basePlayer, comparedPlayer ].filter(player => !_.isEmpty(player));
+
+    const playerRoles = players.map(player => player.playerRoles);
+    const basePlayerData = { name: basePlayer.playerMetadata.name, attributes: basePlayer.playerAttributes };
+    const comparedPlayerData = _.isEmpty(comparedPlayer) ? null : {
+        name: comparedPlayer.playerMetadata.name,
+        attributes: comparedPlayer.playerAttributes
     };
 
     return (
@@ -24,7 +30,7 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
             }
             <Grid container spacing={2}>
                 {
-                    playerData.players.map((player, _idx) => (
+                    players.map((player, _idx) => (
                         <Grid item xs={6} key={ _idx }>
                             <PlayerBioCard { ...player.playerMetadata } />
                         </Grid>
@@ -35,18 +41,18 @@ export default function PlayerComparisonView({ basePlayer, comparedPlayer, filte
                         <CardWithFilter filterControl={ filterControl } />
                     </Grid>
                 }
-                <PlayerComparison { ...playerData } />
+                <PlayerComparison
+                    basePlayerData={basePlayerData}
+                    comparedPlayerData={comparedPlayerData}
+                    playerRoles={playerRoles}
+                />
             </Grid>
         </>
     );
 }
 
 PlayerComparisonView.propTypes = {
-    basePlayer: PropTypes.shape({
-        playerMetadata: PropTypes.shape(PlayerBioCard.propTypes)
-    }),
-    comparedPlayer: PropTypes.shape({
-        playerMetadata: PropTypes.shape(PlayerBioCard.propTypes)
-    }),
+    basePlayer: PlayerProgressionView.propTypes,
+    comparedPlayer: PlayerProgressionView.propTypes,
     filterControl: PropTypes.node,
 };
