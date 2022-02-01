@@ -3,7 +3,6 @@ import _ from 'lodash';
 
 import { playerAttributes } from '../../constants';
 
-// TODO: 31/01/22 remove all usage of these constants from stories and then remove the export keyword
 export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
 
