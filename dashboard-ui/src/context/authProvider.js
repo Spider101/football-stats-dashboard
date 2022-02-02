@@ -4,7 +4,7 @@ import { useQueryClient } from 'react-query';
 import { useHistory } from 'react-router-dom';
 
 import { authenticateUser, createUser } from '../clients/AuthClient';
-import { AUTH_DATA_LS_KEY, queryKeys } from '../utils';
+import { AUTH_DATA_LS_KEY, queryKeys } from '../constants';
 
 const AuthContext = createContext();
 

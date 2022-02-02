@@ -73,5 +73,5 @@ HomePageView.propTypes = {
             createdDate: PropTypes.string
         })
     ),
-    addClubWidget: PropTypes.node
+    addClubWidget: PropTypes.element
 };

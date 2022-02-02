@@ -2,7 +2,7 @@ import { renderHook } from '@testing-library/react-hooks';
 import { act } from 'react-dom/test-utils';
 
 import useFormWithSteps from './useFormWithSteps';
-import { formSubmission } from '../utils';
+import { formSubmission } from '../constants';
 
 describe('useFormWithSteps hook -', () => {
     const testSchema = {};

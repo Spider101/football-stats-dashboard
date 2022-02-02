@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query';
 import { fetchClubSummaries, fetchClub } from '../clients/ClubClient';
 import { useUserAuth } from '../context/authProvider';
-import { queryKeys } from '../utils';
+import { queryKeys } from '../constants';
 
 export function useClubSummariesData() {
     const { authData } = useUserAuth();

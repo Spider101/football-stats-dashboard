@@ -2,7 +2,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { Success } from './AddClub.stories';
 import HomePageView from '../views/HomePageView';
-import { getClubsData } from './utils/storyDataGenerators';
+import { getClubSummaryData } from './utils/storyDataGenerators';
 
 export default {
     component: HomePageView,
@@ -31,11 +31,7 @@ const Template = args => <HomePageView {...args} />;
 
 export const Default = Template.bind({});
 Default.args = {
-    clubSummaries: getClubsData(5).map(club => ({
-        clubId: club.id,
-        name: club.name,
-        createdDate: club.createdDate
-    })),
+    clubSummaries: getClubSummaryData(5),
     addClubWidget: <Success {...Success.args} />
 };
 

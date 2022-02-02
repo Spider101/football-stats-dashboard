@@ -14,9 +14,10 @@ import Checkbox from '@material-ui/core/Checkbox';
 import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { capitalizeLabel, nationalityFlagMap } from '../utils';
+import { capitalizeLabel } from '../utils';
+import { nationalityFlagMap } from '../constants';
 
-// TODO: build this from the server lookup for roles and countries instead of hard-coding it here
+// TODO: build this from the server lookup for roles instead of hard-coding it here
 const roles = [
     { value: 'defensive central midfielder', label: 'Defensive Central Midfielder' },
     { value: 'false nine', label: 'False Nine' },

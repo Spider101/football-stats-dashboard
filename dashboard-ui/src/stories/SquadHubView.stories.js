@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom';
 
-import { moraleIconsMap } from '../utils';
+import { moraleIconsMap } from '../constants';
 
 import SquadHubView from '../views/SquadHubView';
 import { Success } from './AddPlayer.stories';

@@ -28,5 +28,5 @@ export default function CardWithFilter({ filterControl }) {
 }
 
 CardWithFilter.propTypes = {
-    filterControl: PropTypes.node,
+    filterControl: PropTypes.element,
 };

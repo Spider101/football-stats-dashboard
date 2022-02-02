@@ -8,7 +8,7 @@ import Alert from '../components/Alert';
 import DialogForm from '../components/DialogForm';
 import PageAction from '../components/PageAction';
 
-import { formSubmission } from '../utils';
+import { formSubmission } from '../constants';
 import useForm from '../hooks/useForm';
 import CustomSlider from '../components/CustomSlider';
 

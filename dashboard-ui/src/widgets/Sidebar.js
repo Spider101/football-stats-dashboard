@@ -14,7 +14,7 @@ import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 
 import MenuItemGroup from './MenuItemGroup';
 import MenuItem from '../components/MenuItem';
-import { DRAWER_WIDTH } from '../utils';
+import { DRAWER_WIDTH } from '../constants';
 
 const useStyles = makeStyles((theme) => ({
     settingsRoot: {

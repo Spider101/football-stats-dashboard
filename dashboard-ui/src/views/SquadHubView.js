@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { squadTableHeaderDisplayTypeMap, moraleIconsMap } from '../utils';
+import { moraleIconsMap } from '../constants';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
@@ -16,6 +16,16 @@ const useStyles = makeStyles(theme => ({
         right: theme.spacing(4)
     }
 }));
+
+const squadTableHeaderDisplayTypeMap = {
+    name: 'string',
+    nationality: 'image',
+    role: 'string',
+    wages: 'string',
+    form: 'chart',
+    morale: 'icon',
+    current_ability: 'number'
+};
 
 // TODO: define a more appropriate method for this
 const getSortValueForForm = matchRatingsList => matchRatingsList.length > 0 && matchRatingsList[0];
@@ -28,7 +38,6 @@ const buildHeaderDataForSquadTable = headerNames =>
             type: squadTableHeaderDisplayTypeMap[name]
         }));
 
-// TODO: move this into a hook
 const buildRowDataForSquadTable = players => {
     return players.map(player => {
         const keys = Object.keys(player);
@@ -185,5 +194,5 @@ SquadHubView.propTypes = {
             currentAbility: PropTypes.number
         })
     ),
-    addPlayerWidget: PropTypes.node
+    addPlayerWidget: PropTypes.element
 };

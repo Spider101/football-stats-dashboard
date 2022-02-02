@@ -1,5 +1,5 @@
 import fetchDataFromEndpoint from './utils';
-import { httpStatus } from '../utils';
+import { httpStatus } from '../constants';
 
 export const createNewPlayer = async ({ newPlayerData, clubId, authToken }) => {
     const res = await fetchDataFromEndpoint(

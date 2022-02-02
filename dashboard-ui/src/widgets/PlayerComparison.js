@@ -9,89 +9,63 @@ import PlayerAttributesTable from '../components/PlayerAttributesTable';
 import AttributeComparisonPolarPlot from '../components/AttributeComparisonPolarPlot';
 import AttributeComparisonItem from '../components/AttributeComparisonItem';
 import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
-import { playerAttributes } from '../utils';
+import { transformIntoTabularData } from '../utils';
+import { playerAttributes } from '../constants';
 
-// TODO: refactor this to a util fn to encapsulate common code (dupe is in PlayerProgressionView)
-const buildAttributeComparisonItemData = (attributes, playerName, isBasePlayer) => {
-    const attributeItems = playerAttributes.CATEGORIES.map(category =>
-        attributes
-            .filter(attribute => attribute.category === category)
-            .map(attribute => ({
-                attrComparisonItem: {
-                    attrValues: [{ name: playerName, data: [(isBasePlayer ? -1 : 1) * attribute.value] }],
-                    label: attribute.name
-                }
-            }))
-    );
-
-    const maxRows = Math.max(...attributeItems.map(row => row.length));
-
-    const rows = [...Array(maxRows)].map((_, i) =>
-        [...Array(playerAttributes.CATEGORIES.length)].map((_, j) =>
-            i >= attributeItems[j].length ? null : attributeItems[j][i]
-        )
-    );
-
-    return {
-        headers: playerAttributes.CATEGORIES,
-        rows
-    };
-};
-
-const mergeAttributeComparisonItems = attributeComparisonItems => {
-    return attributeComparisonItems.reduce((mergedAttributeComparisonItems, attributeComparisonItemsToMerge) => {
-        if (mergedAttributeComparisonItems.length === 0) {
-            return attributeComparisonItemsToMerge;
-        } else {
-            return mergedAttributeComparisonItems.map((attributeItemRow, i) =>
-                attributeItemRow.map((attributeItem, j) => {
-                    const attributeItemToMerge = attributeComparisonItemsToMerge[i][j];
-                    if (attributeItem === null && attributeItemToMerge === null) {
-                        return null;
-                    } else if (attributeItemToMerge === null) {
-                        return attributeItem;
-                    } else if (attributeItem === null) {
-                        return attributeItemToMerge;
-                    } else {
-                        return {
-                            ...attributeItem,
-                            attrComparisonItem: {
-                                ...attributeItem.attrComparisonItem,
-                                attrValues: [
-                                    ...attributeItem.attrComparisonItem.attrValues,
-                                    ...attributeItemToMerge.attrComparisonItem.attrValues
-                                ]
-                            }
-                        };
-                    }
-                })
-            );
-        }
-    }, []);
-};
-export default function PlayerComparison({ players }) {
+export default function PlayerComparison({ basePlayerData, comparedPlayerData, playerRoles }) {
     const [tabValue, setTabValue] = useState(0);
 
     const handleTabChange = (_, newTabValue) => {
         setTabValue(newTabValue);
     };
 
-    const attributeComparisonItemDataForPlayers = players.map((player, idx) =>
-        buildAttributeComparisonItemData(player.playerAttributes, player.playerMetadata.name, idx === 0)
-    );
+    const filterByCategory = (attribute, categoryName) => attribute.category === categoryName;
 
+    const getComparedPlayerAttributeItemData = (comparedPlayerAttributeData, basePlayerAttributeName, categoryName) =>
+        comparedPlayerAttributeData
+            .filter(attribute => filterByCategory(attribute, categoryName))
+            .find(attribute => attribute.name === basePlayerAttributeName);
+
+    const getAttributeComparisonDataFn = (basePlayerName, comparedPlayerName, comparedPlayerAttributes) =>
+        basePlayerAttribute => {
+            const comparedPlayerAttributeItemData = comparedPlayerAttributes &&
+                getComparedPlayerAttributeItemData(
+                    comparedPlayerAttributes,
+                    basePlayerAttribute.name,
+                    basePlayerAttribute.category
+                );
+            return {
+                attrComparisonItem: {
+                    attrValues: [
+                        { name: basePlayerName, data: [-1 * basePlayerAttribute.value] },
+                        ...(comparedPlayerAttributeItemData
+                            ? [{ name: comparedPlayerName, data: [comparedPlayerAttributeItemData.value] }]
+                            : [])
+                    ],
+                    label: basePlayerAttribute.name
+                }
+            };
+        };
+
+    const playerComparisonTableData = transformIntoTabularData(
+        basePlayerData.attributes,
+        playerAttributes.CATEGORIES,
+        filterByCategory,
+        getAttributeComparisonDataFn(basePlayerData.name, comparedPlayerData?.name, comparedPlayerData?.attributes)
+    );
     const attributeComparisonTableData = {
-        roles: players.map(player => player.playerRoles).flat(),
-        headers: attributeComparisonItemDataForPlayers[0].headers,
-        rows: mergeAttributeComparisonItems(
-            attributeComparisonItemDataForPlayers.map(attributeComparisonItemData => attributeComparisonItemData.rows)
-        )
+        roles: playerRoles,
+        ...playerComparisonTableData
     };
 
+    const playerAttributeData = [
+        { name: basePlayerData.name, attributeData: basePlayerData.attributes },
+        ...(comparedPlayerData ? [{ name: comparedPlayerData.name, attributeData: comparedPlayerData.attributes }] : [])
+    ];
     const attributePolarPlotData = {
-        playersWithAttributes: players.map(player => ({
-            name: player.playerMetadata.name,
-            attributes: Object.entries(_.groupBy(player.playerAttributes, attribute => attribute.group)).map(
+        playersWithAttributes: playerAttributeData.map(playerData => ({
+            name: playerData.name,
+            attributes: Object.entries(_.groupBy(playerData.attributeData, attribute => attribute.group)).map(
                 ([groupName, attributes]) => ({
                     groupName,
                     attributesInGroup: attributes.map(attribute => attribute.value)
@@ -125,5 +99,13 @@ export default function PlayerComparison({ players }) {
 }
 
 PlayerComparison.propTypes = {
-    players: PropTypes.arrayOf(PropTypes.shape(PlayerProgressionView.propTypes))
+    basePlayerData: PropTypes.shape({
+        name: PropTypes.string,
+        attributes: PlayerProgressionView.propTypes.playerAttributes
+    }),
+    comparedPlayerData: PropTypes.shape({
+        name: PropTypes.string,
+        attributes: PlayerProgressionView.propTypes.playerAttributes
+    }),
+    playerRoles: PlayerProgressionView.propTypes.playerRoles
 };

@@ -1,7 +1,7 @@
 import { MemoryRouter } from 'react-router-dom';
 
 import Signup from '../components/Signup';
-import { formSubmission } from '../utils';
+import { formSubmission } from '../constants';
 import { mockHandleChange, mockSubmit } from './utils/storyMocks';
 
 export default {

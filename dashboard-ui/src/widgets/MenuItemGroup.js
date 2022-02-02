@@ -46,7 +46,7 @@ MenuItemGroup.propTypes = {
         id: PropTypes.string,
         menuItems: PropTypes.arrayOf(PropTypes.shape(MenuItem.propTypes)),
         groupTitle: PropTypes.string,
-        groupIcon: PropTypes.elementType,
+        groupIcon: PropTypes.element,
         isCollapsed: PropTypes.bool,
         isItemTextWrapped: PropTypes.bool,
     }),

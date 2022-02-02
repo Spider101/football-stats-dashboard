@@ -2,7 +2,7 @@ import { action } from '@storybook/addon-actions';
 import TextField from '@material-ui/core/TextField';
 
 import DialogForm from '../components/DialogForm';
-import { formSubmission } from '../utils';
+import { formSubmission } from '../constants';
 
 export default {
     component: DialogForm,

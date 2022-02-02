@@ -1,7 +1,7 @@
 import { useQuery } from 'react-query';
 import { fetchUser } from '../clients/AuthClient';
 import { useUserAuth } from '../context/authProvider';
-import { queryKeys } from '../utils';
+import { queryKeys } from '../constants';
 
 export default function () {
     const { authData, logOut } = useUserAuth();

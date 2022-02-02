@@ -1,11 +1,12 @@
 import { faker } from '@faker-js/faker';
 import _ from 'lodash';
 
-import { playerAttributes } from '../../utils';
+import { playerAttributes } from '../../constants';
 
-const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 export const MAX_ATTR_VALUE = 20;
 export const MAX_OVERALL_VALUE = 100;
+
+const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 const NUM_MONTHS = 6;
 
 const allSquadHubTableHeaders = [
@@ -134,33 +135,34 @@ export const getPlayerMetadata = () => ({
 });
 
 
-const getAttributes = (numAttributes, categories, groups, attributeList, hasHistory) => attributeList.map(attribute => {
-    const attributeValue = faker.datatype.number(MAX_ATTR_VALUE);
-    const attributeHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_ATTR_VALUE));
-    return {
-        name: attribute,
-        category: _.sample(categories),
-        group: _.sample(groups),
-        value: attributeValue,
-        ...(hasHistory && { history: [ ...attributeHistory, attributeValue ] })
-    };
-});
+export const getAttributes = (attributeList, hasHistory) =>
+    attributeList.map(attribute => {
+        const attributeValue = faker.datatype.number(MAX_ATTR_VALUE);
+        const attributeHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_ATTR_VALUE));
+        return {
+            name: attribute,
+            category: _.sample(playerAttributes.CATEGORIES),
+            group: _.sample(playerAttributes.GROUPS),
+            value: attributeValue,
+            ...(hasHistory && { history: [ ...attributeHistory, attributeValue ] })
+        };
+    });
 
 export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     const currentPlayerOverall = faker.datatype.number(MAX_OVERALL_VALUE);
     const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_OVERALL_VALUE));
-
-    const categories = ['Technical', 'Physical', 'Mental'];
-    const categoryGroups = ['Defending', 'Speed', 'Vision', 'Attacking', 'Aerial'];
 
     return {
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
         playerOverall: {
             currentValue: currentPlayerOverall,
-            history: [ ...playerOverallHistory, currentPlayerOverall ],
+            history: [...playerOverallHistory, currentPlayerOverall]
         },
-        playerAttributes: getAttributes(30, categories, categoryGroups, attributeNamesList, hasHistory)
+        playerAttributes: getAttributes(
+            attributeNamesList,
+            hasHistory
+        )
     };
 };
 
@@ -291,16 +293,21 @@ export const getLeagueTableData = (numTeams) => {
     }));
 };
 
-// TODO: return a single club and add a data gen for club summaries
-export const getClubsData = (numClubs) => {
+export const getClubData = () => ({
+    id: faker.datatype.uuid(),
+    name: faker.company.companyName(),
+    transferBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
+    wageBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
+    income: faker.datatype.number({ max: 500000, min: 10000000 }),
+    expenditure: faker.datatype.number({ max: 500000, min: 10000000 }),
+    createdDate: faker.date.recent().toLocaleDateString()
+});
+
+export const getClubSummaryData = numClubs => {
     return [ ...Array(numClubs) ].map(() => ({
-        id: faker.datatype.uuid(),
+        clubId: faker.datatype.uuid(),
         name: faker.company.companyName(),
-        transferBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
-        wageBudget: faker.datatype.number({ max: 500000, min: 10000000 }),
-        income: faker.datatype.number({ max: 500000, min: 10000000 }),
-        expenditure: faker.datatype.number({ max: 500000, min: 10000000 }),
-        createdDate: '2021-20-12'
+        createdDate: faker.date.recent().toLocaleDateString()
     }));
 };
 

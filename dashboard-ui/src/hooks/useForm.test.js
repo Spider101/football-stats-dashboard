@@ -1,6 +1,6 @@
 import { renderHook, act } from '@testing-library/react-hooks';
 
-import { formSubmission } from '../utils';
+import { formSubmission } from '../constants';
 import useForm from './useForm';
 
 describe('useForm hook -', () => {

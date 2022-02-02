@@ -11,7 +11,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Alert from './Alert';
-import { formSubmission } from '../utils';
+import { formSubmission } from '../constants';
 
 const useStyles = makeStyles(theme => ({
     paper: {
