@@ -28,6 +28,8 @@ public final class Constants {
     public static final String MATCH_PERFORMANCE_LOOKUP_PATH = "/lookup" + PLAYER_ID_PATH;
 
     public static final int HASHING_COST = 12;
+    public static final String COUNTRY_CODE_MAPPING_FNAME = "countryCodeMapping.json";
+    public static final String COUNTRY_FLAG_URL_TEMPLATE = "https://flagcdn.com/w40/%s.png";
 
     public static final Map<String, Pair<String, String>> PLAYER_ATTRIBUTE_CATEGORY_MAP = Map.ofEntries(
             Map.entry("freekick accuracy", Pair.of("Technical", "Attacking")),
