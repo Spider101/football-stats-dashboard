@@ -250,3 +250,13 @@ securitySchemes:
           body:
             application/json:
               example: !include examples/match-performance-response.json
+
+/lookup/countryFlags:
+  get:
+    description: gets metadata about a country's flag like the image url for the flag
+    securedBy: [access_token]
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/countryFlagsMetadata.json
