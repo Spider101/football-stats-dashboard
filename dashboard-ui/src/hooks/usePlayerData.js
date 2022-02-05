@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 
-import { fetchPlayerData } from '../clients/DashboardClient';
+import { fetchPlayerData } from '../clients/PlayerClient';
 import { useUserAuth } from '../context/authProvider';
 
 export default function(queryKey, playerId) {

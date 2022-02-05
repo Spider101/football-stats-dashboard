@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
 
-import { fetchPlayerPerformanceData } from '../clients/DashboardClient';
+import { fetchPlayerPerformanceData } from '../clients/PlayerClient';
 import { useUserAuth } from '../context/authProvider';
 import { queryKeys } from '../constants';
 
