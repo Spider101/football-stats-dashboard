@@ -4,6 +4,8 @@ import com.footballstatsdashboard.api.model.ImmutablePlayer;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Attribute;
+import com.footballstatsdashboard.api.model.player.AttributeCategory;
+import com.footballstatsdashboard.api.model.player.AttributeGroup;
 import com.footballstatsdashboard.api.model.player.ImmutableAbility;
 import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
@@ -34,8 +36,6 @@ public class PlayerDataProvider {
      */
     public static final class PlayerBuilder {
         private boolean isExistingPlayer = false;
-        private boolean hasAttributeWithInvalidCategory = false;
-        private boolean hasAttributeWithInvalidGroup = false;
         private final ImmutablePlayer.Builder basePlayer = ImmutablePlayer.builder().clubId(UUID.randomUUID());
 
         private PlayerBuilder() { }
@@ -51,16 +51,6 @@ public class PlayerDataProvider {
 
         public PlayerBuilder isExistingPlayer(boolean isExisting) {
             this.isExistingPlayer = isExisting;
-            return this;
-        }
-
-        public PlayerBuilder hasAttributeWithInvalidCategory(boolean hasInvalidCategoryAttribute) {
-            this.hasAttributeWithInvalidCategory = hasInvalidCategoryAttribute;
-            return this;
-        }
-
-        public PlayerBuilder hasAttributeWithInvalidGroup(boolean hasInvalidGroupAttribute) {
-            this.hasAttributeWithInvalidGroup = hasInvalidGroupAttribute;
             return this;
         }
 
@@ -94,14 +84,11 @@ public class PlayerDataProvider {
         }
 
         public PlayerBuilder withTechnicalAttributes() {
-            String category = isExistingPlayer ? "Technical" : hasAttributeWithInvalidCategory ? "fake category" : null;
-            String group = isExistingPlayer ? "Attacking" : hasAttributeWithInvalidGroup ? "fake group" : null;
-
             Attribute technicalAttribute = ImmutableAttribute.builder()
                     .name("crossing")
                     .value(CURRENT_PLAYER_CROSSING)
-                    .category(category)
-                    .group(group)
+                    .category(isExistingPlayer ? AttributeCategory.TECHNICAL : null)
+                    .group(isExistingPlayer ? AttributeGroup.ATTACKING : null)
                     .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_CROSSING) : ImmutableList.of())
                     .build();
             basePlayer.addAttributes(technicalAttribute);
@@ -109,14 +96,11 @@ public class PlayerDataProvider {
         }
 
         public PlayerBuilder withPhysicalAttributes() {
-            String category = isExistingPlayer ? "Physical" : hasAttributeWithInvalidCategory ? "fake category" : null;
-            String group = isExistingPlayer ? "Speed" : hasAttributeWithInvalidGroup ? "fake group" : null;
-
             Attribute physicalAttribute = ImmutableAttribute.builder()
                     .name("sprint speed")
                     .value(CURRENT_PLAYER_SPRINT_SPEED)
-                    .category(category)
-                    .group(group)
+                    .category(isExistingPlayer ? AttributeCategory.PHYSICAL : null)
+                    .group(isExistingPlayer ? AttributeGroup.SPEED : null)
                     .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_SPRINT_SPEED) : ImmutableList.of())
                     .build();
             basePlayer.addAttributes(physicalAttribute);
@@ -124,14 +108,11 @@ public class PlayerDataProvider {
         }
 
         public PlayerBuilder withMentalAttributes() {
-            String category = isExistingPlayer ? "Mental" : hasAttributeWithInvalidCategory ? "fake category" : null;
-            String group = isExistingPlayer ? "Attacking" : hasAttributeWithInvalidGroup ? "fake group" : null;
-
             Attribute mentalAttribute = ImmutableAttribute.builder()
                     .name("composure")
                     .value(CURRENT_PLAYER_COMPOSURE)
-                    .category(category)
-                    .group(group)
+                    .category(isExistingPlayer ? AttributeCategory.MENTAL : null)
+                    .group(isExistingPlayer ? AttributeGroup.ATTACKING : null)
                     .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_COMPOSURE) : ImmutableList.of())
                     .build();
             basePlayer.addAttributes(mentalAttribute);
@@ -151,24 +132,24 @@ public class PlayerDataProvider {
             Attribute technicalAttribute = ImmutableAttribute.builder()
                     .name("crossing")
                     .value(CURRENT_PLAYER_CROSSING)
-                    .category(isExistingPlayer ? "Technical" : null)
-                    .group(isExistingPlayer ? "Attacking" : null)
+                    .category(isExistingPlayer ? AttributeCategory.TECHNICAL : null)
+                    .group(isExistingPlayer ? AttributeGroup.ATTACKING : null)
                     .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_CROSSING) : ImmutableList.of())
                     .build();
 
             Attribute physicalAttribute = ImmutableAttribute.builder()
                     .name("sprint speed")
                     .value(CURRENT_PLAYER_SPRINT_SPEED)
-                    .category(isExistingPlayer ? "Physical" : null)
-                    .group(isExistingPlayer ? "Speed" : null)
+                    .category(isExistingPlayer ? AttributeCategory.PHYSICAL : null)
+                    .group(isExistingPlayer ? AttributeGroup.SPEED : null)
                     .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_SPRINT_SPEED) : ImmutableList.of())
                     .build();
 
             Attribute mentalAttribute = ImmutableAttribute.builder()
                     .name("composure")
                     .value(CURRENT_PLAYER_COMPOSURE)
-                    .category(isExistingPlayer ? "Mental" : null)
-                    .group(isExistingPlayer ? "Attacking" : null)
+                    .category(isExistingPlayer ? AttributeCategory.MENTAL : null)
+                    .group(isExistingPlayer ? AttributeGroup.ATTACKING : null)
                     .history(isExistingPlayer ? ImmutableList.of(CURRENT_PLAYER_COMPOSURE) : ImmutableList.of())
                     .build();
             basePlayer.addAttributes(technicalAttribute, physicalAttribute, mentalAttribute);
