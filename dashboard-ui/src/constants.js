@@ -42,17 +42,7 @@ export const formSubmission = {
 
 
 // TODO: 01/02/22 build this from the server lookup for roles instead of hard-coding it here
-export const nationalityFlagMap = [
-    { nationality: 'France', flag: 'https://upload.wikimedia.org/wikipedia/commons/6/62/Flag_of_France.png' },
-    { nationality: 'Germany', flag: 'https://freepngimg.com/thumb/germany_flag/1-2-germany-flag-picture.png' },
-    { nationality: 'Spain', flag: 'https://freepngimg.com/thumb/spain/5-2-spain-flag-picture.png' },
-    {
-        nationality: 'Netherlands',
-        flag:
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/' +
-            'Flag_of_the_Netherlands.svg/125px-Flag_of_the_Netherlands.svg.png'
-    }
-];
+export const playerNationalityList = ['France', 'Germany', 'Spain', 'Netherlands', 'England'];
 
 export const moraleIconsMap = [
     { morale: 'Angry', icon: <MoodBadIcon /> },

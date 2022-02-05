@@ -12,10 +12,12 @@ import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import Checkbox from '@material-ui/core/Checkbox';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { capitalizeLabel } from '../utils';
-import { caseFormat, nationalityFlagMap, playerAttributeMetadata, roleMetadata } from '../constants';
+import { caseFormat, playerAttributeMetadata, playerNationalityList, roleMetadata } from '../constants';
+import { useLookupData } from '../context/LookupDataProvider';
 
 export const getStepper = activeStep => {
     const steps = [
@@ -91,7 +93,7 @@ AddPlayerForm.propTypes = {
 };
 
 const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, handleChangeFn }) => {
-    const countries = nationalityFlagMap.map(entity => ({ value: entity.nationality, label: entity.nationality }));
+    const { countryFlagMetadata } = useLookupData();
     return (
         <>
             <TextField
@@ -135,11 +137,19 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 helperText={newPlayerMetadataValidations.country}
                 select
             >
-                {countries.map(country => (
-                    <MenuItem key={country.value} value={country.value}>
-                        {country.label}
-                    </MenuItem>
-                ))}
+                {countryFlagMetadata
+                    .filter(flagMetadata => playerNationalityList.includes(flagMetadata.name))
+                    .map(flagMetadata => (
+                        <MenuItem key={flagMetadata.id} value={flagMetadata.name}>
+                            {/* hide the flag when a country is selected */}
+                            {newPlayerMetadata.country !== flagMetadata.name && (
+                                <ListItemIcon>
+                                    <img src={flagMetadata.countryFlagUrl} alt={flagMetadata.countryCode} />
+                                </ListItemIcon>
+                            )}
+                            <ListItemText primary={flagMetadata.name} />
+                        </MenuItem>
+                    ))}
             </TextField>
         </>
     );
