@@ -53,3 +53,34 @@ export const moraleIconsMap = [
     { morale: 'Angry', icon: <MoodBadIcon /> },
     { morale: 'Happy', icon: <MoodIcon /> }
 ];
+
+export const playerAttributeMetadata = [
+    { name: 'freekickAccuracy', category: 'technical', defaultValue: '0' },
+    { name: 'penalties', category: 'technical', defaultValue: '0' },
+    { name: 'headingAccuracy', category: 'technical', defaultValue: '0' },
+    { name: 'crossing', category: 'technical', defaultValue: '0' },
+    { name: 'shortPassing', category: 'technical', defaultValue: '0' },
+    { name: 'longPassing', category: 'technical', defaultValue: '0' },
+    { name: 'longShots', category: 'technical', defaultValue: '0' },
+    { name: 'finishing', category: 'technical', defaultValue: '0' },
+    { name: 'volleys', category: 'technical', defaultValue: '0' },
+    { name: 'ballControl', category: 'technical', defaultValue: '0' },
+    { name: 'standingTackle', category: 'technical', defaultValue: '0' },
+    { name: 'slidingTackle', category: 'technical', defaultValue: '0' },
+    { name: 'dribbling', category: 'technical', defaultValue: '0' },
+    { name: 'curve', category: 'technical', defaultValue: '0' },
+    { name: 'stamina', category: 'physical', defaultValue: '0' },
+    { name: 'jumping', category: 'physical', defaultValue: '0' },
+    { name: 'strength', category: 'physical', defaultValue: '0' },
+    { name: 'sprintSpeed', category: 'physical', defaultValue: '0' },
+    { name: 'acceleration', category: 'physical', defaultValue: '0' },
+    { name: 'agility', category: 'physical', defaultValue: '0' },
+    { name: 'balance', category: 'physical', defaultValue: '0' },
+    { name: 'aggression', category: 'mental', defaultValue: '0' },
+    { name: 'vision', category: 'mental', defaultValue: '0' },
+    { name: 'composure', category: 'mental', defaultValue: '0' },
+    { name: 'defensiveAwareness', category: 'mental', defaultValue: '0' },
+    { name: 'attackingPosition', category: 'mental', defaultValue: '0' }
+];
+
+export const roleMetadata = ['defensiveCentralMidfielder', 'falseNine', 'sweeperKeeper', 'regista', 'insideForward'];
