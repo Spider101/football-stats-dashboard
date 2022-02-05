@@ -31,14 +31,14 @@ public interface Attribute {
      */
     @Valid
     @Nullable
-    String getCategory();
+    AttributeCategory getCategory();
 
     /**
      * group the attribute belongs to
      */
     @Valid
     @Nullable
-    String getGroup();
+    AttributeGroup getGroup();
 
     /**
      * current value of the attribute
