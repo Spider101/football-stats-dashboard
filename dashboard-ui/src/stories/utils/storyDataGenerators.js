@@ -181,7 +181,12 @@ export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
 export const getSquadHubTableData = (numRows, moraleIconsMap, withLink = false) => ({
     headers: allSquadHubTableHeaders,
     rows: [ ...Array(numRows) ].map(() => {
-        const nationalityMetadata = _.sample(nationalityList);
+        const nationalityMetadata = _.sample(
+            countryFlagMetadata.map(flagMetadata => ({
+                countryName: flagMetadata.name,
+                flagURL: flagMetadata.countryFlagUrl
+            }))
+        );
         const moraleEntity = _.sample(moraleIconsMap);
         const chartData = {
             type: 'bar',
@@ -238,13 +243,16 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
 
 export const getSquadHubPlayerData = (numPlayers, moraleList) => {
     return {
-        players: [ ...Array(numPlayers) ].map(() => ({
+        players: [...Array(numPlayers)].map(() => ({
             playerId: faker.datatype.uuid(),
             name: faker.name.findName(),
-            nationality: _.sample(nationalityList),
+            nationality: _.sample(countryFlagMetadata.map(flagMetadata => ({
+                countryName: flagMetadata.name,
+                flagURL: flagMetadata.countryFlagUrl
+            }))),
             role: faker.name.jobType(),
             wages: faker.datatype.number({ max: 1000, min: 100 }),
-            form: [ ...Array(5) ].map(() => faker.datatype.number(MAX_ATTR_VALUE)),
+            form: [...Array(5)].map(() => faker.datatype.number(MAX_ATTR_VALUE)),
             morale: _.sample(moraleList),
             current_ability: faker.datatype.number({ max: MAX_OVERALL_VALUE, min: 1 })
         }))
