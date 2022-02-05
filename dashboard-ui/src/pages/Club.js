@@ -16,7 +16,7 @@ export default function Club() {
         if(clubData && clubData.id !== currentClubId) {
             setCurrentClubId(clubData.id);
         }
-    });
+    }, []);
 
     if (isLoading) {
         return <StyledLoadingCircle />;
