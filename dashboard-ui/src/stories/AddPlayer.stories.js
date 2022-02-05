@@ -1,3 +1,5 @@
+import { LookupDataContextProvider } from '../context/LookupDataProvider';
+import { getLookupDataHandlers } from '../mocks/handlers';
 import AddPlayer from '../widgets/AddPlayer';
 
 export default {
@@ -6,11 +8,18 @@ export default {
     argTypes: { addPlayerAction: { control: { disable: true } } },
     decorators: [
         Story => (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <Story />
-            </div>
+            <LookupDataContextProvider>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <Story />
+                </div>
+            </LookupDataContextProvider>
         )
-    ]
+    ],
+    parameters: {
+        msw: {
+            handlers: getLookupDataHandlers()
+        }
+    }
 };
 
 const Template = args => <AddPlayer {...args} />;
