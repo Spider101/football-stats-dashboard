@@ -1,6 +1,7 @@
 import { rest } from 'msw';
 
 import { AUTH_DATA_LS_KEY } from '../constants';
+import { countryFlagMetadata } from '../stories/utils/storyDataGenerators';
 
 const mockAuthData = {
     id: 'fakeAuthToken',
@@ -77,6 +78,17 @@ export const getPlayerHandlers = (baseUrl = '*') => {
     return [
         rest.post(`${baseUrl}/players`, (req, res, ctx) => {
             return res(ctx.status(201), ctx.json({ id: 'new-player-id', ...req.body }));
+        })
+    ];
+};
+
+export const getLookupDataHandlers = (baseUrl = '*') => {
+    return [
+        rest.get(`${baseUrl}/lookup/countryFlags`, (req, res, ctx) => {
+            return res(
+                ctx.status(200),
+                ctx.json(countryFlagMetadata)
+            );
         })
     ];
 };

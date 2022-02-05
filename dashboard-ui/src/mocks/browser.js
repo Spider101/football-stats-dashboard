@@ -1,5 +1,5 @@
 import { setupWorker } from 'msw';
-import { getClubHandlers, getPlayerHandlers, getUserHandlers } from './handlers';
+import { getClubHandlers, getLookupDataHandlers, getPlayerHandlers, getUserHandlers } from './handlers';
 
-const handlers = [ ...getUserHandlers(), ...getClubHandlers(), ...getPlayerHandlers()];
+const handlers = [ ...getUserHandlers(), ...getClubHandlers(), ...getPlayerHandlers(), ...getLookupDataHandlers()];
 export const worker = setupWorker(...handlers);
