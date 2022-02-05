@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import static com.footballstatsdashboard.core.utils.Constants.COUNTRY_CODE_MAPPING_FNAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -545,7 +546,7 @@ public class PlayerServiceTest {
     private void assertCountryLogo(Metadata createdPlayerMetadata) throws IOException {
         TypeReference<List<CountryCodeMetadata>> countryCodeMetadataTypeRef = new TypeReference<>() { };
         List<CountryCodeMetadata> countryCodeMetadataList =
-                FIXTURE_LOADER.loadFixture("countryCodeMapping.json", countryCodeMetadataTypeRef);
+                FIXTURE_LOADER.loadFixture(COUNTRY_CODE_MAPPING_FNAME, countryCodeMetadataTypeRef);
         String countryCode = countryCodeMetadataList.stream()
                 .filter(countryCodeMetadata ->
                         countryCodeMetadata.getCountryName().equals(createdPlayerMetadata.getCountry()))

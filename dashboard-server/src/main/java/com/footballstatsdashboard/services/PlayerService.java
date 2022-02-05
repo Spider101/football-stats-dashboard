@@ -37,11 +37,11 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static com.footballstatsdashboard.core.utils.Constants.COUNTRY_CODE_MAPPING_FNAME;
+import static com.footballstatsdashboard.core.utils.Constants.COUNTRY_FLAG_URL_TEMPLATE;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ATTRIBUTE_CATEGORY_MAP;
 
 public class PlayerService {
-    // TODO: 1/4/2022 remove constant if and when we switch to using enum for attribute categories
-    private static final List<String> ATTRIBUTE_CATEGORIES = ImmutableList.of("Technical", "Mental", "Physical");
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
 
@@ -67,13 +67,13 @@ public class PlayerService {
         // process and persist the player data if no validations found
         TypeReference<List<CountryCodeMetadata>> countryCodeMetadataTypeRef = new TypeReference<>() { };
         List<CountryCodeMetadata> countryCodeMetadataList =
-                FIXTURE_LOADER.loadFixture("countryCodeMapping.json", countryCodeMetadataTypeRef);
+                FIXTURE_LOADER.loadFixture(COUNTRY_CODE_MAPPING_FNAME, countryCodeMetadataTypeRef);
         String countryLogo = countryCodeMetadataList.stream()
                 .filter(countryCodeMetadata ->
                         countryCodeMetadata.getCountryName().equals(incomingPlayer.getMetadata().getCountry()))
                 .findFirst()
                 .map(countryCodeMetadata ->
-                        String.format("https://flagcdn.com/w40/%s.png", countryCodeMetadata.getCountryCode()))
+                        String.format(COUNTRY_FLAG_URL_TEMPLATE, countryCodeMetadata.getCountryCode()))
                 .orElse("");
 
         // add club information and other derived information to the metadata entity
