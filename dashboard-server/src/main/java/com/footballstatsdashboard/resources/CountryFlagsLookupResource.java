@@ -1,9 +1,7 @@
 package com.footballstatsdashboard.resources;
 
 import com.footballstatsdashboard.api.model.CountryFlagMetadata;
-import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.services.CountryFlagsLookupService;
-import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +20,8 @@ public class CountryFlagsLookupResource {
     }
 
     @GET
-    public Response getCountryFlagMetadata(
-            @Auth User user) throws IOException {
+    // TODO: 2/5/2022 consider rate limiting this endpoint if access without auth token is allowed
+    public Response getCountryFlagMetadata() throws IOException {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getCountryFlagMetadata() request made!");
         }
