@@ -1,9 +1,11 @@
-export const capitalizeLabel = (label, format = 'snakecase') => {
+import { caseFormat } from './constants';
+
+export const capitalizeLabel = (label, format = caseFormat.SNAKE_CASE) => {
     let tokens;
-    if (format === 'snakecase') {
-        tokens = label.split('_');
-    } else {
+    if (format === caseFormat.CAMEL_CASE) {
         tokens = label.replace(/([a-z])([A-Z])/g, '$1 $2').toLowerCase().split(' ');
+    } else {
+        tokens = label.split('_');
     }
     return tokens
         .map(word => word[0].toUpperCase() + word.slice(1))

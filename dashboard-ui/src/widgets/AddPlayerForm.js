@@ -15,7 +15,7 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { capitalizeLabel } from '../utils';
-import { nationalityFlagMap, playerAttributeMetadata, roleMetadata } from '../constants';
+import { caseFormat, nationalityFlagMap, playerAttributeMetadata, roleMetadata } from '../constants';
 
 export const getStepper = activeStep => {
     const steps = [
@@ -165,7 +165,7 @@ const PlayerAttributeForm = ({ newPlayerAttributeData, newPlayerAttributeValidat
                 autoFocus={index === 0}
                 key={attrDataName}
                 name={attrDataName}
-                label={capitalizeLabel(attrDataName, 'camelcase')}
+                label={capitalizeLabel(attrDataName, caseFormat.CAMEL_CASE)}
                 required
                 id={attrDataName}
                 type='number'
@@ -238,7 +238,7 @@ const PlayerRoleForm = ({ newPlayerRoleData, newPlayerRoleValidations, handleCha
             >
                 {roleMetadata.map(roleName => (
                     <MenuItem key={roleName} value={roleName}>
-                        {capitalizeLabel(roleName, 'camelcase')}
+                        {capitalizeLabel(roleName, caseFormat.CAMEL_CASE)}
                     </MenuItem>
                 ))}
             </TextField>
@@ -262,7 +262,7 @@ const PlayerRoleForm = ({ newPlayerRoleData, newPlayerRoleValidations, handleCha
                         .map(attributeName => (
                             <MenuItem key={attributeName} value={attributeName}>
                                 <Checkbox checked={shouldBeChecked(attributeName)} />
-                                <ListItemText primary={capitalizeLabel(attributeName, 'camelcase')} />
+                                <ListItemText primary={capitalizeLabel(attributeName, caseFormat.CAMEL_CASE)} />
                             </MenuItem>
                         ))}
                 </Select>

@@ -1,9 +1,9 @@
 import { useState, useCallback, useEffect } from 'react';
 
 import { capitalizeLabel } from '../utils';
-import { formSubmission } from '../constants';
+import { caseFormat, formSubmission } from '../constants';
 
-const getEmptyFieldValidation = fieldName => `${capitalizeLabel(fieldName, 'camelcase')} cannot be empty!`;
+const getEmptyFieldValidation = fieldName => `${capitalizeLabel(fieldName, caseFormat.CAMEL_CASE)} cannot be empty!`;
 const validateEmail = email => /\S+@\S+\.\S+/.test(email);
 const validatePlayerAge = playerAge => parseInt(playerAge) >= 15 && parseInt(playerAge) <= 50;
 

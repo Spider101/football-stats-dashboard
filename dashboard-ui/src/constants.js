@@ -1,6 +1,11 @@
 import MoodIcon from '@material-ui/icons/Mood';
 import MoodBadIcon from '@material-ui/icons/MoodBad';
 
+export const caseFormat = {
+    CAMEL_CASE: 'camelcase',
+    SNAKE_CASE: 'snakecase'
+};
+
 export const httpStatus = {
     OK: 200,
     BAD_REQUEST: 400,
