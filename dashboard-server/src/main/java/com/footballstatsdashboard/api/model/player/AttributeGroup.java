@@ -1,6 +1,5 @@
 package com.footballstatsdashboard.api.model.player;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum AttributeGroup {
@@ -10,18 +9,13 @@ public enum AttributeGroup {
     SPEED("Speed"),
     VISION("Vision");
 
-    private final String description;
-    AttributeGroup(String description) {
-        this.description = description;
+    private final String value;
+    AttributeGroup(String value) {
+        this.value = value;
     }
 
     @JsonValue
-    public String getDescription() {
-        return this.description;
-    }
-
-    @JsonCreator
-    public static AttributeGroup fromValue(String value) {
-        return AttributeGroup.valueOf(value.toUpperCase());
+    public String getValue() {
+        return this.value;
     }
 }
