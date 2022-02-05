@@ -113,11 +113,7 @@ public class PlayerService {
 
         // early exit by throwing exception if any validations against the player attributes fail
         if (!validationList.isEmpty()) {
-            List<String> attributeCategoryNames = Arrays.stream(AttributeCategory.values())
-                    .map(Enum::name)
-                    .collect(Collectors.toList());
-            String errorMessage = String.format("Player must have at least one attribute from each of %s categories",
-                    attributeCategoryNames);
+            String errorMessage = "Something went wrong trying to set category for player attributes!";
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, errorMessage, validationList);
         }
