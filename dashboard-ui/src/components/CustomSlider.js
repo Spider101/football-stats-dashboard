@@ -6,6 +6,7 @@ import Typography from '@material-ui/core/Typography';
 import Grid from '@material-ui/core/Grid';
 import { capitalizeLabel, formatNumberWithCommas } from '../utils';
 import { makeStyles } from '@material-ui/core/styles';
+import { caseFormat } from '../constants';
 
 const getSplitComponents = (total, percentage) => (
     [
@@ -72,7 +73,7 @@ export default function CustomSlider({ sliderTitle, splitMetadata: { valueToSpli
                         </Grid>
                         <Grid item>
                             <Typography>
-                                {capitalizeLabel(entitiesToSplit[0].name, 'camelcase')}
+                                {capitalizeLabel(entitiesToSplit[0].name, caseFormat.CAMEL_CASE)}
                             </Typography>
                         </Grid>
                     </Grid>
@@ -89,7 +90,7 @@ export default function CustomSlider({ sliderTitle, splitMetadata: { valueToSpli
                         </Grid>
                         <Grid item>
                             <Typography>
-                                {capitalizeLabel(entitiesToSplit[1].name, 'camelcase')}
+                                {capitalizeLabel(entitiesToSplit[1].name, caseFormat.CAMEL_CASE)}
                             </Typography>
                         </Grid>
                     </Grid>

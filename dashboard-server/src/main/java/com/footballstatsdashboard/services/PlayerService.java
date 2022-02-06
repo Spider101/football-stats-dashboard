@@ -8,6 +8,8 @@ import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.player.Ability;
 import com.footballstatsdashboard.api.model.player.Attribute;
+import com.footballstatsdashboard.api.model.player.AttributeCategory;
+import com.footballstatsdashboard.api.model.player.AttributeGroup;
 import com.footballstatsdashboard.api.model.player.ImmutableAbility;
 import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -37,11 +40,11 @@ import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static com.footballstatsdashboard.core.utils.Constants.COUNTRY_CODE_MAPPING_FNAME;
+import static com.footballstatsdashboard.core.utils.Constants.COUNTRY_FLAG_URL_TEMPLATE;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ATTRIBUTE_CATEGORY_MAP;
 
 public class PlayerService {
-    // TODO: 1/4/2022 remove constant if and when we switch to using enum for attribute categories
-    private static final List<String> ATTRIBUTE_CATEGORIES = ImmutableList.of("Technical", "Mental", "Physical");
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
 
@@ -67,13 +70,13 @@ public class PlayerService {
         // process and persist the player data if no validations found
         TypeReference<List<CountryCodeMetadata>> countryCodeMetadataTypeRef = new TypeReference<>() { };
         List<CountryCodeMetadata> countryCodeMetadataList =
-                FIXTURE_LOADER.loadFixture("countryCodeMapping.json", countryCodeMetadataTypeRef);
+                FIXTURE_LOADER.loadFixture(COUNTRY_CODE_MAPPING_FNAME, countryCodeMetadataTypeRef);
         String countryLogo = countryCodeMetadataList.stream()
                 .filter(countryCodeMetadata ->
                         countryCodeMetadata.getCountryName().equals(incomingPlayer.getMetadata().getCountry()))
                 .findFirst()
                 .map(countryCodeMetadata ->
-                        String.format("https://flagcdn.com/w40/%s.png", countryCodeMetadata.getCountryCode()))
+                        String.format(COUNTRY_FLAG_URL_TEMPLATE, countryCodeMetadata.getCountryCode()))
                 .orElse("");
 
         // add club information and other derived information to the metadata entity
@@ -88,7 +91,7 @@ public class PlayerService {
         // also, initialize the attribute history with the current value
         List<Attribute> newPlayerAttributes = incomingPlayer.getAttributes().stream()
                 .map(attribute -> {
-                    Pair<String, String> categoryAndGroupNamePair =
+                    Pair<AttributeCategory, AttributeGroup> categoryAndGroupNamePair =
                             PLAYER_ATTRIBUTE_CATEGORY_MAP.get(attribute.getName());
                     return ImmutableAttribute.builder()
                             .from(attribute)
@@ -100,9 +103,9 @@ public class PlayerService {
                 .collect(Collectors.toList());
 
         // validate player attributes after adding category information
-        ATTRIBUTE_CATEGORIES.forEach(attributeCategory -> {
+        Arrays.stream(AttributeCategory.values()).forEach(attributeCategory -> {
             if (newPlayerAttributes.stream()
-                    .noneMatch(attribute -> attributeCategory.equals(attribute.getCategory()))) {
+                    .noneMatch(attribute -> attributeCategory  == attribute.getCategory())) {
                 validationList.add(new Validation(ValidationSeverity.ERROR,
                         String.format("Player has no attributes associated to %s category", attributeCategory)));
             }
@@ -110,8 +113,7 @@ public class PlayerService {
 
         // early exit by throwing exception if any validations against the player attributes fail
         if (!validationList.isEmpty()) {
-            String errorMessage = String.format("Player must have at least one attribute from each of %s categories",
-                    ATTRIBUTE_CATEGORIES);
+            String errorMessage = "Something went wrong trying to set category for player attributes!";
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, errorMessage, validationList);
         }
@@ -233,12 +235,12 @@ public class PlayerService {
     }
 
     private Integer calculateCurrentAbility(List<Attribute> playerAttributes) {
-        List<OptionalDouble> meanAttributeByCategories = ATTRIBUTE_CATEGORIES.stream()
+        List<OptionalDouble> meanAttributeByCategories = Arrays.stream(AttributeCategory.values())
                 .map(attributeCategory -> playerAttributes.stream()
-                        .filter(attribute -> attributeCategory.equals(attribute.getCategory()))
+                        .filter(attribute -> attributeCategory == attribute.getCategory())
                         .mapToInt(Attribute::getValue)
-                        .average())
-                .collect(Collectors.toList());
+                        .average()
+                ).collect(Collectors.toList());
         OptionalDouble weightedMeanAttributes = meanAttributeByCategories.stream()
                 // this should be true always because we throw validation unless there is at least one attribute for
                 // each category

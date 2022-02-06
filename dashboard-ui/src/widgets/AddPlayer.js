@@ -14,6 +14,7 @@ import PageAction from '../components/PageAction';
 import { capitalizeLabel } from '../utils';
 import useFormWithSteps from '../hooks/useFormWithSteps';
 import AddPlayerForm, { getAddPlayerFormSchema, getStepper } from './AddPlayerForm';
+import { caseFormat } from '../constants';
 
 export default function AddPlayer({ addPlayerAction }) {
     const {
@@ -51,7 +52,7 @@ export default function AddPlayer({ addPlayerAction }) {
                 <>
                     <Typography variant='h5' align='center'>Confirm Details</Typography>
                     {Object.entries(nestedFormData).map(([sectionName, formDataInSection]) => {
-                        const sectionTitle = capitalizeLabel(sectionName, 'camelcase');
+                        const sectionTitle = capitalizeLabel(sectionName, caseFormat.CAMEL_CASE);
                         return (
                             <>
                                 <Typography variant='h6' color='textSecondary'>{sectionTitle}</Typography>
@@ -60,7 +61,7 @@ export default function AddPlayer({ addPlayerAction }) {
                                     {Object.entries(formDataInSection).map(([fieldName, fieldValue]) => {
                                         const formDataText = `${capitalizeLabel(
                                             fieldName,
-                                            'camelcase'
+                                            caseFormat.CAMEL_CASE
                                         )}: ${fieldValue}`;
                                         return (
                                             // TODO: figure out how to display this as field name aligned to the left

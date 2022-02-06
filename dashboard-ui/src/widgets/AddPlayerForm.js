@@ -12,32 +12,12 @@ import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
 import Checkbox from '@material-ui/core/Checkbox';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { capitalizeLabel } from '../utils';
-import { nationalityFlagMap } from '../constants';
-
-// TODO: build this from the server lookup for roles instead of hard-coding it here
-const roles = [
-    { value: 'defensive central midfielder', label: 'Defensive Central Midfielder' },
-    { value: 'false nine', label: 'False Nine' },
-    { value: 'sweeper keeper', label: 'Sweeper Keeper' },
-    { value: 'regista', label: 'Regista' },
-    { value: 'inside forward', label: 'Inside Forward' }
-];
-
-// TODO: build this from server lookup; dummy data for now
-const playerAttributeNames = [
-    'Short Passing',
-    'Long Shots',
-    'Crossing',
-    'Defensive Awareness',
-    'Ball Control',
-    'Strength',
-    'Slide Tackle',
-    'Acceleration',
-    'Finishing'
-];
+import { caseFormat, playerAttributeMetadata, playerNationalityList, roleMetadata } from '../constants';
+import { useLookupData } from '../context/LookupDataProvider';
 
 export const getStepper = activeStep => {
     const steps = [
@@ -62,38 +42,21 @@ export const getStepper = activeStep => {
 export const getAddPlayerFormSchema = () => ({
     metadata: { name: '', age: '', country: '' },
     role: { name: '', associatedAttributes: [] },
-    technicalAttributes: {
-        freekickAccuracy: '0',
-        penalties: '0',
-        headingAccuracy: '0',
-        crossing: '0',
-        shortPassing: '0',
-        longPassing: '0',
-        longShots: '0',
-        finishing: '0',
-        volleys: '0',
-        ballControl: '0',
-        standingTackle: '0',
-        slidingTackle: '0',
-        dribbling: '0',
-        curve: '0'
-    },
-    physicalAttributes: {
-        stamina: '0',
-        jumping: '0',
-        strength: '0',
-        sprintSpeed: '0',
-        acceleration: '0',
-        agility: '0',
-        balance: '0'
-    },
-    mentalAttributes: {
-        aggression: '0',
-        vision: '0',
-        composure: '0',
-        defensiveAwareness: '0',
-        attackingPosition: '0'
-    }
+    technicalAttributes: Object.fromEntries(
+        playerAttributeMetadata
+            .filter(attributeMetadata => attributeMetadata.category === 'technical')
+            .map(attributeMetadata => [attributeMetadata.name, attributeMetadata.defaultValue])
+    ),
+    physicalAttributes: Object.fromEntries(
+        playerAttributeMetadata
+            .filter(attributeMetadata => attributeMetadata.category === 'physical')
+            .map(attributeMetadata => [attributeMetadata.name, attributeMetadata.defaultValue])
+    ),
+    mentalAttributes: Object.fromEntries(
+        playerAttributeMetadata
+            .filter(attributeMetadata => attributeMetadata.category === 'mental')
+            .map(attributeMetadata => [attributeMetadata.name, attributeMetadata.defaultValue])
+    )
 });
 
 export default function AddPlayerForm({ getFormMetadataAtStep, stepIdx }) {
@@ -130,7 +93,7 @@ AddPlayerForm.propTypes = {
 };
 
 const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, handleChangeFn }) => {
-    const countries = nationalityFlagMap.map(entity => ({ value: entity.nationality, label: entity.nationality }));
+    const { countryFlagMetadata } = useLookupData();
     return (
         <>
             <TextField
@@ -174,11 +137,19 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 helperText={newPlayerMetadataValidations.country}
                 select
             >
-                {countries.map(country => (
-                    <MenuItem key={country.value} value={country.value}>
-                        {country.label}
-                    </MenuItem>
-                ))}
+                {countryFlagMetadata
+                    .filter(flagMetadata => playerNationalityList.includes(flagMetadata.name))
+                    .map(flagMetadata => (
+                        <MenuItem key={flagMetadata.id} value={flagMetadata.name}>
+                            {/* hide the flag when a country is selected */}
+                            {newPlayerMetadata.country !== flagMetadata.name && (
+                                <ListItemIcon>
+                                    <img src={flagMetadata.countryFlagUrl} alt={flagMetadata.countryCode} />
+                                </ListItemIcon>
+                            )}
+                            <ListItemText primary={flagMetadata.name} />
+                        </MenuItem>
+                    ))}
             </TextField>
         </>
     );
@@ -204,7 +175,7 @@ const PlayerAttributeForm = ({ newPlayerAttributeData, newPlayerAttributeValidat
                 autoFocus={index === 0}
                 key={attrDataName}
                 name={attrDataName}
-                label={capitalizeLabel(attrDataName, 'camelcase')}
+                label={capitalizeLabel(attrDataName, caseFormat.CAMEL_CASE)}
                 required
                 id={attrDataName}
                 type='number'
@@ -275,9 +246,9 @@ const PlayerRoleForm = ({ newPlayerRoleData, newPlayerRoleValidations, handleCha
                 helperText={newPlayerRoleValidations.name}
                 select
             >
-                {roles.map(role => (
-                    <MenuItem key={role.value} value={role.value}>
-                        {role.label}
+                {roleMetadata.map(roleName => (
+                    <MenuItem key={roleName} value={roleName}>
+                        {capitalizeLabel(roleName, caseFormat.CAMEL_CASE)}
                     </MenuItem>
                 ))}
             </TextField>
@@ -296,12 +267,14 @@ const PlayerRoleForm = ({ newPlayerRoleData, newPlayerRoleValidations, handleCha
                     MenuProps={MenuProps}
                     renderValue={renderChipsFn}
                 >
-                    {playerAttributeNames.map(attributeName => (
-                        <MenuItem key={attributeName} value={attributeName}>
-                            <Checkbox checked={shouldBeChecked(attributeName)} />
-                            <ListItemText primary={attributeName} />
-                        </MenuItem>
-                    ))}
+                    {playerAttributeMetadata
+                        .map(attributeMetadata => attributeMetadata.name)
+                        .map(attributeName => (
+                            <MenuItem key={attributeName} value={attributeName}>
+                                <Checkbox checked={shouldBeChecked(attributeName)} />
+                                <ListItemText primary={capitalizeLabel(attributeName, caseFormat.CAMEL_CASE)} />
+                            </MenuItem>
+                        ))}
                 </Select>
             </FormControl>
         </>

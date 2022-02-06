@@ -10,6 +10,7 @@ import { useThemePreference } from './context/themePreferenceProvider';
 import { ChartOptionsProvider } from './context/chartOptionsProvider';
 import { AuthContextProvider } from './context/authProvider';
 import { ClubContextProvider } from './context/clubProvider';
+import { LookupDataContextProvider } from './context/LookupDataProvider';
 
 function App() {
     const queryClient = new QueryClient();
@@ -30,8 +31,11 @@ function App() {
                 <ThemeProvider theme={theme}>
                     <ChartOptionsProvider>
                         <AuthContextProvider>
+                            {/* // TODO: 05/02/22 move this provider inside home page */}
                             <ClubContextProvider>
-                                <Layout />
+                                <LookupDataContextProvider>
+                                    <Layout />
+                                </LookupDataContextProvider>
                             </ClubContextProvider>
                         </AuthContextProvider>
                     </ChartOptionsProvider>

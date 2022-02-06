@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import static com.footballstatsdashboard.core.utils.Constants.COUNTRY_CODE_MAPPING_FNAME;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
@@ -36,9 +37,6 @@ import static org.mockito.Mockito.when;
 
 public class PlayerServiceTest {
     private static final int UPDATED_PLAYER_SPRINT_SPEED = 87;
-    private static final List<String> PLAYER_ATTRIBUTE_CATEGORIES = ImmutableList.of("Technical", "Physical", "Mental");
-    private static final List<String> PLAYER_ATTRIBUTE_GROUPS = ImmutableList.of("Attacking", "Aerial", "Vision",
-            "Defending", "Speed");
     private static final String CREATED_BY = "fake email";
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
 
@@ -133,15 +131,14 @@ public class PlayerServiceTest {
 
         assertCountryLogo(createdPlayer.getMetadata());
 
+        assertNotNull(createdPlayer.getAbility());
         assertNotNull(createdPlayer.getAbility().getCurrent());
         assertEquals(1, createdPlayer.getAbility().getHistory().size());
 
         createdPlayer.getAttributes().forEach(attribute -> {
-            assertTrue(attribute.getCategory() != null
-                    && PLAYER_ATTRIBUTE_CATEGORIES.contains(attribute.getCategory()));
-            assertTrue(attribute.getGroup() != null
-                    && PLAYER_ATTRIBUTE_GROUPS.contains(attribute.getGroup()));
+            assertNotNull(attribute.getCategory());
             assertNotNull(attribute.getGroup());
+            assertNotNull(attribute.getHistory());
             assertEquals(1, attribute.getHistory().size());
             assertEquals(attribute.getValue(), attribute.getHistory().get(0));
         });
@@ -279,10 +276,8 @@ public class PlayerServiceTest {
                     .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
                     .findFirst().orElse(null);
             assertNotNull(existingPlayerAttribute);
-            assertTrue(attribute.getCategory() != null
-                    && PLAYER_ATTRIBUTE_CATEGORIES.contains(attribute.getCategory()));
-            assertTrue(attribute.getGroup() != null
-                    && PLAYER_ATTRIBUTE_GROUPS.contains(attribute.getGroup()));
+            assertNotNull(attribute.getCategory());
+            assertNotNull(attribute.getGroup());
             assertEquals(existingPlayerAttribute.getHistory().size() + 1, attribute.getHistory().size());
             assertEquals(ImmutableList.of(existingPlayerAttribute.getValue(), attribute.getValue()),
                     attribute.getHistory());
@@ -297,64 +292,6 @@ public class PlayerServiceTest {
         // assertions for general house-keeping fields
         assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
         assertEquals(CREATED_BY, updatedPlayer.getCreatedBy());
-    }
-
-    /**
-     * given a player entity with attributes having invalid category and group information in the request, tests that
-     * the category and group names are derived from the existing data in couchbase instead of what is present in the
-     * request before updating the player data in couchbase
-     */
-    @Test
-    public void updatePlayerWithAttributesHavingInvalidCategoryAndGroupNames() {
-        // setup
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-
-        UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(true)
-                .withId(existingPlayerId)
-                .withMetadata()
-                .withAbility()
-                .withRoles()
-                .withAttributes()
-                .build();
-        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
-
-        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(false)
-                .hasAttributeWithInvalidCategory(true)
-                .hasAttributeWithInvalidGroup(true)
-                .withId(existingPlayerId)
-                .withMetadata()
-                .withRoles()
-                .withTechnicalAttributes()
-                .withPhysicalAttributes()
-                .withMentalAttributes()
-                .build();
-        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
-                .from(incomingPlayerBase)
-                .withUpdatedNameInMetadata("updated name")
-                .withUpdatedRoleName("updated role name")
-                .withUpdatedAttributeValue("sprint speed", UPDATED_PLAYER_SPRINT_SPEED)
-                .build();
-
-        // execute
-        Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
-
-        // assert
-        verify(playerDAO).updateDocument(resourceKeyCaptor.capture(), any());
-        ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
-        assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
-
-        updatedPlayer.getAttributes().forEach(attribute -> {
-            Attribute existingPlayerAttribute = existingPlayerInCouchbase.getAttributes().stream()
-                    .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
-                    .findFirst()
-                    .orElse(null);
-            assertNotNull(existingPlayerAttribute);
-            assertEquals(existingPlayerAttribute.getCategory(), attribute.getCategory());
-            assertEquals(existingPlayerAttribute.getGroup(), attribute.getGroup());
-        });
     }
 
     /**
@@ -545,7 +482,7 @@ public class PlayerServiceTest {
     private void assertCountryLogo(Metadata createdPlayerMetadata) throws IOException {
         TypeReference<List<CountryCodeMetadata>> countryCodeMetadataTypeRef = new TypeReference<>() { };
         List<CountryCodeMetadata> countryCodeMetadataList =
-                FIXTURE_LOADER.loadFixture("countryCodeMapping.json", countryCodeMetadataTypeRef);
+                FIXTURE_LOADER.loadFixture(COUNTRY_CODE_MAPPING_FNAME, countryCodeMetadataTypeRef);
         String countryCode = countryCodeMetadataList.stream()
                 .filter(countryCodeMetadata ->
                         countryCodeMetadata.getCountryName().equals(createdPlayerMetadata.getCountry()))

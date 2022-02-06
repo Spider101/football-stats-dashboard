@@ -6,22 +6,25 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
 import javax.validation.Valid;
+import java.util.UUID;
 
 @Value.Immutable
 @JsonSerialize
-@JsonDeserialize(as = ImmutableCountryCodeMetadata.class)
+@JsonDeserialize(as = ImmutableCountryFlagMetadata.class)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public interface CountryCodeMetadata {
-
+public interface CountryFlagMetadata extends CountryCodeMetadata {
     /**
-     * country name
+     * country flag ID
      */
     @Valid
-    String getCountryName();
+    @Value.Default
+    default UUID getId() {
+        return UUID.randomUUID();
+    }
 
     /**
-     * country code
+     *
      */
     @Valid
-    String getCountryCode();
+    String getCountryFlagUrl();
 }

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from 'react-query';
 
-import { createNewPlayer } from '../clients/DashboardClient';
+import { createNewPlayer } from '../clients/PlayerClient';
 import { useUserAuth } from '../context/authProvider';
 import { useCurrentClub } from '../context/clubProvider';
 import { queryKeys } from '../constants';

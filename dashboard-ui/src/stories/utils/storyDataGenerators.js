@@ -9,6 +9,25 @@ export const MAX_OVERALL_VALUE = 100;
 const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 const NUM_MONTHS = 6;
 
+export const countryFlagMetadata = [
+    { id: faker.datatype.uuid(), name: 'France', countryCode: 'fr', countryFlagUrl: 'https://flagcdn.com/w40/fr.png' },
+    { id: faker.datatype.uuid(), name: 'Germany', countryCode: 'fr', countryFlagUrl: 'https://flagcdn.com/w40/de.png' },
+    { id: faker.datatype.uuid(), name: 'Spain', countryCode: 'fr', countryFlagUrl: 'https://flagcdn.com/w40/es.png' },
+    { id: faker.datatype.uuid(), name: 'Italy', countryCode: 'fr', countryFlagUrl: 'https://flagcdn.com/w40/it.png' },
+    {
+        id: faker.datatype.uuid(),
+        name: 'England',
+        countryCode: 'gb-eng',
+        countryFlagUrl: 'https://flagcdn.com/w40/gb-eng.png'
+    },
+    {
+        id: faker.datatype.uuid(),
+        name: 'Netherlands',
+        countryCode: 'nl',
+        countryFlagUrl: 'https://flagcdn.com/w40/nl.png'
+    }
+];
+
 const allSquadHubTableHeaders = [
     { id: 'name', type: 'string' },
     { id: 'nationality', type: 'image' },
@@ -34,20 +53,6 @@ const allMatchPerformanceTableHeaders = [
     { id: 'fouls', type: 'number' },
     { id: 'average_rating', type: 'number' }
 ];
-
-const nationalityList = [{
-    countryName: 'France',
-    flagURL: 'https://flagcdn.com/w40/fr.png'
-}, {
-    countryName: 'Germany',
-    flagURL: 'https://flagcdn.com/w40/de.png'
-}, {
-    countryName: 'Netherlands',
-    flagURL: 'https://flagcdn.com/w40/nl.png'
-}, {
-    countryName: 'Spain',
-    flagURL: 'https://flagcdn.com/w40/es.png'
-}];
 
 export const getAttributeItemData = (attributeName, highlightedAttributes = []) => ({
     attributeName,
@@ -176,7 +181,12 @@ export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
 export const getSquadHubTableData = (numRows, moraleIconsMap, withLink = false) => ({
     headers: allSquadHubTableHeaders,
     rows: [ ...Array(numRows) ].map(() => {
-        const nationalityMetadata = _.sample(nationalityList);
+        const nationalityMetadata = _.sample(
+            countryFlagMetadata.map(flagMetadata => ({
+                countryName: flagMetadata.name,
+                flagURL: flagMetadata.countryFlagUrl
+            }))
+        );
         const moraleEntity = _.sample(moraleIconsMap);
         const chartData = {
             type: 'bar',
@@ -233,13 +243,16 @@ export const getMatchPerformanceTableData = (numCompetitions) => ({
 
 export const getSquadHubPlayerData = (numPlayers, moraleList) => {
     return {
-        players: [ ...Array(numPlayers) ].map(() => ({
+        players: [...Array(numPlayers)].map(() => ({
             playerId: faker.datatype.uuid(),
             name: faker.name.findName(),
-            nationality: _.sample(nationalityList),
+            nationality: _.sample(countryFlagMetadata.map(flagMetadata => ({
+                countryName: flagMetadata.name,
+                flagURL: flagMetadata.countryFlagUrl
+            }))),
             role: faker.name.jobType(),
             wages: faker.datatype.number({ max: 1000, min: 100 }),
-            form: [ ...Array(5) ].map(() => faker.datatype.number(MAX_ATTR_VALUE)),
+            form: [...Array(5)].map(() => faker.datatype.number(MAX_ATTR_VALUE)),
             morale: _.sample(moraleList),
             current_ability: faker.datatype.number({ max: MAX_OVERALL_VALUE, min: 1 })
         }))

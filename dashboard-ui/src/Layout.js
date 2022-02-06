@@ -56,7 +56,7 @@ const AppContainer = ({ classes }) => {
             }
         }));
 
-    // TODO: this should be returned from backend; remove it when ready
+    // TODO: try creating a ref for this; update ref when club data is loaded
     const menuData = {
         title: 'Dummy App Bar Menu Title',
         teamColor: 'red'

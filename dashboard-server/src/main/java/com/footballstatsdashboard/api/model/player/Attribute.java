@@ -3,6 +3,7 @@ package com.footballstatsdashboard.api.model.player;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.footballstatsdashboard.core.utils.Readonly;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
@@ -31,14 +32,16 @@ public interface Attribute {
      */
     @Valid
     @Nullable
-    String getCategory();
+    @Readonly
+    AttributeCategory getCategory();
 
     /**
      * group the attribute belongs to
      */
     @Valid
     @Nullable
-    String getGroup();
+    @Readonly
+    AttributeGroup getGroup();
 
     /**
      * current value of the attribute
