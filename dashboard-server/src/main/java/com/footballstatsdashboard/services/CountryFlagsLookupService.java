@@ -21,11 +21,12 @@ public class CountryFlagsLookupService {
         TypeReference<List<CountryCodeMetadata>> countryCodeMetadataTypeRef = new TypeReference<>() { };
         List<CountryCodeMetadata> countryCodeMetadataList =
                 FIXTURE_LOADER.loadFixture(COUNTRY_CODE_MAPPING_FNAME, countryCodeMetadataTypeRef);
-        return countryCodeMetadataList.stream().map(countryCodeMetadata -> ImmutableCountryFlagMetadata.builder()
-                .countryCode(countryCodeMetadata.getCountryCode())
-                .countryName(countryCodeMetadata.getCountryName())
-                .countryFlagUrl(String.format(COUNTRY_FLAG_URL_TEMPLATE, countryCodeMetadata.getCountryCode()))
-                .build()
-        ).collect(Collectors.toList());
+        return countryCodeMetadataList.stream()
+                .map(countryCodeMetadata -> ImmutableCountryFlagMetadata.builder()
+                        .countryCode(countryCodeMetadata.getCountryCode())
+                        .countryName(countryCodeMetadata.getCountryName())
+                        .countryFlagUrl(String.format(COUNTRY_FLAG_URL_TEMPLATE, countryCodeMetadata.getCountryCode()))
+                        .build()
+                ).collect(Collectors.toList());
     }
 }
