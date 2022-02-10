@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { CHART_ANIMATION_THRESHOLD, months } from '../constants';
+import { CHART_ANIMATION_THRESHOLD, MONTHS } from '../constants';
 
 import { getStrokeColor } from '../utils';
 
@@ -35,7 +35,7 @@ export default function AttributeProgressChart({ attributeData }) {
                 {/* <text x={500 / 2} y={20} fill="black" textAnchor="middle" dominantBaseline="central">
                     <tspan fontSize="14">{chartTitle}</tspan>
                 </text> */}
-                <XAxis axisLine={false} tickFormatter={number => months[number]} tickLine={false} />
+                <XAxis axisLine={false} tickFormatter={number => MONTHS[number]} tickLine={false} />
                 <YAxis axisLine={false} tickLine={false} />
                 <Tooltip />
                 <Legend />

@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { moraleIconsMap } from '../constants';
+import { MORALE_ICON_MAPPING } from '../constants';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
@@ -62,7 +62,7 @@ const buildRowDataForSquadTable = players => {
                 row = {
                     id: key,
                     type: 'icon',
-                    data: moraleIconsMap.find(entity => entity.morale === value).icon,
+                    data: MORALE_ICON_MAPPING.find(entity => entity.morale === value).icon,
                     metadata: { sortValue: value }
                 };
                 break;

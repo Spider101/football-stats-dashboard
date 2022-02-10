@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { months } from '../constants';
+import { MONTHS } from '../constants';
 
 import { getStrokeColor } from '../utils';
 
@@ -13,7 +13,7 @@ export default function OverallProgressChart({ overallData }) {
     return (
         <ResponsiveContainer width='100%' height={500}>
             <BarChart data={chartData} barSize={50}>
-                <XAxis axisLine={false} tickLine={false} tickFormatter={number => months[number]}/>
+                <XAxis axisLine={false} tickLine={false} tickFormatter={number => MONTHS[number]}/>
                 <YAxis axisLine={false} tickLine={false} />
                 <Tooltip />
                 <CartesianGrid vertical={false} opacity={0.5} />
