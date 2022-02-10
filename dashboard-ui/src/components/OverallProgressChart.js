@@ -1,41 +1,31 @@
 import PropTypes from 'prop-types';
-import ReactApexChart from 'react-apexcharts';
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { months } from '../constants';
 
-import { useGlobalChartOptions } from '../context/chartOptionsProvider';
+import { getStrokeColor } from '../utils';
+
+const transformOverallData = overallHistory => overallHistory.map(playerOverall => ({ playerAbility: playerOverall }));
 
 export default function OverallProgressChart({ overallData }) {
-    const chartTitle = 'Player Overall Progression over last 6 months';
-    const globalChartOptions = useGlobalChartOptions();
+    // const chartTitle = 'Player Overall Progression over last 6 months';
 
+    const chartData = transformOverallData(overallData.history);
     return (
-        <ReactApexChart 
-            options={{
-                ...globalChartOptions,
-                stroke: {
-                    ...globalChartOptions.stroke,
-                    curve: 'straight'
-                },
-                dataLabels: { enabled: false },
-                plotOptions: { bar: { columnWidth: '15%' } },
-                title: {
-                    ...globalChartOptions.title,
-                    text: chartTitle
-                },
-                xaxis: {
-                    title: { text: 'Months', style: { fontFamily: 'Roboto' } },
-                    categories: [1, 2, 3, 4, 5, 6]
-                }
-            }}
-            series={ overallData }
-            type='bar'
-            height={ 500 }
-        />
+        <ResponsiveContainer width='100%' height={500}>
+            <BarChart data={chartData} barSize={50}>
+                <XAxis axisLine={false} tickLine={false} tickFormatter={number => months[number]}/>
+                <YAxis axisLine={false} tickLine={false} />
+                <Tooltip />
+                <CartesianGrid vertical={false} opacity={0.5} />
+                <Bar dataKey='playerAbility' fill={getStrokeColor(0)}/>
+            </BarChart>
+        </ResponsiveContainer>
     );
 }
 
 OverallProgressChart.propTypes = {
-    overallData: PropTypes.arrayOf(PropTypes.shape({
+    overallData: PropTypes.shape({
         name: PropTypes.string,
-        data: PropTypes.arrayOf(PropTypes.number)
-    }))
+        history: PropTypes.arrayOf(PropTypes.number)
+    })
 };

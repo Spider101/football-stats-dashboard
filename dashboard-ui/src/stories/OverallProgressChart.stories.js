@@ -1,5 +1,5 @@
 import OverallProgressChart from '../components/OverallProgressChart';
-import { getPlayerProgressionData, MAX_OVERALL_VALUE } from './utils/storyDataGenerators';
+import { getPlayerOverallData } from './utils/storyDataGenerators';
 
 export default {
     component: OverallProgressChart,
@@ -24,5 +24,5 @@ export default {
 export const Default = (args) => <OverallProgressChart { ...args } />;
 
 Default.args = {
-    overallData: getPlayerProgressionData(1, 'Player Ability', MAX_OVERALL_VALUE)
+    overallData: getPlayerOverallData()
 };

@@ -1,6 +1,6 @@
 import PlayerProgressionCharts from '../widgets/PlayerProgressionCharts';
 import { Default as AttributeProgressChart } from './AttributeProgressChart.stories';
-import { getPlayerProgressionData, MAX_OVERALL_VALUE } from './utils/storyDataGenerators';
+import { Default as OverallProgressChart } from './OverallProgressChart.stories';
 
 export default {
     component: PlayerProgressionCharts,
@@ -30,7 +30,5 @@ const Template = args => <PlayerProgressionCharts { ...args } />;
 export const Default = Template.bind({});
 Default.args = {
     playerAttributeProgressData: AttributeProgressChart.args,
-    playerOverallProgressData: {
-        overallData: getPlayerProgressionData(1, 'Player Ability', MAX_OVERALL_VALUE)
-    }
+    playerOverallProgressData: OverallProgressChart.args
 };

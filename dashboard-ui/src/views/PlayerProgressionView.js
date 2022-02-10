@@ -20,15 +20,12 @@ const getGrowthIndicator = history => {
     }
 };
 
-// TODO: 07/02/22 change how the data is being built once the rechart component is ready
-const buildAttributeProgressChartData = attributeData => {
-    const attributeProgressChartData = attributeData
-        .map(attribute => ({ name: attribute.name, history: attribute.history }));
-    return { attributeData: attributeProgressChartData };
-};
+const buildAttributeProgressChartData = attributeData => ({
+    attributeData: attributeData.map(({ name, history, ..._rest }) => ({ name, history }))
+});
 
-const buildOverallProgressChartData = ({ history: overallHistory }) => ({
-    overallData: [{ name: 'Player Ability', data: overallHistory }]
+const buildOverallProgressChartData = ({ history }) => ({
+    overallData: { name: 'Player Ability', history }
 });
 
 export default function PlayerProgressionView({ playerMetadata, playerRoles, playerOverall, playerAttributes }) {

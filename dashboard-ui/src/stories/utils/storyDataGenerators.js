@@ -174,9 +174,14 @@ export const getPlayerData = (attributeNamesList, hasHistory = false) => {
 export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
     return [ ...Array(numAttributes) ].map(() => ({
         name: keyName || faker.hacker.noun(),
-        history: [ ...Array(6) ].map(() => faker.datatype.number(maxValue))
+        history: [ ...Array(NUM_MONTHS) ].map(() => faker.datatype.number(maxValue))
     }));
 };
+
+export const getPlayerOverallData = () => ({
+    name: 'Player Ability',
+    history: [...Array(NUM_MONTHS)].map(() => faker.datatype.number(MAX_OVERALL_VALUE))
+});
 
 export const getSquadHubTableData = (numRows, moraleIconsMap, withLink = false) => ({
     headers: allSquadHubTableHeaders,
