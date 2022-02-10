@@ -20,9 +20,10 @@ const getGrowthIndicator = history => {
     }
 };
 
+// TODO: 07/02/22 change how the data is being built once the rechart component is ready
 const buildAttributeProgressChartData = attributeData => {
     const attributeProgressChartData = attributeData
-        .map(attribute => ({ name: attribute.name, data: attribute.history }));
+        .map(attribute => ({ name: attribute.name, history: attribute.history }));
     return { attributeData: attributeProgressChartData };
 };
 

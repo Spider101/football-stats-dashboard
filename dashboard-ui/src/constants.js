@@ -41,7 +41,6 @@ export const formSubmission = {
 };
 
 
-// TODO: 01/02/22 build this from the server lookup for roles instead of hard-coding it here
 export const playerNationalityList = ['France', 'Germany', 'Spain', 'Netherlands', 'England'];
 
 export const moraleIconsMap = [
@@ -79,3 +78,10 @@ export const playerAttributeMetadata = [
 ];
 
 export const roleMetadata = ['defensiveCentralMidfielder', 'falseNine', 'sweeperKeeper', 'regista', 'insideForward'];
+
+export const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+
+
+// TODO: 08/02/22 do some profiling to settle on a better number for this
+// setting it to 10 for now.
+export const CHART_ANIMATION_THRESHOLD = 10;
