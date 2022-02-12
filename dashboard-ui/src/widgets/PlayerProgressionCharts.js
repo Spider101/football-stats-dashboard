@@ -21,10 +21,10 @@ export default function PlayerProgressionCharts({ playerAttributeProgressData, p
                 ariaLabel="Player Progression Chart Tabs"
                 tabLabels={['Attribute Progress', 'Overall Progress']}
             >
-                <TabPanel value={ tabValue } index={0}>
+                <TabPanel value={ tabValue } index={0} panelLabel='Attribute Progress Chart'>
                     <AttributeProgressChart { ...playerAttributeProgressData } />
                 </TabPanel>
-                <TabPanel value={ tabValue } index={1}>
+                <TabPanel value={ tabValue } index={1} panelLabel='Overall Progress Chart'>
                     <OverallProgressChart { ...playerOverallProgressData } />
                 </TabPanel>
             </CustomizableTabs>

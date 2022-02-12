@@ -4,13 +4,12 @@ import Box from '@material-ui/core/Box';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
 
-export const TabPanel = ({ children, value, index, ...other }) => {
+export const TabPanel = ({ children, value, index, panelLabel, ...other }) => {
     return (
         <div
             role="tabpanel"
             hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
+            aria-label={panelLabel}
             {...other}
         >
             {value === index && (
@@ -26,6 +25,7 @@ TabPanel.propTypes = {
     children: PropTypes.node,
     index: PropTypes.any.isRequired,
     value: PropTypes.any.isRequired,
+    panelLabel: PropTypes.string
 };
 
 const a11yProps = (index) => ({
