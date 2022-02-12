@@ -1,13 +1,14 @@
 import PropTypes from 'prop-types';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { MONTHS } from '../constants';
+import { useTheme } from '@material-ui/core/styles';
 
-import { getStrokeColor } from '../utils';
+import { MONTHS } from '../constants';
 
 const transformOverallData = overallHistory => overallHistory.map(playerOverall => ({ playerAbility: playerOverall }));
 
 export default function OverallProgressChart({ overallData }) {
     // const chartTitle = 'Player Overall Progression over last 6 months';
+    const theme = useTheme();
 
     const chartData = transformOverallData(overallData.history);
     return (
@@ -17,7 +18,7 @@ export default function OverallProgressChart({ overallData }) {
                 <YAxis axisLine={false} tickLine={false} />
                 <Tooltip />
                 <CartesianGrid vertical={false} opacity={0.5} />
-                <Bar dataKey='playerAbility' fill={getStrokeColor(0)}/>
+                <Bar dataKey='playerAbility' fill={theme.palette.primary.main}/>
             </BarChart>
         </ResponsiveContainer>
     );

@@ -21,7 +21,7 @@ const getGrowthIndicator = history => {
 };
 
 const buildAttributeProgressChartData = attributeData => ({
-    attributeData: attributeData.map(({ name, history, ..._rest }) => ({ name, history }))
+    attributeData: attributeData.map(({ name, history }) => ({ name, history }))
 });
 
 const buildOverallProgressChartData = ({ history }) => ({
