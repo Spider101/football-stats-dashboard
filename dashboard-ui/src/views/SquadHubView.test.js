@@ -4,29 +4,24 @@ import { MemoryRouter } from 'react-router-dom';
 import { Default, NoPlayers } from '../stories/SquadHubView.stories';
 import { snapshotFriendlyRender } from '../testUtils';
 
-const getSanitizedProps = ({ players, ...rest }) => {
-    return {
-        ...rest,
-        players: players.map(player => {
-            // removing form because apex charts is not working with react-testing library for some reason
-            // eslint-disable-next-line no-unused-vars
-            const { form, ...rest } = player;
-            return rest;
-        })
-    };
-};
-
 it('should render the player data when passed in', () => {
+    // execute
     render(
         <MemoryRouter>
-            <Default {...getSanitizedProps(Default.args)} />
+            <Default {...Default.args} />
         </MemoryRouter>
     );
-
-    const { players } = Default.args;
     const rows = screen.getAllByRole('row');
+    const columnHeaders = screen.getAllByRole('columnheader');
+
+    // assert
+    const { players } = Default.args;
     // 1 extra row for the table header
-    expect(rows.length).toEqual(players.length + 1);
+    expect(rows.length).toBe(players.length + 1);
+
+    const playerFields = Object.keys(players[0]);
+    // one of the fields is `id` which is not used in the table
+    expect(columnHeaders.length).toBe(playerFields.length - 1);
 });
 
 it('should always render add player widget', () => {
