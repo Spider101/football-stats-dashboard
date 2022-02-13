@@ -183,6 +183,11 @@ export const getPlayerOverallData = () => ({
     history: [...Array(NUM_MONTHS)].map(() => faker.datatype.number(MAX_OVERALL_VALUE))
 });
 
+export const getCardWithChartData = (dataKeys, numDataPoints, maxValue) =>
+    [...Array(numDataPoints)].map(() =>
+        Object.fromEntries(dataKeys.map(dataKey => [dataKey, faker.datatype.number(maxValue)]))
+    );
+
 export const getSquadHubTableData = (numRows, moraleIconsMapping, withLink = false) => ({
     headers: allSquadHubTableHeaders,
     rows: [ ...Array(numRows) ].map(() => {
