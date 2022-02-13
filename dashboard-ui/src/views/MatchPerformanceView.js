@@ -1,14 +1,13 @@
 import { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
-import ReactApexChart from 'react-apexcharts';
 import Grid from '@material-ui/core/Grid';
 
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
-import { convertCamelCaseToSnakeCase } from '../utils';
-import { useGlobalChartOptions } from '../context/chartOptionsProvider';
+import { convertCamelCaseToSnakeCase, getStrokeColor } from '../utils';
+import { Bar, BarChart, ResponsiveContainer, Tooltip, Legend, YAxis, XAxis, CartesianGrid } from 'recharts';
 
 const matchPerformanceTableHeaderDisplayTypeMap = {
     competition: 'string',
@@ -51,7 +50,12 @@ const buildMatchPerformanceData = competitionData => {
 const filterMatchRatingsByCompetitions = (competitionData, competitionsList) =>
     competitionData
         .filter(competition => competitionsList.includes(competition.id))
-        .map(competition => competition.matchRatingHistory)
+        .map(competition =>
+            competition.matchRatingHistory.map((matchRating, idx) => ({
+                matchNumber: idx,
+                [competition.id]: matchRating
+            }))
+        )
         .flat();
 
 const filterMatchPerformancesByCompetitions = (matchPerformances, competitionNames) =>
@@ -60,21 +64,8 @@ const filterMatchPerformancesByCompetitions = (matchPerformances, competitionNam
         return competitionNames.includes(competitionData.data);
     });
 
-const getOptions = (globalChartOptions, chartTitle) => ({
-    ...globalChartOptions,
-    dataLabels: { enabled: false },
-    title: {
-        ...globalChartOptions.title,
-        text: chartTitle
-    },
-    xaxis: {
-        title: { text: 'Matches', style: { fontFamily: 'Roboto' } },
-        categories: [...Array(10)].map((_, _idx) => _idx + 1)
-    }
-});
-
 export default function MatchPerformanceView({ playerPerformance: { competitions } }) {
-    const chartTitle = 'Player Performance over last 10 matches';
+    // const chartTitle = 'Player Performance over last 10 matches';
 
     const allCompetitionNames = competitions.map(competition => competition.id).flat();
 
@@ -92,13 +83,7 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
         rows: filterMatchPerformancesByCompetitions(rowData, competitionNames)
     };
 
-    const chartData = [
-        {
-            name: 'Match Rating',
-            data: filterMatchRatingsByCompetitions(competitions, competitionNames)
-        }
-    ];
-
+    const chartData = filterMatchRatingsByCompetitions(competitions, competitionNames);
     return (
         <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -112,12 +97,23 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
                 />
             </Grid>
             <Grid item xs={12}>
-                <ReactApexChart
-                    options={getOptions(useGlobalChartOptions(), chartTitle)}
-                    series={chartData}
-                    type='bar'
-                    height={500}
-                />
+                <ResponsiveContainer height={500} width='100%'>
+                    <BarChart data={chartData} barGap={0} barCategoryGap={0}>
+                        <Tooltip />
+                        {competitionNames.map((competitionName, idx) => (
+                            <Bar key={competitionName} dataKey={competitionName} fill={getStrokeColor(idx)} />
+                        ))}
+                        <XAxis hide={true} dataKey='matchNumber' />
+                        <YAxis
+                            axisLine={false}
+                            tickLine={false}
+                            domain={[0, 11]}
+                            label={{ value: 'Match Rating', angle: -90 }}
+                        />
+                        <CartesianGrid vertical={false} opacity={0.5} />
+                        <Legend verticalAlign='top' />
+                    </BarChart>
+                </ResponsiveContainer>
             </Grid>
             <Grid item xs={12}>
                 <SortableTable {...matchPerformanceData} />
