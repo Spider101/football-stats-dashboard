@@ -193,13 +193,7 @@ export const getSquadHubTableData = (numRows, moraleIconsMapping, withLink = fal
             }))
         );
         const moraleEntity = _.sample(moraleIconsMapping);
-        const chartData = {
-            type: 'bar',
-            series: [{
-                name: 'Match Rating',
-                data: [ ...Array(5) ].map(() => (Math.random() * 10).toFixed(2) + 1)
-            }]
-        };
+        const chartData = [...Array(5)].map(() => ({ form: faker.datatype.number({ min: 5, max: 10})}));
 
         const tableData = [
             {
@@ -257,7 +251,7 @@ export const getSquadHubPlayerData = (numPlayers, moraleList) => {
             }))),
             role: faker.name.jobType(),
             wages: faker.datatype.number({ max: 1000, min: 100 }),
-            form: [...Array(5)].map(() => faker.datatype.number(MAX_ATTR_VALUE)),
+            form: [...Array(5)].map(() => faker.datatype.number({ min: 5, max: 10 })),
             morale: _.sample(moraleList),
             current_ability: faker.datatype.number({ max: MAX_OVERALL_VALUE, min: 1 })
         }))

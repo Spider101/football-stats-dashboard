@@ -29,6 +29,7 @@ const squadTableHeaderDisplayTypeMap = {
 
 // TODO: define a more appropriate method for this
 const getSortValueForForm = matchRatingsList => matchRatingsList.length > 0 && matchRatingsList[0];
+const transformFormData = formData => formData.map(form => ({ form }));
 
 const buildHeaderDataForSquadTable = headerNames =>
     headerNames
@@ -70,15 +71,7 @@ const buildRowDataForSquadTable = players => {
                 row = {
                     id: key,
                     type: 'chart',
-                    data: {
-                        type: 'bar',
-                        series: [
-                            {
-                                name: 'Match Rating',
-                                data: value
-                            }
-                        ]
-                    },
+                    data: transformFormData(value),
                     metadata: { sortValue: getSortValueForForm(value) || 0 }
                 };
                 break;
