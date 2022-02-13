@@ -171,10 +171,10 @@ export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     };
 };
 
-export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
+export const getPlayerProgressionData = (numAttributes, maxValue) => {
     return [ ...Array(numAttributes) ].map(() => ({
-        name: keyName || faker.hacker.noun(),
-        history: [ ...Array(NUM_MONTHS) ].map(() => faker.datatype.number(maxValue))
+        name: faker.hacker.noun(),
+        history: [...Array(NUM_MONTHS)].map(() => faker.datatype.number(maxValue))
     }));
 };
 
