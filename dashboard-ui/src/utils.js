@@ -112,3 +112,6 @@ export const getStrokeColor = (idx, themePreference = 'light') => {
     const paletteIdx = idx % lightPalette.length;
     return themePreference === 'dark' ? darkPalette[paletteIdx] : lightPalette[paletteIdx];
 };
+
+export const getFillColorFromTheme = ({ palette }, idx) =>
+    idx % 2 === 0 ? palette.primary.main : palette.secondary.main;

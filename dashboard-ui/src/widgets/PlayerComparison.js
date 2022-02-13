@@ -84,10 +84,10 @@ export default function PlayerComparison({ basePlayerData, comparedPlayerData, p
                     ariaLabel='Player Attributes Comparison Tabs'
                     tabLabels={['Overview', 'Attributes']}
                 >
-                    <TabPanel value={tabValue} index={0}>
+                    <TabPanel value={tabValue} index={0} panelLabel='Player Attribute Group Comparison'>
                         <AttributeComparisonPolarPlot {...attributePolarPlotData} />
                     </TabPanel>
-                    <TabPanel value={tabValue} index={1}>
+                    <TabPanel value={tabValue} index={1} panelLabel='Player Attribute Category Comparison'>
                         <PlayerAttributesTable {...attributeComparisonTableData}>
                             <AttributeComparisonItem />
                         </PlayerAttributesTable>

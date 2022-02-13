@@ -7,16 +7,16 @@ import { playerAttributes } from '../constants';
 
 it('renders successfully', () => {
     // setup
-    const { playerMetadata } = PlayerProgressionView.args;
+    const { playerMetadata, playerAttributes: playerAttributeData } = PlayerProgressionView.args;
 
     // execute
-    render(
-        <PlayerProgressionView {...PlayerProgressionView.args} />
-    );
+    render(<PlayerProgressionView {...PlayerProgressionView.args} />);
     const images = screen.getAllByRole('img');
     const attributeTableColumnHeaders = screen.getAllByRole('columnheader');
     const attributeTableColumnNames = attributeTableColumnHeaders.map(columnHeader => columnHeader.textContent.trim());
+
     const attributeRows = screen.getAllByRole('row');
+    const attributeCells = screen.getAllByRole('cell').filter(cell => cell.textContent.trim());
     const chartTabs = screen.getAllByRole('tab');
     const chartTabNames = chartTabs.map(chartTab => chartTab.textContent.trim());
 
@@ -36,6 +36,8 @@ it('renders successfully', () => {
     // the heading row is also considered a row
     expect(attributeRows.length).toBeGreaterThan(1);
 
+    expect(attributeCells.length).toBe(playerAttributeData.length);
+
     expect(chartTabs.length).toBe(2);
     expect(chartTabNames.sort()).toEqual(['Attribute Progress', 'Overall Progress']);
 });
@@ -48,7 +50,7 @@ it('displays roles when picker is clicked', async () => {
     // execute
     render(<PlayerProgressionView {...PlayerProgressionView.args} />);
 
-    userEvent.click(screen.getByRole('button', {name: 'None'}));
+    userEvent.click(screen.getByRole('button', { name: 'None' }));
 
     const roleOptions = await screen.findAllByRole('option');
     const roleOptionNames = roleOptions.map(roleOption => roleOption.textContent.trim());
@@ -65,7 +67,7 @@ it('highlights associated attributes in table when role is selected', async () =
 
     // execute
     render(<PlayerProgressionView {...PlayerProgressionView.args} />);
-    userEvent.click(screen.getByRole('button', {name: 'None'}));
+    userEvent.click(screen.getByRole('button', { name: 'None' }));
     const roleOptions = await screen.findAllByRole('option');
     const selectedRoleOption = faker.helpers.randomize(
         roleOptions.filter(option => option.textContent.trim() != 'None')
@@ -74,7 +76,7 @@ it('highlights associated attributes in table when role is selected', async () =
 
     // assert
     expect(roleOptions.length).toBe(playerRoles.length + 1);
-    expect(screen.queryByRole('button', {name: selectedRoleOption.textContent.trim()})).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: selectedRoleOption.textContent.trim() })).toBeInTheDocument();
     const selectedRole = playerRoles.find(role => role.name === selectedRoleOption.textContent.trim());
     const highlightedCells = screen
         .getAllByRole('cell')
@@ -88,13 +90,13 @@ it('highlights associated attributes in table when role is selected', async () =
 it('tab is switched to be active when clicked on', () => {
     // execute
     render(<PlayerProgressionView {...PlayerProgressionView.args} />);
-    const currentTab = screen.getByRole('tab', {selected: true});
-    userEvent.click(screen.getByRole('tab', {selected:false}));
+    const currentTab = screen.getByRole('tab', { selected: true });
+    userEvent.click(screen.getByRole('tab', { selected: false }));
 
     // assert
     expect(currentTab).toHaveTextContent('Attribute Progress');
 
-    const newCurrentTab = screen.getByRole('tab', {selected: true});
+    const newCurrentTab = screen.getByRole('tab', { selected: true });
     const newCurrentTabPanel = screen.getByRole('tabpanel');
     expect(newCurrentTab).toHaveTextContent('Overall Progress');
     expect(newCurrentTabPanel).toHaveAccessibleName('Overall Progress Chart');

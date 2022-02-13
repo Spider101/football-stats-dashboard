@@ -1,25 +1,13 @@
-import ReactApexChart from 'react-apexcharts';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
 import PropTypes from 'prop-types';
-import { alpha, makeStyles } from '@material-ui/core/styles';
+import { Bar, BarChart, Tooltip, XAxis, YAxis } from 'recharts';
 import clsx from 'clsx';
 
-const options = {
-    chart: { stacked: true, sparkline: { enabled: true } },
-    plotOptions: {
-        bar: { horizontal: true }
-    },
-    yaxis: {
-        min: -20,
-        max: 20
-    },
-    tooltip: {
-        shared: false,
-        x: { formatter: val => val },
-        y: { formatter: val => Math.abs(val) }
-    }
-};
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import { alpha, makeStyles, useTheme } from '@material-ui/core/styles';
+
+import { MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
+import { getFillColorFromTheme } from '../utils';
 
 const useStyles = makeStyles((theme) => ({
     attr: {
@@ -32,26 +20,39 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
+const transformComparisonItemData = attributeItem => ([{
+    name: attributeItem.label,
+    ...Object.fromEntries(attributeItem.attrValues.map(attr => [attr.name, ...attr.data]))
+}]);
+
+
 export default function AttributeComparisonItem({ attrComparisonItem: { attrValues, label }, highlightedAttributes }) {
     const classes = useStyles();
     const isHighlighted = highlightedAttributes.includes(label);
+    const chartData = transformComparisonItemData({ label, attrValues });
+    const theme = useTheme();
+    const chartRange = [-MAX_ATTR_VALUE, MAX_ATTR_VALUE];
     return (
-        <ListItem className={ clsx(classes.attr, {
-            [classes.highlighted]: isHighlighted
-        })}>
-            <ListItemText primary={ label } />
-            <ReactApexChart
-                options={{
-                    ...options,
-                    xaxis: {
-                        categories: [ label ]
-                    }
-                }}
-                series={ attrValues }
-                type='bar'
-                width='350'
-                height='50'
-            />
+        <ListItem
+            className={clsx(classes.attr, {
+                [classes.highlighted]: isHighlighted
+            })}
+        >
+            <ListItemText primary={label} />
+            <BarChart layout='vertical' data={chartData} stackOffset='sign' width={300} height={50}>
+                <Tooltip />
+                {attrValues.map((attr, idx) => (
+                    <Bar
+                        isAnimationActive={false}
+                        key={attr.name}
+                        dataKey={attr.name}
+                        stackId='stack'
+                        fill={getFillColorFromTheme(theme, idx)}
+                    />
+                ))}
+                <XAxis hide={true} type='number' domain={chartRange}/>
+                <YAxis hide={true} dataKey='name' type='category'/>
+            </BarChart>
         </ListItem>
     );
 }
