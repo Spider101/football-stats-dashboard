@@ -86,17 +86,8 @@ export const transformIntoTabularData = (rawData, headers, filterByColumnNameFn,
     };
 };
 
-export const getStrokeColor = (idx, themePreference = 'light') => {
-    const lightPalette = [
-        '#003f5c',
-        '#2f4b7c',
-        '#665191',
-        '#a05195',
-        '#d45087',
-        '#f95d6a',
-        '#ff7c43',
-        '#ffa600'
-    ];
+export const buildChartPalette = (theme= null, themePreference = 'light') => {
+    const lightPalette = ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a', '#ff7c43', '#ffa600'];
     const darkPalette = [
         '#ebff93',
         '#f2e2f6',
@@ -108,10 +99,15 @@ export const getStrokeColor = (idx, themePreference = 'light') => {
         '#76c5fc',
         '#fd82c7'
     ];
-    // both palettes have the same number of colors so either works here
-    const paletteIdx = idx % lightPalette.length;
-    return themePreference === 'dark' ? darkPalette[paletteIdx] : lightPalette[paletteIdx];
-};
 
-export const getFillColorFromTheme = ({ palette }, idx) =>
-    idx % 2 === 0 ? palette.primary.main : palette.secondary.main;
+    let chartPalette;
+    if (theme != null) {
+        chartPalette =[ theme.palette.primary.main, theme.palette.secondary.main];
+    } else {
+        chartPalette = themePreference === 'dark' ? darkPalette : lightPalette;
+    }
+
+    return {
+        getPaletteColor: idx => chartPalette[idx % chartPalette.length]
+    };
+};

@@ -3,6 +3,7 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { useTheme } from '@material-ui/core/styles';
 
 import { MONTHS } from '../constants';
+import CustomToolTip from './CustomToolTip';
 
 const transformOverallData = overallHistory => overallHistory.map(playerOverall => ({ playerAbility: playerOverall }));
 
@@ -16,7 +17,7 @@ export default function OverallProgressChart({ overallData }) {
             <BarChart data={chartData} barSize={50}>
                 <XAxis axisLine={false} tickLine={false} tickFormatter={number => MONTHS[number]}/>
                 <YAxis axisLine={false} tickLine={false} />
-                <Tooltip />
+                <Tooltip content={<CustomToolTip />}/>
                 <CartesianGrid vertical={false} opacity={0.5} />
                 <Bar dataKey='playerAbility' fill={theme.palette.primary.main}/>
             </BarChart>

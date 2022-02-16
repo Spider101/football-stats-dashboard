@@ -6,8 +6,9 @@ import Grid from '@material-ui/core/Grid';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
-import { convertCamelCaseToSnakeCase, getStrokeColor } from '../utils';
+import { buildChartPalette, convertCamelCaseToSnakeCase } from '../utils';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, Legend, YAxis, XAxis, CartesianGrid } from 'recharts';
+import CustomToolTip from '../components/CustomToolTip';
 
 const matchPerformanceTableHeaderDisplayTypeMap = {
     competition: 'string',
@@ -84,6 +85,7 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
     };
 
     const chartData = filterMatchRatingsByCompetitions(competitions, competitionNames);
+    const { getPaletteColor } = buildChartPalette();
     return (
         <Grid container spacing={2}>
             <Grid item xs={6}>
@@ -99,9 +101,9 @@ export default function MatchPerformanceView({ playerPerformance: { competitions
             <Grid item xs={12}>
                 <ResponsiveContainer height={500} width='100%'>
                     <BarChart data={chartData} barGap={0} barCategoryGap={0}>
-                        <Tooltip />
+                        <Tooltip content={<CustomToolTip />}/>
                         {competitionNames.map((competitionName, idx) => (
-                            <Bar key={competitionName} dataKey={competitionName} fill={getStrokeColor(idx)} />
+                            <Bar key={competitionName} dataKey={competitionName} fill={getPaletteColor(idx)} />
                         ))}
                         <XAxis hide={true} dataKey='matchNumber' />
                         <YAxis

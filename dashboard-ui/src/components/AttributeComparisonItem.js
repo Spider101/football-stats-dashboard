@@ -7,7 +7,8 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { alpha, makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
-import { getFillColorFromTheme } from '../utils';
+import { buildChartPalette } from '../utils';
+import CustomToolTip from './CustomToolTip';
 
 const useStyles = makeStyles((theme) => ({
     attr: {
@@ -32,6 +33,7 @@ export default function AttributeComparisonItem({ attrComparisonItem: { attrValu
     const chartData = transformComparisonItemData({ label, attrValues });
     const theme = useTheme();
     const chartRange = [-MAX_ATTR_VALUE, MAX_ATTR_VALUE];
+    const { getPaletteColor } = buildChartPalette(theme);
     return (
         <ListItem
             className={clsx(classes.attr, {
@@ -40,14 +42,14 @@ export default function AttributeComparisonItem({ attrComparisonItem: { attrValu
         >
             <ListItemText primary={label} />
             <BarChart layout='vertical' data={chartData} stackOffset='sign' width={300} height={50}>
-                <Tooltip />
+                <Tooltip wrapperStyle={{ zIndex: 1000 }} content={<CustomToolTip />} />
                 {attrValues.map((attr, idx) => (
                     <Bar
                         isAnimationActive={false}
                         key={attr.name}
                         dataKey={attr.name}
                         stackId='stack'
-                        fill={getFillColorFromTheme(theme, idx)}
+                        fill={getPaletteColor(idx)}
                     />
                 ))}
                 <XAxis hide={true} type='number' domain={chartRange}/>

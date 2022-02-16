@@ -2,7 +2,8 @@ import PropTypes from 'prop-types';
 import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { CHART_ANIMATION_THRESHOLD, MONTHS } from '../constants';
 
-import { getStrokeColor } from '../utils';
+import { buildChartPalette } from '../utils';
+import CustomToolTip from './CustomToolTip';
 
 const transformAttributeData = attributeData => {
     // assuming each attribute has the name number of historical data points (months)
@@ -19,6 +20,7 @@ export default function AttributeProgressChart({ attributeData }) {
 
     const attributeNames = attributeData.map(attribute => attribute.name);
     const chartData = transformAttributeData(attributeData);
+    const { getPaletteColor } = buildChartPalette();
     return (
         <ResponsiveContainer height={500} width='100%'>
             <LineChart data={chartData}>
@@ -27,7 +29,7 @@ export default function AttributeProgressChart({ attributeData }) {
                         type='monotone'
                         key={attributeName}
                         dataKey={attributeName}
-                        stroke={getStrokeColor(idx)}
+                        stroke={getPaletteColor(idx)}
                         isAnimationActive={attributeNames.length <= CHART_ANIMATION_THRESHOLD}
                     />
                 ))}
@@ -37,7 +39,7 @@ export default function AttributeProgressChart({ attributeData }) {
                 </text> */}
                 <XAxis axisLine={false} tickFormatter={number => MONTHS[number]} tickLine={false} />
                 <YAxis axisLine={false} tickLine={false} />
-                <Tooltip />
+                <Tooltip content={<CustomToolTip />} />
                 <Legend />
                 <CartesianGrid vertical={false} opacity={0.5} />
             </LineChart>

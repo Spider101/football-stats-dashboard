@@ -13,7 +13,8 @@ import { useTheme } from '@material-ui/core/styles';
 
 import { playerAttributes } from '../constants';
 import { MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
-import { getFillColorFromTheme } from '../utils';
+import { buildChartPalette } from '../utils';
+import CustomToolTip from './CustomToolTip';
 
 const transformGroupedAttributeData = playersWithGroupedAttributeData =>
     playerAttributes.GROUPS.map(groupName => {
@@ -41,6 +42,7 @@ export default function AttributeComparisonPolarPlot({ playersWithAttributes }) 
     const polarAxisAngle = 90 - (360/numGroups);
 
     const chartData = transformGroupedAttributeData(playersWithAttributes);
+    const { getPaletteColor } = buildChartPalette(theme);
     return (
         <ResponsiveContainer width='100%' height={500}>
             <RadarChart data={chartData} outerRadius='100%' cy='60%'>
@@ -52,13 +54,13 @@ export default function AttributeComparisonPolarPlot({ playersWithAttributes }) 
                         key={playerData.name}
                         dataKey={playerData.name}
                         name={playerData.name}
-                        stroke={getFillColorFromTheme(theme, idx)}
-                        fill={getFillColorFromTheme(theme, idx)}
+                        stroke={getPaletteColor(idx)}
+                        fill={getPaletteColor(idx)}
                         fillOpacity={0.6}
                     />
                 ))}
                 <Legend wrapperStyle={{bottom: -50}}/>
-                <Tooltip />
+                <Tooltip content={<CustomToolTip />}/>
             </RadarChart>
         </ResponsiveContainer>
     );
