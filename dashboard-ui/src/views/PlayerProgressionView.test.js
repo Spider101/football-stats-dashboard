@@ -39,7 +39,7 @@ it('renders successfully', () => {
     expect(attributeCells.length).toBe(playerAttributeData.length);
 
     expect(chartTabs.length).toBe(2);
-    expect(chartTabNames.sort()).toEqual(['Attribute Progress', 'Overall Progress']);
+    expect(chartTabNames.sort()).toEqual(['Attribute Progress', 'Ability Progress'].sort());
 });
 
 it('displays roles when picker is clicked', async () => {
@@ -98,6 +98,6 @@ it('tab is switched to be active when clicked on', () => {
 
     const newCurrentTab = screen.getByRole('tab', { selected: true });
     const newCurrentTabPanel = screen.getByRole('tabpanel');
-    expect(newCurrentTab).toHaveTextContent('Overall Progress');
-    expect(newCurrentTabPanel).toHaveAccessibleName('Overall Progress Chart');
+    expect(newCurrentTab).toHaveTextContent('Ability Progress');
+    expect(newCurrentTabPanel).toHaveAccessibleName('Ability Progress Chart');
 });

@@ -154,15 +154,15 @@ export const getAttributes = (attributeList, hasHistory) =>
     });
 
 export const getPlayerData = (attributeNamesList, hasHistory = false) => {
-    const currentPlayerOverall = faker.datatype.number(MAX_OVERALL_VALUE);
-    const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_OVERALL_VALUE));
+    const currentPlayerAbility = faker.datatype.number(MAX_OVERALL_VALUE);
+    const playerAbilityHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_OVERALL_VALUE));
 
     return {
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
-        playerOverall: {
-            currentValue: currentPlayerOverall,
-            history: [...playerOverallHistory, currentPlayerOverall]
+        playerAbility: {
+            currentValue: currentPlayerAbility,
+            history: [...playerAbilityHistory, currentPlayerAbility]
         },
         playerAttributes: getAttributes(
             attributeNamesList,
@@ -178,7 +178,7 @@ export const getPlayerProgressionData = (numAttributes, maxValue) => {
     }));
 };
 
-export const getPlayerOverallData = () => ({
+export const getPlayerAbilityData = () => ({
     name: 'Player Ability',
     history: [...Array(NUM_MONTHS)].map(() => faker.datatype.number(MAX_OVERALL_VALUE))
 });

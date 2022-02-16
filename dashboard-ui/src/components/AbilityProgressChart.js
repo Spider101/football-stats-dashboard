@@ -5,13 +5,13 @@ import { useTheme } from '@material-ui/core/styles';
 import { MONTHS } from '../constants';
 import CustomToolTip from './CustomToolTip';
 
-const transformOverallData = overallHistory => overallHistory.map(playerOverall => ({ playerAbility: playerOverall }));
+const transformAbilityData = abilityHistory => abilityHistory.map(ability => ({ playerAbility: ability }));
 
-export default function OverallProgressChart({ overallData }) {
-    // const chartTitle = 'Player Overall Progression over last 6 months';
+export default function AbilityProgressChart({ abilityData }) {
+    // const chartTitle = 'Player ability Progression over last 6 months';
     const theme = useTheme();
 
-    const chartData = transformOverallData(overallData.history);
+    const chartData = transformAbilityData(abilityData.history);
     return (
         <ResponsiveContainer width='100%' height={500}>
             <BarChart data={chartData} barSize={50}>
@@ -25,8 +25,8 @@ export default function OverallProgressChart({ overallData }) {
     );
 }
 
-OverallProgressChart.propTypes = {
-    overallData: PropTypes.shape({
+AbilityProgressChart.propTypes = {
+    abilityData: PropTypes.shape({
         name: PropTypes.string,
         history: PropTypes.arrayOf(PropTypes.number)
     })

@@ -24,11 +24,11 @@ const buildAttributeProgressChartData = attributeData => ({
     attributeData: attributeData.map(({ name, history }) => ({ name, history }))
 });
 
-const buildOverallProgressChartData = ({ history }) => ({
-    overallData: { name: 'Player Ability', history }
+const buildAbilityProgressChartData = ({ history }) => ({
+    abilityData: { name: 'Player Ability', history }
 });
 
-export default function PlayerProgressionView({ playerMetadata, playerRoles, playerOverall, playerAttributes }) {
+export default function PlayerProgressionView({ playerMetadata, playerRoles, playerAbility, playerAttributes }) {
     const categories = Array.from(new Set(playerAttributes.map(attribute => attribute.category)));
     const buildAttributeData = attribute => ({
         attributeName: attribute.name,
@@ -44,7 +44,7 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles, pla
 
     const playerProgressionChartData = {
         playerAttributeProgressData: buildAttributeProgressChartData(playerAttributes),
-        playerOverallProgressData: buildOverallProgressChartData(playerOverall)
+        playerAbilityProgressData: buildAbilityProgressChartData(playerAbility)
     };
 
     return (
@@ -73,7 +73,7 @@ export default function PlayerProgressionView({ playerMetadata, playerRoles, pla
 PlayerProgressionView.propTypes = {
     playerMetadata: PropTypes.shape(PlayerBioCard.propTypes),
     playerRoles: PropTypes.array,
-    playerOverall: PropTypes.shape({
+    playerAbility: PropTypes.shape({
         currentValue: PropTypes.number,
         history: PropTypes.arrayOf(PropTypes.number)
     }),

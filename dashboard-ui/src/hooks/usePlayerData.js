@@ -19,7 +19,7 @@ export default function(queryKey, playerId) {
         data: isLoading || isIdle ? {} : {
             playerMetadata: playerData.metadata,
             playerRoles: playerData.roles,
-            playerOverall: {
+            playerAbility: {
                 currentValue: playerData.ability.current,
                 history: playerData.ability.history
             },
