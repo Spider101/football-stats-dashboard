@@ -41,7 +41,9 @@
       "<rootDir>/src/**/*.{js,jsx}",
       "!**/node_modules/**",
       "!<rootDir>/src/mocks/**",
-      "!**/*.stories.{js,jsx}"
+      "!<rootDir>/src/stories/**",
+      "!**/*[uU]tils*",
+      "!<rootDir>/src/{serviceWorker,constants,index}.js"
     ]
   },
   "eslintConfig": {
