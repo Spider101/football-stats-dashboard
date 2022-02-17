@@ -40,7 +40,7 @@ const CustomToolTip = ({ active, payload, label }) => {
 };
 CustomToolTip.propTypes = {
     active: PropTypes.bool,
-    payload: PropTypes.object,
+    payload: PropTypes.array,
     label: PropTypes.string
 
 };

@@ -33,10 +33,6 @@ export default function AttributeProgressChart({ attributeData }) {
                         isAnimationActive={attributeNames.length <= CHART_ANIMATION_THRESHOLD}
                     />
                 ))}
-                {/* figure out how to layer this on top of the chart */}
-                {/* <text x={500 / 2} y={20} fill="black" textAnchor="middle" dominantBaseline="central">
-                    <tspan fontSize="14">{chartTitle}</tspan>
-                </text> */}
                 <XAxis axisLine={false} tickFormatter={number => MONTHS[number]} tickLine={false} />
                 <YAxis axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomToolTip />} />

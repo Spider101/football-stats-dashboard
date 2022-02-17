@@ -92,8 +92,8 @@ const getChartFromType = (type, chartData, options = {}) => {
 export default function CardWithChart({ cardTitle, chartData, chartOptions, chartType }) {
     return (
         <Card>
-            <CardHeader title={ cardTitle }/>
-            <CardContent style={{ paddingTop: 0, paddingBottom: 0}}>
+            <CardHeader title={cardTitle} />
+            <CardContent style={{ paddingTop: 0, paddingBottom: 0 }} aria-label={chartType}>
                 <ResponsiveContainer width='100%' height={chartOptions.height}>
                     {getChartFromType(chartType, chartData, chartOptions)}
                 </ResponsiveContainer>
