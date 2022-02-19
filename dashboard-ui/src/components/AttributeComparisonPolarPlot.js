@@ -1,43 +1,69 @@
 import PropTypes from 'prop-types';
-import ReactApexChart from 'react-apexcharts';
+import {
+    Legend,
+    PolarAngleAxis,
+    PolarGrid,
+    PolarRadiusAxis,
+    Radar,
+    RadarChart,
+    ResponsiveContainer,
+    Tooltip
+} from 'recharts';
+import { useTheme } from '@material-ui/core/styles';
 
-import { useGlobalChartOptions } from '../context/chartOptionsProvider';
 import { playerAttributes } from '../constants';
+import { MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
+import { buildChartPalette } from '../utils';
+import CustomToolTip from './CustomToolTip';
+
+const transformGroupedAttributeData = playersWithGroupedAttributeData =>
+    playerAttributes.GROUPS.map(groupName => {
+        const attributeGroupData = Object.fromEntries(
+            playersWithGroupedAttributeData.map(playerData => {
+                const attributeGroup = playerData.attributes.find(attribute => attribute.groupName === groupName);
+                const attributesInGroup = attributeGroup?.attributesInGroup || [];
+                const attributeTotalByGroup = attributesInGroup.reduce((a, b) => a + b, 0);
+                const meanAttributeByGroup =
+                    attributeTotalByGroup === 0
+                        ? attributeTotalByGroup
+                        : Math.round(attributeTotalByGroup / attributesInGroup.length);
+                return [playerData.name, meanAttributeByGroup];
+            })
+        );
+        return {
+            groupName,
+            ...attributeGroupData
+        };
+    });
 
 export default function AttributeComparisonPolarPlot({ playersWithAttributes }) {
-    const globalChartOptions = useGlobalChartOptions();
+    const theme = useTheme();
+    const numGroups = playerAttributes.GROUPS.length;
+    const polarAxisAngle = 90 - (360/numGroups);
 
-    const options = {
-        ...globalChartOptions,
-        chart: { type: 'radar', toolbar: { show: false } },
-        fill: { opacity: 0.2 },
-        xaxis: {
-            labels: { style: { fontSize: '14px' } },
-            categories: playerAttributes.GROUPS
-        },
-        plotOptions: {
-            radar: {
-                polygons: {
-                    strokeColors: '#e9e9e9',
-                    fill: { colors: ['#f8f8f8', '#fff'] }
-                }
-            }
-        }
-    };
-
-    const series = playersWithAttributes.map(player => ({
-        name: player.name,
-        data: playerAttributes.GROUPS.map(groupName => {
-            const attributeGroup = player.attributes.find(attribute => attribute.groupName === groupName);
-            const attributesInGroup = attributeGroup?.attributesInGroup || [];
-            const attributesGroupTotal = attributesInGroup.reduce((a, b) => a + b, 0);
-            return attributesGroupTotal === 0
-                ? attributesGroupTotal
-                : Math.round(attributesGroupTotal / attributesInGroup.length);
-        })
-    }));
-
-    return <ReactApexChart options={options} series={series} type='radar' />;
+    const chartData = transformGroupedAttributeData(playersWithAttributes);
+    const { getPaletteColor } = buildChartPalette(theme);
+    return (
+        <ResponsiveContainer width='100%' height={500}>
+            <RadarChart data={chartData} outerRadius='100%' cy='60%'>
+                <PolarGrid />
+                <PolarRadiusAxis angle={polarAxisAngle} domain={[0, MAX_ATTR_VALUE]} />
+                <PolarAngleAxis dataKey='groupName' />
+                {playersWithAttributes.map((playerData, idx) => (
+                    <Radar
+                        key={playerData.name}
+                        dataKey={playerData.name}
+                        name={playerData.name}
+                        stroke={getPaletteColor(idx)}
+                        fill={getPaletteColor(idx)}
+                        fillOpacity={0.6}
+                    />
+                ))}
+                <Legend wrapperStyle={{bottom: -50}}/>
+                <Tooltip content={<CustomToolTip />}/>
+            </RadarChart>
+        </ResponsiveContainer>
+    );
 }
 
 AttributeComparisonPolarPlot.propTypes = {

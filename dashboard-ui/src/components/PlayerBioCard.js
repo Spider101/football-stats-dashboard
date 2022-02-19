@@ -20,7 +20,7 @@ const useStyles = makeStyles({
         display: 'flex',
         flexDirection: 'row'
     },
-    clubLogo: {
+    logo: {
         marginRight: 5,
         height: 25,
         width: 25
@@ -46,7 +46,7 @@ export default function PlayerBioCard({  name, club, clubLogo, dateOfBirth, age,
                     { name }
                 </Typography>
                 <div className={ classes.avatarGroup }>
-                    <Avatar className={classes.clubLogo} src={ clubLogo } />
+                    <Avatar className={classes.logo} src={ clubLogo } />
                     <Typography variant="subtitle1" color="textSecondary">
                         {  club }
                     </Typography>
@@ -55,7 +55,7 @@ export default function PlayerBioCard({  name, club, clubLogo, dateOfBirth, age,
                     { renderPlayerDOB(dateOfBirth, age) }
                 </Typography>
                 <div className={ classes.avatarGroup }>
-                    <Avatar className={classes.clubLogo} src={ countryLogo } />
+                    <Avatar className={classes.logo} src={ countryLogo } />
                     <Typography variant="subtitle1" color="textSecondary">
                         {  country }
                     </Typography>

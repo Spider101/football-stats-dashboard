@@ -25,5 +25,5 @@ export default {
 const Template = args => <AttributeProgressChart { ...args } />;
 export const Default = Template.bind({});
 Default.args = {
-    attributeData: getPlayerProgressionData(10, null, MAX_ATTR_VALUE)
+    attributeData: getPlayerProgressionData(10, MAX_ATTR_VALUE)
 };

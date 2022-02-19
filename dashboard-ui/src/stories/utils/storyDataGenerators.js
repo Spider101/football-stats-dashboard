@@ -154,15 +154,15 @@ export const getAttributes = (attributeList, hasHistory) =>
     });
 
 export const getPlayerData = (attributeNamesList, hasHistory = false) => {
-    const currentPlayerOverall = faker.datatype.number(MAX_OVERALL_VALUE);
-    const playerOverallHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_OVERALL_VALUE));
+    const currentPlayerAbility = faker.datatype.number(MAX_OVERALL_VALUE);
+    const playerAbilityHistory = [ ...Array(NUM_MONTHS - 1) ].map(() => faker.datatype.number(MAX_OVERALL_VALUE));
 
     return {
         playerMetadata: getPlayerMetadata(),
         playerRoles: getPlayerRolesMap(3, attributeNamesList),
-        playerOverall: {
-            currentValue: currentPlayerOverall,
-            history: [...playerOverallHistory, currentPlayerOverall]
+        playerAbility: {
+            currentValue: currentPlayerAbility,
+            history: [...playerAbilityHistory, currentPlayerAbility]
         },
         playerAttributes: getAttributes(
             attributeNamesList,
@@ -171,14 +171,24 @@ export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     };
 };
 
-export const getPlayerProgressionData = (numAttributes, keyName, maxValue) => {
+export const getPlayerProgressionData = (numAttributes, maxValue) => {
     return [ ...Array(numAttributes) ].map(() => ({
-        name: keyName || faker.hacker.noun(),
-        data: [ ...Array(6) ].map(() => faker.datatype.number(maxValue))
+        name: faker.hacker.noun(),
+        history: [...Array(NUM_MONTHS)].map(() => faker.datatype.number(maxValue))
     }));
 };
 
-export const getSquadHubTableData = (numRows, moraleIconsMap, withLink = false) => ({
+export const getPlayerAbilityData = () => ({
+    name: 'Player Ability',
+    history: [...Array(NUM_MONTHS)].map(() => faker.datatype.number(MAX_OVERALL_VALUE))
+});
+
+export const getCardWithChartData = (dataKeys, numDataPoints, maxValue) =>
+    [...Array(numDataPoints)].map(() =>
+        Object.fromEntries(dataKeys.map(dataKey => [dataKey, faker.datatype.number(maxValue)]))
+    );
+
+export const getSquadHubTableData = (numRows, moraleIconsMapping, withLink = false) => ({
     headers: allSquadHubTableHeaders,
     rows: [ ...Array(numRows) ].map(() => {
         const nationalityMetadata = _.sample(
@@ -187,14 +197,8 @@ export const getSquadHubTableData = (numRows, moraleIconsMap, withLink = false) 
                 flagURL: flagMetadata.countryFlagUrl
             }))
         );
-        const moraleEntity = _.sample(moraleIconsMap);
-        const chartData = {
-            type: 'bar',
-            series: [{
-                name: 'Match Rating',
-                data: [ ...Array(5) ].map(() => (Math.random() * 10).toFixed(2) + 1)
-            }]
-        };
+        const moraleEntity = _.sample(moraleIconsMapping);
+        const chartData = [...Array(5)].map(() => ({ form: faker.datatype.number({ min: 5, max: 10})}));
 
         const tableData = [
             {
@@ -252,7 +256,7 @@ export const getSquadHubPlayerData = (numPlayers, moraleList) => {
             }))),
             role: faker.name.jobType(),
             wages: faker.datatype.number({ max: 1000, min: 100 }),
-            form: [...Array(5)].map(() => faker.datatype.number(MAX_ATTR_VALUE)),
+            form: [...Array(5)].map(() => faker.datatype.number({ min: 5, max: 10 })),
             morale: _.sample(moraleList),
             current_ability: faker.datatype.number({ max: MAX_OVERALL_VALUE, min: 1 })
         }))

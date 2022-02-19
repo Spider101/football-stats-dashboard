@@ -1,7 +1,7 @@
-import ReactApexChart from 'react-apexcharts';
-import CardWithChart from '../widgets/CardWithChart';
+import { faker } from '@faker-js/faker';
 
-import { getPlayerProgressionData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './utils/storyDataGenerators';
+import CardWithChart from '../widgets/CardWithChart';
+import { getCardWithChartData, MAX_ATTR_VALUE, MAX_OVERALL_VALUE } from './utils/storyDataGenerators';
 
 export default {
     component: CardWithChart,
@@ -19,40 +19,31 @@ export default {
     }
 };
 
-const baseCardWithChartArgs = {
-    dataTransformer: x => x,
-    chartOptions: {
-        stroke: { width: 2, curve: 'straight' },
-        legend: { show: false },
-        xaxis: {
-            title: { text: 'Months', style: { fontFamily: 'Roboto' } },
-            categories: [1, 2, 3, 4, 5, 6]
-        }
-    }
-};
+const Template = args => <CardWithChart {...args} />;
 
-const Template = args => (
-    <CardWithChart { ...args }>
-        <ReactApexChart />
-    </CardWithChart>
-);
+const lineChartDataKeys = [...Array(10)].map(() => faker.hacker.noun());
 export const LineChart = Template.bind({});
 LineChart.args = {
-    ...baseCardWithChartArgs,
     cardTitle: 'Demo Line Chart in Card',
-    chartData: getPlayerProgressionData(10, null, MAX_ATTR_VALUE),
+    chartData: getCardWithChartData(lineChartDataKeys, 6, MAX_ATTR_VALUE),
+    chartOptions: { dataKeys: lineChartDataKeys, height: 500 },
     chartType: 'line'
 };
 
+const barChartDataKeys = ['playerAbility'];
 export const BarChart = Template.bind({});
 BarChart.args = {
-    ...baseCardWithChartArgs,
     cardTitle: 'Demo Bar Chart in Card',
-    chartData: getPlayerProgressionData(1, 'Player Ability', MAX_OVERALL_VALUE),
-    chartOptions: {
-        ...baseCardWithChartArgs.chartOptions,
-        plotOptions: { bar: { columnWidth: '15%' } },
-        dataLabels: { enabled: false },
-    },
+    chartData: getCardWithChartData(barChartDataKeys, 6, MAX_OVERALL_VALUE),
+    chartOptions: { dataKeys: barChartDataKeys, height: 500, barSize: 50 },
     chartType: 'bar'
+};
+
+const areaChartDataKeys = ['clubProfit'];
+export const AreaChart = Template.bind({});
+AreaChart.args = {
+    cardTitle: 'Demo Area Chart in Card',
+    chartData: getCardWithChartData(areaChartDataKeys, 6, MAX_OVERALL_VALUE),
+    chartOptions: { dataKeys: areaChartDataKeys, height: 500, barSize: 50 },
+    chartType: 'area'
 };

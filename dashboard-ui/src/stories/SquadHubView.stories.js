@@ -1,6 +1,6 @@
 import { MemoryRouter } from 'react-router-dom';
 
-import { moraleIconsMap } from '../constants';
+import { MORALE_ICON_MAPPING } from '../constants';
 
 import SquadHubView from '../views/SquadHubView';
 import { Success } from './AddPlayer.stories';
@@ -29,7 +29,7 @@ export default {
     ]
 };
 
-const moraleList = moraleIconsMap.map(entity => entity.morale);
+const moraleList = MORALE_ICON_MAPPING.map(entity => entity.morale);
 
 const Template = args => <SquadHubView {...args} />;
 

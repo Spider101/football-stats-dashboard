@@ -13,12 +13,9 @@ import { makeStyles } from '@material-ui/core';
 
 import EnhancedTableHeader from '../components/EnhancedTableHeader';
 import { capitalizeLabel, stableSortList } from '../utils';
-import ReactApexChart from 'react-apexcharts';
 import { Link } from 'react-router-dom';
-
-// constants
-const TABLE_CELL_CHART_HEIGHT = 40;
-const TABLE_CELL_CHART_WIDTH = 80;
+import { Bar, BarChart } from 'recharts';
+import { useTheme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
     table: {
@@ -34,9 +31,9 @@ const useStyles = makeStyles({
     }
 });
 
-const getStartingColumnName = (headers) => headers[0] !== undefined ? headers[0].id : '';
+const getStartingColumnName = headers => headers[0] !== undefined ? headers[0].id : '';
 
-const transformHeaderCells = (headerCells) => {
+const transformHeaderCells = headerCells => {
     return headerCells.map(headerCell => ({
         id: headerCell.id,
         label: capitalizeLabel(headerCell.id),
@@ -44,8 +41,15 @@ const transformHeaderCells = (headerCells) => {
     }));
 };
 
+const getCellChart = (chartData, dataKey, fillColor) => (
+    <BarChart data={chartData} width={80} height={40}>
+        <Bar dataKey={dataKey} fill={fillColor}/>
+    </BarChart>
+);
+
 export default function SortableTable({ headers, rows }) {
     const classes = useStyles();
+    const theme = useTheme();
 
     const [ order, setOrder ] = useState('asc');
     const [orderBy, setOrderBy ] = useState(getStartingColumnName(headers));
@@ -71,15 +75,6 @@ export default function SortableTable({ headers, rows }) {
         setOrderBy(property);
 
         setSortedRows(stableSortList(rows, newOrder, property));
-    };
-
-    // define how the charts in the table should look like
-    let chartData = {
-        options: {
-            chart: { sparkline: { enabled : true } }
-        },
-        height: TABLE_CELL_CHART_HEIGHT,
-        width: TABLE_CELL_CHART_WIDTH
     };
 
     return (
@@ -113,13 +108,11 @@ export default function SortableTable({ headers, rows }) {
                                                     />
                                                 );
                                             } else if (cell.type === 'chart') {
-                                                chartData = {
-                                                    ...chartData,
-                                                    type: cell.data.type,
-                                                    series: cell.data.series
-                                                };
-
-                                                tableCell = <ReactApexChart { ...chartData } />;
+                                                tableCell = getCellChart(
+                                                    cell.data,
+                                                    cell.id,
+                                                    theme.palette.primary.main
+                                                );
                                             } else {
                                                 tableCell = cell.data;
                                             }

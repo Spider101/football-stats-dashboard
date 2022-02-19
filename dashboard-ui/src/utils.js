@@ -85,3 +85,29 @@ export const transformIntoTabularData = (rawData, headers, filterByColumnNameFn,
         rows
     };
 };
+
+export const buildChartPalette = (theme= null, themePreference = 'light') => {
+    const lightPalette = ['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a', '#ff7c43', '#ffa600'];
+    const darkPalette = [
+        '#ebff93',
+        '#f2e2f6',
+        '#ffdfcb',
+        '#c2fe90',
+        '#feafca',
+        '#c3d9fd',
+        '#74fd8a',
+        '#76c5fc',
+        '#fd82c7'
+    ];
+
+    let chartPalette;
+    if (theme != null) {
+        chartPalette =[ theme.palette.primary.main, theme.palette.secondary.main];
+    } else {
+        chartPalette = themePreference === 'dark' ? darkPalette : lightPalette;
+    }
+
+    return {
+        getPaletteColor: idx => chartPalette[idx % chartPalette.length]
+    };
+};

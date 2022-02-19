@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 import SortableTable from '../widgets/SortableTable';
 
 import { getSquadHubTableData } from './utils/storyDataGenerators';
-import { moraleIconsMap } from '../constants';
+import { MORALE_ICON_MAPPING } from '../constants';
 
 export default {
     component: SortableTable,
@@ -20,12 +20,12 @@ export default {
 const Template = args => <SortableTable { ...args } />;
 
 export const Default = Template.bind({});
-Default.args = getSquadHubTableData(10, moraleIconsMap);
+Default.args = getSquadHubTableData(10, MORALE_ICON_MAPPING);
 
 
 export const WithRouterLink = Template.bind({});
 WithRouterLink.decorators = [Story => <MemoryRouter><Story/></MemoryRouter>];
-WithRouterLink.args = getSquadHubTableData(10, moraleIconsMap, true);
+WithRouterLink.args = getSquadHubTableData(10, MORALE_ICON_MAPPING, true);
 
 export const EmptyRows = Template.bind({});
 EmptyRows.args = {

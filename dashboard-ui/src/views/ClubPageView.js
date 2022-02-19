@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types';
-import ReactApexChart from 'react-apexcharts';
 
 import Grid from '@material-ui/core/Grid';
 
@@ -8,7 +7,8 @@ import CardWithChart from '../widgets/CardWithChart';
 import BoardObjectives from '../widgets/BoardObjectives';
 
 // TODO: remove this once the fake data generators are replaced
-import { getLeagueTableData, getPlayerProgressionData, MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
+import { getCardWithChartData, getLeagueTableData, MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
+import { MONTHS } from '../constants';
 
 export default function ClubPageView({ club }) {
     return (
@@ -38,26 +38,21 @@ export default function ClubPageView({ club }) {
 
 const ClubSuccessChart = () => {
     // TODO: remove this fake data with the real thing
-    const clubSuccessData = {
-        cardTitle: 'League History',
-        chartData: getPlayerProgressionData(1, 'League Finish', MAX_ATTR_VALUE),
-        dataTransformer: x => x,
-        chartOptions: {
-            stroke: { width: 2, curve: 'straight' },
-            legend: { show: false },
-            xaxis: {
-                title: { text: 'Year', style: { fontFamily: 'Roboto' } },
-                categories: [1, 2, 3, 4, 5, 6]
-            },
-            yaxis: { reversed: true, min: 1 }
-        }
+    const clubSuccessDataKeys = ['leagueFinish'];
+    const chartOptions = {
+        height: 260,
+        dataKeys: clubSuccessDataKeys,
+        barSize: 80
     };
 
     return (
         <Grid item xs>
-            <CardWithChart {...clubSuccessData}>
-                <ReactApexChart height={260} />
-            </CardWithChart>
+            <CardWithChart
+                cardTitle='League History'
+                chartType='bar'
+                chartData={getCardWithChartData(clubSuccessDataKeys, MONTHS.length, MAX_ATTR_VALUE)}
+                chartOptions={chartOptions}
+            />
         </Grid>
     );
 };
@@ -66,30 +61,26 @@ const ClubFinancesChart = ({ income, expenditure }) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     // TODO: build full array once income and expenditure history (month-wise) tracking is implemented
-    const profit = [ (income - expenditure), ...Array(months.length).fill(0) ];
+    const profit = [ income - expenditure, ...Array(months.length).fill(0) ];
 
-    const clubFinancesData = {
-        cardTitle: 'Club Finances',
-        chartData: [
-            { name: 'Profit', data: [...Array(months.length)].map((_, idx) => ({ x: months[idx], y: profit[idx] })) }
-        ],
-        chartOptions: {
-            stroke: { curve: 'straight' },
-            dataLabels: { enabled: false },
-            fill: { opacity: 0.5 },
-            xaxis: {
-                title: { text: 'Months' },
-            }
-        },
-        dataTransformer: x => x,
-        chartType: 'area'
+    const clubFinancesDataKeys = ['profit'];
+    const chartOptions = {
+        height: 260,
+        fillOpacity: 50,
+        dataKeys: clubFinancesDataKeys
     };
+    const chartData = [...Array(months.length)].map((_, idx) =>
+        Object.fromEntries(clubFinancesDataKeys.map(dataKey => [dataKey, profit[idx]]))
+    );
 
     return (
         <Grid item xs>
-            <CardWithChart {...clubFinancesData}>
-                <ReactApexChart height={260} />
-            </CardWithChart>
+            <CardWithChart
+                cardTitle='Club Finances'
+                chartType='area'
+                chartData={chartData}
+                chartOptions={chartOptions}
+            />
         </Grid>
     );
 };
@@ -99,21 +90,27 @@ ClubFinancesChart.propTypes = {
 };
 
 const BudgetBreakdownChart = ({ transferBudget, wageBudget }) => {
-    const transferBudgetData = {
-        cardTitle: 'Budget for EY 2021',
-        chartData: [transferBudget, wageBudget],
-        dataTransformer: x => x,
-        chartOptions: {
-            labels: ['Transfers', 'Wages']
-        },
-        chartType: 'donut'
+    const budgetBreakdownDataKeys = ['value'];
+    const chartData = [{
+        name: 'Transfers',
+        value: transferBudget
+    }, {
+        name: 'Wages',
+        value: wageBudget
+    }];
+    const chartOptions = {
+        height: 500,
+        dataKeys: budgetBreakdownDataKeys
     };
 
     return (
         <Grid item xs>
-            <CardWithChart {...transferBudgetData}>
-                <ReactApexChart height={500} />
-            </CardWithChart>
+            <CardWithChart
+                cardTitle='Budget for EY 2021'
+                chartType='donut'
+                chartData={chartData}
+                chartOptions={chartOptions}
+            />
         </Grid>
     );
 };

@@ -16,7 +16,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { capitalizeLabel } from '../utils';
-import { caseFormat, playerAttributeMetadata, playerNationalityList, roleMetadata } from '../constants';
+import { caseFormat, PLAYER_ATTRIBUTE_METADATA, PLAYER_NATIONS, PLAYER_ROLE_NAMES } from '../constants';
 import { useLookupData } from '../context/LookupDataProvider';
 
 export const getStepper = activeStep => {
@@ -43,17 +43,17 @@ export const getAddPlayerFormSchema = () => ({
     metadata: { name: '', age: '', country: '' },
     role: { name: '', associatedAttributes: [] },
     technicalAttributes: Object.fromEntries(
-        playerAttributeMetadata
+        PLAYER_ATTRIBUTE_METADATA
             .filter(attributeMetadata => attributeMetadata.category === 'technical')
             .map(attributeMetadata => [attributeMetadata.name, attributeMetadata.defaultValue])
     ),
     physicalAttributes: Object.fromEntries(
-        playerAttributeMetadata
+        PLAYER_ATTRIBUTE_METADATA
             .filter(attributeMetadata => attributeMetadata.category === 'physical')
             .map(attributeMetadata => [attributeMetadata.name, attributeMetadata.defaultValue])
     ),
     mentalAttributes: Object.fromEntries(
-        playerAttributeMetadata
+        PLAYER_ATTRIBUTE_METADATA
             .filter(attributeMetadata => attributeMetadata.category === 'mental')
             .map(attributeMetadata => [attributeMetadata.name, attributeMetadata.defaultValue])
     )
@@ -138,7 +138,7 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 select
             >
                 {countryFlagMetadata
-                    .filter(flagMetadata => playerNationalityList.includes(flagMetadata.name))
+                    .filter(flagMetadata => PLAYER_NATIONS.includes(flagMetadata.name))
                     .map(flagMetadata => (
                         <MenuItem key={flagMetadata.id} value={flagMetadata.name}>
                             {/* hide the flag when a country is selected */}
@@ -246,7 +246,7 @@ const PlayerRoleForm = ({ newPlayerRoleData, newPlayerRoleValidations, handleCha
                 helperText={newPlayerRoleValidations.name}
                 select
             >
-                {roleMetadata.map(roleName => (
+                {PLAYER_ROLE_NAMES.map(roleName => (
                     <MenuItem key={roleName} value={roleName}>
                         {capitalizeLabel(roleName, caseFormat.CAMEL_CASE)}
                     </MenuItem>
@@ -267,7 +267,7 @@ const PlayerRoleForm = ({ newPlayerRoleData, newPlayerRoleValidations, handleCha
                     MenuProps={MenuProps}
                     renderValue={renderChipsFn}
                 >
-                    {playerAttributeMetadata
+                    {PLAYER_ATTRIBUTE_METADATA
                         .map(attributeMetadata => attributeMetadata.name)
                         .map(attributeName => (
                             <MenuItem key={attributeName} value={attributeName}>

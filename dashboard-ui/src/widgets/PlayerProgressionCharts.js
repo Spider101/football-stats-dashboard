@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 
 import CustomizableTabs, { TabPanel } from '../components/CustomizableTabs';
 import AttributeProgressChart from '../components/AttributeProgressChart';
-import OverallProgressChart from '../components/OverallProgressChart';
+import AbilityProgressChart from '../components/AbilityProgressChart';
 
-export default function PlayerProgressionCharts({ playerAttributeProgressData, playerOverallProgressData }) {
+export default function PlayerProgressionCharts({ playerAttributeProgressData, playerAbilityProgressData }) {
     const [ tabValue, setTabValue ] = useState(0);
 
     const handleTabChange = (_, newTabValue) => {
@@ -19,13 +19,13 @@ export default function PlayerProgressionCharts({ playerAttributeProgressData, p
                 tabValue= { tabValue }
                 isFullWidth={ false }
                 ariaLabel="Player Progression Chart Tabs"
-                tabLabels={['Attribute Progress', 'Overall Progress']}
+                tabLabels={['Attribute Progress', 'Ability Progress']}
             >
-                <TabPanel value={ tabValue } index={0}>
+                <TabPanel value={ tabValue } index={0} panelLabel='Attribute Progress Chart'>
                     <AttributeProgressChart { ...playerAttributeProgressData } />
                 </TabPanel>
-                <TabPanel value={ tabValue } index={1}>
-                    <OverallProgressChart { ...playerOverallProgressData } />
+                <TabPanel value={ tabValue } index={1} panelLabel='Ability Progress Chart'>
+                    <AbilityProgressChart { ...playerAbilityProgressData } />
                 </TabPanel>
             </CustomizableTabs>
         </div>
@@ -34,5 +34,5 @@ export default function PlayerProgressionCharts({ playerAttributeProgressData, p
 
 PlayerProgressionCharts.propTypes = {
     playerAttributeProgressData: PropTypes.shape(AttributeProgressChart.propTypes.attributeData),
-    playerOverallProgressData: PropTypes.shape(OverallProgressChart.propTypes.overallData)
+    playerAbilityProgressData: PropTypes.shape(AbilityProgressChart.propTypes.abilityData)
 };

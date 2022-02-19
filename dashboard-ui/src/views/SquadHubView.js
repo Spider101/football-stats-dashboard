@@ -5,7 +5,7 @@ import _ from 'lodash';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { moraleIconsMap } from '../constants';
+import { MORALE_ICON_MAPPING } from '../constants';
 import SortableTable from '../widgets/SortableTable';
 import TableFilterControl from '../components/TableFilterControl';
 
@@ -29,6 +29,7 @@ const squadTableHeaderDisplayTypeMap = {
 
 // TODO: define a more appropriate method for this
 const getSortValueForForm = matchRatingsList => matchRatingsList.length > 0 && matchRatingsList[0];
+const transformFormData = formData => formData.map(form => ({ form }));
 
 const buildHeaderDataForSquadTable = headerNames =>
     headerNames
@@ -62,7 +63,7 @@ const buildRowDataForSquadTable = players => {
                 row = {
                     id: key,
                     type: 'icon',
-                    data: moraleIconsMap.find(entity => entity.morale === value).icon,
+                    data: MORALE_ICON_MAPPING.find(entity => entity.morale === value).icon,
                     metadata: { sortValue: value }
                 };
                 break;
@@ -70,15 +71,7 @@ const buildRowDataForSquadTable = players => {
                 row = {
                     id: key,
                     type: 'chart',
-                    data: {
-                        type: 'bar',
-                        series: [
-                            {
-                                name: 'Match Rating',
-                                data: value
-                            }
-                        ]
-                    },
+                    data: transformFormData(value),
                     metadata: { sortValue: getSortValueForForm(value) || 0 }
                 };
                 break;
