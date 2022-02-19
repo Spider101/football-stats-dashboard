@@ -23,14 +23,17 @@ const StyledToolTip = withStyles(styles)(({ classes, children }) => (
     </div>
 ));
 
-const CustomToolTip = ({ active, payload, label }) => {
+const CustomToolTip = ({ active, payload, label, shouldShowNegativeValues = true }) => {
+    console.log(shouldShowNegativeValues);
     if (active) {
         return (
             <StyledToolTip>
                 <p>{label}</p>
                 {payload.map(item => (
                     <p style={{ color: `${item.stroke || item.fill}` }} key={item.name}>
-                        { `${capitalizeLabel(item.name,caseFormat.CAMEL_CASE)} : ${item.value}` }
+                        {`${capitalizeLabel(item.name, caseFormat.CAMEL_CASE)} : ${
+                            shouldShowNegativeValues ? item.value : Math.abs(item.value)
+                        }`}
                     </p>
                 ))}
             </StyledToolTip>
@@ -41,7 +44,7 @@ const CustomToolTip = ({ active, payload, label }) => {
 CustomToolTip.propTypes = {
     active: PropTypes.bool,
     payload: PropTypes.array,
-    label: PropTypes.string
-
+    label: PropTypes.string,
+    shouldShowNegativeValues: PropTypes.bool
 };
 export default CustomToolTip;

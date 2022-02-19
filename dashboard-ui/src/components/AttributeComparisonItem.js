@@ -42,7 +42,7 @@ export default function AttributeComparisonItem({ attrComparisonItem: { attrValu
         >
             <ListItemText primary={label} />
             <BarChart layout='vertical' data={chartData} stackOffset='sign' width={300} height={50}>
-                <Tooltip wrapperStyle={{ zIndex: 1000 }} content={<CustomToolTip />} />
+                <Tooltip wrapperStyle={{ zIndex: 1000 }} content={<CustomToolTip shouldShowNegativeValues={false} />} />
                 {attrValues.map((attr, idx) => (
                     <Bar
                         isAnimationActive={false}
@@ -52,8 +52,8 @@ export default function AttributeComparisonItem({ attrComparisonItem: { attrValu
                         fill={getPaletteColor(idx)}
                     />
                 ))}
-                <XAxis hide={true} type='number' domain={chartRange}/>
-                <YAxis hide={true} dataKey='name' type='category'/>
+                <XAxis hide={true} type='number' domain={chartRange} />
+                <YAxis hide={true} dataKey='name' type='category' />
             </BarChart>
         </ListItem>
     );

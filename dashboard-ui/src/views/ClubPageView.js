@@ -61,7 +61,7 @@ const ClubFinancesChart = ({ income, expenditure }) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
     // TODO: build full array once income and expenditure history (month-wise) tracking is implemented
-    const profit = [ Math.abs(income - expenditure), ...Array(months.length).fill(0) ];
+    const profit = [ income - expenditure, ...Array(months.length).fill(0) ];
 
     const clubFinancesDataKeys = ['profit'];
     const chartOptions = {
