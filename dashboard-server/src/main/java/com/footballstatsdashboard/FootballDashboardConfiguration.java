@@ -19,7 +19,16 @@ public class FootballDashboardConfiguration extends Configuration {
     @JsonProperty
     private CouchbaseClientConfiguration couchbase;
 
+    @Valid
+    @NotNull
+    @JsonProperty
+    private boolean shouldStartCouchbaseServer;
+
     public CouchbaseClientConfiguration getCouchbaseClientConfiguration() {
         return couchbase;
+    }
+
+    public boolean isShouldStartCouchbaseServer() {
+        return shouldStartCouchbaseServer;
     }
 }

@@ -1,5 +1,7 @@
 appId: "1234"
 
+shouldStartCouchbaseServer: false
+
 couchbase:
   clusters:
     defaultCluster:

@@ -70,7 +70,11 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         // setup couchbase cluster and bucket
         CouchbaseClientManager couchbaseClientManager = new CouchbaseClientManager(getName(), environment,
                 configuration.getCouchbaseClientConfiguration());
-        environment.lifecycle().manage(couchbaseClientManager);
+
+        // skip starting the couchbase server if need be
+        if (configuration.isShouldStartCouchbaseServer()) {
+            environment.lifecycle().manage(couchbaseClientManager);
+        }
 
         Map<String, ClusterConfiguration> clusterConfig = configuration.getCouchbaseClientConfiguration().getClusters();
         String clusterName = clusterConfig.entrySet().iterator().next().getKey();
