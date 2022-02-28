@@ -11,6 +11,10 @@ couchbase:
       buckets:
         - "dashboard-data"
 
+fileUpload:
+  maxSizeInBytes: 5242880
+  allowedMediaTypes: ['image/jpeg', 'image/png']
+
 logging:
   level: INFO
   loggers:
