@@ -22,16 +22,19 @@ import com.footballstatsdashboard.db.key.UserKeyProvider;
 import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
 import com.footballstatsdashboard.resources.ClubResource;
 import com.footballstatsdashboard.resources.CountryFlagsLookupResource;
+import com.footballstatsdashboard.resources.FileUploadResource;
 import com.footballstatsdashboard.resources.MatchPerformanceResource;
 import com.footballstatsdashboard.resources.PlayerResource;
 import com.footballstatsdashboard.resources.UserResource;
 import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.CountryFlagsLookupService;
+import com.footballstatsdashboard.services.FileUploadService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthValueFactoryProvider;
 import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
+import io.dropwizard.forms.MultiPartBundle;
 import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -58,7 +61,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
 
     @Override
     public void initialize(final Bootstrap<FootballDashboardConfiguration> bootstrap) {
-        // TODO: application initialization
+        bootstrap.addBundle(new MultiPartBundle());
     }
 
     @Override
@@ -112,6 +115,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         ClubService clubService = new ClubService(clubCouchbaseDAO);
         PlayerService playerService = new PlayerService(playerCouchbaseDAO);
         CountryFlagsLookupService countryFlagsLookupService = new CountryFlagsLookupService();
+        FileUploadService fileUploadService = new FileUploadService(configuration.getFileUploadConfiguration());
 
         // setup resources
         environment.jersey().register(new UserResource(userCouchbaseDAO, authTokenDAO));
@@ -119,6 +123,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         environment.jersey().register(new ClubResource(clubService));
         environment.jersey().register(new MatchPerformanceResource(matchPerformanceDAO));
         environment.jersey().register(new CountryFlagsLookupResource(countryFlagsLookupService));
+        environment.jersey().register(new FileUploadResource(fileUploadService));
 
         // Register OAuth authentication
         environment.jersey()
