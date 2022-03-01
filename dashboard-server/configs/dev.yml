@@ -12,6 +12,7 @@ couchbase:
         - "dashboard-data"
 
 fileUpload:
+  uploadPath: "uploads"
   maxSizeInBytes: 5242880
   allowedMediaTypes: ['image/jpeg', 'image/png']
 

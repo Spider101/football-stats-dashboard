@@ -32,8 +32,10 @@ public class FileUploadServiceTest {
         FileUploadConfiguration fileUploadConfiguration = new FileUploadConfiguration();
         fileUploadConfiguration.setAllowedMediaTypes(ImmutableList.of("image/jpeg", "image/png"));
         fileUploadConfiguration.setMaxSizeInBytes((long) (1024 * 1024));
+        fileUploadConfiguration.setUploadPath(Paths.get("src", "test", "resources", "uploads").toString());
+
         fileUploadService = new FileUploadService(fileUploadConfiguration);
-        fileUploadService.initializeService(pathToUploadDir.toString());
+        fileUploadService.initializeService();
     }
 
     @Test

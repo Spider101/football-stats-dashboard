@@ -25,11 +25,12 @@ public class FileUploadService implements IFileUploadService {
     }
 
     @Override
-    public void initializeService(String uploadDir) {
+    public void initializeService() {
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Initializing file upload service");
+            LOGGER.info("Initializing file upload service...");
         }
-        uploadPath = Paths.get(uploadDir);
+
+        uploadPath = Paths.get(System.getProperty("user.dir"), this.fileUploadConfiguration.getUploadPath());
         if (!Files.exists(uploadPath) || !Files.isDirectory(uploadPath)) {
             try {
                 if (LOGGER.isInfoEnabled()) {
@@ -61,7 +62,9 @@ public class FileUploadService implements IFileUploadService {
             throw new ServiceException(HttpStatus.UNPROCESSABLE_ENTITY_422, errorMessage);
         }
 
-        String fileKey = fileName.replace(fileExtension.get(), "") + UUID.randomUUID() + fileExtension.get();
+        // replace the extension (like .jpeg) with a delimiter
+        // then append a random UUID and the file extension back again
+        String fileKey = fileName.replace(fileExtension.get(), "_") + UUID.randomUUID() + fileExtension.get();
         try {
             Files.copy(fileStream, this.uploadPath.resolve(fileKey));
         } catch (IOException e) {

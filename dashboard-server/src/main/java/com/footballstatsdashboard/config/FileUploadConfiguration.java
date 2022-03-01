@@ -16,6 +16,10 @@ public class FileUploadConfiguration {
     @JsonProperty
     private List<String> allowedMediaTypes;
 
+    @NotNull
+    @JsonProperty
+    private String uploadPath;
+
     public Long getMaxSizeInBytes() {
         return maxSizeInBytes;
     }
@@ -30,5 +34,13 @@ public class FileUploadConfiguration {
 
     public void setAllowedMediaTypes(List<String> allowedMediaTypes) {
         this.allowedMediaTypes = allowedMediaTypes;
+    }
+
+    public String getUploadPath() {
+        return uploadPath;
+    }
+
+    public void setUploadPath(String uploadPath) {
+        this.uploadPath = uploadPath;
     }
 }
