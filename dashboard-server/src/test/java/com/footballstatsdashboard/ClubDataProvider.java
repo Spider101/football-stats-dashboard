@@ -40,6 +40,7 @@ public final class ClubDataProvider {
     public static final class ClubBuilder {
         private boolean isExistingClub = false;
         private String customClubName = null;
+        private String customClubLogo = null;
         private UUID existingUserId = null;
         private BigDecimal customTransferBudget;
         private BigDecimal customWageBudget;
@@ -86,6 +87,11 @@ public final class ClubDataProvider {
             return this;
         }
 
+        public ClubBuilder withCustomClubLogo(String clubLogoKey) {
+            this.customClubLogo = clubLogoKey;
+            return this;
+        }
+
         public ClubBuilder existingUserId(UUID userId) {
             this.existingUserId = userId;
             return this;
@@ -129,6 +135,7 @@ public final class ClubDataProvider {
                     .build();
             return this.baseClub
                     .name(this.customClubName != null ? this.customClubName : DEFAULT_CLUB_NAME)
+                    .logo(this.customClubLogo != null ? this.customClubLogo : "fake club logo file key")
                     .managerFunds(this.customManagerFunds != null ? this.customManagerFunds : defaultManagerFunds)
                     .transferBudget(this.customTransferBudget != null ?
                             this.customTransferBudget : DEFAULT_TRANSFER_BUDGET)
@@ -159,6 +166,11 @@ public final class ClubDataProvider {
 
         public ModifiedClubBuilder withUpdatedName(String newName) {
             baseClub.name(newName);
+            return this;
+        }
+
+        public ModifiedClubBuilder withUpdatedClubLogo(String newClubLogoFileKey) {
+            baseClub.logo(newClubLogoFileKey);
             return this;
         }
 
