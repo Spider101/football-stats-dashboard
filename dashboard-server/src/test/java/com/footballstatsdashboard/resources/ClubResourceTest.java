@@ -156,7 +156,7 @@ public class ClubResourceTest {
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .withIncome()
-                .withCustomClubLogo("invalid club logo file key")
+                .withCustomClubLogo("../../maliciousFileKey.png")
                 .withExpenditure()
                 .build();
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
@@ -252,7 +252,7 @@ public class ClubResourceTest {
                 .build();
         Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
                 .from(incomingClubBase)
-                .withUpdatedClubLogo("new invalid club logo file key")
+                .withUpdatedClubLogo("../../newInvalidFileKey.png")
                 .withUpdatedTransferBudget(updatedTransferBudget)
                 .withUpdatedWageBudget(updatedWageBudget)
                 .withUpdatedManagerFunds(totalFunds)

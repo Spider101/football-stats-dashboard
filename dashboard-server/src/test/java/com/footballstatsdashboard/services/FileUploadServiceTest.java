@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Comparator;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 
@@ -84,6 +85,35 @@ public class FileUploadServiceTest {
         } catch (IOException ioException) {
             fail("Failed to save file!");
         }
+    }
+
+    @Test
+    public void doesFileExistReturnsTrueForAValidFileKey() throws IOException {
+        // setup
+        String imageFileName = "stockPhoto";
+        String imageFileExtension = ".jpeg";
+        String fileKey = imageFileName + UUID.randomUUID() + imageFileExtension;
+        Files.copy(pathToResourcesDir.resolve(imageFileName + imageFileExtension), pathToUploadDir.resolve(fileKey));
+
+        // execute
+        boolean doesFileExist = fileUploadService.doesFileExist(fileKey);
+
+        // assert
+        assertTrue(doesFileExist);
+    }
+
+    @Test
+    public void doesFileExistReturnsTrueForInvalidFileKey() {
+        // setup
+        String imageFileName = "stockPhoto";
+        String imageFileExtension = ".jpeg";
+        String maliciousFileKey = "../" + imageFileName + imageFileExtension;
+
+        // execute
+        boolean doesFileExist = fileUploadService.doesFileExist(maliciousFileKey);
+
+        // assert
+        assertFalse(doesFileExist);
     }
 
     @AfterClass

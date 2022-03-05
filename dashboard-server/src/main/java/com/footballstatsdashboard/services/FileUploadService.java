@@ -72,7 +72,9 @@ public class FileUploadService implements IFileUploadService {
     }
 
     public boolean doesFileExist(String fileKey) {
-        return Files.exists(this.uploadPath.resolve(fileKey));
+        // sanitize file key to remove any malicious characters like '../' to change directories
+        String sanitizedFileKey = fileKey.replaceAll("[^0-9_a-zA-Z\\-](?!jpg|jpeg|png)", "");
+        return Files.exists(this.uploadPath.resolve(sanitizedFileKey));
     }
 
     // TODO: 04/03/22 add method for loading file input stream from disk to stream to client

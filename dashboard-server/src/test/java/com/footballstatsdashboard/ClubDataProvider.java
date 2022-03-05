@@ -38,6 +38,8 @@ public final class ClubDataProvider {
      * Helps in building a club entity according to the needs of a test
      */
     public static final class ClubBuilder {
+        private static final String VALID_CLUB_LOGO_FILE_KEY = "clubLogoFileKey.png";
+
         private boolean isExistingClub = false;
         private String customClubName = null;
         private String customClubLogo = null;
@@ -135,7 +137,7 @@ public final class ClubDataProvider {
                     .build();
             return this.baseClub
                     .name(this.customClubName != null ? this.customClubName : DEFAULT_CLUB_NAME)
-                    .logo(this.customClubLogo != null ? this.customClubLogo : "fake club logo file key")
+                    .logo(this.customClubLogo != null ? this.customClubLogo : VALID_CLUB_LOGO_FILE_KEY)
                     .managerFunds(this.customManagerFunds != null ? this.customManagerFunds : defaultManagerFunds)
                     .transferBudget(this.customTransferBudget != null ?
                             this.customTransferBudget : DEFAULT_TRANSFER_BUDGET)
