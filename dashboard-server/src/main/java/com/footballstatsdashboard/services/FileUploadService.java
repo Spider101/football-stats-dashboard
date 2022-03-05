@@ -24,7 +24,6 @@ public class FileUploadService implements IFileUploadService {
         this.fileUploadConfiguration = fileUploadConfiguration;
     }
 
-    @Override
     public void initializeService() {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Initializing file upload service...");
@@ -44,7 +43,6 @@ public class FileUploadService implements IFileUploadService {
         }
     }
 
-    @Override
     public String storeFile(InputStream fileStream, String fileName, String mediaType, long fileSizeInBytes) {
         Optional<String> fileExtension = getExtensionFromFileName(fileName);
         if (fileExtension.isEmpty() ||
@@ -71,6 +69,10 @@ public class FileUploadService implements IFileUploadService {
             throw new RuntimeException("Could not save file stream to location: " + this.uploadPath);
         }
         return fileKey;
+    }
+
+    public boolean doesFileExist(String fileKey) {
+        return Files.exists(this.uploadPath.resolve(fileKey));
     }
 
     private Optional<String> getExtensionFromFileName(String filename) {
