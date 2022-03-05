@@ -40,6 +40,12 @@ public interface Club {
     String getName();
 
     /**
+     * key for club logo image file
+     */
+    @Valid
+    String getLogo();
+
+    /**
      * funds allocated to the manager from the club's finances
      */
     @Valid

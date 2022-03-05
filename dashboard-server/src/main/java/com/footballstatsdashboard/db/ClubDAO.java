@@ -27,6 +27,7 @@ public class ClubDAO<K> extends CouchbaseDAO<K> {
     }
 
     public List<ClubSummary> getClubSummariesByUserId(UUID userId) {
+        // TODO: 04/03/22 grab the club logo file key from the club document as well
         String query = String.format("Select club.id as clubId, club.name, club.createdDate from `%s` club" +
                         " where club.type = 'Club' and club.userId = $userId",
                 this.getBucketNameResolver().get());

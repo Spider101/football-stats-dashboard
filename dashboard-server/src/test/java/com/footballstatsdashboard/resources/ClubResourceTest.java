@@ -11,6 +11,7 @@ import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
+import com.footballstatsdashboard.services.FileUploadService;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
@@ -54,6 +55,9 @@ public class ClubResourceTest {
     private ClubService clubService;
 
     @Mock
+    private FileUploadService fileUploadService;
+
+    @Mock
     private UriInfo uriInfo;
 
     /**
@@ -74,7 +78,8 @@ public class ClubResourceTest {
                 .lastName("")
                 .build();
 
-        clubResource = new ClubResource(clubService);
+        clubResource = new ClubResource(clubService, fileUploadService);
+        verify(fileUploadService).initializeService();
     }
 
     /**
@@ -126,6 +131,7 @@ public class ClubResourceTest {
                 .withExpenditure()
                 .build();
         when(clubService.createClub(any(), any(), anyString())).thenReturn(createdClub);
+        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClub, uriInfo);
@@ -138,6 +144,29 @@ public class ClubResourceTest {
         // a clubId is set on the club instance created despite not setting one explicitly due to the way the
         // interface has been set up
         assertEquals(URI_PATH + "/" + incomingClub.getId().toString(), clubResponse.getLocation().getPath());
+    }
+
+    /**
+     * given a valid club entity in the request with an invalid club logo file key, tests that the club data is
+     * not persisted and a service exception is thrown
+     */
+    @Test(expected = ServiceException.class)
+    public void createClubWithInvalidClubLogoFileKey() {
+        // assert
+        Club incomingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withIncome()
+                .withCustomClubLogo("../../maliciousFileKey.png")
+                .withExpenditure()
+                .build();
+        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
+
+        // execute
+        clubResource.createClub(userPrincipal, incomingClub, uriInfo);
+
+        // assert
+        verify(fileUploadService).doesFileExist(anyString());
+        verify(clubService, never()).createClub(any(), any(), anyString());
     }
 
     /**
@@ -178,6 +207,8 @@ public class ClubResourceTest {
                 .build();
         when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClub);
 
+        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
+
         // execute
         Response clubResponse = clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
 
@@ -194,6 +225,47 @@ public class ClubResourceTest {
         assertEquals(userPrincipal.getId(), clubInResponse.getUserId());
         assertEquals(userPrincipal.getEmail(), clubInResponse.getCreatedBy());
         assertEquals(LocalDate.now(), clubInResponse.getLastModifiedDate());
+    }
+
+    /**
+     * given a valid club entity in the request with an invalid club logo file key, tests that the club data is
+     * not updated and a service exception is thrown
+     */
+    @Test(expected = ServiceException.class)
+    public void updateClubWhenIncomingClubHasInvalidClubLogoFileKey() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userPrincipal.getId())
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+
+        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedClubLogo("../../newInvalidFileKey.png")
+                .withUpdatedTransferBudget(updatedTransferBudget)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedManagerFunds(totalFunds)
+                .build();
+        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
+
+        // execute
+        clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
+
+        // assert
+        verify(fileUploadService).doesFileExist(anyString());
+        verify(clubService, never()).getClub(any(), any());
+        verify(clubService, never()).updateClub(any(), any(), any());
     }
 
     /**
@@ -218,6 +290,8 @@ public class ClubResourceTest {
                 .isExisting(false)
                 .withId(incorrectIncomingClubId)
                 .build();
+
+        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
         clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
@@ -258,6 +332,8 @@ public class ClubResourceTest {
                 .withUpdatedManagerFunds(totalFunds)
                 .build();
 
+        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
+
         // execute
         clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
 
@@ -290,6 +366,7 @@ public class ClubResourceTest {
     public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
         UUID userId = userPrincipal.getId();
+        // TODO: 04/03/22 update data provider to include club logo file key when ready
         List<ClubSummary> mockClubData = ClubDataProvider.getAllClubSummariesForUser(userId);
         when(clubService.getClubSummariesByUserId(any())).thenReturn(mockClubData);
 

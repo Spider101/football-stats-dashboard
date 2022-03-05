@@ -29,6 +29,9 @@ public final class Constants {
     public static final String MATCH_PERFORMANCE_ID_PATH = "/{" + MATCH_PERFORMANCE_ID + "}";
     public static final String MATCH_PERFORMANCE_LOOKUP_PATH = "/lookup" + PLAYER_ID_PATH;
 
+    public static final String COUNTRY_FLAG_LOOKUP_V1_BASE_PATH = "football-stats-dashboard/v1/lookup/countryFlags";
+    public static final String FILE_UPLOAD_V1_BASE_PATH = "football-stats-dashboard/v1/upload";
+
     public static final int HASHING_COST = 12;
     public static final String COUNTRY_CODE_MAPPING_FNAME = "countryCodeMapping.json";
     public static final String COUNTRY_FLAG_URL_TEMPLATE = "https://flagcdn.com/w40/%s.png";

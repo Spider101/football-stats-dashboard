@@ -1,5 +1,7 @@
 appId: "1234"
 
+shouldStartCouchbaseServer: false
+
 couchbase:
   clusters:
     defaultCluster:
@@ -8,6 +10,11 @@ couchbase:
       host: "localhost"
       buckets:
         - "dashboard-data"
+
+fileUpload:
+  uploadPath: "uploads"
+  maxSizeInBytes: 5242880
+  allowedMediaTypes: ['image/jpeg', 'image/png']
 
 logging:
   level: INFO
