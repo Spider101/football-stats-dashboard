@@ -366,6 +366,7 @@ public class ClubResourceTest {
     public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
         UUID userId = userPrincipal.getId();
+        // TODO: 04/03/22 update data provider to include club logo file key when ready
         List<ClubSummary> mockClubData = ClubDataProvider.getAllClubSummariesForUser(userId);
         when(clubService.getClubSummariesByUserId(any())).thenReturn(mockClubData);
 

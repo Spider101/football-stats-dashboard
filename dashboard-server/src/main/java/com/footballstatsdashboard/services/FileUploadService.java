@@ -75,6 +75,8 @@ public class FileUploadService implements IFileUploadService {
         return Files.exists(this.uploadPath.resolve(fileKey));
     }
 
+    // TODO: 04/03/22 add method for loading file input stream from disk to stream to client
+
     private Optional<String> getExtensionFromFileName(String filename) {
         return Optional.ofNullable(filename)
                 .filter(f -> f.contains("."))

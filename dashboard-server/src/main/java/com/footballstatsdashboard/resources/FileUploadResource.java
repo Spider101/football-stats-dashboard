@@ -51,4 +51,6 @@ public class FileUploadResource {
         URI location = uriInfo.getAbsolutePathBuilder().path(fileKey).build();
         return Response.created(location).entity(ImmutableMap.of("fileKey", fileKey)).build();
     }
+
+    // TODO: 04/03/22 add endpoint for downloading (streaming) image file from disk to client
 }

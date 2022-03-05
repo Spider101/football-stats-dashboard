@@ -22,6 +22,7 @@ public interface ClubSummary {
      */
     @Valid UUID getClubId();
 
+    // TODO: 04/03/22 add club logo property here
     /**
      * club name
      */
