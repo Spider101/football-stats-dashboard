@@ -6,6 +6,7 @@ import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
+import com.footballstatsdashboard.services.IFileUploadService;
 import io.dropwizard.auth.Auth;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -38,9 +39,13 @@ public class ClubResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
     private final ClubService clubService;
+    private final IFileUploadService fileUploadService;
 
-    public ClubResource(ClubService clubService) {
+    public ClubResource(ClubService clubService, IFileUploadService fileUploadService) {
         this.clubService = clubService;
+        this.fileUploadService = fileUploadService;
+
+        this.fileUploadService.initializeService();
     }
 
     @GET
@@ -67,6 +72,12 @@ public class ClubResource {
             LOGGER.info("createClub() request.");
         }
 
+        if (!this.fileUploadService.doesFileExist(incomingClub.getLogo())) {
+            String errorMessage = "No file found for club logo image with key: " + incomingClub.getLogo();
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
+
         Club newClub = this.clubService.createClub(incomingClub, user.getId(), user.getEmail());
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newClub.getId().toString()).build();
@@ -82,6 +93,12 @@ public class ClubResource {
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
+        }
+
+        if (!this.fileUploadService.doesFileExist(incomingClub.getLogo())) {
+            String errorMessage = "No file found for club logo image with key: " + incomingClub.getLogo();
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
 
         Club existingClub = this.clubService.getClub(existingClubId, user.getId());
