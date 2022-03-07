@@ -17,6 +17,7 @@ const TextFieldProps = {
     id: faker.hacker.noun(),
     label: capitalizeLabel(faker.hacker.noun(), caseFormat.CAMEL_CASE)
 };
+const handleChangeFn = action('invoked change handler');
 
 export const Initial = Template.bind({});
 Initial.args = {
@@ -24,7 +25,7 @@ Initial.args = {
     progress: 0,
     fileKey: null,
     errorMessage: null,
-    handleChangeFn: action('invoked change handler')
+    handleChangeFn
 };
 
 export const MidUpload = Template.bind({});
@@ -33,7 +34,7 @@ MidUpload.args = {
     progress: 44,
     fileKey: null,
     errorMessage: null,
-    handleChangeFn: action('invoked change handler')
+    handleChangeFn
 };
 
 export const CompletedUpload = Template.bind({});
@@ -42,7 +43,7 @@ CompletedUpload.args = {
     progress: 100,
     fileKey: 'Sample.png',
     errorMessage: null,
-    handleChangeFn: action('invoked change handler')
+    handleChangeFn
 };
 
 export const FailedUpload = Template.bind({});
@@ -51,5 +52,5 @@ FailedUpload.args = {
     progress: 0,
     fileKey: null,
     errorMessage: 'Something went wrong in uploading the file!',
-    handleChangeFn: action('invoked change handler')
+    handleChangeFn
 };

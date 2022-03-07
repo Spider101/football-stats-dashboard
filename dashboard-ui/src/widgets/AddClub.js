@@ -7,12 +7,13 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Alert from '../components/Alert';
 import DialogForm from '../components/DialogForm';
 import PageAction from '../components/PageAction';
+import CustomSlider from '../components/CustomSlider';
+import FileUpload from '../components/FileUpload';
+
+import useForm from '../hooks/useForm';
+import useFileUpload from '../hooks/useFileUpload';
 
 import { formSubmission } from '../constants';
-import useForm from '../hooks/useForm';
-import CustomSlider from '../components/CustomSlider';
-import useFileUpload from '../hooks/useFileUpload';
-import FileUpload from '../components/FileUpload';
 
 export default function AddClub({ addClubAction }) {
     const {

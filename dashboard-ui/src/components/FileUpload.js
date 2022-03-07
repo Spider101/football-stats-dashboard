@@ -1,6 +1,10 @@
 import PropTypes from 'prop-types';
 
-import { Box, LinearProgress, TextField, Typography, useTheme, withStyles } from '@material-ui/core';
+import Box from '@material-ui/core/Box';
+import LinearProgress from '@material-ui/core/LinearProgress';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import { useTheme, withStyles } from '@material-ui/core/styles';
 
 export default function FileUpload({ TextFieldProps, progress, errorMessage, fileKey, handleChangeFn }) {
     const theme = useTheme();
