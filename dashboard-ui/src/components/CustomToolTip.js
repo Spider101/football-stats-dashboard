@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core';
+import { withStyles } from '@material-ui/core/styles';
 import { capitalizeLabel } from '../utils';
 import { caseFormat } from '../constants';
 
@@ -24,7 +24,6 @@ const StyledToolTip = withStyles(styles)(({ classes, children }) => (
 ));
 
 const CustomToolTip = ({ active, payload, label, shouldShowNegativeValues = true }) => {
-    console.log(shouldShowNegativeValues);
     if (active) {
         return (
             <StyledToolTip>

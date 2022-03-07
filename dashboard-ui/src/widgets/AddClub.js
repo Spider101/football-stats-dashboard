@@ -7,10 +7,13 @@ import InputAdornment from '@material-ui/core/InputAdornment';
 import Alert from '../components/Alert';
 import DialogForm from '../components/DialogForm';
 import PageAction from '../components/PageAction';
+import CustomSlider from '../components/CustomSlider';
+import FileUpload from '../components/FileUpload';
+
+import useForm from '../hooks/useForm';
+import useFileUpload from '../hooks/useFileUpload';
 
 import { formSubmission } from '../constants';
-import useForm from '../hooks/useForm';
-import CustomSlider from '../components/CustomSlider';
 
 export default function AddClub({ addClubAction }) {
     const {
@@ -22,6 +25,7 @@ export default function AddClub({ addClubAction }) {
     } = useForm(
         {
             name: '',
+            logo: '',
             managerFunds: '0',
             transferBudget: '0',
             wageBudget: '0',
@@ -29,6 +33,16 @@ export default function AddClub({ addClubAction }) {
             expenditure: '0'
         },
         useCallback(newClubData => addClubAction(newClubData), [])
+    );
+    const {
+        progress,
+        fileKey,
+        fileUploadError,
+        handleChangeFn: fileUploadChangeHandler
+    } = useFileUpload(
+        uploadedFileKey => handleChangeFn({ target: { name: 'logo', value: uploadedFileKey } }),
+        // TODO: 03/07/22 update this with the file upload client fn once it is ready
+        _ => ({ fileKey: 'sample.png', error: null })
     );
 
     const addNewClubDialogForm = (
@@ -52,6 +66,13 @@ export default function AddClub({ addClubAction }) {
                 onChange={e => handleChangeFn(e)}
                 error={!!addNewClubValidations.name}
                 helperText={addNewClubValidations.name}
+            />
+            <FileUpload
+                TextFieldProps={{ name: 'logo', id: 'clubLogo', label: 'Club Logo' }}
+                progress={progress}
+                fileKey={fileKey}
+                errorMessage={fileUploadError}
+                handleChangeFn={fileUploadChangeHandler}
             />
             <TextField
                 name='managerFunds'

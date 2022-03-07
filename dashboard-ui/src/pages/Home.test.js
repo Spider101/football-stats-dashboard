@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { MemoryRouter } from 'react-router-dom';
@@ -40,7 +40,18 @@ it('should render success message when add new club form is submitted', async ()
     expect(screen.queryByRole('dialog')).toBeInTheDocument();
 
     const inputValue = 'Aston Villa FC';
+    const clubLogoToUpload = new File(['club logo'], 'clubLogo.png', { type: 'image/png' });
+
     userEvent.type(screen.getByLabelText(/club name/i), inputValue);
+
+    await act(async () => {
+        // running this inside act because file upload updates the state by setting the `fileKey` property
+        userEvent.upload(screen.getByLabelText(/club logo/i), clubLogoToUpload);
+    });
+    const fileInput = screen.getByLabelText(/club logo/i);
+    expect(fileInput.files.length).toBe(1);
+    expect(fileInput.files[0]).toEqual(clubLogoToUpload);
+
     userEvent.type(screen.getByLabelText(/manager funds/i), '10');
 
     // shift focus to the slider and hit left arrow key to set transfer and wage budget values
@@ -57,5 +68,5 @@ it('should render success message when add new club form is submitted', async ()
     expect(submitButton).not.toBeDisabled();
     userEvent.click(submitButton);
 
-    await screen.findByText('New Club Added Successfully!');
+    await waitFor(() => expect(screen.queryByText('New Club Added Successfully!')).toBeInTheDocument());
 });

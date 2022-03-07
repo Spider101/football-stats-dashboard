@@ -1,4 +1,4 @@
-import faker from '@faker-js/faker';
+import { faker } from '@faker-js/faker';
 import * as _ from 'lodash';
 
 import { transformIntoTabularData } from './utils';
