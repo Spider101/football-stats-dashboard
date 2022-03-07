@@ -1,18 +1,14 @@
 import PropTypes from 'prop-types';
 
 import { Box, LinearProgress, TextField, Typography, useTheme, withStyles } from '@material-ui/core';
-import { capitalizeLabel } from '../utils';
-import { caseFormat } from '../constants';
 
-export default function FileUpload({ name, id, progress, errorMessage, fileKey, handleChangeFn }) {
+export default function FileUpload({ TextFieldProps, progress, errorMessage, fileKey, handleChangeFn }) {
     const theme = useTheme();
     return (
         <>
             <TextField
-                name={name}
-                label={capitalizeLabel(id, caseFormat.CAMEL_CASE)}
+                {...TextFieldProps}
                 required
-                id={id}
                 type='file'
                 margin='normal'
                 fullWidth
@@ -45,8 +41,11 @@ const BorderLinearProgress = withStyles(theme => ({
 }))(LinearProgress);
 
 FileUpload.propTypes = {
-    name: PropTypes.string,
-    id: PropTypes.string,
+    TextFieldProps: PropTypes.shape({
+        name: PropTypes.string,
+        id: PropTypes.string,
+        label: PropTypes.string,
+    }),
     progress: PropTypes.number,
     fileKey: PropTypes.string,
     errorMessage: PropTypes.string,

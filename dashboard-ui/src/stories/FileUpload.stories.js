@@ -1,6 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { action } from '@storybook/addon-actions';
+
 import FileUpload from '../components/FileUpload';
+import { caseFormat } from '../constants';
+import { capitalizeLabel } from '../utils';
 
 export default {
     component: FileUpload,
@@ -9,10 +12,15 @@ export default {
 
 const Template = args => <FileUpload {...args} />;
 
-export const Initial = Template.bind({});
-Initial.args = {
+const TextFieldProps = {
     name: faker.hacker.noun(),
     id: faker.hacker.noun(),
+    label: capitalizeLabel(faker.hacker.noun(), caseFormat.CAMEL_CASE)
+};
+
+export const Initial = Template.bind({});
+Initial.args = {
+    TextFieldProps,
     progress: 0,
     fileKey: null,
     errorMessage: null,
@@ -21,8 +29,7 @@ Initial.args = {
 
 export const MidUpload = Template.bind({});
 MidUpload.args = {
-    name: faker.hacker.noun(),
-    id: faker.hacker.noun(),
+    TextFieldProps,
     progress: 44,
     fileKey: null,
     errorMessage: null,
@@ -31,8 +38,7 @@ MidUpload.args = {
 
 export const CompletedUpload = Template.bind({});
 CompletedUpload.args = {
-    name: faker.hacker.noun(),
-    id: faker.hacker.noun(),
+    TextFieldProps,
     progress: 100,
     fileKey: 'Sample.png',
     errorMessage: null,
@@ -41,8 +47,7 @@ CompletedUpload.args = {
 
 export const FailedUpload = Template.bind({});
 FailedUpload.args = {
-    name: faker.hacker.noun(),
-    id: faker.hacker.noun(),
+    TextFieldProps,
     progress: 0,
     fileKey: null,
     errorMessage: 'Something went wrong in uploading the file!',
