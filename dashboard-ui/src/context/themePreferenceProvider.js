@@ -6,6 +6,9 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 const ThemePreferenceContext = createContext();
 
 function ThemePreferenceProvider({ children }) {
+    // TODO: 03/07/22 this can be run just once on app start up. Don't need the context provider since the value is
+    // available through the mui theme.palette.type property after initializing the theme with the preference.
+    // Remove this context provider hook
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
     return (
