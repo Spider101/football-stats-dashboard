@@ -14,8 +14,7 @@ import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.validations.Validation;
 import com.footballstatsdashboard.core.validations.ValidationSeverity;
-import com.footballstatsdashboard.db.ClubDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.IClubEntityDAO;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -31,9 +30,9 @@ import java.util.UUID;
 
 public class ClubService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubService.class);
-    private final ClubDAO<ResourceKey> clubDAO;
+    private final IClubEntityDAO clubDAO;
 
-    public ClubService(ClubDAO<ResourceKey> clubDAO) {
+    public ClubService(IClubEntityDAO clubDAO) {
         this.clubDAO = clubDAO;
     }
 
@@ -92,8 +91,7 @@ public class ClubService {
                 .createdBy(createdBy)
                 .build();
 
-        ResourceKey resourceKey = new ResourceKey(newClub.getId());
-        this.clubDAO.insertDocument(resourceKey, newClub);
+        this.clubDAO.insertEntity(newClub);
 
         return newClub;
     }
@@ -130,8 +128,7 @@ public class ClubService {
                 .lastModifiedDate(LocalDate.now())
                 .build();
 
-        ResourceKey resourceKey = new ResourceKey(existingClubId);
-        this.clubDAO.updateDocument(resourceKey, updatedClub);
+        this.clubDAO.updateEntity(existingClubId, updatedClub);
 
         return updatedClub;
     }
@@ -144,9 +141,11 @@ public class ClubService {
             throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
         }
 
-        ResourceKey resourceKey = new ResourceKey(clubId);
+        // TODO: 19/03/22 create generic Not Found exception to be thrown from DAO;
+        //  catch the DocumentNotFoundException inside the couchbase implementation instead and then throw the generic
+        //  exception; update all other entity DAOs as well
         try {
-            this.clubDAO.deleteDocument(resourceKey);
+            this.clubDAO.deleteEntity(clubId);
         } catch (DocumentNotFoundException documentNotFoundException) {
             LOGGER.error("No club entity found for ID: {}", clubId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
@@ -155,7 +154,7 @@ public class ClubService {
     }
 
     public List<ClubSummary> getClubSummariesByUserId(UUID userId) {
-        return this.clubDAO.getClubSummariesByUserId(userId);
+        return this.clubDAO.getClubSummariesForUser(userId);
     }
 
     public List<SquadPlayer> getSquadPlayers(UUID clubId) {
@@ -163,16 +162,13 @@ public class ClubService {
     }
 
     private Club fetchClubData(UUID clubId) {
-        ResourceKey resourceKey = new ResourceKey(clubId);
-        Club club;
         try {
-            club = this.clubDAO.getDocument(resourceKey, Club.class);
+            return this.clubDAO.getEntity(clubId);
         } catch (DocumentNotFoundException documentNotFoundException) {
             String errorMessage = String.format("No club entity found for ID: %s", clubId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
-        return club;
     }
 
     private List<Validation> validateIncomingClub(Club incomingClub, boolean isForNewClub) {
