@@ -3,8 +3,7 @@ package com.footballstatsdashboard.resources;
 import com.footballstatsdashboard.api.model.ImmutableMatchPerformance;
 import com.footballstatsdashboard.api.model.MatchPerformance;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.db.MatchPerformanceDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.IMatchPerformanceEntityDAO;
 import io.dropwizard.auth.Auth;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +39,9 @@ import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
 public class MatchPerformanceResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
-    private final MatchPerformanceDAO<ResourceKey> matchPerformanceDAO;
+    private final IMatchPerformanceEntityDAO matchPerformanceDAO;
 
-    public MatchPerformanceResource(MatchPerformanceDAO<ResourceKey> matchPerformanceDAO) {
+    public MatchPerformanceResource(IMatchPerformanceEntityDAO matchPerformanceDAO) {
         this.matchPerformanceDAO = matchPerformanceDAO;
     }
 
@@ -55,9 +54,8 @@ public class MatchPerformanceResource {
             LOGGER.info("getMatchPerformance() request for match performance ID: {}", matchPerformanceId);
         }
 
-        ResourceKey resourceKey = new ResourceKey(matchPerformanceId);
         MatchPerformance matchPerformance =
-                this.matchPerformanceDAO.getDocument(resourceKey, MatchPerformance.class);
+                this.matchPerformanceDAO.getEntity(matchPerformanceId);
         return Response.ok().entity(matchPerformance).build();
     }
 
@@ -80,8 +78,7 @@ public class MatchPerformanceResource {
                 .createdBy(user.getEmail())
                 .build();
 
-        ResourceKey resourceKey = new ResourceKey(newMatchPerformance.getId());
-        this.matchPerformanceDAO.insertDocument(resourceKey, newMatchPerformance);
+        this.matchPerformanceDAO.insertEntity(newMatchPerformance);
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newMatchPerformance.getId().toString()).build();
         return Response.created(location).entity(new HashMap<>()).build();
@@ -97,9 +94,7 @@ public class MatchPerformanceResource {
             LOGGER.info("updateMatchPerformance() request for match performance ID: {}", existingMatchPerformanceId);
         }
 
-        ResourceKey resourceKey = new ResourceKey(existingMatchPerformanceId);
-        MatchPerformance existingMatchPerformance = this.matchPerformanceDAO.getDocument(resourceKey,
-                MatchPerformance.class);
+        MatchPerformance existingMatchPerformance = this.matchPerformanceDAO.getEntity(existingMatchPerformanceId);
 
         if (existingMatchPerformance.getId().equals(incomingMatchPerformance.getId())) {
             MatchPerformance updatedMatchPerformance = ImmutableMatchPerformance.builder()
@@ -119,7 +114,7 @@ public class MatchPerformanceResource {
                     .lastModifiedDate(LocalDate.now())
                     .build();
 
-            this.matchPerformanceDAO.updateDocument(resourceKey, updatedMatchPerformance);
+            this.matchPerformanceDAO.updateEntity(existingMatchPerformanceId, updatedMatchPerformance);
             return Response.ok().entity(updatedMatchPerformance).build();
         }
 
@@ -141,8 +136,7 @@ public class MatchPerformanceResource {
                     matchPerformanceId);
         }
 
-        ResourceKey resourceKey = new ResourceKey(matchPerformanceId);
-        this.matchPerformanceDAO.deleteDocument(resourceKey);
+        this.matchPerformanceDAO.deleteEntity(matchPerformanceId);
 
         return Response.noContent().build();
     }
@@ -155,8 +149,8 @@ public class MatchPerformanceResource {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("getMatchPerformanceByPlayerId() request made!");
         }
-        List<MatchPerformance> matchPerformance = this.matchPerformanceDAO.lookupMatchPerformanceByPlayerId(playerId,
-                competitionId);
+        List<MatchPerformance> matchPerformance =
+                this.matchPerformanceDAO.getMatchPerformanceOfPlayerInCompetition(playerId, competitionId);
         if (matchPerformance != null && !matchPerformance.isEmpty()) {
             return Response.ok().entity(matchPerformance).build();
         }
