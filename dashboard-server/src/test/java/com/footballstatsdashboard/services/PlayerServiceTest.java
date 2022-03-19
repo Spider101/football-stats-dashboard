@@ -9,6 +9,7 @@ import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.Metadata;
+import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.db.IEntityDAO;
@@ -88,7 +89,7 @@ public class PlayerServiceTest {
     public void getPlayerWhenPlayerNotFoundInCouchbase() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
-        when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(DocumentNotFoundException.class);
+        when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(EntityNotFoundException.class);
 
         // execute
         playerService.getPlayer(invalidPlayerId);
@@ -435,10 +436,7 @@ public class PlayerServiceTest {
     public void deletePlayerWhenPlayerNotFound() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
-        // TODO: 19/03/22 create generic Not Found exception to be thrown from DAO;
-        //  catch the DocumentNotFoundException inside the couchbase implementation instead and then throw the generic
-        //  exception; update all other entity DAOs as well
-        when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(DocumentNotFoundException.class);
+        when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(EntityNotFoundException.class);
 
         // execute
         playerService.deletePlayer(invalidPlayerId, clubId -> true);

@@ -1,6 +1,5 @@
 package com.footballstatsdashboard.services;
 
-import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
@@ -11,6 +10,7 @@ import com.footballstatsdashboard.api.model.club.ImmutableManagerFunds;
 import com.footballstatsdashboard.api.model.club.Income;
 import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
+import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.validations.Validation;
 import com.footballstatsdashboard.core.validations.ValidationSeverity;
@@ -141,12 +141,9 @@ public class ClubService {
             throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
         }
 
-        // TODO: 19/03/22 create generic Not Found exception to be thrown from DAO;
-        //  catch the DocumentNotFoundException inside the couchbase implementation instead and then throw the generic
-        //  exception; update all other entity DAOs as well
         try {
             this.clubDAO.deleteEntity(clubId);
-        } catch (DocumentNotFoundException documentNotFoundException) {
+        } catch (EntityNotFoundException entityNotFoundException) {
             LOGGER.error("No club entity found for ID: {}", clubId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
                     String.format("Cannot delete club (ID: %s) that does not exist", clubId));
@@ -164,7 +161,7 @@ public class ClubService {
     private Club fetchClubData(UUID clubId) {
         try {
             return this.clubDAO.getEntity(clubId);
-        } catch (DocumentNotFoundException documentNotFoundException) {
+        } catch (EntityNotFoundException entityNotFoundException) {
             String errorMessage = String.format("No club entity found for ID: %s", clubId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);

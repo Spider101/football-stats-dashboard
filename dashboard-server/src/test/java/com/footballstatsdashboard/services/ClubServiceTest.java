@@ -6,6 +6,7 @@ import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
+import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.db.IClubEntityDAO;
 import com.google.common.collect.ImmutableList;
@@ -90,7 +91,7 @@ public class ClubServiceTest {
     public void getClubWhenClubNotFoundInCouchbase() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(DocumentNotFoundException.class);
+        when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
 
         // execute
         clubService.getClub(invalidClubId, userId);
@@ -546,7 +547,7 @@ public class ClubServiceTest {
     public void deleteClubWhenClubDataDoesNotExist() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(DocumentNotFoundException.class);
+        when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
 
         // execute
         clubService.deleteClub(invalidClubId, userId);

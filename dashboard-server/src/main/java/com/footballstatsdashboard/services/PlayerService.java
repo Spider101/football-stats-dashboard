@@ -1,6 +1,5 @@
 package com.footballstatsdashboard.services;
 
-import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.footballstatsdashboard.api.model.CountryCodeMetadata;
 import com.footballstatsdashboard.api.model.ImmutablePlayer;
@@ -14,6 +13,7 @@ import com.footballstatsdashboard.api.model.player.ImmutableAbility;
 import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
 import com.footballstatsdashboard.api.model.player.Metadata;
+import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.core.validations.Validation;
@@ -193,12 +193,9 @@ public class PlayerService {
             throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
         }
 
-        // TODO: 19/03/22 create generic Not Found exception to be thrown from DAO;
-        //  catch the DocumentNotFoundException inside the couchbase implementation instead and then throw the generic
-        //  exception; update all other entity DAOs as well
         try {
             this.playerDAO.deleteEntity(playerId);
-        } catch (DocumentNotFoundException documentNotFoundException) {
+        } catch (EntityNotFoundException entityNotFoundException) {
             LOGGER.error("No player entity found for ID: {}", playerId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
                     String.format("Cannot delete player (ID: %s) that does not exist", playerId));
@@ -259,12 +256,9 @@ public class PlayerService {
     }
 
     private Player fetchPlayerData(UUID playerId) {
-        // TODO: 19/03/22 create generic Not Found exception to be thrown from DAO;
-        //  catch the DocumentNotFoundException inside the couchbase implementation instead and then throw the generic
-        //  exception; update all other entity DAOs as well
         try {
             return this.playerDAO.getEntity(playerId);
-        } catch (DocumentNotFoundException documentNotFoundException) {
+        } catch (EntityNotFoundException entityNotFoundException) {
             String errorMessage = String.format("No player entity found for ID: %s", playerId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
