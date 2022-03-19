@@ -20,9 +20,10 @@ public class AuthTokenCouchbaseDAO implements IAuthTokenEntityDAO {
     private final Cluster cluster;
     private final Bucket bucket;
     private final String bucketName;
+
     public AuthTokenCouchbaseDAO(CouchbaseKeyProvider<ResourceKey> keyProvider,
-                                 Cluster couchbaseCluster, Bucket couchbaseBucket,
-                                 String bucketName) {
+                                Cluster couchbaseCluster, Bucket couchbaseBucket,
+                                String bucketName) {
         this.keyProvider = keyProvider;
         this.cluster = couchbaseCluster;
         this.bucket = couchbaseBucket;
