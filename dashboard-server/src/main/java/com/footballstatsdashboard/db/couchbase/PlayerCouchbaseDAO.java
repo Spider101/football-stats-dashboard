@@ -2,7 +2,6 @@ package com.footballstatsdashboard.db.couchbase;
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.kv.GetResult;
-import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.db.IEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
@@ -14,8 +13,7 @@ public class PlayerCouchbaseDAO implements IEntityDAO<Player> {
     private final CouchbaseKeyProvider<ResourceKey> keyProvider;
     private final Bucket bucket;
 
-    public PlayerCouchbaseDAO(CouchbaseKeyProvider<ResourceKey> keyProvider,
-                              Bucket couchbaseBucket) {
+    public PlayerCouchbaseDAO(CouchbaseKeyProvider<ResourceKey> keyProvider, Bucket couchbaseBucket) {
         this.keyProvider = keyProvider;
         this.bucket = couchbaseBucket;
     }
@@ -33,8 +31,8 @@ public class PlayerCouchbaseDAO implements IEntityDAO<Player> {
         return result.contentAs(Player.class);
     }
 
-    public void updateEntity(Player updatedEntity) {
-        ResourceKey key = new ResourceKey(updatedEntity.getId());
+    public void updateEntity(UUID existingEntityId, Player updatedEntity) {
+        ResourceKey key = new ResourceKey(existingEntityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         this.bucket.defaultCollection().replace(documentKey, updatedEntity);
     }

@@ -50,8 +50,8 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
         return result.contentAs(Club.class);
     }
 
-    public void updateEntity(Club updatedEntity) {
-        ResourceKey key = new ResourceKey(updatedEntity.getId());
+    public void updateEntity(UUID existingEntityId, Club updatedEntity) {
+        ResourceKey key = new ResourceKey(existingEntityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         this.bucket.defaultCollection().replace(documentKey, updatedEntity);
     }

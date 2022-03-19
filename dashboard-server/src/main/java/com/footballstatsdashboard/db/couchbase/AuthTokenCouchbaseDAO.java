@@ -42,8 +42,8 @@ public class AuthTokenCouchbaseDAO implements IAuthTokenEntityDAO {
         return result.contentAs(AuthToken.class);
     }
 
-    public void updateEntity(AuthToken updatedEntity) {
-        ResourceKey key = new ResourceKey(updatedEntity.getId());
+    public void updateEntity(UUID existingEntityId, AuthToken updatedEntity) {
+        ResourceKey key = new ResourceKey(existingEntityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         this.bucket.defaultCollection().replace(documentKey, updatedEntity);
     }

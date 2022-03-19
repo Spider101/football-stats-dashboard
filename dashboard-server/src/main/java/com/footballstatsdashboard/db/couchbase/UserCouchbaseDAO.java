@@ -22,11 +22,11 @@ public class UserCouchbaseDAO implements IUserEntityDAO {
     private final String bucketName;
 
     public UserCouchbaseDAO(CouchbaseKeyProvider<ResourceKey> keyProvider,
-                            Bucket couchbaseBucket, Cluster couchbaseCluster,
+                            Cluster couchbaseCluster, Bucket couchbaseBucket,
                             String bucketName) {
         this.keyProvider = keyProvider;
-        this.bucket = couchbaseBucket;
         this.cluster = couchbaseCluster;
+        this.bucket = couchbaseBucket;
         this.bucketName = bucketName;
     }
 
@@ -43,8 +43,8 @@ public class UserCouchbaseDAO implements IUserEntityDAO {
         return result.contentAs(User.class);
     }
 
-    public void updateEntity(User updatedEntity) {
-        ResourceKey key = new ResourceKey(updatedEntity.getId());
+    public void updateEntity(UUID existingEntityId, User updatedEntity) {
+        ResourceKey key = new ResourceKey(existingEntityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         this.bucket.defaultCollection().replace(documentKey, updatedEntity);
     }

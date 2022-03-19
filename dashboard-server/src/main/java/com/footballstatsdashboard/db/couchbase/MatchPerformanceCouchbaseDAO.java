@@ -42,8 +42,8 @@ public class MatchPerformanceCouchbaseDAO implements IMatchPerformanceEntityDAO 
         return result.contentAs(MatchPerformance.class);
     }
 
-    public void updateEntity(MatchPerformance updatedEntity) {
-        ResourceKey key = new ResourceKey(updatedEntity.getId());
+    public void updateEntity(UUID existingEntityId, MatchPerformance updatedEntity) {
+        ResourceKey key = new ResourceKey(existingEntityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         this.bucket.defaultCollection().replace(documentKey, updatedEntity);
     }
