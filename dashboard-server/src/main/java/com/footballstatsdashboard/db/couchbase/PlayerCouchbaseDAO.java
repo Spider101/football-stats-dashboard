@@ -1,8 +1,10 @@
 package com.footballstatsdashboard.db.couchbase;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.kv.GetResult;
 import com.footballstatsdashboard.api.model.Player;
+import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.db.IEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
@@ -27,8 +29,12 @@ public class PlayerCouchbaseDAO implements IEntityDAO<Player> {
     public Player getEntity(UUID entityId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        GetResult result = this.bucket.defaultCollection().get(documentKey);
-        return result.contentAs(Player.class);
+        try {
+            GetResult result = this.bucket.defaultCollection().get(documentKey);
+            return result.contentAs(Player.class);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            throw new EntityNotFoundException(documentNotFoundException.getMessage());
+        }
     }
 
     public void updateEntity(UUID existingEntityId, Player updatedEntity) {
@@ -40,6 +46,10 @@ public class PlayerCouchbaseDAO implements IEntityDAO<Player> {
     public void deleteEntity(UUID entityId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        this.bucket.defaultCollection().remove(documentKey);
+        try {
+            this.bucket.defaultCollection().remove(documentKey);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            throw new EntityNotFoundException(documentNotFoundException.getMessage());
+        }
     }
 }

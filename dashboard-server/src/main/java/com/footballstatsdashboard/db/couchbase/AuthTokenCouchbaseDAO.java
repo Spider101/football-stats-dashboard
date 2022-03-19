@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.db.couchbase;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
@@ -7,6 +8,7 @@ import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
 import com.footballstatsdashboard.api.model.AuthToken;
+import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.db.IAuthTokenEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
@@ -39,8 +41,12 @@ public class AuthTokenCouchbaseDAO implements IAuthTokenEntityDAO {
     public AuthToken getEntity(UUID entityId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        GetResult result = this.bucket.defaultCollection().get(documentKey);
-        return result.contentAs(AuthToken.class);
+        try {
+            GetResult result = this.bucket.defaultCollection().get(documentKey);
+            return result.contentAs(AuthToken.class);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            throw new EntityNotFoundException(documentNotFoundException.getMessage());
+        }
     }
 
     public void updateEntity(UUID existingEntityId, AuthToken updatedEntity) {
@@ -52,7 +58,11 @@ public class AuthTokenCouchbaseDAO implements IAuthTokenEntityDAO {
     public void deleteEntity(UUID entityId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        this.bucket.defaultCollection().remove(documentKey);
+        try {
+            this.bucket.defaultCollection().remove(documentKey);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            throw new EntityNotFoundException(documentNotFoundException.getMessage());
+        }
     }
 
     public Optional<AuthToken> getAuthTokenForUser(UUID userId) {

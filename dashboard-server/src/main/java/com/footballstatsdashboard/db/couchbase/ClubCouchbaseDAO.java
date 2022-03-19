@@ -1,5 +1,6 @@
 package com.footballstatsdashboard.db.couchbase;
 
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonArray;
@@ -11,6 +12,7 @@ import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
+import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.db.IClubEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
@@ -46,8 +48,12 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
     public Club getEntity(UUID entityId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        GetResult result = this.bucket.defaultCollection().get(documentKey);
-        return result.contentAs(Club.class);
+        try {
+            GetResult result = this.bucket.defaultCollection().get(documentKey);
+            return result.contentAs(Club.class);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            throw new EntityNotFoundException(documentNotFoundException.getMessage());
+        }
     }
 
     public void updateEntity(UUID existingEntityId, Club updatedEntity) {
@@ -59,7 +65,11 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
     public void deleteEntity(UUID entityId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        this.bucket.defaultCollection().remove(documentKey);
+        try {
+            this.bucket.defaultCollection().remove(documentKey);
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            throw new EntityNotFoundException(documentNotFoundException.getMessage());
+        }
     }
 
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
