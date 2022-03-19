@@ -11,8 +11,7 @@ import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
-import com.footballstatsdashboard.db.CouchbaseDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.IEntityDAO;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.junit.Before;
@@ -31,6 +30,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,7 +43,7 @@ public class PlayerServiceTest {
     private PlayerService playerService;
 
     @Mock
-    private CouchbaseDAO<ResourceKey> playerDAO;
+    private IEntityDAO<Player> playerDAO;
 
     /**
      * set up test data before each test case is run
@@ -70,13 +70,13 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
+        when(playerDAO.getEntity(eq(playerId))).thenReturn(playerFromCouchbase);
 
         // execute
         Player player = playerService.getPlayer(playerId);
 
         // assert
-        verify(playerDAO).getDocument(any(), any());
+        verify(playerDAO).getEntity(any());
         assertEquals(playerId, player.getId());
     }
 
@@ -88,13 +88,13 @@ public class PlayerServiceTest {
     public void getPlayerWhenPlayerNotFoundInCouchbase() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
-        when(playerDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
+        when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(DocumentNotFoundException.class);
 
         // execute
         playerService.getPlayer(invalidPlayerId);
 
         // assert
-        verify(playerDAO).getDocument(any(), any());
+        verify(playerDAO).getEntity(any());
     }
 
     /**
@@ -122,7 +122,7 @@ public class PlayerServiceTest {
         Player createdPlayer = playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(playerDAO).insertDocument(any(), newPlayerCaptor.capture());
+        verify(playerDAO).insertEntity(newPlayerCaptor.capture());
         Player newPlayer = newPlayerCaptor.getValue();
         assertEquals(createdPlayer, newPlayer);
 
@@ -172,7 +172,7 @@ public class PlayerServiceTest {
         playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(playerDAO, never()).insertDocument(any(), any());
+        verify(playerDAO, never()).insertEntity(any());
     }
 
     /**
@@ -198,7 +198,7 @@ public class PlayerServiceTest {
         playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(playerDAO, never()).insertDocument(any(), any());
+        verify(playerDAO, never()).insertEntity(any());
     }
 
     /**
@@ -226,7 +226,7 @@ public class PlayerServiceTest {
         playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
 
         // assert
-        verify(playerDAO, never()).insertDocument(any(), any());
+        verify(playerDAO, never()).insertEntity(any());
     }
 
     /**
@@ -236,8 +236,6 @@ public class PlayerServiceTest {
     @Test
     public void updatePlayerUpdatesPlayerInCouchbase() {
         // setup
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
-
         UUID existingPlayerId = UUID.randomUUID();
         Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
@@ -247,7 +245,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -267,10 +265,7 @@ public class PlayerServiceTest {
         Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(playerDAO).updateDocument(resourceKeyCaptor.capture(), any());
-        ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
-        assertEquals(existingPlayerId, capturedResourceKey.getResourceId());
-
+        verify(playerDAO).updateEntity(eq(existingPlayerId), any());
         updatedPlayer.getAttributes().forEach(attribute -> {
             Attribute existingPlayerAttribute = existingPlayerInCouchbase.getAttributes().stream()
                     .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
@@ -310,7 +305,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -328,7 +323,7 @@ public class PlayerServiceTest {
         playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(playerDAO, never()).updateDocument(any(), any());
+        verify(playerDAO, never()).updateEntity(any(), any());
     }
 
     /**
@@ -347,7 +342,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -365,7 +360,7 @@ public class PlayerServiceTest {
         playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(playerDAO, never()).updateDocument(any(), any());
+        verify(playerDAO, never()).updateEntity(any(), any());
     }
 
     /**
@@ -384,7 +379,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getDocument(any(), any())).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -404,7 +399,7 @@ public class PlayerServiceTest {
         playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
 
         // assert
-        verify(playerDAO, never()).updateDocument(any(), any());
+        verify(playerDAO, never()).updateEntity(any(), any());
     }
 
     /**
@@ -422,16 +417,14 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
+        when(playerDAO.getEntity(eq(playerId))).thenReturn(playerFromCouchbase);
 
         // execute
         playerService.deletePlayer(playerId, clubId -> true);
 
         // assert
-        verify(playerDAO).getDocument(any(), any());
-        verify(playerDAO).deleteDocument(resourceKeyCaptor.capture());
-        assertEquals(playerId, resourceKeyCaptor.getValue().getResourceId());
+        verify(playerDAO).getEntity(any());
+        verify(playerDAO).deleteEntity(eq(playerId));
     }
 
     /**
@@ -442,16 +435,17 @@ public class PlayerServiceTest {
     public void deletePlayerWhenPlayerNotFound() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
-        when(playerDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
+        // TODO: 19/03/22 create generic Not Found exception to be thrown from DAO;
+        //  catch the DocumentNotFoundException inside the couchbase implementation instead and then throw the generic
+        //  exception; update all other entity DAOs as well
+        when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(DocumentNotFoundException.class);
 
         // execute
         playerService.deletePlayer(invalidPlayerId, clubId -> true);
 
         // assert
-        verify(playerDAO).getDocument(resourceKeyCaptor.capture(), any());
-        verify(playerDAO, never()).deleteDocument(any());
-        assertEquals(invalidPlayerId, resourceKeyCaptor.getValue().getResourceId());
+        verify(playerDAO).getEntity(any());
+        verify(playerDAO, never()).deleteEntity(any());
     }
 
     /**
@@ -470,13 +464,13 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getDocument(any(), any())).thenReturn(playerFromCouchbase);
+        when(playerDAO.getEntity(eq(playerId))).thenReturn(playerFromCouchbase);
 
         // execute
         playerService.deletePlayer(playerId, clubId -> false);
 
         // assert
-        verify(playerDAO, never()).deleteDocument(any());
+        verify(playerDAO, never()).deleteEntity(any());
     }
 
     private void assertCountryLogo(Metadata createdPlayerMetadata) throws IOException {

@@ -18,7 +18,7 @@ import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.core.validations.Validation;
 import com.footballstatsdashboard.core.validations.ValidationSeverity;
-import com.footballstatsdashboard.db.CouchbaseDAO;
+import com.footballstatsdashboard.db.IEntityDAO;
 import com.footballstatsdashboard.db.key.ResourceKey;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
@@ -48,15 +48,15 @@ public class PlayerService {
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
 
-    private final CouchbaseDAO<ResourceKey> playerDAO;
+    private final IEntityDAO<Player> playerDAO;
 
-    public PlayerService(CouchbaseDAO<ResourceKey> playerDAO) {
+    public PlayerService(IEntityDAO<Player> playerDAO) {
         this.playerDAO = playerDAO;
     }
 
     public Player getPlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
-        return fetchPlayerData(playerId, resourceKey);
+        return fetchPlayerData(playerId);
     }
 
     public Player createPlayer(Player incomingPlayer, Club clubDataForNewPlayer, String createdBy) throws IOException {
@@ -135,13 +135,12 @@ public class PlayerService {
                 .lastModifiedDate(currentDate)
                 .build();
 
-        ResourceKey resourceKey = new ResourceKey(newPlayer.getId());
-        this.playerDAO.insertDocument(resourceKey, newPlayer);
+        this.playerDAO.insertEntity(newPlayer);
 
         return newPlayer;
     }
 
-    public Player updatePlayer(Player incomingPlayer, Player existingPlayer, UUID playerId) {
+    public Player updatePlayer(Player incomingPlayer, Player existingPlayer, UUID existingPlayerId) {
         List<Validation> validationList = validateIncomingPlayer(incomingPlayer, existingPlayer);
         if (!validationList.isEmpty()) {
             LOGGER.error("Unable to create new player! Found errors: {}", validationList);
@@ -180,25 +179,25 @@ public class PlayerService {
 
         Player updatedPlayer = updatedPlayerBuilder.build();
 
-        ResourceKey resourceKey = new ResourceKey(playerId);
-        this.playerDAO.updateDocument(resourceKey, updatedPlayer);
+        this.playerDAO.updateEntity(existingPlayerId, updatedPlayer);
         return updatedPlayer;
     }
 
     public void deletePlayer(UUID playerId, Predicate<UUID> doesClubBelongToUser) {
-        ResourceKey resourceKey = new ResourceKey(playerId);
-
         // verify that the current user has access to the player they are trying to delete
         // since a player cannot belong to more than one club, we can transitively check the user's access to the player
         // by checking their access to the club the user belongs to
-        Player player = fetchPlayerData(playerId, resourceKey);
+        Player player = fetchPlayerData(playerId);
         if (!doesClubBelongToUser.test(player.getClubId())) {
             LOGGER.error("Player with ID: {} does not belong to user making request", player.getId());
             throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
         }
 
+        // TODO: 19/03/22 create generic Not Found exception to be thrown from DAO;
+        //  catch the DocumentNotFoundException inside the couchbase implementation instead and then throw the generic
+        //  exception; update all other entity DAOs as well
         try {
-            this.playerDAO.deleteDocument(resourceKey);
+            this.playerDAO.deleteEntity(playerId);
         } catch (DocumentNotFoundException documentNotFoundException) {
             LOGGER.error("No player entity found for ID: {}", playerId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
@@ -259,9 +258,12 @@ public class PlayerService {
         }
     }
 
-    private Player fetchPlayerData(UUID playerId, ResourceKey resourceKey) {
+    private Player fetchPlayerData(UUID playerId) {
+        // TODO: 19/03/22 create generic Not Found exception to be thrown from DAO;
+        //  catch the DocumentNotFoundException inside the couchbase implementation instead and then throw the generic
+        //  exception; update all other entity DAOs as well
         try {
-            return this.playerDAO.getDocument(resourceKey, Player.class);
+            return this.playerDAO.getEntity(playerId);
         } catch (DocumentNotFoundException documentNotFoundException) {
             String errorMessage = String.format("No player entity found for ID: %s", playerId);
             LOGGER.error(errorMessage);
