@@ -10,7 +10,6 @@ import com.footballstatsdashboard.api.model.club.ImmutableManagerFunds;
 import com.footballstatsdashboard.api.model.club.Income;
 import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
-import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.validations.Validation;
 import com.footballstatsdashboard.core.validations.ValidationSeverity;
@@ -20,6 +19,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;

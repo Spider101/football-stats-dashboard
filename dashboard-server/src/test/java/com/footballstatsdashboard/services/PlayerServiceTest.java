@@ -1,6 +1,5 @@
 package com.footballstatsdashboard.services;
 
-import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.PlayerDataProvider;
@@ -9,7 +8,6 @@ import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.Metadata;
-import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.db.IEntityDAO;
@@ -21,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;

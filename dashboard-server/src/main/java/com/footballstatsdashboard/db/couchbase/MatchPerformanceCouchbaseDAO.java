@@ -8,11 +8,11 @@ import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
 import com.footballstatsdashboard.api.model.MatchPerformance;
-import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.db.IMatchPerformanceEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.UUID;
 

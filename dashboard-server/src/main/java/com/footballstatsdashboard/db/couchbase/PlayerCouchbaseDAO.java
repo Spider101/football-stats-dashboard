@@ -4,11 +4,11 @@ import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.kv.GetResult;
 import com.footballstatsdashboard.api.model.Player;
-import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.db.IEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.UUID;
 
 public class PlayerCouchbaseDAO implements IEntityDAO<Player> {

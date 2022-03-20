@@ -1,7 +1,6 @@
 package com.footballstatsdashboard.db;
 
-import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
-
+import javax.persistence.EntityNotFoundException;
 import java.util.UUID;
 
 public interface IEntityDAO<E> {

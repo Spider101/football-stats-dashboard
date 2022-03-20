@@ -12,11 +12,11 @@ import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
-import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.db.IClubEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;

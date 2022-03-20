@@ -13,7 +13,6 @@ import com.footballstatsdashboard.api.model.player.ImmutableAbility;
 import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.ImmutableMetadata;
 import com.footballstatsdashboard.api.model.player.Metadata;
-import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.core.validations.Validation;
@@ -27,6 +26,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;

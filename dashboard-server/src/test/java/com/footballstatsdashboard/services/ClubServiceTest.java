@@ -1,12 +1,10 @@
 package com.footballstatsdashboard.services;
 
-import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
-import com.footballstatsdashboard.core.exceptions.EntityNotFoundException;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.db.IClubEntityDAO;
 import com.google.common.collect.ImmutableList;
@@ -16,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
