@@ -107,6 +107,10 @@
             <artifactId>bcrypt</artifactId>
         </dependency>
         <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>javax.persistence-api</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
