@@ -81,7 +81,7 @@ public class MatchPerformanceResource {
         this.matchPerformanceDAO.insertEntity(newMatchPerformance);
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newMatchPerformance.getId().toString()).build();
-        return Response.created(location).entity(new HashMap<>()).build();
+        return Response.created(location).entity(newMatchPerformance).build();
     }
 
     @PUT
