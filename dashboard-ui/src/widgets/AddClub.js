@@ -14,6 +14,7 @@ import useForm from '../hooks/useForm';
 import useFileUpload from '../hooks/useFileUpload';
 
 import { formSubmission } from '../constants';
+import { uploadImageFile } from '../clients/FileUploadClient';
 
 export default function AddClub({ addClubAction }) {
     const {
@@ -41,8 +42,7 @@ export default function AddClub({ addClubAction }) {
         handleChangeFn: fileUploadChangeHandler
     } = useFileUpload(
         uploadedFileKey => handleChangeFn({ target: { name: 'logo', value: uploadedFileKey } }),
-        // TODO: 03/07/22 update this with the file upload client fn once it is ready
-        _ => ({ fileKey: 'sample.png', error: null })
+        useCallback(fileData => uploadImageFile(fileData))
     );
 
     const addNewClubDialogForm = (
