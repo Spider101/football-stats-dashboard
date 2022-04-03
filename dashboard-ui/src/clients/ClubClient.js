@@ -1,8 +1,8 @@
-import fetchDataFromEndpoint from './utils';
+import makeRequestToEndpoint from './utils';
 import { httpStatus } from '../constants';
 
 export const fetchClubSummaries = async ({ meta: { authData } }) => {
-    const res = await fetchDataFromEndpoint('club/all', 'GET', {
+    const res = await makeRequestToEndpoint('club/all', 'GET', {
         Authorization: `BEARER ${authData.id}`
     });
     return await res.json();
@@ -10,12 +10,12 @@ export const fetchClubSummaries = async ({ meta: { authData } }) => {
 
 export const fetchClub = async ({ queryKey, meta: { authData }}) => {
     const clubId = queryKey[1];
-    const res = await fetchDataFromEndpoint(`club/${clubId}`, 'GET', { Authorization: `BEARER ${authData.id}`});
+    const res = await makeRequestToEndpoint(`club/${clubId}`, 'GET', { Authorization: `BEARER ${authData.id}`});
     return await res.json();
 };
 
 export const createNewClub = async ({ newClubData, authToken }) => {
-    const res = await fetchDataFromEndpoint('club', 'POST', { Authorization: `BEARER ${authToken}` }, newClubData);
+    const res = await makeRequestToEndpoint('club', 'POST', { Authorization: `BEARER ${authToken}` }, newClubData);
     if (res.ok) {
         return await res.json();
     } else if (res.status === httpStatus.BAD_REQUEST) {
@@ -26,7 +26,7 @@ export const createNewClub = async ({ newClubData, authToken }) => {
 
 export const fetchSquadHubData = async ({ queryKey, meta: { authData } }) => {
     const clubId = queryKey[1];
-    const res = await fetchDataFromEndpoint(`club/${clubId}/squadPlayers`, 'GET', {
+    const res = await makeRequestToEndpoint(`club/${clubId}/squadPlayers`, 'GET', {
         Authorization: `BEARER ${authData.id}`
     });
     return await res.json();

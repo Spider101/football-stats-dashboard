@@ -1,5 +1,5 @@
 import { httpStatus } from '../constants';
-import fetchDataFromEndpoint from './utils';
+import makeRequestToEndpoint from './utils';
 import UnauthorizedError from '../errors/UnauthorizedError';
 
 /**
@@ -10,7 +10,7 @@ import UnauthorizedError from '../errors/UnauthorizedError';
  * @returns auth data containing bearer token, userId and refresh information
  */
 export const authenticateUser = async ({ username, password }) => {
-    const res = await fetchDataFromEndpoint('users/authenticate', 'POST', {}, { email: username, password });
+    const res = await makeRequestToEndpoint('users/authenticate', 'POST', {}, { email: username, password });
     if (res.ok) {
         return await res.json();
     } else if (res.status === httpStatus.BAD_REQUEST) {
@@ -27,7 +27,7 @@ export const authenticateUser = async ({ username, password }) => {
  * @returns user data containing userId, email, firstName, lastName and encrypted password
  */
 export const fetchUser = async ({ meta: { authData } }) => {
-    const res = await fetchDataFromEndpoint(`users/${authData.userId}`, 'GET', {
+    const res = await makeRequestToEndpoint(`users/${authData.userId}`, 'GET', {
         Authorization: `BEARER ${authData.id}`
     });
     if (res.ok) {
@@ -47,7 +47,7 @@ export const fetchUser = async ({ meta: { authData } }) => {
 export const createUser = async newUserData => {
     const { email } = newUserData;
 
-    const res = await fetchDataFromEndpoint('users', 'POST', {}, newUserData);
+    const res = await makeRequestToEndpoint('users', 'POST', {}, newUserData);
     if (res.ok) {
         return await res.json();
     } else if (res.status === httpStatus.CONFLICT) {
