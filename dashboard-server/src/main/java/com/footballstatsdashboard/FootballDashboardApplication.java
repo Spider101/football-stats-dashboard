@@ -7,6 +7,7 @@ import com.footballstatsdashboard.core.service.auth.CustomAuthorizer;
 import com.footballstatsdashboard.core.utils.DashboardInternalModule;
 import com.footballstatsdashboard.core.utils.DashboardReadonlyModule;
 import com.footballstatsdashboard.db.DAOFactory;
+import com.footballstatsdashboard.db.IUserEntityDAO;
 import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
 import com.footballstatsdashboard.resources.ClubResource;
 import com.footballstatsdashboard.resources.CountryFlagsLookupResource;
@@ -59,6 +60,8 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         // setup data access layer
         DAOFactory daoFactory = new DAOFactory(configuration, environment);
         daoFactory.initialize();
+        // since this entity is referenced by other entities, need to initialize it before others
+        IUserEntityDAO userEntityDAO = daoFactory.getUserEntityDAO();
 
         // setup services
         ClubService clubService = new ClubService(daoFactory.getClubEntityDAO());
@@ -67,8 +70,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         FileUploadService fileUploadService = new FileUploadService(configuration.getFileUploadConfiguration());
 
         // setup resources
-        environment.jersey().register(new UserResource(daoFactory.getUserEntityDAO(),
-                daoFactory.getAuthTokenEntityDAO()));
+        environment.jersey().register(new UserResource(userEntityDAO, daoFactory.getAuthTokenEntityDAO()));
         environment.jersey().register(new PlayerResource(playerService, clubService));
         environment.jersey().register(new ClubResource(clubService, fileUploadService));
         environment.jersey().register(new MatchPerformanceResource(daoFactory.getMatchPerformanceEntityDAO()));
@@ -77,7 +79,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
 
         // Register OAuth authentication
         CustomAuthenticator customAuthenticator = new CustomAuthenticator(daoFactory.getAuthTokenEntityDAO(),
-                daoFactory.getUserEntityDAO());
+                userEntityDAO);
         environment.jersey()
                 .register(new AuthDynamicFeature(new OAuthCredentialAuthFilter.Builder<User>()
                         .setAuthenticator(customAuthenticator)
