@@ -92,3 +92,14 @@ export const getLookupDataHandlers = (baseUrl = '*') => {
         })
     ];
 };
+
+export const getFileUploadHandlers = (baseUrl = '*') => {
+    return [
+        rest.post(`${baseUrl}/upload/image`, (req, res, ctx) => {
+            return res(
+                ctx.status(201),
+                ctx.json({ fileKey: 'sample file.png' })
+            );
+        })
+    ];
+};
