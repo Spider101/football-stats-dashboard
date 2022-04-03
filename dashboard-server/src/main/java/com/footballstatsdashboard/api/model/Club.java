@@ -11,6 +11,7 @@ import com.footballstatsdashboard.api.model.club.Income;
 import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
+import org.jdbi.v3.core.mapper.Nested;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -49,6 +50,7 @@ public interface Club {
      * funds allocated to the manager from the club's finances
      */
     @Valid
+    @Nested("managerFunds")
     ManagerFunds getManagerFunds();
 
     /**
