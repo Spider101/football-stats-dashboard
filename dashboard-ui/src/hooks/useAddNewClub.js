@@ -22,7 +22,7 @@ export default function () {
                         ...rest,
                         income: { current: Number(income) },
                         expenditure: { current: Number(expenditure) },
-                        managerFunds: Number(managerFunds)
+                        managerFunds: { current: Number(managerFunds) }
                     },
                     authToken: authData.id
                 });
