@@ -138,16 +138,16 @@ const PlayerMetadataForm = ({ newPlayerMetadata, newPlayerMetadataValidations, h
                 select
             >
                 {countryFlagMetadata
-                    .filter(flagMetadata => PLAYER_NATIONS.includes(flagMetadata.name))
+                    .filter(flagMetadata => PLAYER_NATIONS.includes(flagMetadata.countryName))
                     .map(flagMetadata => (
-                        <MenuItem key={flagMetadata.id} value={flagMetadata.name}>
+                        <MenuItem key={flagMetadata.id} value={flagMetadata.countryName}>
                             {/* hide the flag when a country is selected */}
-                            {newPlayerMetadata.country !== flagMetadata.name && (
+                            {newPlayerMetadata.country !== flagMetadata.countryName && (
                                 <ListItemIcon>
                                     <img src={flagMetadata.countryFlagUrl} alt={flagMetadata.countryCode} />
                                 </ListItemIcon>
                             )}
-                            <ListItemText primary={flagMetadata.name} />
+                            <ListItemText primary={flagMetadata.countryName} />
                         </MenuItem>
                     ))}
             </TextField>
