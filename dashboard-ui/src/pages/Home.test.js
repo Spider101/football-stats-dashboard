@@ -65,7 +65,7 @@ it('should render success message when add new club form is submitted', async ()
     userEvent.type(screen.getByLabelText(/expenditure/i), '1');
 
     const submitButton = screen.getByRole('button', { name: 'Submit' });
-    expect(submitButton).not.toBeDisabled();
+    await waitFor(() => expect(submitButton).not.toBeDisabled());
     userEvent.click(submitButton);
 
     await waitFor(() => expect(screen.queryByText('New Club Added Successfully!')).toBeInTheDocument());
