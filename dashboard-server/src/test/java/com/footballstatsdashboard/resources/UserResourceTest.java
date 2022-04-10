@@ -6,9 +6,8 @@ import com.footballstatsdashboard.api.model.AuthToken;
 import com.footballstatsdashboard.api.model.ImmutableAuthToken;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.db.AuthTokenDAO;
-import com.footballstatsdashboard.db.UserDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.IAuthTokenEntityDAO;
+import com.footballstatsdashboard.db.IUserEntityDAO;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
@@ -29,6 +28,7 @@ import java.util.UUID;
 import static com.footballstatsdashboard.core.utils.Constants.HASHING_COST;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,10 +48,10 @@ public class UserResourceTest {
     private UserResource userResource;
 
     @Mock
-    private AuthTokenDAO<ResourceKey> authTokenDAO;
+    private IAuthTokenEntityDAO authTokenDAO;
 
     @Mock
-    private UserDAO<ResourceKey> userDAO;
+    private IUserEntityDAO userDAO;
 
     @Mock
     private UriInfo uriInfo;
@@ -77,13 +77,13 @@ public class UserResourceTest {
         // setup
         UUID userId = UUID.randomUUID();
         User userFromCouchbase = getUserDataStub(userId, false);
-        when(userDAO.getDocument(any(), any())).thenReturn(userFromCouchbase);
+        when(userDAO.getEntity(eq(userId))).thenReturn(userFromCouchbase);
 
         // execute
         Response userResponse = userResource.getUser(userId);
 
         // assert
-        verify(userDAO).getDocument(any(), any());
+        verify(userDAO).getEntity(any());
         assertEquals(HttpStatus.OK_200, userResponse.getStatus());
         assertNotNull(userResponse.getEntity());
 
@@ -99,14 +99,14 @@ public class UserResourceTest {
     public void getUserWhenUserNotFoundInCouchbase() {
         // setup
         UUID invalidUserId = UUID.randomUUID();
-        when(userDAO.getDocument(any(), any()))
+        when(userDAO.getEntity(eq(invalidUserId)))
                 .thenThrow(new RuntimeException("Unable to find document with Id: " + invalidUserId));
 
         // execute
         userResource.getUser(invalidUserId);
 
         // assert
-        verify(userDAO).getDocument(any(), any());
+        verify(userDAO).getEntity(any());
     }
 
     /**
@@ -118,16 +118,15 @@ public class UserResourceTest {
         // setup
         User incomingUser = getUserDataStub(null, false);
         ArgumentCaptor<User> newUserCaptor = ArgumentCaptor.forClass(User.class);
-        when(userDAO.getUsersByFirstNameLastNameEmail(
-                eq(incomingUser.getFirstName()), eq(incomingUser.getLastName()), eq(incomingUser.getEmail())
-        )).thenReturn(new ArrayList<>());
+        when(userDAO.getExistingUsers(eq(incomingUser.getFirstName()), eq(incomingUser.getLastName()),
+                eq(incomingUser.getEmail()))).thenReturn(new ArrayList<>());
 
         // execute
         Response userResponse = userResource.createUser(incomingUser, uriInfo);
 
         // assert
-        verify(userDAO).getUsersByFirstNameLastNameEmail(anyString(), anyString(), anyString());
-        verify(userDAO).insertDocument(any(), newUserCaptor.capture());
+        verify(userDAO).getExistingUsers(anyString(), anyString(), anyString());
+        verify(userDAO).insertEntity(newUserCaptor.capture());
 
         User newUser = newUserCaptor.getValue();
         assertNotNull(newUser.getCreatedBy());
@@ -155,16 +154,15 @@ public class UserResourceTest {
     public void createUserWhenUserAlreadyExists() {
         // setup
         User incomingUser = getUserDataStub(null, false);
-        when(userDAO.getUsersByFirstNameLastNameEmail(
-                eq(incomingUser.getFirstName()), eq(incomingUser.getLastName()), eq(incomingUser.getEmail())
-        )).thenReturn(ImmutableList.of(incomingUser));
+        when(userDAO.getExistingUsers(eq(incomingUser.getFirstName()), eq(incomingUser.getLastName()),
+                eq(incomingUser.getEmail()))).thenReturn(ImmutableList.of(incomingUser));
 
         // execute
         Response userResponse = userResource.createUser(incomingUser, uriInfo);
 
         // assert
-        verify(userDAO).getUsersByFirstNameLastNameEmail(anyString(), anyString(), anyString());
-        verify(userDAO, never()).insertDocument(any(), any());
+        verify(userDAO).getExistingUsers(anyString(), anyString(), anyString());
+        verify(userDAO, never()).insertEntity(any());
 
         assertEquals(HttpStatus.CONFLICT_409, userResponse.getStatus());
         assertNotNull(userResponse.getEntity());
@@ -184,7 +182,7 @@ public class UserResourceTest {
                 .email(userFromCouchbase.getEmail())
                 .password(RAW_PASSWORD)
                 .build();
-        when(userDAO.getUserByCredentials(eq(userCredentials.getEmail())))
+        when(userDAO.getUserByEmailAddress(eq(userCredentials.getEmail())))
                 .thenReturn(Optional.of(userFromCouchbase));
         when(authTokenDAO.getAuthTokenForUser(eq(userId))).thenReturn(Optional.empty());
 
@@ -192,10 +190,10 @@ public class UserResourceTest {
         Response userResponse = userResource.authenticateUser(userCredentials);
 
         // assert
-        verify(userDAO).getUserByCredentials(anyString());
+        verify(userDAO).getUserByEmailAddress(anyString());
         verify(authTokenDAO).getAuthTokenForUser(any());
-        verify(authTokenDAO, never()).updateLastAccessTime(any(), any());
-        verify(authTokenDAO).insertDocument(any(), any());
+        verify(authTokenDAO, never()).updateEntity(any(), any()); // this would only be called to update the last access time
+        verify(authTokenDAO).insertEntity(any());
 
         assertEquals(HttpStatus.OK_200, userResponse.getStatus());
         assertNotNull(userResponse.getEntity());
@@ -216,8 +214,7 @@ public class UserResourceTest {
                 .email("invalid email")
                 .password("valid password")
                 .build();
-        when(userDAO.getUserByCredentials(eq(userCredentials.getEmail())))
-                .thenReturn(Optional.empty());
+        when(userDAO.getUserByEmailAddress(eq(userCredentials.getEmail()))).thenReturn(Optional.empty());
 
         // execute
         Response userResponse = userResource.authenticateUser(userCredentials);
@@ -239,8 +236,7 @@ public class UserResourceTest {
                 .password("invalid password")
                 .build();
         User userFromCouchbase = getUserDataStub(userId, true);
-        when(userDAO.getUserByCredentials(eq(userCredentials.getEmail())))
-                .thenReturn(Optional.of(userFromCouchbase));
+        when(userDAO.getUserByEmailAddress(eq(userCredentials.getEmail()))).thenReturn(Optional.of(userFromCouchbase));
 
         // execute
         Response userResponse = userResource.authenticateUser(userCredentials);
@@ -263,8 +259,7 @@ public class UserResourceTest {
                 .email(userFromCouchbase.getEmail())
                 .password(RAW_PASSWORD)
                 .build();
-        when(userDAO.getUserByCredentials(eq(userCredentials.getEmail())))
-                .thenReturn(Optional.of(userFromCouchbase));
+        when(userDAO.getUserByEmailAddress(eq(userCredentials.getEmail()))).thenReturn(Optional.of(userFromCouchbase));
 
         Instant instantInPast = Instant.now().minusSeconds(SECONDS_TO_SUBTRACT);
         AuthToken existingAuthToken = ImmutableAuthToken.builder()
@@ -279,13 +274,14 @@ public class UserResourceTest {
         Response userResponse = userResource.authenticateUser(userCredentials);
 
         // assert
-        verify(userDAO).getUserByCredentials(anyString());
+        verify(userDAO).getUserByEmailAddress(anyString());
         verify(authTokenDAO).getAuthTokenForUser(any());
-        verify(authTokenDAO, never()).insertDocument(any(), any());
+        verify(authTokenDAO, never()).insertEntity(any());
 
-        verify(authTokenDAO).updateLastAccessTime(any(), existingAuthTokenCaptor.capture());
+        // this would only be called to update the last access time
+        verify(authTokenDAO).updateEntity(eq(existingAuthToken.getId()), existingAuthTokenCaptor.capture());
         AuthToken capturedExistingAuthToken = existingAuthTokenCaptor.getValue();
-        assertEquals(existingAuthToken, capturedExistingAuthToken);
+        assertNotEquals(existingAuthToken.getLastAccessUTC(), capturedExistingAuthToken.getLastAccessUTC());
 
         assertEquals(HttpStatus.OK_200, userResponse.getStatus());
         assertNotNull(userResponse.getEntity());
@@ -313,10 +309,11 @@ public class UserResourceTest {
     }
 
     private void assertInvalidUserCredentials(User userCredentials, Response userResponse) {
-        verify(userDAO).getUserByCredentials(anyString());
+        verify(userDAO).getUserByEmailAddress(anyString());
         verify(authTokenDAO, never()).getAuthTokenForUser(any());
-        verify(authTokenDAO, never()).updateLastAccessTime(any(), any());
-        verify(authTokenDAO, never()).insertDocument(any(), any());
+        // this would only be called to update the last access time
+        verify(authTokenDAO, never()).updateEntity(any(), any());
+        verify(authTokenDAO, never()).insertEntity(any());
 
         assertEquals(HttpStatus.BAD_REQUEST_400, userResponse.getStatus());
         assertNotNull(userResponse.getEntity());

@@ -1,6 +1,5 @@
 package com.footballstatsdashboard.services;
 
-import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.ImmutableClub;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
@@ -14,13 +13,13 @@ import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.validations.Validation;
 import com.footballstatsdashboard.core.validations.ValidationSeverity;
-import com.footballstatsdashboard.db.ClubDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.IClubEntityDAO;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,9 +30,9 @@ import java.util.UUID;
 
 public class ClubService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubService.class);
-    private final ClubDAO<ResourceKey> clubDAO;
+    private final IClubEntityDAO clubDAO;
 
-    public ClubService(ClubDAO<ResourceKey> clubDAO) {
+    public ClubService(IClubEntityDAO clubDAO) {
         this.clubDAO = clubDAO;
     }
 
@@ -92,8 +91,7 @@ public class ClubService {
                 .createdBy(createdBy)
                 .build();
 
-        ResourceKey resourceKey = new ResourceKey(newClub.getId());
-        this.clubDAO.insertDocument(resourceKey, newClub);
+        this.clubDAO.insertEntity(newClub);
 
         return newClub;
     }
@@ -130,8 +128,7 @@ public class ClubService {
                 .lastModifiedDate(LocalDate.now())
                 .build();
 
-        ResourceKey resourceKey = new ResourceKey(existingClubId);
-        this.clubDAO.updateDocument(resourceKey, updatedClub);
+        this.clubDAO.updateEntity(existingClubId, updatedClub);
 
         return updatedClub;
     }
@@ -144,10 +141,9 @@ public class ClubService {
             throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
         }
 
-        ResourceKey resourceKey = new ResourceKey(clubId);
         try {
-            this.clubDAO.deleteDocument(resourceKey);
-        } catch (DocumentNotFoundException documentNotFoundException) {
+            this.clubDAO.deleteEntity(clubId);
+        } catch (EntityNotFoundException entityNotFoundException) {
             LOGGER.error("No club entity found for ID: {}", clubId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
                     String.format("Cannot delete club (ID: %s) that does not exist", clubId));
@@ -155,7 +151,7 @@ public class ClubService {
     }
 
     public List<ClubSummary> getClubSummariesByUserId(UUID userId) {
-        return this.clubDAO.getClubSummariesByUserId(userId);
+        return this.clubDAO.getClubSummariesForUser(userId);
     }
 
     public List<SquadPlayer> getSquadPlayers(UUID clubId) {
@@ -163,16 +159,13 @@ public class ClubService {
     }
 
     private Club fetchClubData(UUID clubId) {
-        ResourceKey resourceKey = new ResourceKey(clubId);
-        Club club;
         try {
-            club = this.clubDAO.getDocument(resourceKey, Club.class);
-        } catch (DocumentNotFoundException documentNotFoundException) {
+            return this.clubDAO.getEntity(clubId);
+        } catch (EntityNotFoundException entityNotFoundException) {
             String errorMessage = String.format("No club entity found for ID: %s", clubId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
-        return club;
     }
 
     private List<Validation> validateIncomingClub(Club incomingClub, boolean isForNewClub) {

@@ -1,14 +1,12 @@
 package com.footballstatsdashboard.services;
 
-import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.footballstatsdashboard.ClubDataProvider;
 import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
-import com.footballstatsdashboard.db.ClubDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.IClubEntityDAO;
 import com.google.common.collect.ImmutableList;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +14,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.persistence.EntityNotFoundException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -40,7 +39,7 @@ public class ClubServiceTest {
     private ClubService clubService;
 
     @Mock
-    private ClubDAO<ResourceKey> clubDAO;
+    private IClubEntityDAO clubDAO;
 
     /**
      * set up test data before each test case is run
@@ -68,13 +67,13 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
+        when(clubDAO.getEntity(eq(clubId))).thenReturn(clubFromCouchbase);
 
         // execute
         Club club = clubService.getClub(clubId, userId);
 
         // assert
-        verify(clubDAO).getDocument(any(), any());
+        verify(clubDAO).getEntity(any());
 
         assertEquals(clubId, club.getId());
         assertNotNull(club.getIncome());
@@ -91,13 +90,13 @@ public class ClubServiceTest {
     public void getClubWhenClubNotFoundInCouchbase() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
+        when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
 
         // execute
         clubService.getClub(invalidClubId, userId);
 
         // assert
-        verify(clubDAO).getDocument(any(), any());
+        verify(clubDAO).getEntity(any());
     }
 
     /**
@@ -115,13 +114,13 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getDocument(any(), any())).thenReturn(clubFromCouchbase);
+        when(clubDAO.getEntity(eq(clubId))).thenReturn(clubFromCouchbase);
 
         // execute
         clubService.getClub(clubId, userId);
 
         // assert
-        verify(clubDAO).getDocument(any(), any());
+        verify(clubDAO).getEntity(any());
     }
 
     /**
@@ -142,7 +141,7 @@ public class ClubServiceTest {
         Club createdClub = clubService.createClub(incomingClub, userId, USER_EMAIL);
 
         // assert
-        verify(clubDAO).insertDocument(any(), newClubCaptor.capture());
+        verify(clubDAO).insertEntity(newClubCaptor.capture());
         Club newClub = newClubCaptor.getValue();
         assertEquals(createdClub, newClub);
 
@@ -185,7 +184,7 @@ public class ClubServiceTest {
         clubService.createClub(incomingClubWithNoName, userId, USER_EMAIL);
 
         // assert
-        verify(clubDAO, never()).insertDocument(any(), any());
+        verify(clubDAO, never()).insertEntity(any());
     }
 
     /**
@@ -204,7 +203,7 @@ public class ClubServiceTest {
         clubService.createClub(incomingClubWithNoIncomeData, userId, USER_EMAIL);
 
         // assert
-        verify(clubDAO, never()).insertDocument(any(), any());
+        verify(clubDAO, never()).insertEntity(any());
     }
 
     /**
@@ -223,7 +222,7 @@ public class ClubServiceTest {
         clubService.createClub(incomingClubWithNoExpenditureData, userId, USER_EMAIL);
 
         // assert
-        verify(clubDAO, never()).insertDocument(any(), any());
+        verify(clubDAO, never()).insertEntity(any());
     }
 
     /**
@@ -244,7 +243,7 @@ public class ClubServiceTest {
         clubService.createClub(incomingClubWithIncorrectManagerFunds, userId, USER_EMAIL);
 
         // assert
-        verify(clubDAO, never()).insertDocument(any(), any());
+        verify(clubDAO, never()).insertEntity(any());
     }
 
     /**
@@ -266,7 +265,7 @@ public class ClubServiceTest {
         clubService.createClub(incomingClubWithIncorrectBudget, userId, USER_EMAIL);
 
         // assert
-        verify(clubDAO, never()).insertDocument(any(), any());
+        verify(clubDAO, never()).insertEntity(any());
     }
 
     /**
@@ -305,7 +304,7 @@ public class ClubServiceTest {
         Club updatedClub = clubService.updateClub(incomingClub, existingClub, existingClubId);
 
         // assert
-        verify(clubDAO).updateDocument(any(), updatedClubCaptor.capture());
+        verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
         Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
         assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
 
@@ -359,7 +358,7 @@ public class ClubServiceTest {
         Club updatedClub = clubService.updateClub(incomingClub, existingClub, existingClubId);
 
         // assert
-        verify(clubDAO).updateDocument(any(), updatedClubCaptor.capture());
+        verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
         Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
         assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
 
@@ -401,7 +400,7 @@ public class ClubServiceTest {
         clubService.updateClub(incomingClub, existingClub, existingClubId);
 
         // assert
-        verify(clubDAO, never()).updateDocument(any(), any());
+        verify(clubDAO, never()).updateEntity(any(), any());
     }
 
     /**
@@ -434,7 +433,7 @@ public class ClubServiceTest {
         clubService.updateClub(incomingClub, existingClub, existingClubId);
 
         // assert
-        verify(clubDAO, never()).updateDocument(any(), any());
+        verify(clubDAO, never()).updateEntity(any(), any());
     }
 
     /**
@@ -453,7 +452,7 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getDocument(any(), any())).thenReturn(existingClubInCouchbase);
+        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubInCouchbase);
 
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
@@ -474,7 +473,7 @@ public class ClubServiceTest {
         Club updatedClub = clubService.updateClub(incomingClub, existingClubInCouchbase, existingClubId);
 
         // assert
-        verify(clubDAO).updateDocument(any(), updatedClubCaptor.capture());
+        verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
         Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
         assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
 
@@ -505,17 +504,14 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getDocument(any(), any())).thenReturn(existingClub);
-        ArgumentCaptor<ResourceKey> resourceKeyCaptor = ArgumentCaptor.forClass(ResourceKey.class);
+        when(clubDAO.getEntity(eq(clubId))).thenReturn(existingClub);
 
         // execute
         clubService.deleteClub(clubId, userId);
 
         // assert
-        verify(clubDAO).getDocument(any(), any());
-        verify(clubDAO).deleteDocument(resourceKeyCaptor.capture());
-        ResourceKey capturedResourceKey = resourceKeyCaptor.getValue();
-        assertEquals(clubId, capturedResourceKey.getResourceId());
+        verify(clubDAO).getEntity(any());
+        verify(clubDAO).deleteEntity(eq(clubId));
     }
 
     /**
@@ -533,14 +529,14 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getDocument(any(), any())).thenReturn(existingClub);
+        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClub);
 
         // execute
         clubService.deleteClub(existingClubId, userId);
 
         // assert
-        verify(clubDAO).getDocument(any(), any());
-        verify(clubDAO, never()).deleteDocument(any());
+        verify(clubDAO).getEntity(any());
+        verify(clubDAO, never()).deleteEntity(any());
     }
 
     /**
@@ -550,13 +546,13 @@ public class ClubServiceTest {
     public void deleteClubWhenClubDataDoesNotExist() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.getDocument(any(), any())).thenThrow(DocumentNotFoundException.class);
+        when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
 
         // execute
         clubService.deleteClub(invalidClubId, userId);
 
         // assert
-        verify(clubDAO, never()).deleteDocument(any());
+        verify(clubDAO, never()).deleteEntity(any());
     }
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from
@@ -566,13 +562,13 @@ public class ClubServiceTest {
     public void getClubsByUserIdFetchesAllClubsForUser() {
         // setup
         List<ClubSummary> mockClubData = ClubDataProvider.getAllClubSummariesForUser(userId);
-        when(clubDAO.getClubSummariesByUserId(any())).thenReturn(mockClubData);
+        when(clubDAO.getClubSummariesForUser(eq(userId))).thenReturn(mockClubData);
 
         // execute
         List<ClubSummary> clubSummaries = clubService.getClubSummariesByUserId(userId);
 
         // assert
-        verify(clubDAO).getClubSummariesByUserId(eq(userId));
+        verify(clubDAO).getClubSummariesForUser(any());
         assertFalse(clubSummaries.isEmpty());
 
         for (int idx = 0; idx < clubSummaries.size(); idx++) {
@@ -587,13 +583,13 @@ public class ClubServiceTest {
     @Test
     public void getClubsByUserIdReturnsEmptyListWhenNoClubsAreAssociatedWithUser() {
         // setup
-        when(clubDAO.getClubSummariesByUserId(any())).thenReturn(new ArrayList<>());
+        when(clubDAO.getClubSummariesForUser(eq(userId))).thenReturn(new ArrayList<>());
 
         // execute
         List<ClubSummary> clubList = clubService.getClubSummariesByUserId(userId);
 
         // assert
-        verify(clubDAO).getClubSummariesByUserId(eq(userId));
+        verify(clubDAO).getClubSummariesForUser(any());
         assertTrue(clubList.isEmpty());
     }
 

@@ -5,9 +5,8 @@ import com.footballstatsdashboard.api.model.AuthToken;
 import com.footballstatsdashboard.api.model.ImmutableAuthToken;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
-import com.footballstatsdashboard.db.AuthTokenDAO;
-import com.footballstatsdashboard.db.UserDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.IAuthTokenEntityDAO;
+import com.footballstatsdashboard.db.IUserEntityDAO;
 import io.dropwizard.auth.Auth;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -43,11 +42,11 @@ public class UserResource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserResource.class);
 
-    private final UserDAO<ResourceKey> userDAO;
-    private final AuthTokenDAO<ResourceKey> authTokenDAO;
+    private final IUserEntityDAO userDAO;
+    private final IAuthTokenEntityDAO authTokenDAO;
 
-    public UserResource(UserDAO<ResourceKey> userDAO,
-                        AuthTokenDAO<ResourceKey> authTokenDAO) {
+    public UserResource(IUserEntityDAO userDAO,
+                        IAuthTokenEntityDAO authTokenDAO) {
         this.userDAO = userDAO;
         this.authTokenDAO = authTokenDAO;
     }
@@ -61,8 +60,7 @@ public class UserResource {
             LOGGER.info("getUser() request for user with ID: {}", userId.toString());
         }
 
-        ResourceKey resourceKey = new ResourceKey(userId);
-        User user = this.userDAO.getDocument(resourceKey, User.class);
+        User user = this.userDAO.getEntity(userId);
         return Response.ok(user).build();
     }
 
@@ -76,7 +74,7 @@ public class UserResource {
         }
 
         // check if there are any existing users with the same first name, last name, email combination
-        List<User> existingUsers = this.userDAO.getUsersByFirstNameLastNameEmail(incomingUserDetails.getFirstName(),
+        List<User> existingUsers = this.userDAO.getExistingUsers(incomingUserDetails.getFirstName(),
                 incomingUserDetails.getLastName(), incomingUserDetails.getEmail());
         if (existingUsers.size() > 0) {
             if (LOGGER.isInfoEnabled()) {
@@ -98,8 +96,7 @@ public class UserResource {
                 .lastModifiedDate(currentDate)
                 .build();
 
-        ResourceKey resourceKey = new ResourceKey(newUser.getId());
-        this.userDAO.insertDocument(resourceKey, newUser);
+        this.userDAO.insertEntity(newUser);
 
         URI location = uriInfo.getAbsolutePathBuilder().path(newUser.getId().toString()).build();
         return Response.created(location).entity(newUser).build();
@@ -109,7 +106,7 @@ public class UserResource {
     @Path("/authenticate")
     public Response authenticateUser(
             @Valid @NotNull User userCredentials) {
-        Optional<User> user = this.userDAO.getUserByCredentials(userCredentials.getEmail());
+        Optional<User> user = this.userDAO.getUserByEmailAddress(userCredentials.getEmail());
 
         if (user.isEmpty()) {
             LOGGER.error("Invalid email provided: " + userCredentials.getEmail());
@@ -137,8 +134,7 @@ public class UserResource {
                         + validUser.getId());
             }
 
-            ResourceKey authTokenKey = new ResourceKey(validAuthToken.getId());
-            this.authTokenDAO.updateLastAccessTime(authTokenKey, authToken.get());
+            updateLastAccessTimeOnAuthToken(authToken.get());
 
             return Response.ok().entity(validAuthToken).build();
         }
@@ -148,12 +144,19 @@ public class UserResource {
                 .userId(validUser.getId())
                 .lastAccessUTC(Instant.now())
                 .build();
-        ResourceKey authTokenKey = new ResourceKey(freshAuthToken.getId());
-        this.authTokenDAO.insertDocument(authTokenKey, freshAuthToken);
+        this.authTokenDAO.insertEntity(freshAuthToken);
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Fresh Auth Token: " + freshAuthToken.getId() + " generated");
         }
         return Response.ok().entity(freshAuthToken).build();
+    }
+
+    private void updateLastAccessTimeOnAuthToken(AuthToken existingAuthToken) {
+        AuthToken updatedAuthToken = ImmutableAuthToken.builder()
+                .from(existingAuthToken)
+                .lastAccessUTC(Instant.now())
+                .build();
+        this.authTokenDAO.updateEntity(existingAuthToken.getId(), updatedAuthToken);
     }
 }

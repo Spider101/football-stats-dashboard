@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import com.footballstatsdashboard.api.model.matchPerformance.MatchRating;
 import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
+import org.jdbi.v3.core.mapper.Nested;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
@@ -112,6 +113,7 @@ public interface MatchPerformance {
      * Player's match rating in the competition
      */
     @Valid
+    @Nested("matchRating")
     MatchRating getMatchRating();
 
     // TODO: 12/05/21 update all local date times to zoned date times to involve timezones as well

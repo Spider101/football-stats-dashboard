@@ -48,7 +48,7 @@ public final class Constants {
                     Map.entry("dribbling", Pair.of(AttributeCategory.TECHNICAL, AttributeGroup.ATTACKING)),
                     Map.entry("curve", Pair.of(AttributeCategory.TECHNICAL, AttributeGroup.ATTACKING)),
                     Map.entry("short passing", Pair.of(AttributeCategory.TECHNICAL, AttributeGroup.VISION)),
-                    Map.entry("long Passing", Pair.of(AttributeCategory.TECHNICAL, AttributeGroup.VISION)),
+                    Map.entry("long passing", Pair.of(AttributeCategory.TECHNICAL, AttributeGroup.VISION)),
                     Map.entry("standing tackle", Pair.of(AttributeCategory.TECHNICAL, AttributeGroup.DEFENDING)),
                     Map.entry("sliding tackle", Pair.of(AttributeCategory.TECHNICAL, AttributeGroup.DEFENDING)),
                     Map.entry("heading accuracy", Pair.of(AttributeCategory.TECHNICAL, AttributeGroup.AERIAL)),

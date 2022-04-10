@@ -4,6 +4,7 @@ import com.footballstatsdashboard.client.couchbase.config.CouchbaseClientConfigu
 import com.footballstatsdashboard.config.FileUploadConfiguration;
 import io.dropwizard.Configuration;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.dropwizard.db.DataSourceFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -14,6 +15,11 @@ public class FootballDashboardConfiguration extends Configuration {
     @NotNull
     @JsonProperty
     private Long appId;
+
+    @Valid
+    @NotNull
+    @JsonProperty
+    private DataSourceFactory database;
 
     @Valid
     @NotNull
@@ -29,6 +35,10 @@ public class FootballDashboardConfiguration extends Configuration {
     @NotNull
     @JsonProperty
     private FileUploadConfiguration fileUpload;
+
+    public DataSourceFactory getDatabase() {
+        return database;
+    }
 
     public CouchbaseClientConfiguration getCouchbaseClientConfiguration() {
         return couchbase;
