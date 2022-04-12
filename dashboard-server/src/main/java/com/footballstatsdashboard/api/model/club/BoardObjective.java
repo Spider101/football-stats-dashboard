@@ -15,7 +15,7 @@ import java.util.UUID;
 public interface BoardObjective {
 
     /**
-     * board objective
+     * board objective id
      */
     @Valid
     @Value.Default

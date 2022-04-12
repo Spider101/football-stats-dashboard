@@ -56,7 +56,7 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
     private interface IBoardObjectivesDAO {
         @SqlUpdate(
                 "CREATE TABLE IF NOT EXISTS boardObjectives (id VARCHAR PRIMARY KEY, clubId VARCHAR, title VARCHAR," +
-                        " description VARCHAR, isCompleted BYTE, FOREIGN KEY (clubId) REFERENCES club (id)"
+                        " description VARCHAR, isCompleted BYTE, FOREIGN KEY (clubId) REFERENCES club (id))"
         )
         void createTable();
 
