@@ -1,0 +1,16 @@
+[
+  {
+    "id": "7519ccfd-5c57-4b67-8da7-361ecc857d73",
+    "title": "first objective title",
+    "description": "first objective description.",
+    "isCompleted": true,
+    "clubId": "7c77a932-0e92-4ce4-bafa-a51fd89851d2"
+  },
+  {
+    "id": "bd9406cf-7663-41e7-8501-976a49b94107",
+    "title": "second objective title",
+    "description": "second objective description.",
+    "isCompleted": false,
+    "clubId": "7c77a932-0e92-4ce4-bafa-a51fd89851d2"
+  }
+]
