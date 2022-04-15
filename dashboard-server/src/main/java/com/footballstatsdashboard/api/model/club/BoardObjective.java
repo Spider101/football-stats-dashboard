@@ -47,6 +47,8 @@ public interface BoardObjective {
      * ID of the club the objective belongs to
      */
     @Valid
+    @Nullable
+    @InternalField
     UUID getClubId();
 
     /**
