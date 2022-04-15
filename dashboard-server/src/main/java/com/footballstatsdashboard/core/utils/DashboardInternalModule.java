@@ -54,7 +54,7 @@ public class DashboardInternalModule extends Module {
 
         @Override
         public List<BeanPropertyWriter> changeProperties(SerializationConfig config, BeanDescription beanDescription,
-                                                         List<BeanPropertyWriter> beanPropertyWriters) {
+                                                        List<BeanPropertyWriter> beanPropertyWriters) {
             return beanPropertyWriters.stream()
                     .filter(beanPropertyWriter -> beanPropertyWriter.getAnnotation(InternalField.class) == null)
                     .collect(Collectors.toList());
@@ -68,7 +68,7 @@ public class DashboardInternalModule extends Module {
 
         @Override
         public BeanDeserializerBuilder updateBuilder(DeserializationConfig deserializationConfig,
-                                                     BeanDescription beanDescription, BeanDeserializerBuilder builder) {
+                                                    BeanDescription beanDescription, BeanDeserializerBuilder builder) {
             Iterator<SettableBeanProperty> propertyIterator = builder.getProperties();
             List<SettableBeanProperty> propertiesToRemove = new ArrayList<>();
             while (propertyIterator.hasNext()) {
