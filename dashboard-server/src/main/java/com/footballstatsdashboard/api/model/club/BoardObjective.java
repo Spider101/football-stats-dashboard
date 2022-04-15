@@ -3,8 +3,10 @@ package com.footballstatsdashboard.api.model.club;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import java.util.UUID;
 
@@ -46,4 +48,14 @@ public interface BoardObjective {
      */
     @Valid
     UUID getClubId();
+
+    /**
+     * represent the type of entity
+     */
+    @Nullable
+    @InternalField
+    @Value.Default
+    default String getType() {
+        return "BoardObjective";
+    }
 }
