@@ -259,12 +259,6 @@ securitySchemes:
         get:
           description: gets data for all board objectives entities associated with a club id
           securedBy: [access_token]
-          queryParameters:
-            clubId:
-              displayName: Club ID
-              description: The ID for the club to filter by
-              type: string
-              required: true
           responses:
             200:
               body:
