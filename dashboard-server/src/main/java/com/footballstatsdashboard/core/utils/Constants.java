@@ -10,7 +10,7 @@ public final class Constants {
         throw new AssertionError("Should not be initialized");
     }
 
-    public static final String APPLICATION_NAME = "football-dashboard";
+    public static final String APPLICATION_NAME = "football-stats-dashboard";
 
     private static final String API_V1_BASE_PATH = APPLICATION_NAME + "/v1";
     public static final String PLAYER_V1_BASE_PATH = API_V1_BASE_PATH + "/players";
