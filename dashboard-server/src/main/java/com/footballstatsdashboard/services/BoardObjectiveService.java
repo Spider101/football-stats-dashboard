@@ -56,7 +56,8 @@ public class BoardObjectiveService {
         return newBoardObjective;
     }
 
-    public BoardObjective updateBoardObjective(UUID existingBoardObjectiveId, UUID clubId, BoardObjective incomingBoardObjective) {
+    public BoardObjective updateBoardObjective(UUID existingBoardObjectiveId, UUID clubId,
+                                                BoardObjective incomingBoardObjective) {
         BoardObjective existingBoardObjective = this.getBoardObjective(existingBoardObjectiveId, clubId);
         BoardObjective updatedBoardObjective = ImmutableBoardObjective.builder()
                 .from(existingBoardObjective)
