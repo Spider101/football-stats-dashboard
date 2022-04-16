@@ -40,6 +40,7 @@ public class BoardObjectiveResource {
 
     private final BoardObjectiveService boardObjectiveService;
     private final ClubService clubService;
+
     public BoardObjectiveResource(BoardObjectiveService boardObjectiveService, ClubService clubService) {
         this.boardObjectiveService = boardObjectiveService;
         this.clubService = clubService;
@@ -104,6 +105,7 @@ public class BoardObjectiveResource {
         //  to check that it exists. Also add a belongs to check after splitting it since it is encapsulated inside the
         //  getClub call at the moment
         this.clubService.getClub(clubId, user.getId());
+
         BoardObjective updatedBoardObjective = boardObjectiveService.updateBoardObjective(boardObjectiveId, clubId,
                 incomingBoardObjective);
         return Response.ok().entity(updatedBoardObjective).build();
@@ -121,8 +123,10 @@ public class BoardObjectiveResource {
         }
 
         if (!this.clubService.doesClubBelongToUser(clubId, user.getId())) {
-            LOGGER.error("Board Objective with ID: {} does not belong to user making request", boardObjectiveId);
-            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this board objective!");
+            String errorMessage = String.format("User making request for board objective (ID: %s) does not have" +
+                    " access to associated club (ID: %s)", boardObjectiveId, clubId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, errorMessage);
         }
 
         this.boardObjectiveService.deleteBoardObjective(boardObjectiveId, clubId);
