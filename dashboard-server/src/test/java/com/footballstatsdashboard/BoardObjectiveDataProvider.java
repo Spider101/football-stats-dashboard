@@ -7,9 +7,14 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class BoardObjectiveDataProvider {
+
+    private static final int NUMBER_OF_BOARD_OBJECTIVES = 5;
 
     /**
      * Helps in building a board objective entity according to the needs of a test
@@ -114,5 +119,22 @@ public class BoardObjectiveDataProvider {
             }
             return baseBoardObjective.build();
         }
+    }
+
+    /**
+     * get multiple board objective stubs with the same club ID
+     * @param clubId ID of club the board objective belongs to
+     * @return list of board objective stubs to use for testing
+     */
+    public static List<BoardObjective> getMultipleBoardObjectives(UUID clubId) {
+        return IntStream.range(0, NUMBER_OF_BOARD_OBJECTIVES)
+                .mapToObj(i ->
+                        BoardObjectiveBuilder.builder()
+                                .isExisting(true)
+                                .withClubId(clubId)
+                                .customTitle("fake objective title " + i)
+                                .customDescription("fake objective description " + i)
+                                .build()
+                ).collect(Collectors.toList());
     }
 }
