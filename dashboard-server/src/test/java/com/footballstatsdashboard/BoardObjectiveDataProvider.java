@@ -94,6 +94,7 @@ public class BoardObjectiveDataProvider {
 
         public ModifiedBoardObjectiveBuilder from(BoardObjective boardObjective) {
             this.boardObjectiveReference = boardObjective;
+            baseBoardObjective.from(boardObjective);
             return this;
         }
 
