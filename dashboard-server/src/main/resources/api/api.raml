@@ -188,7 +188,9 @@ securitySchemes:
               description: User is trying to fetch a board objective associated to a club that doesn't belong to them
               body:
                 application/json:
-                  example: !include examples/club-response-403.json
+                  examples:
+                    club: !include examples/club-response-403.json
+                    boardObjective: !include examples/board-objective-response-403.json
         put:
           description: updates the board objective data for a club on the basis of the board objective ID
           securedBy: [access_token]
@@ -201,7 +203,9 @@ securitySchemes:
               description: User is trying to update a board objective associated to a club that doesn't belong to them
               body:
                 application/json:
-                  example: !include examples/club-response-403.json
+                  examples:
+                    club: !include examples/club-response-403.json
+                    boardObjective: !include examples/board-objective-response-403.json
             404:
               description: |
                 User is either trying to update a board objective that does not exist
@@ -221,7 +225,9 @@ securitySchemes:
               description: User is trying to delete a board objective associated to a club that doesn't belong to them
               body:
                 application/json:
-                  example: !include examples/club-response-403.json
+                  examples:
+                    club: !include examples/club-response-403.json
+                    boardObjective: !include examples/board-objective-response-403.json
             404:
               description: User is trying to delete a board objective that does not exist
               body:
