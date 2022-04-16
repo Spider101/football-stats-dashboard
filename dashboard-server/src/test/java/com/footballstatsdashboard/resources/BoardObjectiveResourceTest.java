@@ -85,7 +85,8 @@ public class BoardObjectiveResourceTest {
                 .withExistingId(boardObjectiveId)
                 .withClubId(clubId)
                 .build();
-        when(boardObjectiveService.getBoardObjective(eq(boardObjectiveId), eq(clubId))).thenReturn(existingBoardObjective);
+        when(boardObjectiveService.getBoardObjective(eq(boardObjectiveId), eq(clubId)))
+                .thenReturn(existingBoardObjective);
 
         // execute
         Response boardObjectiveResponse = boardObjectiveResource.getBoardObjective(userPrincipal, clubId,
@@ -116,7 +117,7 @@ public class BoardObjectiveResourceTest {
                 .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
 
         // execute
-        boardObjectiveResource.getBoardObjective(userPrincipal, invalidClubId, UUID.randomUUID()    );
+        boardObjectiveResource.getBoardObjective(userPrincipal, invalidClubId, UUID.randomUUID());
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -367,7 +368,7 @@ public class BoardObjectiveResourceTest {
         assertEquals(HttpStatus.OK_200, boardObjectiveResponse.getStatus());
         assertNotNull(boardObjectiveResponse.getEntity());
 
-        TypeReference<List<BoardObjective>> boardObjectiveListRef = new TypeReference<>() {};
+        TypeReference<List<BoardObjective>> boardObjectiveListRef = new TypeReference<>() { };
         List<BoardObjective> boardObjectiveList =
                 OBJECT_MAPPER.convertValue(boardObjectiveResponse.getEntity(), boardObjectiveListRef);
         assertFalse(boardObjectiveList.isEmpty());

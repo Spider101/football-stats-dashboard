@@ -192,7 +192,8 @@ public class UserResourceTest {
         // assert
         verify(userDAO).getUserByEmailAddress(anyString());
         verify(authTokenDAO).getAuthTokenForUser(any());
-        verify(authTokenDAO, never()).updateEntity(any(), any()); // this would only be called to update the last access time
+        // this would only be called to update the last access time
+        verify(authTokenDAO, never()).updateEntity(any(), any());
         verify(authTokenDAO).insertEntity(any());
 
         assertEquals(HttpStatus.OK_200, userResponse.getStatus());

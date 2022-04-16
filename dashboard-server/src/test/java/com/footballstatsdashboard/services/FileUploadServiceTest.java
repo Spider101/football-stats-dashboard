@@ -118,7 +118,7 @@ public class FileUploadServiceTest {
 
     @AfterClass
     public static void cleanUp() throws IOException {
-        if (Files.exists(pathToUploadDir)){
+        if (Files.exists(pathToUploadDir)) {
             Files.walk(pathToUploadDir)
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)

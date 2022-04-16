@@ -169,7 +169,9 @@ public class BoardObjectiveServiceTest {
         assertEquals(incomingBoardObjective.getIsCompleted(), capturedBoardObjective.getIsCompleted());
 
         assertNotNull(capturedBoardObjective.getLastModifiedDate());
-        assertTrue(capturedBoardObjective.getLastModifiedDate().isAfter(Objects.requireNonNull(existingBoardObjective.getLastModifiedDate())));
+        assertTrue(capturedBoardObjective.getLastModifiedDate().isAfter(
+                Objects.requireNonNull(existingBoardObjective.getLastModifiedDate())
+        ));
     }
 
     /**

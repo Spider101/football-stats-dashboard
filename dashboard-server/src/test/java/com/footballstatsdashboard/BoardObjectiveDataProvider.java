@@ -29,7 +29,7 @@ public class BoardObjectiveDataProvider {
 
         private final ImmutableBoardObjective.Builder baseBoardObjective = ImmutableBoardObjective.builder();
 
-        private BoardObjectiveBuilder() {}
+        private BoardObjectiveBuilder() { }
 
         public static BoardObjectiveBuilder builder() {
             return new BoardObjectiveBuilder();
@@ -91,7 +91,7 @@ public class BoardObjectiveDataProvider {
         private BoardObjective boardObjectiveReference;
         private final ImmutableBoardObjective.Builder baseBoardObjective = ImmutableBoardObjective.builder();
 
-        private ModifiedBoardObjectiveBuilder() {}
+        private ModifiedBoardObjectiveBuilder() { }
 
         public static ModifiedBoardObjectiveBuilder builder() {
             return new ModifiedBoardObjectiveBuilder();
