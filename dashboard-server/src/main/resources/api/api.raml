@@ -185,7 +185,9 @@ securitySchemes:
                     boardObjective: !include examples/board-objective-response-404.json
                     club: !include examples/club-response-404.json
             403:
-              description: User is trying to fetch a board objective associated to a club that doesn't belong to them
+              description: |
+                User is either trying to fetch a board objective associated to a club that doesn't belong to them or a
+                board objective that doesn't belong to the club the user is making a request for
               body:
                 application/json:
                   examples:
@@ -200,7 +202,9 @@ securitySchemes:
                 application/json:
                   example: !include examples/board-objective-response.json
             403:
-              description: User is trying to update a board objective associated to a club that doesn't belong to them
+              description: |
+                User is either trying to update a board objective associated to a club that doesn't belong to them or a
+                board objective that doesn't belong to the club the user is making a request for
               body:
                 application/json:
                   examples:
@@ -222,7 +226,9 @@ securitySchemes:
             204:
               description: successfully delete the board objective
             403:
-              description: User is trying to delete a board objective associated to a club that doesn't belong to them
+              description: |
+                User is either trying to delete a board objective associated to a club that doesn't belong to them or a
+                board objective that doesn't belong to the club the user is making a request for
               body:
                 application/json:
                   examples:
