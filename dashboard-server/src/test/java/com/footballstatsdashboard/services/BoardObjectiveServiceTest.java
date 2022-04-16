@@ -308,7 +308,8 @@ public class BoardObjectiveServiceTest {
     public void getAllBoardObjectivesForClubFetchesAllBoardObjectivesAssociatedWithClub() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        List<BoardObjective> boardObjectivesAssociatedWithClub = getMultipleBoardObjectives(existingClubId);
+        List<BoardObjective> boardObjectivesAssociatedWithClub =
+                BoardObjectiveDataProvider.getMultipleBoardObjectives(existingClubId);
         when(boardObjectiveDAO.getBoardObjectivesForClub(eq(existingClubId)))
                 .thenReturn(boardObjectivesAssociatedWithClub);
 
@@ -319,17 +320,5 @@ public class BoardObjectiveServiceTest {
         verify(boardObjectiveDAO).getBoardObjectivesForClub(any());
         assertFalse(boardObjectives.isEmpty());
         assertEquals(boardObjectivesAssociatedWithClub, boardObjectives);
-    }
-
-    private List<BoardObjective> getMultipleBoardObjectives(UUID clubId) {
-        return IntStream.range(0, 5)
-                .mapToObj(i ->
-                        BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
-                                .isExisting(true)
-                                .withClubId(clubId)
-                                .customTitle("fake objective title " + i)
-                                .customDescription("fake objective description " + i)
-                                .build()
-                ).collect(Collectors.toList());
     }
 }
