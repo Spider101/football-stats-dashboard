@@ -160,6 +160,7 @@ public class PlayerResourceTest {
         when(clubService.getClub(eq(incomingPlayer.getClubId()), eq(userPrincipal.getId())))
                 .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
 
+        // TODO: 13/04/22 clean up unused variables like below
         // execute
         Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
 
