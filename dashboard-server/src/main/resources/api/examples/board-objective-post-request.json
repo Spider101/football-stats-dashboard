@@ -1,6 +1,5 @@
 {
   "title": "A board objective title",
   "description": "A board objective description",
-  "isCompleted": false,
-  "clubId": "f894c5e4-dc5b-45fe-b441-864409e7b7bd"
+  "isCompleted": false
 }
