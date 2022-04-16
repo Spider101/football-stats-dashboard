@@ -9,12 +9,14 @@ import com.footballstatsdashboard.core.utils.DashboardReadonlyModule;
 import com.footballstatsdashboard.db.DAOFactory;
 import com.footballstatsdashboard.db.IUserEntityDAO;
 import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
+import com.footballstatsdashboard.resources.BoardObjectiveResource;
 import com.footballstatsdashboard.resources.ClubResource;
 import com.footballstatsdashboard.resources.CountryFlagsLookupResource;
 import com.footballstatsdashboard.resources.FileUploadResource;
 import com.footballstatsdashboard.resources.MatchPerformanceResource;
 import com.footballstatsdashboard.resources.PlayerResource;
 import com.footballstatsdashboard.resources.UserResource;
+import com.footballstatsdashboard.services.BoardObjectiveService;
 import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.CountryFlagsLookupService;
 import com.footballstatsdashboard.services.FileUploadService;
@@ -68,6 +70,8 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         PlayerService playerService = new PlayerService(daoFactory.getPlayerEntityDAO());
         CountryFlagsLookupService countryFlagsLookupService = new CountryFlagsLookupService();
         FileUploadService fileUploadService = new FileUploadService(configuration.getFileUploadConfiguration());
+        BoardObjectiveService boardObjectiveService =
+                new BoardObjectiveService(daoFactory.getBoardObjectiveEntityDAO());
 
         // setup resources
         environment.jersey().register(new UserResource(userEntityDAO, daoFactory.getAuthTokenEntityDAO()));
@@ -76,6 +80,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         environment.jersey().register(new MatchPerformanceResource(daoFactory.getMatchPerformanceEntityDAO()));
         environment.jersey().register(new CountryFlagsLookupResource(countryFlagsLookupService));
         environment.jersey().register(new FileUploadResource(fileUploadService));
+        environment.jersey().register(new BoardObjectiveResource(boardObjectiveService, clubService));
 
         // Register OAuth authentication
         CustomAuthenticator customAuthenticator = new CustomAuthenticator(daoFactory.getAuthTokenEntityDAO(),
