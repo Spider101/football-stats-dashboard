@@ -96,6 +96,7 @@ public class BoardObjectiveResourceTest {
         verify(clubService).getClub(any(), any());
         verify(boardObjectiveService).getBoardObjective(any(), any());
 
+        assertNotNull(boardObjectiveResponse);
         assertEquals(HttpStatus.OK_200, boardObjectiveResponse.getStatus());
         assertNotNull(boardObjectiveResponse.getEntity());
 
@@ -125,7 +126,7 @@ public class BoardObjectiveResourceTest {
     }
 
     /**
-     * given and ID for a board objective associated with a club that does not exist, tests that the objective data is
+     * given an ID for a board objective associated with a club that does not exist, tests that the objective data is
      * not returned and a service exception is thrown instead
      */
     @Test(expected = ServiceException.class)
@@ -262,7 +263,7 @@ public class BoardObjectiveResourceTest {
 
     /**
      * given a valid board objective entity in the request, tests that the if the user does not have access to the club
-     * with which the board objective is associated, the board objective data is not updated and a service exceptions is
+     * with which the board objective is associated, the board objective data is not updated and a service exception is
      * thrown
      */
     @Test(expected = ServiceException.class)
@@ -280,7 +281,6 @@ public class BoardObjectiveResourceTest {
 
         // assert
         verify(clubService).getClub(any(), any());
-        verify(boardObjectiveService, never()).getBoardObjective(any(), any());
         verify(boardObjectiveService, never()).updateBoardObjective(any(), any(), any());
     }
 
@@ -323,7 +323,7 @@ public class BoardObjectiveResourceTest {
                 boardObjectiveId);
 
         // assert
-        verify(boardObjectiveService).deleteBoardObjective(eq(boardObjectiveId), any());
+        verify(boardObjectiveService).deleteBoardObjective(eq(boardObjectiveId), eq(clubId));
         assertNotNull(boardObjectiveResponse);
         assertEquals(HttpStatus.NO_CONTENT_204, boardObjectiveResponse.getStatus());
     }

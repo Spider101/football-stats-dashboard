@@ -61,6 +61,7 @@ public class BoardObjectiveServiceTest {
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         assertEquals(boardObjectiveId, boardObjective.getId());
+        assertEquals(clubId, boardObjective.getClubId());
     }
 
     /**
@@ -140,8 +141,8 @@ public class BoardObjectiveServiceTest {
         UUID existingClubId = UUID.randomUUID();
         UUID existingBoardObjectiveId = UUID.randomUUID();
         BoardObjective existingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
-                .withExistingId(existingBoardObjectiveId)
                 .isExisting(true)
+                .withExistingId(existingBoardObjectiveId)
                 .withClubId(existingClubId)
                 .build();
         when(boardObjectiveDAO.getEntity(eq(existingBoardObjectiveId))).thenReturn(existingBoardObjective);
