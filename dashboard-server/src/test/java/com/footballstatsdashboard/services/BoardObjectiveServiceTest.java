@@ -31,7 +31,7 @@ public class BoardObjectiveServiceTest {
     private BoardObjectiveService boardObjectiveService;
 
     @Mock
-    IBoardObjectiveEntityDAO boardObjectiveDAO;
+    private IBoardObjectiveEntityDAO boardObjectiveDAO;
 
     @Before
     public void initialize() {
