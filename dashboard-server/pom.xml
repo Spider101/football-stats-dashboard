@@ -246,7 +246,7 @@
                         <sourceDirectory>src/main/java</sourceDirectory>
                     </sourceDirectories>
                     <testSourceDirectories>
-                        <testSourceDirectory>src/java/test</testSourceDirectory>
+                        <testSourceDirectory>src/test</testSourceDirectory>
                     </testSourceDirectories>
                     <encoding>UTF-8</encoding>
                     <consoleOutput>true</consoleOutput>
