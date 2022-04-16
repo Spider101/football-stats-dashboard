@@ -17,7 +17,10 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 
 public class FileUploadServiceTest {
     private final static Path pathToResourcesDir =  Paths.get(System.getProperty("user.dir"),
