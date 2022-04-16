@@ -10,27 +10,32 @@ public final class Constants {
         throw new AssertionError("Should not be initialized");
     }
 
-    public static final String APPLICATION_NAME = "football-dashboard";
+    public static final String APPLICATION_NAME = "football-stats-dashboard";
 
-    public static final String PLAYER_V1_BASE_PATH = "football-stats-dashboard/v1/players";
+    private static final String API_V1_BASE_PATH = APPLICATION_NAME + "/v1";
+    public static final String PLAYER_V1_BASE_PATH = API_V1_BASE_PATH + "/players";
     public static final String PLAYER_ID = "playerId";
     public static final String PLAYER_ID_PATH = "/{" + PLAYER_ID + "}";
 
-    public static final String USER_V1_BASE_PATH = "football-stats-dashboard/v1/users";
+    public static final String USER_V1_BASE_PATH = API_V1_BASE_PATH + "/users";
     public static final String USER_ID = "userId";
     public static final String USER_ID_PATH = "/{" + USER_ID + "}";
 
-    public static final String CLUB_V1_BASE_PATH = "football-stats-dashboard/v1/club";
+    public static final String CLUB_V1_BASE_PATH = API_V1_BASE_PATH + "/club";
     public static final String CLUB_ID = "clubId";
     public static final String CLUB_ID_PATH = "/{" + CLUB_ID + "}";
 
-    public static final String MATCH_PERFORMANCE_V1_BASE_PATH = "football-stats-dashboard/v1/match-performance";
+    public static final String MATCH_PERFORMANCE_V1_BASE_PATH = API_V1_BASE_PATH + "/match-performance";
     public static final String MATCH_PERFORMANCE_ID = "matchPerformanceId";
     public static final String MATCH_PERFORMANCE_ID_PATH = "/{" + MATCH_PERFORMANCE_ID + "}";
     public static final String MATCH_PERFORMANCE_LOOKUP_PATH = "/lookup" + PLAYER_ID_PATH;
 
-    public static final String COUNTRY_FLAG_LOOKUP_V1_BASE_PATH = "football-stats-dashboard/v1/lookup/countryFlags";
-    public static final String FILE_UPLOAD_V1_BASE_PATH = "football-stats-dashboard/v1/upload";
+    public static final String COUNTRY_FLAG_LOOKUP_V1_BASE_PATH = API_V1_BASE_PATH + "/lookup/countryFlags";
+    public static final String FILE_UPLOAD_V1_BASE_PATH = API_V1_BASE_PATH + "/upload";
+
+    public static final String BOARD_OBJECTIVE_V1_BASE_PATH = CLUB_V1_BASE_PATH + CLUB_ID_PATH + "/board-objective";
+    public static final String BOARD_OBJECTIVE_ID = "boardObjectiveId";
+    public static final String BOARD_OBJECTIVE_ID_PATH = "/{" + BOARD_OBJECTIVE_ID + "}";
 
     public static final int HASHING_COST = 12;
     public static final String COUNTRY_CODE_MAPPING_FNAME = "countryCodeMapping.json";

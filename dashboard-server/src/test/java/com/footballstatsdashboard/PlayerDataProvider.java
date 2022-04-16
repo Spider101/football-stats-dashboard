@@ -83,6 +83,7 @@ public class PlayerDataProvider {
             return this;
         }
 
+        // TODO: 15/04/22 remove this (unused)
         public PlayerBuilder withTechnicalAttributes() {
             Attribute technicalAttribute = ImmutableAttribute.builder()
                     .name("crossing")
@@ -97,7 +98,7 @@ public class PlayerDataProvider {
 
         public PlayerBuilder withPhysicalAttributes() {
             Attribute physicalAttribute = ImmutableAttribute.builder()
-                    .name("sprint speed")
+                    .name("sprintSpeed")
                     .value(CURRENT_PLAYER_SPRINT_SPEED)
                     .category(isExistingPlayer ? AttributeCategory.PHYSICAL : null)
                     .group(isExistingPlayer ? AttributeGroup.SPEED : null)
@@ -138,7 +139,7 @@ public class PlayerDataProvider {
                     .build();
 
             Attribute physicalAttribute = ImmutableAttribute.builder()
-                    .name("sprint speed")
+                    .name("sprintSpeed")
                     .value(CURRENT_PLAYER_SPRINT_SPEED)
                     .category(isExistingPlayer ? AttributeCategory.PHYSICAL : null)
                     .group(isExistingPlayer ? AttributeGroup.SPEED : null)

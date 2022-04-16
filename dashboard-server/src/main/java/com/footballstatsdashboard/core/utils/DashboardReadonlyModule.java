@@ -44,7 +44,7 @@ public class DashboardReadonlyModule extends Module {
 
         @Override
         public BeanDeserializerBuilder updateBuilder(DeserializationConfig deserializationConfig,
-                                                     BeanDescription beanDescription, BeanDeserializerBuilder builder) {
+                                                    BeanDescription beanDescription, BeanDeserializerBuilder builder) {
             Iterator<SettableBeanProperty> propertyIterator = builder.getProperties();
             List<SettableBeanProperty> propertiesToRemove = new ArrayList<>();
             while (propertyIterator.hasNext()) {

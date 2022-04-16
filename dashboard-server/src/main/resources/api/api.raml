@@ -63,7 +63,6 @@ securitySchemes:
       responses:
         204:
           description: successfully delete a player's data
-
   post:
     description: adds a new player's data
     securedBy: [access_token]
@@ -161,6 +160,121 @@ securitySchemes:
             body:
               application/json:
                 example: !include examples/squad-players-response.json
+    /board-objective:
+      /{boardObjectiveId}:
+        uriParameters:
+          boardObjectiveId:
+            description: The identifier for the board objective associated with a club
+            type: string
+            required: true
+        get:
+          description: gets the board objective data for a club on the basis of the board objective ID
+          securedBy: [access_token]
+          responses:
+            200:
+              body:
+                application/json:
+                  example: !include examples/board-objective-response.json
+            404:
+              description: |
+                User is either trying to fetch a board objective that does not exist
+                or a board objective for a club that does not exist
+              body:
+                application/json:
+                  examples:
+                    boardObjective: !include examples/board-objective-response-404.json
+                    club: !include examples/club-response-404.json
+            403:
+              description: |
+                User is either trying to fetch a board objective associated to a club that doesn't belong to them or a
+                board objective that doesn't belong to the club the user is making a request for
+              body:
+                application/json:
+                  examples:
+                    club: !include examples/club-response-403.json
+                    boardObjective: !include examples/board-objective-response-403.json
+        put:
+          description: updates the board objective data for a club on the basis of the board objective ID
+          securedBy: [access_token]
+          responses:
+            200:
+              body:
+                application/json:
+                  example: !include examples/board-objective-response.json
+            403:
+              description: |
+                User is either trying to update a board objective associated to a club that doesn't belong to them or a
+                board objective that doesn't belong to the club the user is making a request for
+              body:
+                application/json:
+                  examples:
+                    club: !include examples/club-response-403.json
+                    boardObjective: !include examples/board-objective-response-403.json
+            404:
+              description: |
+                User is either trying to update a board objective that does not exist
+                or a board objective for a club that does not exist
+              body:
+                application/json:
+                  examples:
+                    boardObjective: !include examples/board-objective-response-404.json
+                    club: !include examples/club-response-404.json
+        delete:
+          description: delete the board objective data for a club on the basis of the board objective ID
+          securedBy: [access_token]
+          responses:
+            204:
+              description: successfully delete the board objective
+            403:
+              description: |
+                User is either trying to delete a board objective associated to a club that doesn't belong to them or a
+                board objective that doesn't belong to the club the user is making a request for
+              body:
+                application/json:
+                  examples:
+                    club: !include examples/club-response-403.json
+                    boardObjective: !include examples/board-objective-response-403.json
+            404:
+              description: User is trying to delete a board objective that does not exist
+              body:
+                application/json:
+                  example: !include examples/board-objective-response-404.json
+      post:
+        description: adds a new board objective
+        securedBy: [access_token]
+        body:
+          application/json:
+            example: !include examples/board-objective-post-request.json
+        responses:
+          201:
+            description: board objective data created
+            body:
+              application/json:
+                example: !include examples/board-objective-response.json
+          403:
+            description: User is trying to create a board objective associated to a club that doesn't belong to them
+            body:
+              application/json:
+                example: !include examples/club-response-403.json
+          404:
+            description: User is trying to create a board objective for a club that does not exist
+            body:
+              application/json:
+                example: !include examples/club-response-404.json
+      /all:
+        get:
+          description: gets data for all board objectives entities associated with a club id
+          securedBy: [access_token]
+          responses:
+            200:
+              body:
+                application/json:
+                  example: !include examples/all-board-objectives-response.json
+            403:
+              description: User is trying to fetch the board objectives associated to a club that doesn't belong to them
+              body:
+                application/json:
+                  example: !include examples/club-response-403.json
   post:
     description: adds a new club's data
     securedBy: [access_token]

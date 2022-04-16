@@ -54,6 +54,7 @@ public class PlayerService {
         this.playerDAO = playerDAO;
     }
 
+    // TODO: 16/04/22 remove resource key usage
     public Player getPlayer(UUID playerId) {
         ResourceKey resourceKey = new ResourceKey(playerId);
         return fetchPlayerData(playerId);

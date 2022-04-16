@@ -162,6 +162,7 @@ public final class ClubDataProvider {
 
         public ModifiedClubBuilder from(Club club) {
             clubReference = club;
+            // TODO: 16/04/22 can just call the .from method; no need to create it from scratch
             baseClub = ImmutableClub.builder().from(club);
             return this;
         }

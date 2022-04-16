@@ -8,6 +8,7 @@ import com.footballstatsdashboard.api.model.Club;
 import com.footballstatsdashboard.api.model.MatchPerformance;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.api.model.User;
+import com.footballstatsdashboard.api.model.club.BoardObjective;
 import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.ManagerFunds;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
@@ -22,6 +23,7 @@ import com.footballstatsdashboard.db.couchbase.MatchPerformanceCouchbaseDAO;
 import com.footballstatsdashboard.db.couchbase.PlayerCouchbaseDAO;
 import com.footballstatsdashboard.db.couchbase.UserCouchbaseDAO;
 import com.footballstatsdashboard.db.jdbi.AuthTokenJdbiDAO;
+import com.footballstatsdashboard.db.jdbi.BoardObjectiveJdbiDAO;
 import com.footballstatsdashboard.db.jdbi.ClubJdbiDAO;
 import com.footballstatsdashboard.db.jdbi.MatchPerformanceJdbiDAO;
 import com.footballstatsdashboard.db.jdbi.PlayerJdbiDAO;
@@ -73,7 +75,7 @@ public class DAOFactory {
             jdbi.getConfig(JdbiImmutables.class)
                     .registerImmutable(User.class, AuthToken.class, Club.class, Player.class, MatchPerformance.class,
                             MatchRating.class, ManagerFunds.class, SquadPlayer.class, ClubSummary.class,
-                            Metadata.class, Attribute.class);
+                            Metadata.class, Attribute.class, BoardObjective.class);
         }
     }
 
@@ -118,6 +120,15 @@ public class DAOFactory {
                     this.couchbaseBucket, this.couchbaseBucket.name());
         } else {
             return new MatchPerformanceJdbiDAO(jdbi);
+        }
+    }
+
+    public IBoardObjectiveEntityDAO getBoardObjectiveEntityDAO() {
+        if (this.configuration.isShouldStartCouchbaseServer()) {
+            // TODO: 16/04/22 initialize the couchbase implementation for the board objective entity DAO when ready
+            return null;
+        } else {
+            return new BoardObjectiveJdbiDAO(jdbi);
         }
     }
 }

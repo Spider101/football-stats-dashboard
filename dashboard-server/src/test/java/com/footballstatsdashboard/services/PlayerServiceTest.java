@@ -80,6 +80,7 @@ public class PlayerServiceTest {
         assertEquals(playerId, player.getId());
     }
 
+    // TODO: 15/04/22 update the comments; a lot of it out-dated like the wrong exception, calling it requests, etc
     /**
      * given an invalid player id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
      * ServiceException is thrown instead
