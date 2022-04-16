@@ -169,7 +169,7 @@ public class BoardObjectiveServiceTest {
         assertEquals(existingClubId, capturedBoardObjective.getClubId());
         assertEquals(incomingBoardObjective.getTitle(), capturedBoardObjective.getTitle());
         assertEquals(incomingBoardObjective.getDescription(), capturedBoardObjective.getDescription());
-        assertEquals(incomingBoardObjective.isCompleted(), capturedBoardObjective.isCompleted());
+        assertEquals(incomingBoardObjective.getIsCompleted(), capturedBoardObjective.getIsCompleted());
 
         assertNotNull(capturedBoardObjective.getLastModifiedDate());
         assertTrue(capturedBoardObjective.getLastModifiedDate().isAfter(Objects.requireNonNull(existingBoardObjective.getLastModifiedDate())));

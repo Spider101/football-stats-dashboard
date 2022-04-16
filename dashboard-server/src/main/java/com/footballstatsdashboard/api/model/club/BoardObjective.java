@@ -45,7 +45,7 @@ public interface BoardObjective {
      * objective completion status
      */
     @Valid
-    boolean isCompleted();
+    boolean getIsCompleted();
 
     /**
      * ID of the club the objective belongs to

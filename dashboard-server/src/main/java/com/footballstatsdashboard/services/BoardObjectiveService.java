@@ -62,7 +62,7 @@ public class BoardObjectiveService {
                 .from(existingBoardObjective)
                 .title(incomingBoardObjective.getTitle())
                 .description(incomingBoardObjective.getDescription())
-                .isCompleted(incomingBoardObjective.isCompleted())
+                .isCompleted(incomingBoardObjective.getIsCompleted())
                 .lastModifiedDate(LocalDate.now())
                 .build();
 

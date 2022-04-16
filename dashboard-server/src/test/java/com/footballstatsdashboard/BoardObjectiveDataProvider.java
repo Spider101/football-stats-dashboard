@@ -104,7 +104,7 @@ public class BoardObjectiveDataProvider {
         }
 
         public ModifiedBoardObjectiveBuilder withUpdatedCompletionFlag() {
-            baseBoardObjective.isCompleted(!this.boardObjectiveReference.isCompleted());
+            baseBoardObjective.isCompleted(!this.boardObjectiveReference.getIsCompleted());
             return this;
         }
 

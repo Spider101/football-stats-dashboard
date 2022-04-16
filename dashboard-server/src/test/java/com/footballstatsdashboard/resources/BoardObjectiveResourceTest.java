@@ -259,7 +259,7 @@ public class BoardObjectiveResourceTest {
         assertEquals(existingClubId, boardObjectiveFromResponse.getClubId());
         assertEquals(incomingBoardObjective.getTitle(), boardObjectiveFromResponse.getTitle());
         assertEquals(incomingBoardObjective.getDescription(), boardObjectiveFromResponse.getDescription());
-        assertEquals(incomingBoardObjective.isCompleted(), boardObjectiveFromResponse.isCompleted());
+        assertEquals(incomingBoardObjective.getIsCompleted(), boardObjectiveFromResponse.getIsCompleted());
     }
 
     /**
