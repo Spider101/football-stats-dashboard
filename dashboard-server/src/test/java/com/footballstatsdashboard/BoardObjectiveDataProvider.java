@@ -12,9 +12,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class BoardObjectiveDataProvider {
-
+public final class BoardObjectiveDataProvider {
     private static final int NUMBER_OF_BOARD_OBJECTIVES = 5;
+    private BoardObjectiveDataProvider() { }
 
     /**
      * Helps in building a board objective entity according to the needs of a test
