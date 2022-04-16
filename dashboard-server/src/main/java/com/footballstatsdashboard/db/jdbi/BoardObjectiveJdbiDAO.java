@@ -56,13 +56,16 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
     private interface IBoardObjectivesDAO {
         @SqlUpdate(
                 "CREATE TABLE IF NOT EXISTS boardObjectives (id VARCHAR PRIMARY KEY, clubId VARCHAR, title VARCHAR," +
-                        " description VARCHAR, isCompleted BYTE, FOREIGN KEY (clubId) REFERENCES club (id))"
+                        " description VARCHAR, isCompleted BYTE, cratedDate DATE, lastModifiedDate DATE," +
+                        " createdBy VARCHAR, type VARCHAR, FOREIGN KEY (clubId) REFERENCES club (id))"
         )
         void createTable();
 
         @SqlUpdate(
-                "INSERT INTO boardObjectives (id, clubId, title, description, isCompleted)" +
-                        " VALUES (:id, :clubId, :title, :description, :isCompleted)"
+                "INSERT INTO boardObjectives (id, clubId, title, description, isCompleted, createdDate," +
+                        " lastModifiedDate, createdBy, type)" +
+                        " VALUES (:id, :clubId, :title, :description, :isCompleted, :createdDate, :lastModifiedDate," +
+                        " :createdBy, :type)"
         )
         void insert(@BindPojo BoardObjective boardObjective);
 
@@ -73,8 +76,8 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
         List<BoardObjective> findByClubId(@Bind("clubId") String clubId);
 
         @SqlUpdate(
-                "UPDATE boardObjectives SET title = :title, description = :description, isCompleted = :isCompleted" +
-                        " WHERE id = :id"
+                "UPDATE boardObjectives SET title = :title, description = :description, isCompleted = :isCompleted," +
+                        " lastModifiedDate = :lastModifiedDate WHERE id = :id"
         )
         void update(@Bind("id") String existingBoardObjectiveId, @BindPojo BoardObjective updatedBoardObjective);
 
