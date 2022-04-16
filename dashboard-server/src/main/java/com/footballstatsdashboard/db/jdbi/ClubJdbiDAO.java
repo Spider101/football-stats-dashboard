@@ -171,7 +171,7 @@ public class ClubJdbiDAO implements IClubEntityDAO {
 
         @SqlUpdate(
                 "UPDATE club SET name = :name, logo = :logo, transferBudget = :transferBudget," +
-                        " wageBudget = :wageBudget, lastModified = :lastModified WHERE id = :id"
+                        " wageBudget = :wageBudget, lastModifiedDate = :lastModifiedDate WHERE id = :id"
         )
         void update(@Bind("id") String existingClubId, @BindPojo Club updatedClub);
 
