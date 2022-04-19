@@ -10,27 +10,36 @@ import List from '@material-ui/core/List';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
 
 import BoardObjective from '../components/BoardObjective';
+import useForm from '../hooks/useForm';
+import { formSubmission } from '../constants';
+export default function BoardObjectives({ objectives }) {
+    const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
-export default function BoardObjectives({ objectives: initialObjectives }) {
-    const [isDirty, setIsDirty] = useState(false);
-    const [objectives, setObjectives] = useState(initialObjectives);
-
-    const completeObjective = objectiveId => {
-        const updatedObjectives = objectives.map(objective => {
-            if (objective.id === objectiveId) {
-                return {
-                    ...objective,
-                    isCompleted: !objective.isCompleted
-                };
-            }
-            return objective;
-        });
-
-        setIsDirty(!_.isEqual(updatedObjectives, initialObjectives));
-        setObjectives(updatedObjectives);
+    const handleAddFormOpen = () => {
+        setIsAddFormOpen(true);
     };
+
+    const handleAddFormClose = () => {
+        setIsAddFormOpen(false);
+    };
+
+    const {
+        handleChangeFn,
+        handleSubmitFn,
+        formData: addNewObjectiveData,
+        formValidations: addNewObjectiveValidations,
+        submitStatus
+    } = useForm(
+        {
+            title: '',
+            description: ''
+        },
+        // TODO: 04/19/22 replace this with the mutation function once ready
+        x => x
+    );
 
     const noObjective = (
         <Typography component='div' variant='h6' align='center' color='textSecondary'>
@@ -43,7 +52,7 @@ export default function BoardObjectives({ objectives: initialObjectives }) {
             {/* TODO: add icon to represent manager rating */}
             <CardHeader title='Board Objectives' style={{ paddingBottom: 0 }} />
             <CardContent style={{ paddingTop: 0, paddingBottom: 0 }}>
-                {objectives.length === 0 && noObjective}
+                {objectives.length === 0 && !isAddFormOpen && noObjective}
                 <List>
                     {objectives.map((objective, idx) => {
                         return (
@@ -51,24 +60,33 @@ export default function BoardObjectives({ objectives: initialObjectives }) {
                                 key={objective.id}
                                 objective={objective}
                                 hasDivider={idx < objectives.length - 1}
-                                handleClickFn={() => completeObjective(objective.id)}
+                                handleClickFn={x => x}
                             />
                         );
                     })}
                 </List>
             </CardContent>
-            {/* TODO: add the ObjectiveForm widget for adding new objectives when the rest of the functionality
-            is ready */}
             <Divider variant='middle' />
+            {isAddFormOpen && (
+                <AddBoardObjectiveForm
+                    newObjectiveData={addNewObjectiveData}
+                    newObjectiveValidations={addNewObjectiveValidations}
+                    handleChangeFn={handleChangeFn}
+                    submitStatus={submitStatus}
+                />
+            )}
             <CardActions>
-                <Button color='primary' disabled={objectives.length === 5}>
+                <Button color='primary' disabled={objectives.length === 5 || isAddFormOpen} onClick={handleAddFormOpen}>
                     Add Objective
                 </Button>
-                {/* TODO: update the widget to consume a mutute function which can be used to save changes to
-                the objectives  */}
-                <Button color='primary' disabled={!isDirty}>
+                <Button color='primary' disabled={!isAddFormOpen} onClick={handleSubmitFn}>
                     Save Changes
                 </Button>
+                {isAddFormOpen && (
+                    <Button color='secondary' onClick={handleAddFormClose}>
+                        Cancel
+                    </Button>
+                )}
             </CardActions>
         </Card>
     );
@@ -76,4 +94,45 @@ export default function BoardObjectives({ objectives: initialObjectives }) {
 
 BoardObjectives.propTypes = {
     objectives: PropTypes.arrayOf(BoardObjective.propTypes.objective)
+};
+
+const AddBoardObjectiveForm = ({ newObjectiveData, newObjectiveValidations, submitStatus, handleChangeFn }) => {
+    return (
+        <div style={{ width: '80%', margin: 'auto' }}>
+            <TextField
+                autoFocus
+                name='title'
+                label='Title'
+                id='title'
+                required
+                margin='normal'
+                fullWidth
+                disabled={submitStatus === formSubmission.INPROGRESS}
+                onChange={e => handleChangeFn(e)}
+                value={newObjectiveData.title}
+                error={!!newObjectiveValidations.title}
+                helperText={newObjectiveValidations.title}
+            />
+            <TextField
+                name='description'
+                label='Description'
+                id='description'
+                required
+                margin='normal'
+                fullWidth
+                disabled={submitStatus === formSubmission.INPROGRESS}
+                onChange={e => handleChangeFn(e)}
+                value={newObjectiveData.description}
+                error={!!newObjectiveValidations.description}
+                helperText={newObjectiveValidations.description}
+            />
+        </div>
+    );
+};
+
+AddBoardObjectiveForm.propTypes = {
+    newObjectiveData: PropTypes.object,
+    newObjectiveValidations: PropTypes.object,
+    submitStatus: PropTypes.string,
+    handleChangeFn: PropTypes.func
 };
