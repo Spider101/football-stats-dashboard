@@ -30,7 +30,8 @@ it('should render text when no objectives have been added', () => {
     expect(screen.getByText('No Board Objectives have been added yet!')).toBeInTheDocument();
 });
 
-it('should mark objective as completed and enable Save Changes button when objective is clicked on', () => {
+// TODO: 04/20/22 enable this when complete objective functionality is ready
+it.skip('should mark objective as completed and enable Save Changes button when objective is clicked on', () => {
     render(<Default {...Default.args} />);
     const { title: objectiveTitle } = Default.args.objectives[0];
     const objectiveItemHeading = screen.getByRole('heading', { name: objectiveTitle });
