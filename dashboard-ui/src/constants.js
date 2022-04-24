@@ -20,7 +20,8 @@ export const queryKeys = {
     COMPARED_PLAYER_DATA: 'comparedPlayerData',
     PLAYER_PERFORMANCE_DATA: 'playerPerformance',
     ALL_CLUBS: 'allClubsData',
-    USER_DATA: 'userData'
+    USER_DATA: 'userData',
+    ALL_BOARD_OBJECTIVES: 'allBoardObjectives'
 };
 
 // key for storing the auth token data in localstorage
