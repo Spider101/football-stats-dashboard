@@ -9,6 +9,11 @@ import BoardObjectives from '../widgets/BoardObjectives';
 // TODO: remove this once the fake data generators are replaced
 import { getCardWithChartData, getLeagueTableData, MAX_ATTR_VALUE } from '../stories/utils/storyDataGenerators';
 import { MONTHS } from '../constants';
+import useBoardObjectivesForClubData from '../hooks/useBoardObjectivesForClubData';
+import StyledLoadingCircle from '../components/StyledLoadingCircle';
+import useAddNewBoardObjective from '../hooks/useAddNewBoardObjective';
+import { Redirect } from 'react-router-dom';
+import { useCurrentClub } from '../context/clubProvider';
 
 export default function ClubPageView({ club }) {
     return (
@@ -24,9 +29,7 @@ export default function ClubPageView({ club }) {
             </Grid>
             <Grid container spacing={2}>
                 <Grid item xs>
-                    {/* TODO: move this into a container function where the useMutation hook and other business logic
-                     can be housed. Then pass in actual objectives instead of the default empty list here. */}
-                    <BoardObjectives objectives={[]} />
+                    <BoardObjectivesContainer />
                 </Grid>
                 <Grid item xs>
                     <BudgetBreakdownChart transferBudget={club.transferBudget} wageBudget={club.wageBudget}/>
@@ -35,6 +38,23 @@ export default function ClubPageView({ club }) {
         </>
     );
 }
+
+const BoardObjectivesContainer = () => {
+    const { currentClubId } = useCurrentClub();
+    if (!currentClubId) {
+        return <Redirect to='/' />;
+    }
+    const { addNewBoardObjectiveAction } = useAddNewBoardObjective();
+    const { isLoading, data: boardObjectiveForClubData } = useBoardObjectivesForClubData();
+
+    if (isLoading) {
+        return <StyledLoadingCircle />;
+    }
+
+    return (
+        <BoardObjectives objectives={boardObjectiveForClubData} addBoardObjectiveAction={addNewBoardObjectiveAction} />
+    );
+};
 
 const ClubSuccessChart = () => {
     // TODO: remove this fake data with the real thing
