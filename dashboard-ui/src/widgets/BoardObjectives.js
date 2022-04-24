@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
@@ -15,7 +15,7 @@ import TextField from '@material-ui/core/TextField';
 import BoardObjective from '../components/BoardObjective';
 import useForm from '../hooks/useForm';
 import { formSubmission } from '../constants';
-export default function BoardObjectives({ objectives }) {
+export default function BoardObjectives({ objectives, addBoardObjectiveAction }) {
     const [isAddFormOpen, setIsAddFormOpen] = useState(false);
 
     const handleAddFormOpen = () => {
@@ -37,9 +37,14 @@ export default function BoardObjectives({ objectives }) {
             title: '',
             description: ''
         },
-        // TODO: 04/19/22 replace this with the mutation function once ready
-        x => x
+        useCallback(newBoardObjectiveData => addBoardObjectiveAction(newBoardObjectiveData), [])
     );
+
+    useEffect(() => {
+        if (submitStatus === formSubmission.COMPLETE) {
+            handleAddFormClose();
+        }
+    }, [submitStatus]);
 
     const noObjective = (
         <Typography component='div' variant='h6' align='center' color='textSecondary'>
@@ -93,7 +98,8 @@ export default function BoardObjectives({ objectives }) {
 }
 
 BoardObjectives.propTypes = {
-    objectives: PropTypes.arrayOf(BoardObjective.propTypes.objective)
+    objectives: PropTypes.arrayOf(BoardObjective.propTypes.objective),
+    addBoardObjectiveAction: PropTypes.func
 };
 
 const AddBoardObjectiveForm = ({ newObjectiveData, newObjectiveValidations, submitStatus, handleChangeFn }) => {
