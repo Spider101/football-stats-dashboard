@@ -74,6 +74,20 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
     ];
 };
 
+export const getBoardObjectiveHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
+    const allBoardObjectives = [];
+    return [
+        rest.post(`${baseUrl}/club/${clubIdFragment}/board-objective`, (req, res, ctx) => {
+            const newBoardObjective = { id: 'new-board-objective-id', ...req.body };
+            allBoardObjectives.push(newBoardObjective);
+            return res(ctx.status(201), ctx.json(newBoardObjective));
+        }),
+        rest.get(`${baseUrl}/club/${clubIdFragment}/board-objective/all`, (req, res, ctx) => {
+            return res(ctx.status(200), ctx.json(allBoardObjectives));
+        })
+    ];
+};
+
 export const getPlayerHandlers = (baseUrl = '*') => {
     return [
         rest.post(`${baseUrl}/players`, (req, res, ctx) => {
