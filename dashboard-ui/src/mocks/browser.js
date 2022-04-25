@@ -1,5 +1,6 @@
 import { setupWorker } from 'msw';
 import {
+    getBoardObjectiveHandlers,
     getClubHandlers,
     getFileUploadHandlers,
     getLookupDataHandlers,
@@ -10,6 +11,7 @@ import {
 const handlers = [
     ...getUserHandlers(),
     ...getClubHandlers(),
+    ...getBoardObjectiveHandlers(),
     ...getPlayerHandlers(),
     ...getLookupDataHandlers(),
     ...getFileUploadHandlers()

@@ -40,20 +40,21 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
         expenditure: 100000,
         createdDate: '2021-02-20'
     };
-    const dummyClubSummary = {
-        clubId: dummyClub.id,
-        name: dummyClub.name,
-        createdDate: dummyClub.createdDate
-    };
+
+    const clubSummaries = [];
+    clubSummaries.push({ clubId: dummyClub.id, name: dummyClub.name, createdDate: dummyClub.createdDate });
+
     return [
         rest.get(`${baseUrl}/club/all`, (req, res, ctx) => {
-            return res(ctx.status(200), ctx.json([dummyClubSummary]));
+            return res(ctx.status(200), ctx.json(clubSummaries));
         }),
         rest.get(`${baseUrl}/club/${clubIdFragment}`, (req, res, ctx) => {
             return res(ctx.status(200), ctx.json(dummyClub));
         }),
         rest.post(`${baseUrl}/club`, (req, res, ctx) => {
-            return res(ctx.status(201), ctx.json({ id: 'new-club-id', ...req.body }));
+            const newClub = { id: 'new-club-id', createdDate: '2022-04-28', ...req.body };
+            clubSummaries.push({ id: newClub.id, name: newClub.name, createdDate: newClub.createdDate });
+            return res(ctx.status(201), ctx.json(newClub));
         }),
         rest.get(`${baseUrl}/club/${clubIdFragment}/squadPlayers`, (req, res, ctx) => {
             return res(
@@ -70,6 +71,20 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
                     }
                 ])
             );
+        })
+    ];
+};
+
+export const getBoardObjectiveHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
+    const allBoardObjectives = [];
+    return [
+        rest.post(`${baseUrl}/club/${clubIdFragment}/board-objective`, (req, res, ctx) => {
+            const newBoardObjective = { id: 'new-board-objective-id', ...req.body };
+            allBoardObjectives.push(newBoardObjective);
+            return res(ctx.status(201), ctx.json(newBoardObjective));
+        }),
+        rest.get(`${baseUrl}/club/${clubIdFragment}/board-objective/all`, (req, res, ctx) => {
+            return res(ctx.status(200), ctx.json(allBoardObjectives));
         })
     ];
 };
