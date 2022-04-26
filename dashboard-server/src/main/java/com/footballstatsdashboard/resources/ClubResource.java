@@ -72,6 +72,7 @@ public class ClubResource {
             LOGGER.info("createClub() request.");
         }
 
+        // TODO: 26/04/22 change this to a 422 - invalid club logo file key; update tests
         if (!this.fileUploadService.doesFileExist(incomingClub.getLogo())) {
             String errorMessage = "No file found for club logo image with key: " + incomingClub.getLogo();
             LOGGER.error(errorMessage);
@@ -95,6 +96,7 @@ public class ClubResource {
             LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
         }
 
+        // TODO: 26/04/22 change this to a 422 - invalid club logo file key; update tests
         if (!this.fileUploadService.doesFileExist(incomingClub.getLogo())) {
             String errorMessage = "No file found for club logo image with key: " + incomingClub.getLogo();
             LOGGER.error(errorMessage);
@@ -102,6 +104,8 @@ public class ClubResource {
         }
 
         Club existingClub = this.clubService.getClub(existingClubId, user.getId());
+
+        // TODO: 26/04/22 this is a dumb check; get rid of this scenario; update tests
         if (!existingClub.getId().equals(incomingClub.getId())) {
             String errorMessage = String.format(
                     "Incoming club entity ID: %s does not match ID of existing club entity %s.",

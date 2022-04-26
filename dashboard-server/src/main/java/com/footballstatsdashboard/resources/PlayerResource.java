@@ -91,6 +91,7 @@ public class PlayerResource {
 
         Player existingPlayer = this.playerService.getPlayer(playerId);
 
+        // TODO: 26/04/22 this is a dumb check, remove this scenario; update tests
         // verify that player id matches between the existing and incoming data
         if (!existingPlayer.getId().equals(incomingPlayer.getId())) {
             String errorMessage = String.format(

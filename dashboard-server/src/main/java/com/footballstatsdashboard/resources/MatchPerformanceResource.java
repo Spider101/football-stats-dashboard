@@ -95,6 +95,7 @@ public class MatchPerformanceResource {
 
         MatchPerformance existingMatchPerformance = this.matchPerformanceDAO.getEntity(existingMatchPerformanceId);
 
+        // TODO: 26/04/22 this is a dumb check; get rid of this scenario; update tests
         if (existingMatchPerformance.getId().equals(incomingMatchPerformance.getId())) {
             MatchPerformance updatedMatchPerformance = ImmutableMatchPerformance.builder()
                     .from(existingMatchPerformance)

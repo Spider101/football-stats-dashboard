@@ -47,6 +47,11 @@ securitySchemes:
           body:
             application/json:
               example: !include examples/player-response.json
+        404:
+          description: User is trying to fetch a player that does not exist
+          body:
+              application/json:
+                example: !include examples/player-response-404.json
     put:
       description: updates a player's data
       securedBy: [access_token]
@@ -55,14 +60,34 @@ securitySchemes:
           body:
             application/json:
               example: !include examples/player-response.json
-        500:
-          description: failed during player data update
+        403:
+          description: User is trying to update a player for a club that they don't have access to
+          body:
+            application/json:
+              example: !include examples/player-response-403.json
+        404:
+          description: User is trying to update a player that does not exist
+          body:
+            application/json:
+              example: !include examples/player-response-404.json
+        422:
+          description: unprocessable entity when player roles or attributes are missing
     delete:
       description: delete a player's data
       securedBy: [access_token]
       responses:
         204:
           description: successfully delete a player's data
+        403:
+          description: User is trying delete a player from a club they don't have access to
+          body:
+            application/json:
+              example: !include examples/player-response-403.json
+        404:
+          description: User is trying to delete a player that does not exist
+          body:
+            application/json:
+              example: !include examples/player-response-404.json
   post:
     description: adds a new player's data
     securedBy: [access_token]
@@ -75,6 +100,16 @@ securitySchemes:
         body:
           application/json:
             example: !include examples/player-response.json
+      403:
+        description: User is trying to create a player for a club that they don't have access to
+        body:
+          application/json:
+            example: !include examples/club-response-403.json
+      404:
+        description: User is trying to create a player for a club that does not exist
+        body:
+          application/json:
+            example: !include examples/club-response-404.json
       422:
         description: unprocessable entity when player roles or attributes are missing
 
@@ -135,6 +170,16 @@ securitySchemes:
           body:
             application/json:
               example: !include examples/club-response.json
+        403:
+          description: User is trying to fetch a club that they don't have access to
+          body:
+            application/json:
+              example: !include examples/club-response-403.json
+        404:
+          description: User is trying to fetch a club that does not exist
+          body:
+            application/json:
+              example: !include examples/club-response-404.json
     put:
       description: updates a club's data
       securedBy: [access_token]
@@ -143,14 +188,34 @@ securitySchemes:
           body:
             application/json:
               example: !include examples/club-response.json
-        500:
-          description: failed during club data update
+        403:
+          description: User is trying to update a club that they don't have access to
+          body:
+            application/json:
+              example: !include examples/club-response-403.json
+        404:
+          description: User is trying to update a club that does not exist
+          body:
+            application/json:
+              example: !include examples/club-response-404.json
+        422:
+          description: unprocessable entity when club name, income or expenditure data is missing in the request
     delete:
       description: delete a club's data
       securedBy: [access_token]
       responses:
         204:
           description: successfully delete a club's data
+        403:
+          description: User is trying to delete a club that they don't have access to
+          body:
+            application/json:
+              example: !include examples/club-response-403.json
+        404:
+          description: User is trying to delete a club that does not exist
+          body:
+            application/json:
+              example: !include examples/club-response-404.json
     /squadPlayers:
       get:
         description: gets list of all players in the corresponding club
@@ -342,8 +407,6 @@ securitySchemes:
         body:
           application/json:
             example: !include examples/match-performance-response.json
-      422:
-        description: unprocessable entity when playerID or competitionID is missing
   /lookup/{playerId}:
     uriParameters:
       playerId:

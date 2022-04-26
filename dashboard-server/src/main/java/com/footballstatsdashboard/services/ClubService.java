@@ -144,9 +144,9 @@ public class ClubService {
         try {
             this.clubDAO.deleteEntity(clubId);
         } catch (EntityNotFoundException entityNotFoundException) {
-            LOGGER.error("No club entity found for ID: {}", clubId);
+            LOGGER.error("Cannot delete club with ID: {} that does not exist", clubId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
-                    String.format("Cannot delete club (ID: %s) that does not exist", clubId));
+                    String.format("No club entity found for ID: %s", clubId));
         }
     }
 
