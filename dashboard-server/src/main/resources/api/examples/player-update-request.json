@@ -1,0 +1,128 @@
+{
+  "metadata": {
+    "name": "Sander Gard Bolin Berge",
+    "country": "Norway",
+    "age": 22
+  },
+  "roles": [
+    {
+      "name": "defensive central midfielder",
+      "associatedAttributes": [
+        "interceptions",
+        "defensive awareness",
+        "aggression",
+        "stamina",
+        "stand tackle",
+        "slide tackle"
+      ]
+    }
+  ],
+  "attributes": [
+    {
+      "name": "freekick accuracy",
+      "value": 2
+    },
+    {
+      "name": "penalties",
+      "value": 9
+    },
+    {
+      "name": "heading accuracy",
+      "value": 3
+    },
+    {
+      "name": "crossing",
+      "value": 1
+    },
+    {
+      "name": "short passing",
+      "value": 16
+    },
+    {
+      "name": "long passing",
+      "value": 19
+    },
+    {
+      "name": "long shots",
+      "value": 16
+    },
+    {
+      "name": "finishing",
+      "value": 2
+    },
+    {
+      "name": "volleys",
+      "value": 18
+    },
+    {
+      "name": "ball control",
+      "value": 9
+    },
+    {
+      "name": "standing tackle",
+      "value": 8
+    },
+    {
+      "name": "sliding tackle",
+      "value": 3
+    },
+    {
+      "name": "dribbling",
+      "value": 7
+    },
+    {
+      "name": "curve",
+      "value": 19
+    },
+    {
+      "name": "stamina",
+      "value": 19
+    },
+    {
+      "name": "jumping",
+      "value": 14
+    },
+    {
+      "name": "strength",
+      "value": 17
+    },
+    {
+      "name": "sprint speed",
+      "value": 8
+    },
+    {
+      "name": "acceleration",
+      "value": 5
+    },
+    {
+      "name": "agility",
+      "value": 17
+    },
+    {
+      "name": "balance",
+      "value": 12
+    },
+    {
+      "name": "aggression",
+      "value": 0
+    },
+    {
+      "name": "vision",
+      "value": 19
+    },
+    {
+      "name": "composure",
+      "value": 10
+    },
+    {
+      "name": "defensive awareness",
+      "value": 11
+    },
+    {
+      "name": "attacking position",
+      "value": 14
+    }
+  ],
+  "clubId": "462ecd34-b645-4f50-a8e0-d28e3b38db66",
+  "id": "18331d95-b856-43aa-b4a8-d67f50f12b12"
+}

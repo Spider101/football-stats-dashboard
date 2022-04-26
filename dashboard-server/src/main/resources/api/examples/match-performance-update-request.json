@@ -1,4 +1,5 @@
 {
+  "id": "567abe7a-df68-48ff-8dd0-1f25d7370962",
   "playerId": "091417ca-14ef-404c-9162-64f57ed84835",
   "competitionId": "daf48153-143b-4d5a-9422-9a5829ce7ccb",
   "appearances": 10,
@@ -14,6 +15,17 @@
   "passCompletionRate": 70.0,
   "matchRating": {
     "current": 7.5,
-    "history": []
+    "history": [
+      4,
+      5,
+      8,
+      6,
+      9,
+      4,
+      9,
+      2,
+      2,
+      3
+    ]
   }
 }

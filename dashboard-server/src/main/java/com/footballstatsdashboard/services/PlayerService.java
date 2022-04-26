@@ -197,9 +197,9 @@ public class PlayerService {
         try {
             this.playerDAO.deleteEntity(playerId);
         } catch (EntityNotFoundException entityNotFoundException) {
-            LOGGER.error("No player entity found for ID: {}", playerId);
+            LOGGER.error("Cannot delete player with ID: {} that does not exist", playerId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
-                    String.format("Cannot delete player (ID: %s) that does not exist", playerId));
+                    String.format("Not player entity found for ID: %s", playerId));
         }
     }
 
