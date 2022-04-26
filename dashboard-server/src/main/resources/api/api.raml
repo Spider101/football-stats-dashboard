@@ -55,6 +55,9 @@ securitySchemes:
     put:
       description: updates a player's data
       securedBy: [access_token]
+      body:
+        application/json:
+          example: !include examples/player-update-request.json
       responses:
         200:
           body:
@@ -183,6 +186,9 @@ securitySchemes:
     put:
       description: updates a club's data
       securedBy: [access_token]
+      body:
+        application/json:
+          example: !include examples/club-update-request.json
       responses:
         200:
           body:
@@ -261,6 +267,9 @@ securitySchemes:
         put:
           description: updates the board objective data for a club on the basis of the board objective ID
           securedBy: [access_token]
+          body:
+            application/json:
+              example: !include examples/board-objective-update-request.json
           responses:
             200:
               body:
@@ -382,6 +391,9 @@ securitySchemes:
     put:
       description: updates a player's performance data in a given competition on the basis of the performance ID
       securedBy: [access_token]
+      body:
+        application/json:
+          example: !include examples/match-performance-update-request.json
       responses:
         200:
           body:
