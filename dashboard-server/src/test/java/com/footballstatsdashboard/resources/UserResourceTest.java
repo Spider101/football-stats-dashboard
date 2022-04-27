@@ -30,6 +30,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -91,11 +92,12 @@ public class UserResourceTest {
         assertEquals(userId, userFromResponse.getId());
     }
 
+    // TODO: 28/04/22 this should be throwing an entity not found exception
     /**
      * given a runtime exception is thrown the user DAO when user entity is not found, verifies that the same
      * exception is thrown by the `getUser` resource method as well
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void getUserWhenUserNotFoundInCouchbase() {
         // setup
         UUID invalidUserId = UUID.randomUUID();
@@ -103,7 +105,7 @@ public class UserResourceTest {
                 .thenThrow(new RuntimeException("Unable to find document with Id: " + invalidUserId));
 
         // execute
-        userResource.getUser(invalidUserId);
+        assertThrows(RuntimeException.class, () -> userResource.getUser(invalidUserId));
 
         // assert
         verify(userDAO).getEntity(any());

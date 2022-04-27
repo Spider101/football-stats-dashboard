@@ -28,6 +28,7 @@ import static com.footballstatsdashboard.core.utils.Constants.COUNTRY_CODE_MAPPI
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -55,14 +56,13 @@ public class PlayerServiceTest {
     }
 
     /**
-     * given a valid player id, tests that the player entity is successfully fetched from couchbase server and
-     * returned in the response
+     * given a valid player id, tests that the player entity is successfully fetched from the DAO layer
      */
     @Test
-    public void getPlayerFetchesPlayerFromCouchbase() {
+    public void getPlayerFetchesPlayerData() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(playerId)
                 .withMetadata()
@@ -70,7 +70,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getEntity(eq(playerId))).thenReturn(playerFromCouchbase);
+        when(playerDAO.getEntity(eq(playerId))).thenReturn(existingPlayerData);
 
         // execute
         Player player = playerService.getPlayer(playerId);
@@ -80,30 +80,28 @@ public class PlayerServiceTest {
         assertEquals(playerId, player.getId());
     }
 
-    // TODO: 15/04/22 update the comments; a lot of it out-dated like the wrong exception, calling it requests, etc
     /**
-     * given an invalid player id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * given an invalid player id, tests that the EntityNotFound exception thrown by the DAO layer is handled and a
      * ServiceException is thrown instead
      */
-    @Test(expected = ServiceException.class)
-    public void getPlayerWhenPlayerNotFoundInCouchbase() {
+    @Test
+    public void getPlayerWhenPlayerDataCannotBeFound() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
         when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        playerService.getPlayer(invalidPlayerId);
+        assertThrows(ServiceException.class, () -> playerService.getPlayer(invalidPlayerId));
 
         // assert
         verify(playerDAO).getEntity(any());
     }
 
     /**
-     * given a valid player entity in the request, tests that the internal fields are set correctly on the entity and
-     * persisted in couchbase
+     * given a valid player entity, tests that the internal fields are set correctly on the entity and persisted
      */
     @Test
-    public void createPlayerPersistsPlayerInCouchbase() throws IOException {
+    public void createPlayerPersistsPlayerData() throws IOException {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -151,11 +149,11 @@ public class PlayerServiceTest {
     }
 
     /**
-     * given that the request contains a player entity without player roles, tests that no data is persisted in
-     * couchbase and a service exception is thrown instead
+     * given a player entity without player roles, tests that no data is persisted and a service exception is thrown
+     * instead
      */
-    @Test(expected = ServiceException.class)
-    public void createPlayerWhenPlayerRolesAreNotProvided() throws IOException {
+    @Test
+    public void createPlayerWhenPlayerRolesAreNotProvided() {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -170,18 +168,19 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
+        assertThrows(ServiceException.class,
+                () -> playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY));
 
         // assert
         verify(playerDAO, never()).insertEntity(any());
     }
 
     /**
-     * given that the request contains a player entity without player attributes, tests that no data is persisted in
-     * couchbase and a service exception is thrown instead
+     * given a player entity without player attributes, tests that no data is persisted and a service exception is
+     * thrown instead
      */
-    @Test(expected = ServiceException.class)
-    public void createPlayerWhenPlayerAttributesAreNotProvided() throws IOException {
+    @Test
+    public void createPlayerWhenPlayerAttributesAreNotProvided() {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -196,18 +195,19 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
+        assertThrows(ServiceException.class,
+                () -> playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY));
 
         // assert
         verify(playerDAO, never()).insertEntity(any());
     }
 
     /**
-     * given that the request contains a player entity without attributes of a particular category like TECHNICAL,
-     * tests that no data is persisted in couchbase and a service exception is thrown instead
+     * given a player entity without attributes of a particular category like TECHNICAL, tests that no data is
+     * persisted and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
-    public void createPlayerWhenTechnicalPlayerAttributesAreNotProvided() throws IOException {
+    @Test
+    public void createPlayerWhenTechnicalPlayerAttributesAreNotProvided() {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -224,21 +224,22 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY);
+        assertThrows(ServiceException.class,
+                () -> playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY));
 
         // assert
         verify(playerDAO, never()).insertEntity(any());
     }
 
     /**
-     * given a valid player entity in the request, tests that an updated player entity with updated internal fields
-     * is upserted in couchbase
+     * given a valid player entity and an identifier for an existing player entity, tests that the corresponding player
+     * entity is updated with the incoming properties and persisted in the DAO layer
      */
     @Test
-    public void updatePlayerUpdatesPlayerInCouchbase() {
+    public void updatePlayerUpdatesPlayerData() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(existingPlayerId)
                 .withMetadata()
@@ -246,7 +247,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -263,12 +264,12 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+        Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId);
 
         // assert
         verify(playerDAO).updateEntity(eq(existingPlayerId), any());
         updatedPlayer.getAttributes().forEach(attribute -> {
-            Attribute existingPlayerAttribute = existingPlayerInCouchbase.getAttributes().stream()
+            Attribute existingPlayerAttribute = existingPlayerData.getAttributes().stream()
                     .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
                     .findFirst().orElse(null);
             assertNotNull(existingPlayerAttribute);
@@ -281,24 +282,24 @@ public class PlayerServiceTest {
 
         assertEquals(incomingPlayer.getMetadata().getName(), updatedPlayer.getMetadata().getName());
         assertNotNull(updatedPlayer.getAbility());
-        assertEquals(existingPlayerInCouchbase.getAbility().getHistory().size() + 1,
+        assertEquals(existingPlayerData.getAbility().getHistory().size() + 1,
                 updatedPlayer.getAbility().getHistory().size());
         assertEquals(incomingPlayer.getRoles(), updatedPlayer.getRoles());
 
         // assertions for general house-keeping fields
-        assertNotEquals(existingPlayerInCouchbase.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
+        assertNotEquals(existingPlayerData.getLastModifiedDate(), updatedPlayer.getLastModifiedDate());
         assertEquals(CREATED_BY, updatedPlayer.getCreatedBy());
     }
 
     /**
-     * given a player entity without roles data in the request, tests that the corresponding player data in couchbase is
-     * not updated and a service exception is thrown instead
+     * given a player entity without roles, tests that the corresponding player data is not updated and a service
+     * exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updatePlayerWhenPlayerRolesAreNotProvided() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(existingPlayerId)
                 .withMetadata()
@@ -306,7 +307,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -321,21 +322,22 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+        assertThrows(ServiceException.class,
+                () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
 
         // assert
         verify(playerDAO, never()).updateEntity(any(), any());
     }
 
     /**
-     * given a player entity without attributes data in the request, tests that the corresponding player data in
-     * couchbase is not updated and a service exception is thrown instead
+     * given a player entity without attributes data, tests that the corresponding player data is not updated and a
+     * service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updatePlayerWhenPlayerAttributesAreNotProvided() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(existingPlayerId)
                 .withMetadata()
@@ -343,7 +345,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -358,21 +360,22 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+        assertThrows(ServiceException.class,
+                () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
 
         // assert
         verify(playerDAO, never()).updateEntity(any(), any());
     }
 
     /**
-     * given a player entity with an invalid attribute in the request, tests that the corresponding player data in
-     * couchbase is not updated and a service exception is thrown instead
+     * given a player entity with an invalid attribute name, tests that the corresponding player data is not updated
+     * and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
-    public void updatePlayerWhenPlayerAttributeIncludesInvalidAttribute() {
+    @Test
+    public void updatePlayerWhenAttributeNameIsInvalid() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayerInCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(existingPlayerId)
                 .withMetadata()
@@ -380,7 +383,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerInCouchbase);
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -397,20 +400,21 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        playerService.updatePlayer(incomingPlayer, existingPlayerInCouchbase, existingPlayerId);
+        assertThrows(ServiceException.class,
+                () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
 
         // assert
         verify(playerDAO, never()).updateEntity(any(), any());
     }
 
     /**
-     * given a valid player id, removes the player entity from couchbase
+     * given a valid player id, removes the player entity from the DAO layer
      */
     @Test
-    public void deletePlayerRemovesPlayerFromCouchbase() {
+    public void deletePlayerRemovesPlayerData() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(playerId)
                 .withMetadata()
@@ -418,7 +422,7 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getEntity(eq(playerId))).thenReturn(playerFromCouchbase);
+        when(playerDAO.getEntity(eq(playerId))).thenReturn(existingPlayerData);
 
         // execute
         playerService.deletePlayer(playerId, clubId -> true);
@@ -429,17 +433,18 @@ public class PlayerServiceTest {
     }
 
     /**
-     * given an invalid player id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * given an invalid player id, tests that the EntityNotFound exception thrown by the DAO layer is handled and a
      * ServiceException is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void deletePlayerWhenPlayerNotFound() {
         // setup
         UUID invalidPlayerId = UUID.randomUUID();
         when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        playerService.deletePlayer(invalidPlayerId, clubId -> true);
+        assertThrows(ServiceException.class,
+                () -> playerService.deletePlayer(invalidPlayerId, clubId -> true));
 
         // assert
         verify(playerDAO).getEntity(any());
@@ -450,11 +455,11 @@ public class PlayerServiceTest {
      * given an id for a player that the user does not have access to, tests that the player data is not deleted and a
      * service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void deletePlayerWhenUserDoesNotHaveAccessToPlayer() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player playerFromCouchbase = PlayerDataProvider.PlayerBuilder.builder()
+        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(true)
                 .withId(playerId)
                 .withMetadata()
@@ -462,10 +467,11 @@ public class PlayerServiceTest {
                 .withRoles()
                 .withAttributes()
                 .build();
-        when(playerDAO.getEntity(eq(playerId))).thenReturn(playerFromCouchbase);
+        when(playerDAO.getEntity(eq(playerId))).thenReturn(existingPlayerData);
 
         // execute
-        playerService.deletePlayer(playerId, clubId -> false);
+        assertThrows(ServiceException.class,
+                () -> playerService.deletePlayer(playerId, clubId -> false));
 
         // assert
         verify(playerDAO, never()).deleteEntity(any());

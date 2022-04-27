@@ -26,6 +26,7 @@ import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -148,7 +149,7 @@ public class PlayerResourceTest {
      * given a valid player entity in the request with a club id for a club that doesn't exist, tests that no player
      * data is created and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createPlayerWhenClubForPlayerDoesNotExist() throws IOException {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
@@ -162,7 +163,7 @@ public class PlayerResourceTest {
 
         // TODO: 13/04/22 clean up unused variables like below
         // execute
-        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
+        assertThrows(ServiceException.class, () -> playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo));
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -173,7 +174,7 @@ public class PlayerResourceTest {
      * given a valid player entity in the request with a club id for a club that the current user doesn't have access
      * to, tests that no player data is created and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createPlayerWhenClubForPlayerIsNotAccessible() throws IOException {
         // setup
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
@@ -186,7 +187,7 @@ public class PlayerResourceTest {
                 .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
 
         // execute
-        Response playerResponse = playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo);
+        assertThrows(ServiceException.class, () -> playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo));
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -266,7 +267,7 @@ public class PlayerResourceTest {
      * given a valid player entity in the request, tests that if the player data does not already exist, no player data
      * is updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updatePlayerWhenPlayerDoesNotExist() {
         // setup
         String updatedPlayerName = "updated name";
@@ -293,7 +294,8 @@ public class PlayerResourceTest {
                 .build();
 
         // execute
-        Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
+        assertThrows(ServiceException.class,
+                () -> playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer));
 
         // assert
         verify(playerService).getPlayer(any());
@@ -305,7 +307,7 @@ public class PlayerResourceTest {
      * given a valid player entity in the request, tests that if the user does not have access to the player, no player
      * data is updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updatePlayerWhenPlayerDoesNotBelongToUser() {
         // setup
         String updatedPlayerName = "updated name";
@@ -342,7 +344,8 @@ public class PlayerResourceTest {
                 .build();
 
         // execute
-        playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
+        assertThrows(ServiceException.class,
+                () -> playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer));
 
         // assert
         verify(playerService).getPlayer(any());
@@ -354,7 +357,7 @@ public class PlayerResourceTest {
      * given that the request contains a player entity whose ID does not match the existing player's ID, tests that
      * the associated player data is not updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
@@ -381,11 +384,12 @@ public class PlayerResourceTest {
                 .build();
 
         // execute
-        Response playerResponse = playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer);
+        assertThrows(ServiceException.class,
+                () -> playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer));
 
         // assert
         verify(playerService).getPlayer(any());
-        verify(clubService).doesClubBelongToUser(any(), any());
+        verify(clubService, never()).doesClubBelongToUser(any(), any());
         verify(playerService, never()).updatePlayer(any(), any(), any());
     }
 

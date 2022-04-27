@@ -26,6 +26,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -110,7 +111,7 @@ public class BoardObjectiveResourceTest {
      *  given an ID for a board objective associated with a club the user does not have access to, tests that the board
      *  objective data is not returned and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void getBoardObjectiveWhenClubDoesNotBelongToUser() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
@@ -118,7 +119,8 @@ public class BoardObjectiveResourceTest {
                 .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
 
         // execute
-        boardObjectiveResource.getBoardObjective(userPrincipal, invalidClubId, UUID.randomUUID());
+        assertThrows(ServiceException.class,
+                () -> boardObjectiveResource.getBoardObjective(userPrincipal, invalidClubId, UUID.randomUUID()));
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -129,7 +131,7 @@ public class BoardObjectiveResourceTest {
      * given an ID for a board objective associated with a club that does not exist, tests that the objective data is
      * not returned and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void getBoardObjectiveWhenClubDoesNotExist() {
         // setup
         UUID nonExistentClubId = UUID.randomUUID();
@@ -137,7 +139,8 @@ public class BoardObjectiveResourceTest {
                 .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
 
         // execute
-        boardObjectiveResource.getBoardObjective(userPrincipal, nonExistentClubId, UUID.randomUUID());
+        assertThrows(ServiceException.class,
+                () -> boardObjectiveResource.getBoardObjective(userPrincipal, nonExistentClubId, UUID.randomUUID()));
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -182,7 +185,7 @@ public class BoardObjectiveResourceTest {
      * given a valid board objective entity in the request with a club id for a club that doesn't exist, tests that no
      * data is created and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createBoardObjectiveWhenClubForBoardObjectiveDoesNotExist() {
         // setup
         UUID nonExistentClubId = UUID.randomUUID();
@@ -191,7 +194,9 @@ public class BoardObjectiveResourceTest {
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
 
         // execute
-        boardObjectiveResource.createBoardObjective(userPrincipal, nonExistentClubId, incomingBoardObjective, uriInfo);
+        assertThrows(ServiceException.class,
+                () -> boardObjectiveResource.createBoardObjective(userPrincipal, nonExistentClubId,
+                        incomingBoardObjective, uriInfo));
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -202,7 +207,7 @@ public class BoardObjectiveResourceTest {
      * given a valid board objective entity in the request with a club id for a club that the current user does not have
      * access to, tests that no board objective data is created and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createBoardObjectiveWhenClubForBoardObjectiveIsNotAccessible() {
         // setup
         UUID inaccessibleClubId = UUID.randomUUID();
@@ -211,7 +216,9 @@ public class BoardObjectiveResourceTest {
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
 
         // execute
-        boardObjectiveResource.createBoardObjective(userPrincipal, inaccessibleClubId, incomingBoardObjective, uriInfo);
+        assertThrows(ServiceException.class,
+                () -> boardObjectiveResource.createBoardObjective(userPrincipal, inaccessibleClubId,
+                        incomingBoardObjective, uriInfo));
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -266,7 +273,7 @@ public class BoardObjectiveResourceTest {
      * with which the board objective is associated, the board objective data is not updated and a service exception is
      * thrown
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateBoardObjectiveWhenAssociatedClubDoesNotBelongToUser() {
         // setup
         UUID existingBoardObjectiveId = UUID.randomUUID();
@@ -276,8 +283,9 @@ public class BoardObjectiveResourceTest {
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
 
         // execute
-        boardObjectiveResource.updateBoardObjective(userPrincipal, inaccessibleClubId, existingBoardObjectiveId,
-                incomingBoardObjective);
+        assertThrows(ServiceException.class,
+                () -> boardObjectiveResource.updateBoardObjective(userPrincipal, inaccessibleClubId,
+                        existingBoardObjectiveId, incomingBoardObjective));
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -288,7 +296,7 @@ public class BoardObjectiveResourceTest {
      * given a valid board objective entity in the request, tests that if the club associated with the board objective
      * data does not exist, no board objective data is updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateBoardObjectiveWhenClubDoesNotExist() {
         // setup
         UUID boardObjectiveId = UUID.randomUUID();
@@ -298,8 +306,9 @@ public class BoardObjectiveResourceTest {
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
 
         // execute
-        boardObjectiveResource.updateBoardObjective(userPrincipal, nonExistentClubId, boardObjectiveId,
-                incomingBoardObjective);
+        assertThrows(ServiceException.class,
+                () -> boardObjectiveResource.updateBoardObjective(userPrincipal, nonExistentClubId, boardObjectiveId,
+                        incomingBoardObjective));
 
         // assert
         verify(clubService).getClub(any(), any());
@@ -332,14 +341,16 @@ public class BoardObjectiveResourceTest {
      * given a valid board objective id, tests that if the user does not have access to the club associated with the
      * board objective, no board objective data is removed and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void deleteBoardObjectiveWhenBoardObjectiveDoesNotBelongToUser() {
         // setup
         UUID inaccessibleClubId = UUID.randomUUID();
         when(clubService.doesClubBelongToUser(eq(inaccessibleClubId), eq(userPrincipal.getId()))).thenReturn(false);
 
         // execute
-        boardObjectiveResource.deleteBoardObjective(userPrincipal, inaccessibleClubId, UUID.randomUUID());
+        assertThrows(ServiceException.class,
+                () -> boardObjectiveResource.deleteBoardObjective(userPrincipal, inaccessibleClubId,
+                        UUID.randomUUID()));
 
         // assert
         verify(clubService).doesClubBelongToUser(any(), any());
@@ -379,14 +390,15 @@ public class BoardObjectiveResourceTest {
      * given a valid club id, tests that if the user does not have access to the club the board objectives are being
      * requested for, no board objective data is returned and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void getAllBoardObjectivesForClubWhenClubDoesNotBelongToUser() {
         // setup
         UUID inaccessibleClubId = UUID.randomUUID();
         when(clubService.doesClubBelongToUser(eq(inaccessibleClubId), eq(userPrincipal.getId()))).thenReturn(false);
 
         // execute
-        boardObjectiveResource.getAllBoardObjectives(userPrincipal, inaccessibleClubId);
+        assertThrows(ServiceException.class,
+                () -> boardObjectiveResource.getAllBoardObjectives(userPrincipal, inaccessibleClubId));
 
         // assert
         verify(clubService).doesClubBelongToUser(any(), any());
