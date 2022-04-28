@@ -159,9 +159,8 @@ public class PlayerResourceTest {
                 .withAttributes()
                 .build();
         when(clubService.getClub(eq(incomingPlayer.getClubId()), eq(userPrincipal.getId())))
-                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
+                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No player found!"));
 
-        // TODO: 13/04/22 clean up unused variables like below
         // execute
         assertThrows(ServiceException.class, () -> playerResource.createPlayer(userPrincipal, incomingPlayer, uriInfo));
 
@@ -344,13 +343,14 @@ public class PlayerResourceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer));
 
         // assert
         verify(playerService).getPlayer(any());
         verify(clubService).doesClubBelongToUser(any(), any());
         verify(playerService, never()).updatePlayer(any(), any(), any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
@@ -384,13 +384,14 @@ public class PlayerResourceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer));
 
         // assert
         verify(playerService).getPlayer(any());
         verify(clubService, never()).doesClubBelongToUser(any(), any());
         verify(playerService, never()).updatePlayer(any(), any(), any());
+        assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
     }
 
     /**

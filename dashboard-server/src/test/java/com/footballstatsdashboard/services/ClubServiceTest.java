@@ -8,6 +8,7 @@ import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.db.IClubEntityDAO;
 import com.google.common.collect.ImmutableList;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -93,10 +94,12 @@ public class ClubServiceTest {
         when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        assertThrows(ServiceException.class, () -> clubService.getClub(invalidClubId, userId));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.getClub(invalidClubId, userId));
 
         // assert
         verify(clubDAO).getEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -117,10 +120,12 @@ public class ClubServiceTest {
         when(clubDAO.getEntity(eq(clubId))).thenReturn(existingClubData);
 
         // execute
-        assertThrows(ServiceException.class, () -> clubService.getClub(clubId, userId));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.getClub(clubId, userId));
 
         // assert
         verify(clubDAO).getEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
@@ -180,10 +185,12 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class, () -> clubService.createClub(incomingClubWithNoName, userId, USER_EMAIL));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.createClub(incomingClubWithNoName, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -199,11 +206,12 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubService.createClub(incomingClubWithNoIncomeData, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -219,11 +227,12 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubService.createClub(incomingClubWithNoExpenditureData, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -241,11 +250,12 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubService.createClub(incomingClubWithIncorrectManagerFunds, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -264,11 +274,12 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubService.createClub(incomingClubWithIncorrectBudget, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -398,10 +409,12 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class, () -> clubService.updateClub(incomingClub, existingClubData, existingClubId));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.updateClub(incomingClub, existingClubData, existingClubId));
 
         // assert
         verify(clubDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -431,10 +444,12 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class, () -> clubService.updateClub(incomingClub, existingClubData, existingClubId));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.updateClub(incomingClub, existingClubData, existingClubId));
 
         // assert
         verify(clubDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -532,11 +547,13 @@ public class ClubServiceTest {
         when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubData);
 
         // execute
-        assertThrows(ServiceException.class, () -> clubService.deleteClub(existingClubId, userId));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.deleteClub(existingClubId, userId));
 
         // assert
         verify(clubDAO).getEntity(any());
         verify(clubDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
@@ -550,10 +567,12 @@ public class ClubServiceTest {
         when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        assertThrows(ServiceException.class, () -> clubService.deleteClub(invalidClubId, userId));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.deleteClub(invalidClubId, userId));
 
         // assert
         verify(clubDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from

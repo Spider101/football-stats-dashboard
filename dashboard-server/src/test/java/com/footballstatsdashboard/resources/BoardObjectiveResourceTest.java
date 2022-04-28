@@ -348,13 +348,14 @@ public class BoardObjectiveResourceTest {
         when(clubService.doesClubBelongToUser(eq(inaccessibleClubId), eq(userPrincipal.getId()))).thenReturn(false);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveResource.deleteBoardObjective(userPrincipal, inaccessibleClubId,
                         UUID.randomUUID()));
 
         // assert
         verify(clubService).doesClubBelongToUser(any(), any());
         verify(boardObjectiveService, never()).deleteBoardObjective(any(), any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
@@ -397,11 +398,12 @@ public class BoardObjectiveResourceTest {
         when(clubService.doesClubBelongToUser(eq(inaccessibleClubId), eq(userPrincipal.getId()))).thenReturn(false);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveResource.getAllBoardObjectives(userPrincipal, inaccessibleClubId));
 
         // assert
         verify(clubService).doesClubBelongToUser(any(), any());
         verify(boardObjectiveService, never()).getAllBoardObjectivesForClub(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 }

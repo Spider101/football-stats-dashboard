@@ -4,6 +4,7 @@ import com.footballstatsdashboard.BoardObjectiveDataProvider;
 import com.footballstatsdashboard.api.model.club.BoardObjective;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.db.IBoardObjectiveEntityDAO;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -76,11 +77,12 @@ public class BoardObjectiveServiceTest {
         when(boardObjectiveDAO.getEntity(eq(nonExistentBoardObjectiveId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveService.getBoardObjective(nonExistentBoardObjectiveId, UUID.randomUUID()));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -101,11 +103,12 @@ public class BoardObjectiveServiceTest {
         when(boardObjectiveDAO.getEntity(eq(inaccessibleBoardObjectiveId))).thenReturn(inaccessibleBoardObjective);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveService.getBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
@@ -196,13 +199,14 @@ public class BoardObjectiveServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveService.updateBoardObjective(nonExistentBoardObjectiveId, UUID.randomUUID(),
                         incomingBoardObjective));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         verify(boardObjectiveDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -229,13 +233,14 @@ public class BoardObjectiveServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveService.updateBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId,
                         incomingBoardObjective));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         verify(boardObjectiveDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
@@ -273,12 +278,13 @@ public class BoardObjectiveServiceTest {
         when(boardObjectiveDAO.getEntity(eq(nonExistentBoardObjectiveId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveService.deleteBoardObjective(nonExistentBoardObjectiveId, clubId));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         verify(boardObjectiveDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -299,12 +305,13 @@ public class BoardObjectiveServiceTest {
         when(boardObjectiveDAO.getEntity(eq(inaccessibleBoardObjectiveId))).thenReturn(inaccessibleBoardObjective);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveService.deleteBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         verify(boardObjectiveDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**

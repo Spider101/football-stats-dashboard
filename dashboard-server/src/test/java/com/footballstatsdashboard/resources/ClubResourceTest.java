@@ -163,11 +163,13 @@ public class ClubResourceTest {
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
 
         // execute
-        assertThrows(ServiceException.class, () -> clubResource.createClub(userPrincipal, incomingClub, uriInfo));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubResource.createClub(userPrincipal, incomingClub, uriInfo));
 
         // assert
         verify(fileUploadService).doesFileExist(anyString());
         verify(clubService, never()).createClub(any(), any(), anyString());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -261,13 +263,14 @@ public class ClubResourceTest {
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
 
         // assert
         verify(fileUploadService).doesFileExist(anyString());
         verify(clubService, never()).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -296,12 +299,13 @@ public class ClubResourceTest {
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
 
         // assert
         verify(clubService).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
+        assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
     }
 
     /**
@@ -319,7 +323,8 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(eq(existingClubId), eq(userPrincipal.getId()))).thenThrow(ServiceException.class);
+        when(clubService.getClub(eq(existingClubId), eq(userPrincipal.getId())))
+                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
 
         BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
         BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));

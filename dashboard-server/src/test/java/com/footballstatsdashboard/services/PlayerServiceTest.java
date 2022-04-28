@@ -13,6 +13,7 @@ import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.db.IEntityDAO;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -91,10 +92,12 @@ public class PlayerServiceTest {
         when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        assertThrows(ServiceException.class, () -> playerService.getPlayer(invalidPlayerId));
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> playerService.getPlayer(invalidPlayerId));
 
         // assert
         verify(playerDAO).getEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -168,11 +171,12 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY));
 
         // assert
         verify(playerDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -195,11 +199,12 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY));
 
         // assert
         verify(playerDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -224,11 +229,12 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerService.createPlayer(incomingPlayer, existingClub, CREATED_BY));
 
         // assert
         verify(playerDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -322,11 +328,12 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
 
         // assert
         verify(playerDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -360,11 +367,12 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
 
         // assert
         verify(playerDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -400,11 +408,12 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
 
         // assert
         verify(playerDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
@@ -443,12 +452,13 @@ public class PlayerServiceTest {
         when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerService.deletePlayer(invalidPlayerId, clubId -> true));
 
         // assert
         verify(playerDAO).getEntity(any());
         verify(playerDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -470,11 +480,12 @@ public class PlayerServiceTest {
         when(playerDAO.getEntity(eq(playerId))).thenReturn(existingPlayerData);
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> playerService.deletePlayer(playerId, clubId -> false));
 
         // assert
         verify(playerDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     private void assertCountryLogo(Metadata createdPlayerMetadata) throws IOException {
