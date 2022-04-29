@@ -32,6 +32,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -104,11 +105,12 @@ public class MatchPerformanceResourceTest {
         assertEquals(matchPerformanceId, matchPerformanceFromResponse.getId());
     }
 
+    // TODO: 28/04/22 this should be throwing an entity not found exception
     /**
      * given a runtime exception is thrown by couchbase DAO when match performance data is not found, verifies
      * that the same exception is thrown by `getClub` resource method as well
      */
-    @Test(expected = RuntimeException.class)
+    @Test
     public void getMatchPerformanceWhenMatchPerformanceNotFoundInCouchbase() {
         // setup
         UUID invalidMatchPerformanceId = UUID.randomUUID();
@@ -116,7 +118,8 @@ public class MatchPerformanceResourceTest {
                 .thenThrow(new RuntimeException("Unable to find document with ID: " + invalidMatchPerformanceId));
 
         // execute
-        matchPerformanceResource.getMatchPerformance(invalidMatchPerformanceId);
+        assertThrows(RuntimeException.class,
+                () -> matchPerformanceResource.getMatchPerformance(invalidMatchPerformanceId));
 
         // assert
         verify(matchPerformanceDAO).getEntity(any());

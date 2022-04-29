@@ -4,6 +4,7 @@ import com.footballstatsdashboard.BoardObjectiveDataProvider;
 import com.footballstatsdashboard.api.model.club.BoardObjective;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.db.IBoardObjectiveEntityDAO;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -18,6 +19,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -68,24 +70,26 @@ public class BoardObjectiveServiceTest {
      * given an invalid board objective id, tests that the EntityNotFound exception thrown from the DAO layer is
      * handled and a service exception is thrown
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void getBoardObjectiveWhenBoardObjectiveDataCannotBeFound() {
         // setup
         UUID nonExistentBoardObjectiveId = UUID.randomUUID();
         when(boardObjectiveDAO.getEntity(eq(nonExistentBoardObjectiveId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        boardObjectiveService.getBoardObjective(nonExistentBoardObjectiveId, UUID.randomUUID());
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> boardObjectiveService.getBoardObjective(nonExistentBoardObjectiveId, UUID.randomUUID()));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
      * given an invalid board objective id, tests that if the board objective does not belong to the club, no board
      * objective data is returned and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void getBoardObjectiveWhenBoardObjectiveDoesNotBelongToClub() {
         // setup
         UUID inaccessibleBoardObjectiveId = UUID.randomUUID();
@@ -99,10 +103,12 @@ public class BoardObjectiveServiceTest {
         when(boardObjectiveDAO.getEntity(eq(inaccessibleBoardObjectiveId))).thenReturn(inaccessibleBoardObjective);
 
         // execute
-        boardObjectiveService.getBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> boardObjectiveService.getBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
@@ -133,10 +139,10 @@ public class BoardObjectiveServiceTest {
 
     /**
      * given a valid board objective entity and an identifier for an existing board objective, tests that the
-     * corresponding board objective data is updated in persistent storage
+     * corresponding board objective data is updated with the incoming properties and persisted in the DAO layer
      */
     @Test
-    public void updateBoardObjectiveUpdateBoardObjectiveData() {
+    public void updateBoardObjectiveUpdatesBoardObjectiveData() {
         // setup
         UUID existingClubId = UUID.randomUUID();
         UUID existingBoardObjectiveId = UUID.randomUUID();
@@ -180,7 +186,7 @@ public class BoardObjectiveServiceTest {
      * objective for that identifier does not exist, no board objective data is updated and a service exception is
      * thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateBoardObjectiveWhenBoardObjectiveDoesNotExist() {
         // setup
         UUID nonExistentBoardObjectiveId = UUID.randomUUID();
@@ -193,19 +199,21 @@ public class BoardObjectiveServiceTest {
                 .build();
 
         // execute
-        boardObjectiveService.updateBoardObjective(nonExistentBoardObjectiveId, UUID.randomUUID(),
-                incomingBoardObjective);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> boardObjectiveService.updateBoardObjective(nonExistentBoardObjectiveId, UUID.randomUUID(),
+                        incomingBoardObjective));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         verify(boardObjectiveDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
      * given an invalid board objective id, tests that if the board objective does not belong to the club, no board
      * objective data is updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateBoardObjectiveWhenBoardObjectiveDoesNotBelongToClub() {
         // setup
         UUID inaccessibleBoardObjectiveId = UUID.randomUUID();
@@ -225,16 +233,18 @@ public class BoardObjectiveServiceTest {
                 .build();
 
         // execute
-        boardObjectiveService.updateBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId,
-                incomingBoardObjective);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> boardObjectiveService.updateBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId,
+                        incomingBoardObjective));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         verify(boardObjectiveDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
-     * given a valid board objective id, removes the board objective entity from persistent storage
+     * given a valid board objective id, removes the board objective entity from the DAO layer
      */
     @Test
     public void deleteBoardObjectiveRemovesBoardObjectiveData() {
@@ -260,7 +270,7 @@ public class BoardObjectiveServiceTest {
      * given an invalid board objective id, tests that the EntityNotFound exception thrown by the DAO layer is handled
      * and a ServiceException is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void deleteBoardObjectiveWhenBoardObjectiveDataCannotBeNotFound() {
         // setup
         UUID nonExistentBoardObjectiveId = UUID.randomUUID();
@@ -268,18 +278,20 @@ public class BoardObjectiveServiceTest {
         when(boardObjectiveDAO.getEntity(eq(nonExistentBoardObjectiveId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        boardObjectiveService.deleteBoardObjective(nonExistentBoardObjectiveId, clubId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> boardObjectiveService.deleteBoardObjective(nonExistentBoardObjectiveId, clubId));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         verify(boardObjectiveDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
      * given an invalid board objective id, tests that if the board objective does not belong to the club, no board
      * objective data is deleted and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void deleteBoardObjectiveWhenBoardObjectiveDoesNotBelongToClub() {
         // setup
         UUID inaccessibleBoardObjectiveId = UUID.randomUUID();
@@ -293,11 +305,13 @@ public class BoardObjectiveServiceTest {
         when(boardObjectiveDAO.getEntity(eq(inaccessibleBoardObjectiveId))).thenReturn(inaccessibleBoardObjective);
 
         // execute
-        boardObjectiveService.deleteBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> boardObjectiveService.deleteBoardObjective(inaccessibleBoardObjectiveId, accessibleClubId));
 
         // assert
         verify(boardObjectiveDAO).getEntity(any());
         verify(boardObjectiveDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**

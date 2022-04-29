@@ -8,6 +8,7 @@ import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.db.IClubEntityDAO;
 import com.google.common.collect.ImmutableList;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -24,6 +25,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,21 +55,20 @@ public class ClubServiceTest {
     }
 
     /**
-     * given a valid club id, tests that the club entity is successfully fetched from couchbase server and returned
-     * in the response
+     * given a valid club id, tests that the club entity is successfully fetched from the DAO layer
      */
     @Test
-    public void getClubFetchesClubFromCouchbase() {
+    public void getClubFetchesClubData() {
         // setup
         UUID clubId = UUID.randomUUID();
-        Club clubFromCouchbase = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(clubId)
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getEntity(eq(clubId))).thenReturn(clubFromCouchbase);
+        when(clubDAO.getEntity(eq(clubId))).thenReturn(existingClubData);
 
         // execute
         Club club = clubService.getClub(clubId, userId);
@@ -83,52 +84,55 @@ public class ClubServiceTest {
     }
 
     /**
-     * given an invalid club id, tests that the DocumentNotFound exception thrown by the DAO layer is handled and a
+     * given an invalid club id, tests that the EntityNotFound exception thrown by the DAO layer is handled and a
      * ServiceException is thrown instead
      */
-    @Test(expected = ServiceException.class)
-    public void getClubWhenClubNotFoundInCouchbase() {
+    @Test
+    public void getClubWhenClubDataCannotBeFound() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
         when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        clubService.getClub(invalidClubId, userId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.getClub(invalidClubId, userId));
 
         // assert
         verify(clubDAO).getEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
      * given a club id for a club the user does not have access to, tests that the club data is not returned and a
      * service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void getClubWhenClubDoesNotBelongToUser() {
         // setup
         UUID clubId = UUID.randomUUID();
-        Club clubFromCouchbase = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(UUID.randomUUID())
                 .withId(clubId)
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getEntity(eq(clubId))).thenReturn(clubFromCouchbase);
+        when(clubDAO.getEntity(eq(clubId))).thenReturn(existingClubData);
 
         // execute
-        clubService.getClub(clubId, userId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.getClub(clubId, userId));
 
         // assert
         verify(clubDAO).getEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
-     * given a valid club entity in the request, tests that the internal fields are set correctly on the entity and
-     * persisted in couchbase
+     * given a valid club entity, tests that the internal fields are set correctly on the entity and persisted
      */
     @Test
-    public void createClubPersistsClubInCouchbase() {
+    public void createClubPersistsClubData() {
         // setup
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
@@ -167,10 +171,10 @@ public class ClubServiceTest {
     }
 
     /**
-     * given that the request contains a club entity with an empty club name, tests that no data is persisted in
-     * couchbase and a service exception is thrown instead
+     * given a club entity with an empty club name, tests that no data is persisted and a service exception is thrown
+     * instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createClubWhenClubNameIsEmpty() {
         // setup
         Club incomingClubWithNoName = ClubDataProvider.ClubBuilder.builder()
@@ -181,17 +185,19 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        clubService.createClub(incomingClubWithNoName, userId, USER_EMAIL);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.createClub(incomingClubWithNoName, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
-     * given that the request contains a club entity without valid income data, tests that no data is persisted in
-     * couchbase and a service exception is thrown instead
+     * given a club entity without valid income data, tests that no data is persisted and a service exception is thrown
+     * instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createClubWithoutIncomeData() {
         // setup
         Club incomingClubWithNoIncomeData = ClubDataProvider.ClubBuilder.builder()
@@ -200,17 +206,19 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        clubService.createClub(incomingClubWithNoIncomeData, userId, USER_EMAIL);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.createClub(incomingClubWithNoIncomeData, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
-     * given that the request contains a club entity without valid expenditure data, tests that no data is persisted in
-     * couchbase and a service exception is thrown instead
+     * given a club entity without valid expenditure data, tests that no data is persisted and a service exception is
+     * thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createClubWithoutExpenditureData() {
         // setup
         Club incomingClubWithNoExpenditureData = ClubDataProvider.ClubBuilder.builder()
@@ -219,17 +227,19 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        clubService.createClub(incomingClubWithNoExpenditureData, userId, USER_EMAIL);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.createClub(incomingClubWithNoExpenditureData, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
-     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
-     * set, tests that no data is persisted in couchbase and a service exception is thrown instead
+     * given a club entity whose manager funds is greater than the transfer and wage budgets set, tests that no data is
+     * persisted and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createClubWithIncorrectManagerFunds() {
         // setup
         Club incomingClubWithIncorrectManagerFunds = ClubDataProvider.ClubBuilder.builder()
@@ -240,17 +250,19 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        clubService.createClub(incomingClubWithIncorrectManagerFunds, userId, USER_EMAIL);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.createClub(incomingClubWithIncorrectManagerFunds, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
-     * given that the request contains a club entity whose transfer and wage budgets is greater than the manager funds
-     * set, tests that no data is persisted in couchbase and a service exception is thrown
+     * given a club entity whose transfer and wage budgets is greater than the manager funds set, tests that no data is
+     * persisted and a service exception is thrown
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createClubWithIncorrectBudget() {
         // setup
         Club incomingClubWithIncorrectBudget = ClubDataProvider.ClubBuilder.builder()
@@ -262,21 +274,23 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        clubService.createClub(incomingClubWithIncorrectBudget, userId, USER_EMAIL);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.createClub(incomingClubWithIncorrectBudget, userId, USER_EMAIL));
 
         // assert
         verify(clubDAO, never()).insertEntity(any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
-     * given a valid club entity in the request, tests that an updated club entity with update internal fields is
-     * upserted in couchbase
+     * given a valid club entity and an identifier for an existing club entity, tests that the corresponding club
+     * entity is updated with the incoming properties and persisted in the DAO layer
      */
     @Test
-    public void updateClubUpdatesClubInCouchbase() {
+    public void updateClubUpdatesClubData() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(existingClubId)
@@ -284,8 +298,8 @@ public class ClubServiceTest {
                 .withExpenditure()
                 .build();
 
-        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
-        BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal updatedWageBudget = existingClubData.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClubData.getTransferBudget().add(new BigDecimal("100"));
         BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
@@ -301,18 +315,17 @@ public class ClubServiceTest {
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
-        Club updatedClub = clubService.updateClub(incomingClub, existingClub, existingClubId);
+        Club updatedClub = clubService.updateClub(incomingClub, existingClubData, existingClubId);
 
         // assert
         verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
-        Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
-        assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
+        assertEquals(updatedClub, updatedClubCaptor.getValue());
 
-        assertEquals(existingClub.getId(), updatedClub.getId());
+        assertEquals(existingClubData.getId(), updatedClub.getId());
         assertEquals(updatedTransferBudget, updatedClub.getTransferBudget());
         assertEquals(updatedWageBudget, updatedClub.getWageBudget());
         assertEquals(totalFunds, updatedClub.getManagerFunds().getCurrent());
-        assertEquals(existingClub.getManagerFunds().getHistory().size() + 1,
+        assertEquals(existingClubData.getManagerFunds().getHistory().size() + 1,
                 updatedClub.getManagerFunds().getHistory().size());
 
         // assertions for general house-keeping fields
@@ -322,14 +335,14 @@ public class ClubServiceTest {
     }
 
     /**
-     * given a valid club entity where only the transfer and wage budget split has changes, tests that the manager funds
-     * entity is left unchanged when the club data is upserted in couchbase
+     * given a valid club entity where only the transfer and wage budget split has changes, tests that the corresponding
+     * club entity with the incoming properties and persisted in the DAO layer while the manager funds remain unchanged
      */
     @Test
     public void updateClubWhenTransferAndWageBudgetSplitChanges() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(existingClubId)
@@ -338,9 +351,9 @@ public class ClubServiceTest {
                 .build();
 
         // decrease transfer budget by 100 and increase wage budget by the same amount
-        BigDecimal updatedTransferBudget = existingClub.getTransferBudget()
+        BigDecimal updatedTransferBudget = existingClubData.getTransferBudget()
                 .subtract(new BigDecimal("100"));
-        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedWageBudget = existingClubData.getWageBudget().add(new BigDecimal("100"));
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .withId(existingClubId)
@@ -355,27 +368,26 @@ public class ClubServiceTest {
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
-        Club updatedClub = clubService.updateClub(incomingClub, existingClub, existingClubId);
+        Club updatedClub = clubService.updateClub(incomingClub, existingClubData, existingClubId);
 
         // assert
         verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
-        Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
-        assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
+        assertEquals(updatedClub, updatedClubCaptor.getValue());
 
         assertEquals(updatedTransferBudget, updatedClub.getTransferBudget());
         assertEquals(updatedWageBudget, updatedClub.getWageBudget());
-        assertEquals(existingClub.getManagerFunds(), updatedClub.getManagerFunds());
+        assertEquals(existingClubData.getManagerFunds(), updatedClub.getManagerFunds());
     }
 
     /**
-     * given that the request contains a club entity whose manager funds is greater than the transfer and wage budgets
-     * set, tests that no data is updated in couchbase and a service exception is thrown instead
+     * given a club entity whose manager funds is greater than the transfer and wage budgets set, tests that the
+     * corresponding club data is not updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateClubWithIncorrectManagerFunds() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(existingClubId)
@@ -397,21 +409,23 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        clubService.updateClub(incomingClub, existingClub, existingClubId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.updateClub(incomingClub, existingClubData, existingClubId));
 
         // assert
         verify(clubDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
-     * given that the request contains a club entity  whose transfer and wage budgets is greater than the manager funds
-     * set, tests that no data is updated in couchbase and a service exception is thrown instead
+     * given a club entity  whose transfer and wage budgets is greater than the manager funds set, tests that the
+     * corresponding club data is not updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateClubWithIncorrectBudget() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(existingClubId)
@@ -430,29 +444,31 @@ public class ClubServiceTest {
                 .build();
 
         // execute
-        clubService.updateClub(incomingClub, existingClub, existingClubId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.updateClub(incomingClub, existingClubData, existingClubId));
 
         // assert
         verify(clubDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
      * given a club entity with updated income and expenditure data in the request, tests that they are ignored while
-     * the rest of the club entity if updated and upserted in couchbase
+     * the rest of the club entity is updated with the incoming properties and persisted in the DAO layer
      */
     @Test
     public void updateClubIgnoresUpdatedIncomeAndExpenditure() {
         // setup
         String updatedClubName = "updated club name";
         UUID existingClubId = UUID.randomUUID();
-        Club existingClubInCouchbase = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .existingUserId(userId)
                 .withId(existingClubId)
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubInCouchbase);
+        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubData);
 
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
@@ -470,41 +486,40 @@ public class ClubServiceTest {
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
-        Club updatedClub = clubService.updateClub(incomingClub, existingClubInCouchbase, existingClubId);
+        Club updatedClub = clubService.updateClub(incomingClub, existingClubData, existingClubId);
 
         // assert
         verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
-        Club clubToBeUpdatedInCouchbase = updatedClubCaptor.getValue();
-        assertEquals(updatedClub, clubToBeUpdatedInCouchbase);
+        assertEquals(updatedClub, updatedClubCaptor.getValue());
 
         assertEquals(updatedClubName, updatedClub.getName());
 
-        assertNotNull(existingClubInCouchbase.getIncome());
+        assertNotNull(existingClubData.getIncome());
         assertNotNull(updatedClub.getIncome());
-        assertEquals(existingClubInCouchbase.getIncome().getCurrent(), updatedClub.getIncome().getCurrent());
-        assertEquals(existingClubInCouchbase.getIncome().getHistory(), updatedClub.getIncome().getHistory());
+        assertEquals(existingClubData.getIncome().getCurrent(), updatedClub.getIncome().getCurrent());
+        assertEquals(existingClubData.getIncome().getHistory(), updatedClub.getIncome().getHistory());
 
-        assertNotNull(existingClubInCouchbase.getExpenditure());
+        assertNotNull(existingClubData.getExpenditure());
         assertNotNull(updatedClub.getExpenditure());
-        assertEquals(existingClubInCouchbase.getExpenditure().getCurrent(), updatedClub.getExpenditure().getCurrent());
-        assertEquals(existingClubInCouchbase.getExpenditure().getHistory(), updatedClub.getExpenditure().getHistory());
+        assertEquals(existingClubData.getExpenditure().getCurrent(), updatedClub.getExpenditure().getCurrent());
+        assertEquals(existingClubData.getExpenditure().getHistory(), updatedClub.getExpenditure().getHistory());
     }
 
     /**
-     * given a valid club ID, removes the club entity from couchbase
+     * given a valid club ID, removes the club entity from the DAO layer
      */
     @Test
-    public void deleteClubRemovesClubFromCouchbase() {
+    public void deleteClubRemovesClubData() {
         // setup
         UUID clubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .withId(clubId)
                 .existingUserId(userId)
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getEntity(eq(clubId))).thenReturn(existingClub);
+        when(clubDAO.getEntity(eq(clubId))).thenReturn(existingClubData);
 
         // execute
         clubService.deleteClub(clubId, userId);
@@ -515,48 +530,53 @@ public class ClubServiceTest {
     }
 
     /**
-     * given an ID to a club not belong to a user, tests that the club data is not deleted from couchbase and a service
-     * exception is thrown instead
+     * given an ID to a club not belong to a user, tests that the club data is not deleted and a service exception is
+     * thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void deleteClubWhenClubDoesNotBelongToUser() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
                 .withId(existingClubId)
                 .existingUserId(UUID.randomUUID())
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClub);
+        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubData);
 
         // execute
-        clubService.deleteClub(existingClubId, userId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.deleteClub(existingClubId, userId));
 
         // assert
         verify(clubDAO).getEntity(any());
         verify(clubDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
-     * given an invalid club id, tests that no data is deleted and a service exception is thrown instead
+     * given an invalid club id, tests that the EntityNotFound exception thrown by the DAO layer is handled and
+     * ServiceException is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void deleteClubWhenClubDataDoesNotExist() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
         when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
 
         // execute
-        clubService.deleteClub(invalidClubId, userId);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.deleteClub(invalidClubId, userId));
 
         // assert
         verify(clubDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from
-     * couchbase
+     * the DAO layer
      */
     @Test
     public void getClubsByUserIdFetchesAllClubsForUser() {
@@ -581,7 +601,7 @@ public class ClubServiceTest {
      * an empty list is returned
      */
     @Test
-    public void getClubsByUserIdReturnsEmptyListWhenNoClubsAreAssociatedWithUser() {
+    public void getClubsByUserIdWhenNoClubsAreAssociatedWithUser() {
         // setup
         when(clubDAO.getClubSummariesForUser(eq(userId))).thenReturn(new ArrayList<>());
 
@@ -594,10 +614,10 @@ public class ClubServiceTest {
     }
 
     /**
-     * given a valid club ID, fetches player data for all players associated with the club from couchbase
+     * given a valid club ID, fetches player data for all players associated with the club from the DAO layer
      */
     @Test
-    public void getSquadPlayersFetchesPlayersFromCouchbase() {
+    public void getSquadPlayersFetchesPlayerDataAssociatedWithClub() {
         // setup
         UUID clubId = UUID.randomUUID();
         ImmutableSquadPlayer expectedSquadPlayer = ImmutableSquadPlayer.builder()

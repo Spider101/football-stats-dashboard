@@ -32,6 +32,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -150,7 +151,7 @@ public class ClubResourceTest {
      * given a valid club entity in the request with an invalid club logo file key, tests that the club data is
      * not persisted and a service exception is thrown
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void createClubWithInvalidClubLogoFileKey() {
         // assert
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
@@ -162,11 +163,13 @@ public class ClubResourceTest {
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
 
         // execute
-        clubResource.createClub(userPrincipal, incomingClub, uriInfo);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubResource.createClub(userPrincipal, incomingClub, uriInfo));
 
         // assert
         verify(fileUploadService).doesFileExist(anyString());
         verify(clubService, never()).createClub(any(), any(), anyString());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
@@ -231,7 +234,7 @@ public class ClubResourceTest {
      * given a valid club entity in the request with an invalid club logo file key, tests that the club data is
      * not updated and a service exception is thrown
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateClubWhenIncomingClubHasInvalidClubLogoFileKey() {
         // setup
         UUID existingClubId = UUID.randomUUID();
@@ -260,19 +263,21 @@ public class ClubResourceTest {
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
 
         // execute
-        clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
 
         // assert
         verify(fileUploadService).doesFileExist(anyString());
         verify(clubService, never()).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
      * given that the request contains a club entity whose ID does not match the existing club's ID, tests that the
      * associated club data is not updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateClubWhenIncomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
@@ -294,18 +299,20 @@ public class ClubResourceTest {
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
-        clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
 
         // assert
         verify(clubService).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
+        assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
     }
 
     /**
      * given that the request contains a club that does not belong to the current user, tests that the club data is not
      * updated and a service exception is thrown instead
      */
-    @Test(expected = ServiceException.class)
+    @Test
     public void updateClubWhenClubDoesNotBelongToUser() {
         // setup
         UUID existingClubId = UUID.randomUUID();
@@ -316,7 +323,8 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(eq(existingClubId), eq(userPrincipal.getId()))).thenThrow(ServiceException.class);
+        when(clubService.getClub(eq(existingClubId), eq(userPrincipal.getId())))
+                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
 
         BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
         BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
@@ -335,7 +343,8 @@ public class ClubResourceTest {
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
-        clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
+        assertThrows(ServiceException.class,
+                () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
 
         // assert
         verify(clubService).getClub(any(), any());
