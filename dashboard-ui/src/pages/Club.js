@@ -13,8 +13,9 @@ export default function Club() {
     const { isLoading, data: clubData } = useClubData(clubId);
 
     useEffect(() => {
-        if(clubData && clubData.id !== currentClubId) {
-            setCurrentClubId(clubData.id);
+        // update the currentClubId only when the clubId param in the url changes
+        if (currentClubId != clubId) {
+            setCurrentClubId(clubId);
         }
     }, []);
 
