@@ -12,8 +12,7 @@ import { MONTHS } from '../constants';
 import useBoardObjectivesForClubData from '../hooks/useBoardObjectivesForClubData';
 import StyledLoadingCircle from '../components/StyledLoadingCircle';
 import useAddNewBoardObjective from '../hooks/useAddNewBoardObjective';
-import { Redirect } from 'react-router-dom';
-import { useCurrentClub } from '../context/clubProvider';
+import { useParams } from 'react-router-dom';
 
 export default function ClubPageView({ club }) {
     return (
@@ -40,11 +39,9 @@ export default function ClubPageView({ club }) {
 }
 
 const BoardObjectivesContainer = () => {
-    const { currentClubId } = useCurrentClub();
-    if (!currentClubId) {
-        return <Redirect to='/' />;
-    }
-    const { addNewBoardObjectiveAction } = useAddNewBoardObjective();
+    const { clubId } = useParams();
+
+    const { addNewBoardObjectiveAction } = useAddNewBoardObjective(clubId);
     const { isLoading, data: boardObjectiveForClubData } = useBoardObjectivesForClubData();
 
     if (isLoading) {

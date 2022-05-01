@@ -14,6 +14,7 @@ const SquadHub = () => {
     if (!currentClubId) {
         return <Redirect to='/'/>;
     }
+
     const { addNewPlayerAction: addNewPlayerAction } = useAddNewPlayer();
     const addPlayerWidget = <AddPlayer addPlayerAction={addNewPlayerAction} />;
     const { isLoading, data: squadHubData } = useSquadHubData();
