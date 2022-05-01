@@ -1,15 +1,13 @@
 import { useQuery } from 'react-query';
 import { queryKeys } from '../constants';
 import { useUserAuth } from '../context/authProvider';
-import { useCurrentClub } from '../context/clubProvider';
 import { fetchAllBoardObjectivesForClub } from '../clients/BoardObjectiveClient';
 
-export default function() {
+export default function(clubId) {
     const { authData } = useUserAuth();
-    const { currentClubId } = useCurrentClub();
 
     const { isLoading, data: boardObjectivesForClubData } = useQuery(
-        [queryKeys.ALL_BOARD_OBJECTIVES, currentClubId],
+        [queryKeys.ALL_BOARD_OBJECTIVES, clubId],
         fetchAllBoardObjectivesForClub,
         { meta: { authData } }
     );
