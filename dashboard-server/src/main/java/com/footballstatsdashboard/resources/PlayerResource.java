@@ -89,18 +89,18 @@ public class PlayerResource {
             LOGGER.info("updatePlayer() request for player with ID: {}", playerId.toString());
         }
 
-        Player existingPlayer = this.playerService.getPlayer(playerId);
-
-        // TODO: 26/04/22 this is a dumb check, remove this scenario; update tests
-        // verify that player id matches between the existing and incoming data
-        if (!existingPlayer.getId().equals(incomingPlayer.getId())) {
+        // verify that player id in the incoming request matches with the id in the existing data
+        // the player ID in the path param can be considered a proxy for the corresponding persisted entity's ID
+        if (!playerId.equals(incomingPlayer.getId())) {
             String errorMessage = String.format(
-                    "Incoming player ID: %s does not match ID of existing player entity in couchbase: %s.",
-                    incomingPlayer.getId(), existingPlayer.getId()
+                    "Incoming player ID: %s does not match ID of existing player entity: %s.",
+                    incomingPlayer.getId(), playerId
             );
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
         }
+
+        Player existingPlayer = this.playerService.getPlayer(playerId);
 
         // verify that the current user has access to the player they are trying to update
         // since a player cannot belong to more than one club, we can transitively check the user's access to the player
