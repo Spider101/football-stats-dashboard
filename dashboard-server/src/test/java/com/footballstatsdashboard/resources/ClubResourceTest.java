@@ -281,29 +281,19 @@ public class ClubResourceTest {
     public void updateClubWhenIncomingClubIdDoesNotMatchExisting() {
         // setup
         UUID existingClubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(true)
-                .existingUserId(userPrincipal.getId())
-                .withId(existingClubId)
-                .withIncome()
-                .withExpenditure()
-                .build();
-        when(clubService.getClub(any(), any())).thenReturn(existingClub);
-
         UUID incorrectIncomingClubId = UUID.randomUUID();
         Club incomingClub = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .withId(incorrectIncomingClubId)
                 .build();
 
-        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
-
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
 
         // assert
-        verify(clubService).getClub(any(), any());
+        verify(fileUploadService, never()).doesFileExist(anyString());
+        verify(clubService, never()).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
         assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
     }
