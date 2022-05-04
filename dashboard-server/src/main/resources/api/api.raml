@@ -293,6 +293,10 @@ securitySchemes:
                   examples:
                     boardObjective: !include examples/board-objective-response-404.json
                     club: !include examples/club-response-404.json
+            409:
+              description: |
+                conflict because the entity ID in the incoming data doesn't match the ID for the corresponding entity
+                in the database
         delete:
           description: delete the board objective data for a club on the basis of the board objective ID
           securedBy: [access_token]
