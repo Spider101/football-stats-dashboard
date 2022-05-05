@@ -101,7 +101,8 @@ public class BoardObjectiveResource {
             LOGGER.info("updateBoardObjective() request for board objective with ID: {}", boardObjectiveId);
         }
 
-        // the board objective ID in the path param can be considered a proxy for the ID in the corresponding entity
+        // verify that board objective id in the incoming request matches with the id in the existing data
+        // the board objective ID in the path param can be considered a proxy for the corresponding entity
         // stored in the database (assuming it exists)
         if (!boardObjectiveId.equals(incomingBoardObjective.getId())) {
             String errorMessage = String.format(

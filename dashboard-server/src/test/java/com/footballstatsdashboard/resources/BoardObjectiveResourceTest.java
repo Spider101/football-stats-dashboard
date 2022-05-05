@@ -333,13 +333,14 @@ public class BoardObjectiveResourceTest {
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
 
         // execute
-        assertThrows(ServiceException.class,
+        ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> boardObjectiveResource.updateBoardObjective(userPrincipal, UUID.randomUUID(),
                         existingBoardObjectiveId, incomingBoardObjective));
 
         // assert
         verify(clubService, never()).getClub(any(), any());
         verify(boardObjectiveService, never()).updateBoardObjective(any(), any(), any());
+        assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
     }
 
     /**
