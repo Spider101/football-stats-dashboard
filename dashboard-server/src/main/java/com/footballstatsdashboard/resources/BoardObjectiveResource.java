@@ -101,6 +101,17 @@ public class BoardObjectiveResource {
             LOGGER.info("updateBoardObjective() request for board objective with ID: {}", boardObjectiveId);
         }
 
+        // verify that board objective id in the incoming request matches with the id in the existing data
+        // the board objective ID in the path param can be considered a proxy for the corresponding entity
+        // stored in the database (assuming it exists)
+        if (!boardObjectiveId.equals(incomingBoardObjective.getId())) {
+            String errorMessage = String.format(
+                    "Incoming board objective ID: %s does not match ID of existing board objective entity: %s.",
+                    incomingBoardObjective.getId(), boardObjectiveId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
+        }
+
         // TODO: 13/04/22 move the entity existence check to DAO layer so we don't have to fetch the entire entity just
         //  to check that it exists. Also add a belongs to check after splitting it since it is encapsulated inside the
         //  getClub call at the moment

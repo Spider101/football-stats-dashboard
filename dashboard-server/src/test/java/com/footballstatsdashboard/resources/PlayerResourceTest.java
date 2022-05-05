@@ -361,19 +361,6 @@ public class PlayerResourceTest {
     public void updatePlayerWhenIncomingPlayerIdDoesNotMatchExisting() {
         // setup
         UUID existingPlayerId = UUID.randomUUID();
-        Player existingPlayer = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(true)
-                .withId(existingPlayerId)
-                .withMetadata()
-                .withAbility()
-                .withRoles()
-                .withAttributes()
-                .build();
-        when(playerService.getPlayer(eq(existingPlayerId))).thenReturn(existingPlayer);
-
-        when(clubService.doesClubBelongToUser(eq(existingPlayer.getClubId()), eq(userPrincipal.getId())))
-                .thenReturn(true);
-
         UUID incomingPlayerId = UUID.randomUUID();
         Player incomingPlayer = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -388,7 +375,7 @@ public class PlayerResourceTest {
                 () -> playerResource.updatePlayer(userPrincipal, existingPlayerId, incomingPlayer));
 
         // assert
-        verify(playerService).getPlayer(any());
+        verify(playerService, never()).getPlayer(any());
         verify(clubService, never()).doesClubBelongToUser(any(), any());
         verify(playerService, never()).updatePlayer(any(), any(), any());
         assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());

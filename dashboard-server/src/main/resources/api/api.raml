@@ -73,6 +73,10 @@ securitySchemes:
           body:
             application/json:
               example: !include examples/player-response-404.json
+        409:
+          description: |
+            conflict because the entity ID in the incoming data doesn't match the ID for the corresponding entity
+            in the database
         422:
           description: unprocessable entity when player roles or attributes are missing
     delete:
@@ -204,6 +208,10 @@ securitySchemes:
           body:
             application/json:
               example: !include examples/club-response-404.json
+        409:
+          description: |
+            conflict because the entity ID in the incoming data doesn't match the ID for the corresponding entity
+            in the database
         422:
           description: unprocessable entity when club name, income or expenditure data is missing in the request
     delete:
@@ -293,6 +301,10 @@ securitySchemes:
                   examples:
                     boardObjective: !include examples/board-objective-response-404.json
                     club: !include examples/club-response-404.json
+            409:
+              description: |
+                conflict because the entity ID in the incoming data doesn't match the ID for the corresponding entity
+                in the database
         delete:
           description: delete the board objective data for a club on the basis of the board objective ID
           securedBy: [access_token]

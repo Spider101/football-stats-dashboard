@@ -96,6 +96,17 @@ public class ClubResource {
             LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
         }
 
+        // verify that club id in the incoming request matches with the id in the existing data
+        // the club ID in the path param can be considered a proxy for the corresponding persisted entity's ID
+        if (!existingClubId.equals(incomingClub.getId())) {
+            String errorMessage = String.format(
+                    "Incoming club entity ID: %s does not match ID of existing club entity %s.",
+                    incomingClub.getId(), existingClubId
+            );
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
+        }
+
         // TODO: 26/04/22 change this to a 422 - invalid club logo file key; update tests
         if (!this.fileUploadService.doesFileExist(incomingClub.getLogo())) {
             String errorMessage = "No file found for club logo image with key: " + incomingClub.getLogo();
@@ -104,16 +115,6 @@ public class ClubResource {
         }
 
         Club existingClub = this.clubService.getClub(existingClubId, user.getId());
-
-        // TODO: 26/04/22 this is a dumb check; get rid of this scenario; update tests
-        if (!existingClub.getId().equals(incomingClub.getId())) {
-            String errorMessage = String.format(
-                    "Incoming club entity ID: %s does not match ID of existing club entity %s.",
-                    incomingClub.getId(), existingClub.getId()
-            );
-            LOGGER.error(errorMessage);
-            throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
-        }
 
         Club updatedClub = this.clubService.updateClub(incomingClub, existingClub, existingClubId);
         return Response.ok().entity(updatedClub).build();
