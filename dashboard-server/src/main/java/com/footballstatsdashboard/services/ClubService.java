@@ -137,16 +137,16 @@ public class ClubService {
     }
 
     public void deleteClub(UUID clubId, UUID authorizedUserId) {
-        // ensure user has access to the club that is being requested to be deleted
-        if (!doesClubBelongToUser(clubId, authorizedUserId)) {
-            LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
-                    clubId, authorizedUserId);
-            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
-        }
-
         try {
+            // ensure user has access to the club that is being requested to be deleted
+            if (!this.clubDAO.doesEntityBelongToUser(clubId, authorizedUserId)) {
+                LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
+                    clubId, authorizedUserId);
+                throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
+            }
+
             this.clubDAO.deleteEntity(clubId);
-        } catch (EntityNotFoundException entityNotFoundException) {
+        } catch (EntityNotFoundException | NoResultException persistenceException) {
             LOGGER.error("Cannot delete club with ID: {} that does not exist", clubId);
             throw new ServiceException(HttpStatus.NOT_FOUND_404,
                     String.format("No club entity found for ID: %s", clubId));

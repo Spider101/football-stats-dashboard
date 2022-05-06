@@ -597,23 +597,62 @@ public class ClubServiceTest {
     }
 
     /**
-     * given an invalid club id, tests that the EntityNotFound exception thrown by the DAO layer is handled and
+     * given a valid club ID, removes the club entity from the DAO layer
+     */
+    @Test
+    public void deleteClubRemovesClubData() {
+        // setup
+        UUID clubId = UUID.randomUUID();
+        when(clubDAO.doesEntityBelongToUser(eq(clubId), eq(userId))).thenReturn(true);
+
+        // execute
+        clubService.deleteClub(clubId, userId);
+
+        // assert
+        verify(clubDAO).doesEntityBelongToUser(any(), any());
+        verify(clubDAO).deleteEntity(eq(clubId));
+    }
+
+    /**
+     * given an ID to a club not belong to a user, tests that the club data is not deleted and a service exception is
+     * thrown instead
+     */
+    @Test
+    public void deleteClubWhenClubDoesNotBelongToUser() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        when(clubDAO.doesEntityBelongToUser(eq(existingClubId), eq(userId))).thenReturn(false);
+
+        // execute
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.deleteClub(existingClubId, userId));
+
+        // assert
+        verify(clubDAO).doesEntityBelongToUser(any(), any());
+        verify(clubDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
+    }
+
+    /**
+     * given an invalid club id, tests that the NoResultException thrown by the DAO layer is handled and
      * ServiceException is thrown instead
      */
     @Test
     public void deleteClubWhenClubDataDoesNotExist() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.getEntity(eq(invalidClubId))).thenThrow(EntityNotFoundException.class);
+        when(clubDAO.doesEntityBelongToUser(eq(invalidClubId), eq(userId))).thenThrow(NoResultException.class);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubService.deleteClub(invalidClubId, userId));
 
         // assert
+        verify(clubDAO).doesEntityBelongToUser(any(), any());
         verify(clubDAO, never()).deleteEntity(any());
         assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
+
     /**
      * given a valid user entity as the auth principal, tests that all clubs associated with the user is fetched from
      * the DAO layer
