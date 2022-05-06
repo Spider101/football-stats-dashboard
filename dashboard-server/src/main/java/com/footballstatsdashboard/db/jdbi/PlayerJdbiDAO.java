@@ -121,6 +121,18 @@ public class PlayerJdbiDAO implements IPlayerEntityDAO {
         this.playerDAO.delete(entityId.toString());
     }
 
+    @Override
+    public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        return this.playerDAO.findUserIdAssociatedWithPlayer(entityId.toString())
+                .map(userIdAssociatedWithPlayer -> userIdAssociatedWithPlayer.equals(userId.toString()))
+                .orElseThrow(NoResultException::new);
+    }
+
+    @Override
+    public boolean doesEntityExist(UUID entityId) {
+        return this.playerDAO.findById(entityId.toString()).isPresent();
+    }
+
     private ImmutablePlayer buildPlayerEntity(Player basePlayerEntity) {
         List<Integer> abilityHistory =
                 this.playerAbilityHistoryDAO.getAbilityHistoryForPlayer(basePlayerEntity.getId().toString());
@@ -170,6 +182,9 @@ public class PlayerJdbiDAO implements IPlayerEntityDAO {
         )
         @RegisterRowMapper(PlayerRowMapper.class)
         Optional<Player> findById(@Bind("id") String playerId);
+
+        @SqlQuery("SELECT c.userId FROM player p LEFT JOIN club c ON p.clubId = c.id WHERE p.id = :playerId")
+        Optional<String> findUserIdAssociatedWithPlayer(@Bind("playerId") String playerId);
 
         @SqlUpdate("UPDATE player SET lastModifiedDate = :lastModifiedDate, createdBy = :createdBy WHERE id = :id")
         void update(@Bind("id") String existingPlayerId, @BindPojo Player updatedPlayer);

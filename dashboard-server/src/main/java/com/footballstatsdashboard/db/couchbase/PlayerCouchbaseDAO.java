@@ -52,4 +52,16 @@ public class PlayerCouchbaseDAO implements IPlayerEntityDAO {
             throw new EntityNotFoundException(documentNotFoundException.getMessage());
         }
     }
+
+    @Override
+    public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        // TODO: 02/05/22 implement this when the couchbase server is ready
+        return false;
+    }
+
+    @Override
+    public boolean doesEntityExist(UUID entityId) {
+        // TODO: 06/05/22 implement this when the couchbase server is ready
+        return false;
+    }
 }
