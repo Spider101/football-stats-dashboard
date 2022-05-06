@@ -186,7 +186,6 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(any(), any())).thenReturn(existingClub);
 
         BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
         BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
@@ -208,7 +207,8 @@ public class ClubResourceTest {
                 .withUpdatedWageBudget(updatedWageBudget)
                 .withUpdatedManagerFunds(totalFunds)
                 .build();
-        when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClub);
+        when(clubService.updateClub(eq(incomingClub), eq(existingClubId), eq(userPrincipal.getId())))
+                .thenReturn(updatedClub);
 
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
@@ -216,8 +216,7 @@ public class ClubResourceTest {
         Response clubResponse = clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
 
         // assert
-        verify(clubService).getClub(eq(existingClubId), any());
-        verify(clubService).updateClub(eq(incomingClub), eq(existingClub), eq(existingClubId));
+        verify(clubService).updateClub(any(), any(), any());
 
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
@@ -268,7 +267,6 @@ public class ClubResourceTest {
 
         // assert
         verify(fileUploadService).doesFileExist(anyString());
-        verify(clubService, never()).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
         assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }

@@ -89,19 +89,19 @@ public class ClubResource {
     @Path(CLUB_ID_PATH)
     public Response updateClub(
             @Auth User user,
-            @PathParam(CLUB_ID) UUID existingClubId,
+            @PathParam(CLUB_ID) UUID clubId,
             @Valid @NotNull Club incomingClub) {
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("updateClub() request for club with ID: {}", existingClubId);
+            LOGGER.info("updateClub() request for club with ID: {}", clubId);
         }
 
         // verify that club id in the incoming request matches with the id in the existing data
         // the club ID in the path param can be considered a proxy for the corresponding persisted entity's ID
-        if (!existingClubId.equals(incomingClub.getId())) {
+        if (!clubId.equals(incomingClub.getId())) {
             String errorMessage = String.format(
                     "Incoming club entity ID: %s does not match ID of existing club entity %s.",
-                    incomingClub.getId(), existingClubId
+                    incomingClub.getId(), clubId
             );
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
@@ -114,9 +114,7 @@ public class ClubResource {
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
 
-        Club existingClub = this.clubService.getClub(existingClubId, user.getId());
-
-        Club updatedClub = this.clubService.updateClub(incomingClub, existingClub, existingClubId);
+        Club updatedClub = this.clubService.updateClub(incomingClub, clubId, user.getId());
         return Response.ok().entity(updatedClub).build();
     }
 

@@ -297,6 +297,7 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
+        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubData);
 
         BigDecimal updatedWageBudget = existingClubData.getWageBudget().add(new BigDecimal("100"));
         BigDecimal updatedTransferBudget = existingClubData.getTransferBudget().add(new BigDecimal("100"));
@@ -315,9 +316,10 @@ public class ClubServiceTest {
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
-        Club updatedClub = clubService.updateClub(incomingClub, existingClubData, existingClubId);
+        Club updatedClub = clubService.updateClub(incomingClub, existingClubId, userId);
 
         // assert
+        verify(clubDAO).getEntity(any());
         verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
         assertEquals(updatedClub, updatedClubCaptor.getValue());
 
@@ -349,6 +351,7 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
+        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubData);
 
         // decrease transfer budget by 100 and increase wage budget by the same amount
         BigDecimal updatedTransferBudget = existingClubData.getTransferBudget()
@@ -368,9 +371,10 @@ public class ClubServiceTest {
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
-        Club updatedClub = clubService.updateClub(incomingClub, existingClubData, existingClubId);
+        Club updatedClub = clubService.updateClub(incomingClub, existingClubId, userId);
 
         // assert
+        verify(clubDAO).getEntity(any());
         verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
         assertEquals(updatedClub, updatedClubCaptor.getValue());
 
@@ -394,13 +398,14 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
+        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubData);
 
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .withId(existingClubId)
                 .build();
-        BigDecimal updatedWageBudget = incomingClubBase.getWageBudget().add(new BigDecimal("100"));
-        BigDecimal updatedTransferBudget = incomingClubBase.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal updatedWageBudget = existingClubData.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClubData.getTransferBudget().add(new BigDecimal("100"));
         Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
                 .from(incomingClubBase)
                 .withUpdatedWageBudget(updatedWageBudget)
@@ -410,9 +415,10 @@ public class ClubServiceTest {
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> clubService.updateClub(incomingClub, existingClubData, existingClubId));
+                () -> clubService.updateClub(incomingClub, existingClubId, userId));
 
         // assert
+        verify(clubDAO).getEntity(any());
         verify(clubDAO, never()).updateEntity(any(), any());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
@@ -432,6 +438,8 @@ public class ClubServiceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
+        when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubData);
+
         Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(false)
                 .withId(existingClubId)
@@ -445,15 +453,16 @@ public class ClubServiceTest {
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> clubService.updateClub(incomingClub, existingClubData, existingClubId));
+                () -> clubService.updateClub(incomingClub, existingClubId, userId));
 
         // assert
+        verify(clubDAO).getEntity(any());
         verify(clubDAO, never()).updateEntity(any(), any());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
     /**
-     * given a club entity with updated income and expenditure data in the request, tests that they are ignored while
+     * given a club entity with updated income and expenditure data, tests that they are ignored while
      * the rest of the club entity is updated with the incoming properties and persisted in the DAO layer
      */
     @Test
@@ -486,9 +495,10 @@ public class ClubServiceTest {
         ArgumentCaptor<Club> updatedClubCaptor = ArgumentCaptor.forClass(Club.class);
 
         // execute
-        Club updatedClub = clubService.updateClub(incomingClub, existingClubData, existingClubId);
+        Club updatedClub = clubService.updateClub(incomingClub, existingClubId, userId);
 
         // assert
+        verify(clubDAO).getEntity(any());
         verify(clubDAO).updateEntity(eq(existingClubId), updatedClubCaptor.capture());
         assertEquals(updatedClub, updatedClubCaptor.getValue());
 

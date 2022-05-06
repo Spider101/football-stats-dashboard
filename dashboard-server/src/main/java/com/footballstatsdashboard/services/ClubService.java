@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -96,7 +97,9 @@ public class ClubService {
         return newClub;
     }
 
-    public Club updateClub(Club incomingClub, Club existingClub, UUID existingClubId) {
+    public Club updateClub(Club incomingClub, UUID existingClubId, UUID authorizedUserId) {
+        Club existingClub = getClub(existingClubId, authorizedUserId);
+
         List<Validation> validationList = validateIncomingClub(incomingClub, false);
         if (!validationList.isEmpty()) {
             LOGGER.error("Unable to update club! Found errors: {}", validationList);
