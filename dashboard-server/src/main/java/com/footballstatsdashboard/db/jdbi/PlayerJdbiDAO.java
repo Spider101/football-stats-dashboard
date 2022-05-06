@@ -8,7 +8,7 @@ import com.footballstatsdashboard.api.model.player.ImmutableAbility;
 import com.footballstatsdashboard.api.model.player.ImmutableAttribute;
 import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.api.model.player.Role;
-import com.footballstatsdashboard.db.IEntityDAO;
+import com.footballstatsdashboard.db.IPlayerEntityDAO;
 import com.footballstatsdashboard.db.jdbi.rowmappers.PlayerRoleRowMapper;
 import com.footballstatsdashboard.db.jdbi.rowmappers.PlayerRowMapper;
 import org.jdbi.v3.core.Jdbi;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public class PlayerJdbiDAO implements IEntityDAO<Player> {
+public class PlayerJdbiDAO implements IPlayerEntityDAO {
     private final IPlayerDAO playerDAO;
     private final IPlayerMetadataDAO playerMetadataDAO;
     private final IPlayerAbilityHistoryDAO playerAbilityHistoryDAO;

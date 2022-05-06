@@ -17,8 +17,7 @@ import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
 import com.footballstatsdashboard.core.validations.Validation;
 import com.footballstatsdashboard.core.validations.ValidationSeverity;
-import com.footballstatsdashboard.db.IEntityDAO;
-import com.footballstatsdashboard.db.key.ResourceKey;
+import com.footballstatsdashboard.db.IPlayerEntityDAO;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.apache.commons.lang3.tuple.Pair;
@@ -48,9 +47,9 @@ public class PlayerService {
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
     private static final Logger LOGGER = LoggerFactory.getLogger(PlayerService.class);
 
-    private final IEntityDAO<Player> playerDAO;
+    private final IPlayerEntityDAO playerDAO;
 
-    public PlayerService(IEntityDAO<Player> playerDAO) {
+    public PlayerService(IPlayerEntityDAO playerDAO) {
         this.playerDAO = playerDAO;
     }
 

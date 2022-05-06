@@ -106,7 +106,7 @@ public class DAOFactory {
         }
     }
 
-    public IEntityDAO<Player> getPlayerEntityDAO() {
+    public IPlayerEntityDAO getPlayerEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
             return new PlayerCouchbaseDAO(new PlayerKeyProvider(), this.couchbaseBucket);
         } else {
