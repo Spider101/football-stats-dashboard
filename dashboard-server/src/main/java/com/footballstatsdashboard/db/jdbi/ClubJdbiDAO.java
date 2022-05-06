@@ -86,6 +86,13 @@ public class ClubJdbiDAO implements IClubEntityDAO {
         this.clubDAO.delete(entityId.toString());
     }
 
+    @Override
+    public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        return this.clubDAO.findUserIdAssociatedWithClub(entityId.toString())
+                .map(userIdAssociatedWithClub -> userIdAssociatedWithClub.equals(userId.toString()))
+                .orElseThrow(NoResultException::new);
+    }
+
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
         return this.clubDAO.findClubsByUserId(userId.toString());
     }
@@ -158,6 +165,9 @@ public class ClubJdbiDAO implements IClubEntityDAO {
 
         @SqlQuery("SELECT id AS clubId, name, createdDate FROM club WHERE userId = :userId")
         List<ClubSummary> findClubsByUserId(@Bind("userId") String userId);
+
+        @SqlQuery("SELECT userId FROM club WHERE id = :clubId")
+        Optional<String> findUserIdAssociatedWithClub(@Bind("clubId") String clubId);
 
         @SqlQuery(
                 "SELECT p.id, pm.name, pm.country, pm.countryLogo as countryFlag," +
