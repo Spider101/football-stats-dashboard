@@ -19,8 +19,10 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -79,35 +81,9 @@ public class PlayerJdbiDAO implements IPlayerEntityDAO {
 
     @Override
     public Player getEntity(UUID entityId) throws EntityNotFoundException {
-        Player basePlayerEntity = this.playerDAO.findById(entityId.toString());
-        if (basePlayerEntity == null) {
-            throw new EntityNotFoundException();
-        }
-        List<Integer> abilityHistory = this.playerAbilityHistoryDAO.getAbilityHistoryForPlayer(entityId.toString());
-        Ability playerAbility = ImmutableAbility.builder()
-                // the history is sorted so the latest value is first
-                .current(abilityHistory.get(0))
-                .history(abilityHistory)
-                .build();
-
-        List<Role> playerRoles = this.playerRoleDAO.getRolesForPlayer(entityId.toString());
-
-        List<Attribute> attributes = this.playerAttributeDAO.getAttributesForPlayer(entityId.toString()).stream()
-                .map(attribute -> {
-                    List<Integer> attributeHistory = this.playerAttributeHistoryDAO
-                            .getHistoryForAttributeByName(attribute.getName());
-                    return ImmutableAttribute.builder()
-                            .from(attribute)
-                            .history(attributeHistory)
-                            .build();
-                }).collect(Collectors.toList());
-
-        return ImmutablePlayer.builder()
-                .from(basePlayerEntity)
-                .ability(playerAbility)
-                .roles(playerRoles)
-                .attributes(attributes)
-                .build();
+        return this.playerDAO.findById(entityId.toString())
+                .map(this::buildPlayerEntity)
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -145,6 +121,36 @@ public class PlayerJdbiDAO implements IPlayerEntityDAO {
         this.playerDAO.delete(entityId.toString());
     }
 
+    private ImmutablePlayer buildPlayerEntity(Player basePlayerEntity) {
+        List<Integer> abilityHistory =
+                this.playerAbilityHistoryDAO.getAbilityHistoryForPlayer(basePlayerEntity.getId().toString());
+        Ability playerAbility = ImmutableAbility.builder()
+                // the history is sorted so the latest value is first
+                .current(abilityHistory.get(0))
+                .history(abilityHistory)
+                .build();
+
+        List<Role> playerRoles = this.playerRoleDAO.getRolesForPlayer(basePlayerEntity.getId().toString());
+
+        List<Attribute> attributes =
+                this.playerAttributeDAO.getAttributesForPlayer(basePlayerEntity.getId().toString()).stream()
+                        .map(attribute -> {
+                            List<Integer> attributeHistory = this.playerAttributeHistoryDAO
+                                    .getHistoryForAttributeByName(attribute.getName());
+                            return ImmutableAttribute.builder()
+                                    .from(attribute)
+                                    .history(attributeHistory)
+                                    .build();
+                        }).collect(Collectors.toList());
+
+        return ImmutablePlayer.builder()
+                .from(basePlayerEntity)
+                .ability(playerAbility)
+                .roles(playerRoles)
+                .attributes(attributes)
+                .build();
+    }
+
     private interface IPlayerDAO {
         @SqlUpdate(
                 "CREATE TABLE IF NOT EXISTS player (id VARCHAR PRIMARY KEY, clubId VARCHAR, createdDate DATE," +
@@ -163,7 +169,7 @@ public class PlayerJdbiDAO implements IPlayerEntityDAO {
                         " WHERE p.id = :id"
         )
         @RegisterRowMapper(PlayerRowMapper.class)
-        Player findById(@Bind("id") String playerId);
+        Optional<Player> findById(@Bind("id") String playerId);
 
         @SqlUpdate("UPDATE player SET lastModifiedDate = :lastModifiedDate, createdBy = :createdBy WHERE id = :id")
         void update(@Bind("id") String existingPlayerId, @BindPojo Player updatedPlayer);
