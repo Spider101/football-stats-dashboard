@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -516,54 +517,83 @@ public class ClubServiceTest {
     }
 
     /**
-     * given a valid club ID, removes the club entity from the DAO layer
+     * given a club entity that does not belong to the user, tests the corresponding club data is not updated and a
+     * service exception is thrown instead
      */
     @Test
-    public void deleteClubRemovesClubData() {
-        // setup
-        UUID clubId = UUID.randomUUID();
-        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(true)
-                .withId(clubId)
-                .existingUserId(userId)
-                .withIncome()
-                .withExpenditure()
-                .build();
-        when(clubDAO.getEntity(eq(clubId))).thenReturn(existingClubData);
-
-        // execute
-        clubService.deleteClub(clubId, userId);
-
-        // assert
-        verify(clubDAO).getEntity(any());
-        verify(clubDAO).deleteEntity(eq(clubId));
-    }
-
-    /**
-     * given an ID to a club not belong to a user, tests that the club data is not deleted and a service exception is
-     * thrown instead
-     */
-    @Test
-    public void deleteClubWhenClubDoesNotBelongToUser() {
+    public void updateClubWhenClubDoesNotBelongToUser() {
         // setup
         UUID existingClubId = UUID.randomUUID();
         Club existingClubData = ClubDataProvider.ClubBuilder.builder()
                 .isExisting(true)
-                .withId(existingClubId)
                 .existingUserId(UUID.randomUUID())
+                .withId(existingClubId)
                 .withIncome()
                 .withExpenditure()
                 .build();
         when(clubDAO.getEntity(eq(existingClubId))).thenReturn(existingClubData);
 
+        BigDecimal updatedWageBudget = existingClubData.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClubData.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedTransferBudget(updatedTransferBudget)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedManagerFunds(totalFunds)
+                .build();
+
         // execute
-        ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> clubService.deleteClub(existingClubId, userId));
+        assertThrows(ServiceException.class, () -> clubService.updateClub(incomingClub, existingClubId, userId));
 
         // assert
         verify(clubDAO).getEntity(any());
-        verify(clubDAO, never()).deleteEntity(any());
-        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
+        verify(clubDAO, never()).updateEntity(any(), any());
+    }
+
+    /**
+     * given incoming club data for a club entity that does not exist, tests that no club data is updated and a service
+     * exception is thrown instead
+     */
+    @Test
+    public void updateClubWhenClubDoesNotExist() {
+        // setup
+        UUID existingClubId = UUID.randomUUID();
+        Club existingClubData = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(true)
+                .existingUserId(userId)
+                .withId(existingClubId)
+                .withIncome()
+                .withExpenditure()
+                .build();
+        when(clubDAO.getEntity(eq(existingClubId))).thenThrow(EntityNotFoundException.class);
+
+        BigDecimal updatedWageBudget = existingClubData.getWageBudget().add(new BigDecimal("100"));
+        BigDecimal updatedTransferBudget = existingClubData.getTransferBudget().add(new BigDecimal("100"));
+        BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
+        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
+                .isExisting(false)
+                .withId(existingClubId)
+                .build();
+        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
+                .from(incomingClubBase)
+                .withUpdatedTransferBudget(updatedTransferBudget)
+                .withUpdatedWageBudget(updatedWageBudget)
+                .withUpdatedManagerFunds(totalFunds)
+                .build();
+
+        // execute
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> clubService.updateClub(incomingClub, existingClubId, userId));
+
+        // assert
+        verify(clubDAO).getEntity(any());
+        verify(clubDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
 
     /**
