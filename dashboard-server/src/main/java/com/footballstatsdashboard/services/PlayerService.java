@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -36,7 +37,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.OptionalDouble;
 import java.util.UUID;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.footballstatsdashboard.core.utils.Constants.COUNTRY_CODE_MAPPING_FNAME;
@@ -53,10 +53,14 @@ public class PlayerService {
         this.playerDAO = playerDAO;
     }
 
-    // TODO: 16/04/22 remove resource key usage
     public Player getPlayer(UUID playerId) {
-        ResourceKey resourceKey = new ResourceKey(playerId);
-        return fetchPlayerData(playerId);
+        try {
+            return this.playerDAO.getEntity(playerId);
+        } catch (EntityNotFoundException entityNotFoundException) {
+            String errorMessage = String.format("No player entity found for ID: %s", playerId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
     }
 
     public Player createPlayer(Player incomingPlayer, Club clubDataForNewPlayer, String createdBy) throws IOException {
@@ -140,7 +144,21 @@ public class PlayerService {
         return newPlayer;
     }
 
-    public Player updatePlayer(Player incomingPlayer, Player existingPlayer, UUID existingPlayerId) {
+    public Player updatePlayer(Player incomingPlayer, UUID existingPlayerId, UUID authorizedUserId) {
+        Player existingPlayer = getPlayer(existingPlayerId);
+
+        try {
+            // verify that the current user has access to the player they are trying to delete
+            if (!this.playerDAO.doesEntityBelongToUser(existingPlayerId, authorizedUserId)) {
+                LOGGER.error("Player with ID: {} does not belong to user making request", existingPlayerId);
+                throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
+            }
+        } catch (NoResultException noResultException) {
+            LOGGER.error("Cannot update player with ID: {} that does not exist", existingPlayerId);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404,
+                    String.format("No player entity found for ID: %s", existingPlayerId));
+        }
+
         List<Validation> validationList = validateIncomingPlayer(incomingPlayer, existingPlayer);
         if (!validationList.isEmpty()) {
             LOGGER.error("Unable to create new player! Found errors: {}", validationList);
@@ -183,23 +201,26 @@ public class PlayerService {
         return updatedPlayer;
     }
 
-    public void deletePlayer(UUID playerId, Predicate<UUID> doesClubBelongToUser) {
-        // verify that the current user has access to the player they are trying to delete
-        // since a player cannot belong to more than one club, we can transitively check the user's access to the player
-        // by checking their access to the club the user belongs to
-        Player player = fetchPlayerData(playerId);
-        if (!doesClubBelongToUser.test(player.getClubId())) {
-            LOGGER.error("Player with ID: {} does not belong to user making request", player.getId());
-            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
+    public void deletePlayer(UUID playerId, UUID authorizedUserId) {
+        if (!this.playerDAO.doesEntityExist(playerId)) {
+            String errorMessage = String.format("No player entity found for ID: %s", playerId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
 
         try {
-            this.playerDAO.deleteEntity(playerId);
-        } catch (EntityNotFoundException entityNotFoundException) {
-            LOGGER.error("Cannot delete player with ID: {} that does not exist", playerId);
-            throw new ServiceException(HttpStatus.NOT_FOUND_404,
-                    String.format("Not player entity found for ID: %s", playerId));
+            // verify that the current user has access to the player they are trying to delete
+            if (!this.playerDAO.doesEntityBelongToUser(playerId, authorizedUserId)) {
+                LOGGER.error("Player with ID: {} does not belong to user making request", playerId);
+                throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
+            }
+        } catch (NoResultException noResultException) {
+            LOGGER.error("Cannot delete player with ID {} because it does not belong to any existing club associated" +
+                    " with current user", playerId);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
         }
+
+        this.playerDAO.deleteEntity(playerId);
     }
 
     private List<Validation> validateIncomingPlayer(Player incomingPlayer, Player existingPlayer) {
@@ -252,16 +273,6 @@ public class PlayerService {
                     playerAttributes);
             throw new ServiceException(HttpStatus.INTERNAL_SERVER_ERROR_500,
                     "Something went wrong trying to calculate current ability of player");
-        }
-    }
-
-    private Player fetchPlayerData(UUID playerId) {
-        try {
-            return this.playerDAO.getEntity(playerId);
-        } catch (EntityNotFoundException entityNotFoundException) {
-            String errorMessage = String.format("No player entity found for ID: %s", playerId);
-            LOGGER.error(errorMessage);
-            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
     }
 }

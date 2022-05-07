@@ -131,14 +131,15 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.createClub(any(), any(), anyString())).thenReturn(createdClub);
+        when(clubService.createClub(eq(incomingClub), eq(userPrincipal.getId()), eq(userPrincipal.getEmail())))
+                .thenReturn(createdClub);
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClub, uriInfo);
 
         // assert
-        verify(clubService).createClub(eq(incomingClub), eq(userPrincipal.getId()), eq(userPrincipal.getEmail()));
+        verify(clubService).createClub(any(), any(), anyString());
         assertEquals(HttpStatus.CREATED_201, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
@@ -291,7 +292,6 @@ public class ClubResourceTest {
 
         // assert
         verify(fileUploadService, never()).doesFileExist(anyString());
-        verify(clubService, never()).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
         assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
     }
@@ -322,13 +322,13 @@ public class ClubResourceTest {
         UUID userId = userPrincipal.getId();
         // TODO: 04/03/22 update data provider to include club logo file key when ready
         List<ClubSummary> mockClubData = ClubDataProvider.getAllClubSummariesForUser(userId);
-        when(clubService.getClubSummariesByUserId(any())).thenReturn(mockClubData);
+        when(clubService.getClubSummariesByUserId(eq(userId))).thenReturn(mockClubData);
 
         // execute
         Response response = clubResource.getClubsByUserId(userPrincipal);
 
         // assert
-        verify(clubService).getClubSummariesByUserId(eq(userId));
+        verify(clubService).getClubSummariesByUserId(any());
         assertNotNull(response);
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
@@ -365,7 +365,7 @@ public class ClubResourceTest {
         Response response = clubResource.getSquadPlayers(clubId);
 
         // assert
-        verify(clubService).getSquadPlayers(eq(clubId));
+        verify(clubService).getSquadPlayers(any());
         assertNotNull(response);
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());

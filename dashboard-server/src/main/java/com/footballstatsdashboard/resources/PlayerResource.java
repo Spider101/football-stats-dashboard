@@ -27,7 +27,6 @@ import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID;
 import static com.footballstatsdashboard.core.utils.Constants.PLAYER_ID_PATH;
@@ -100,18 +99,7 @@ public class PlayerResource {
             throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
         }
 
-        Player existingPlayer = this.playerService.getPlayer(playerId);
-
-        // verify that the current user has access to the player they are trying to update
-        // since a player cannot belong to more than one club, we can transitively check the user's access to the player
-        // by checking their access to the club the user belongs to
-        if (!clubService.doesClubBelongToUser(existingPlayer.getClubId(), user.getId())) {
-            LOGGER.error("Player with ID: {} does not belong to user making request (ID: {})",
-                    existingPlayer.getId(), user.getId());
-            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
-        }
-
-        Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, existingPlayer, playerId);
+        Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, playerId, playerId);
         return Response.ok(updatedPlayer).build();
     }
 
@@ -125,8 +113,7 @@ public class PlayerResource {
             LOGGER.info("deletePlayer() request for player with ID: {}", playerId);
         }
 
-        Predicate<UUID> doesClubBelongsToUser = clubId -> this.clubService.doesClubBelongToUser(clubId, user.getId());
-        this.playerService.deletePlayer(playerId, doesClubBelongsToUser);
+        this.playerService.deletePlayer(playerId, user.getId());
         return Response.noContent().build();
     }
 }

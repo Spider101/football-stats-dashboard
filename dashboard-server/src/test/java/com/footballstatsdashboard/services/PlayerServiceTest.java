@@ -10,7 +10,7 @@ import com.footballstatsdashboard.api.model.player.Attribute;
 import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.core.utils.FixtureLoader;
-import com.footballstatsdashboard.db.IEntityDAO;
+import com.footballstatsdashboard.db.IPlayerEntityDAO;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -42,10 +43,11 @@ public class PlayerServiceTest {
     private static final String CREATED_BY = "fake email";
     private static final FixtureLoader FIXTURE_LOADER = new FixtureLoader(Jackson.newObjectMapper().copy());
 
+    private UUID authorizedUserId;
     private PlayerService playerService;
 
     @Mock
-    private IEntityDAO<Player> playerDAO;
+    private IPlayerEntityDAO playerDAO;
 
     /**
      * set up test data before each test case is run
@@ -53,6 +55,8 @@ public class PlayerServiceTest {
     @Before
     public void initialize() {
         MockitoAnnotations.openMocks(this);
+
+        authorizedUserId = UUID.randomUUID();
         playerService = new PlayerService(playerDAO);
     }
 
@@ -254,6 +258,7 @@ public class PlayerServiceTest {
                 .withAttributes()
                 .build();
         when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
+        when(playerDAO.doesEntityBelongToUser(eq(existingPlayerId), eq(authorizedUserId))).thenReturn(true);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -270,10 +275,13 @@ public class PlayerServiceTest {
                 .build();
 
         // execute
-        Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId);
+        Player updatedPlayer = playerService.updatePlayer(incomingPlayer, existingPlayerId, authorizedUserId);
 
         // assert
-        verify(playerDAO).updateEntity(eq(existingPlayerId), any());
+        verify(playerDAO).getEntity(any());
+        verify(playerDAO).doesEntityBelongToUser(any(), any());
+        verify(playerDAO).updateEntity(any(), any());
+
         updatedPlayer.getAttributes().forEach(attribute -> {
             Attribute existingPlayerAttribute = existingPlayerData.getAttributes().stream()
                     .filter(existingAttribute -> existingAttribute.getName().equals(attribute.getName()))
@@ -298,6 +306,81 @@ public class PlayerServiceTest {
     }
 
     /**
+     * given incoming player data for a player entity that does not exist, tests that no player data is updated and a
+     * service exception is thrown
+     */
+    @Test
+    public void updatePlayerWhenPlayerDoesNotExist() {
+        // setup
+        UUID existingPlayerId = UUID.randomUUID();
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenThrow(EntityNotFoundException.class);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata("updated name")
+                .withUpdatedAttributeValue("sprint speed", UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
+
+        // execute
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> playerService.updatePlayer(incomingPlayer, existingPlayerId, authorizedUserId));
+
+        // assert
+        verify(playerDAO).getEntity(any());
+        verify(playerDAO, never()).doesEntityBelongToUser(any(), any());
+        verify(playerDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
+    }
+
+    /**
+     * given incoming player data for a player entity the use does not have access to, tests that the corresponding
+     * player data is updated and a service exception is thrown instead
+     */
+    @Test
+    public void updatePlayerWhenPlayerDoesNotBelongToUser() {
+        // setup
+        UUID existingPlayerId = UUID.randomUUID();
+        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(true)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAbility()
+                .withRoles()
+                .withAttributes()
+                .build();
+        when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
+        when(playerDAO.doesEntityBelongToUser(eq(existingPlayerId), eq(authorizedUserId))).thenReturn(false);
+
+        Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
+                .isExistingPlayer(false)
+                .withId(existingPlayerId)
+                .withMetadata()
+                .withAttributes()
+                .build();
+        Player incomingPlayer = PlayerDataProvider.ModifiedPlayerBuilder.builder()
+                .from(incomingPlayerBase)
+                .withUpdatedNameInMetadata("updated name")
+                .withUpdatedAttributeValue("sprint speed", UPDATED_PLAYER_SPRINT_SPEED)
+                .build();
+
+        // execute
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> playerService.updatePlayer(incomingPlayer, existingPlayerId, authorizedUserId));
+
+        // assert
+        verify(playerDAO).getEntity(any());
+        verify(playerDAO).doesEntityBelongToUser(any(), any());
+        verify(playerDAO, never()).updateEntity(any(), any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
+    }
+
+    /**
      * given a player entity without roles, tests that the corresponding player data is not updated and a service
      * exception is thrown instead
      */
@@ -314,6 +397,7 @@ public class PlayerServiceTest {
                 .withAttributes()
                 .build();
         when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
+        when(playerDAO.doesEntityBelongToUser(eq(existingPlayerId), eq(authorizedUserId))).thenReturn(true);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -329,9 +413,11 @@ public class PlayerServiceTest {
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
+                () -> playerService.updatePlayer(incomingPlayer, existingPlayerId, authorizedUserId));
 
         // assert
+        verify(playerDAO).getEntity(any());
+        verify(playerDAO).doesEntityBelongToUser(any(), any());
         verify(playerDAO, never()).updateEntity(any(), any());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
@@ -353,6 +439,7 @@ public class PlayerServiceTest {
                 .withAttributes()
                 .build();
         when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
+        when(playerDAO.doesEntityBelongToUser(eq(existingPlayerId), eq(authorizedUserId))).thenReturn(true);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -368,9 +455,11 @@ public class PlayerServiceTest {
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
+                () -> playerService.updatePlayer(incomingPlayer, existingPlayerId, authorizedUserId));
 
         // assert
+        verify(playerDAO).getEntity(any());
+        verify(playerDAO).doesEntityBelongToUser(any(), any());
         verify(playerDAO, never()).updateEntity(any(), any());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
@@ -392,6 +481,7 @@ public class PlayerServiceTest {
                 .withAttributes()
                 .build();
         when(playerDAO.getEntity(eq(existingPlayerId))).thenReturn(existingPlayerData);
+        when(playerDAO.doesEntityBelongToUser(eq(existingPlayerId), eq(authorizedUserId))).thenReturn(true);
 
         Player incomingPlayerBase = PlayerDataProvider.PlayerBuilder.builder()
                 .isExistingPlayer(false)
@@ -409,9 +499,11 @@ public class PlayerServiceTest {
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> playerService.updatePlayer(incomingPlayer, existingPlayerData, existingPlayerId));
+                () -> playerService.updatePlayer(incomingPlayer, existingPlayerId, authorizedUserId));
 
         // assert
+        verify(playerDAO).getEntity(any());
+        verify(playerDAO).doesEntityBelongToUser(any(), any());
         verify(playerDAO, never()).updateEntity(any(), any());
         assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
@@ -423,21 +515,15 @@ public class PlayerServiceTest {
     public void deletePlayerRemovesPlayerData() {
         // setup
         UUID playerId = UUID.randomUUID();
-        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(true)
-                .withId(playerId)
-                .withMetadata()
-                .withAbility()
-                .withRoles()
-                .withAttributes()
-                .build();
-        when(playerDAO.getEntity(eq(playerId))).thenReturn(existingPlayerData);
+        when(playerDAO.doesEntityExist(eq(playerId))).thenReturn(true);
+        when(playerDAO.doesEntityBelongToUser(eq(playerId), eq(authorizedUserId))).thenReturn(true);
 
         // execute
-        playerService.deletePlayer(playerId, clubId -> true);
+        playerService.deletePlayer(playerId, authorizedUserId);
 
         // assert
-        verify(playerDAO).getEntity(any());
+        verify(playerDAO).doesEntityExist(any());
+        verify(playerDAO).doesEntityBelongToUser(any(), any());
         verify(playerDAO).deleteEntity(eq(playerId));
     }
 
@@ -448,17 +534,41 @@ public class PlayerServiceTest {
     @Test
     public void deletePlayerWhenPlayerNotFound() {
         // setup
-        UUID invalidPlayerId = UUID.randomUUID();
-        when(playerDAO.getEntity(eq(invalidPlayerId))).thenThrow(EntityNotFoundException.class);
+        UUID nonExistentPlayerId = UUID.randomUUID();
+        when(playerDAO.doesEntityExist(nonExistentPlayerId)).thenReturn(false);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> playerService.deletePlayer(invalidPlayerId, clubId -> true));
+                () -> playerService.deletePlayer(nonExistentPlayerId, authorizedUserId));
 
         // assert
-        verify(playerDAO).getEntity(any());
+        verify(playerDAO).doesEntityExist(any());
+        verify(playerDAO, never()).doesEntityBelongToUser(any(), any());
         verify(playerDAO, never()).deleteEntity(any());
         assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
+    }
+
+    /**
+     * given a player id for a player entity with an invalid club id, tests that the NoResultException thrown by the
+     * DAO layer is handled and a ServiceException is thrown instead
+     */
+    @Test
+    public void deletePlayerWhenAssociatedClubNotFound() {
+        // setup
+        UUID inaccessiblePlayerId = UUID.randomUUID();
+        when(playerDAO.doesEntityExist(eq(inaccessiblePlayerId))).thenReturn(true);
+        when(playerDAO.doesEntityBelongToUser(eq(inaccessiblePlayerId), eq(authorizedUserId)))
+                .thenThrow(NoResultException.class);
+
+        // execute
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> playerService.deletePlayer(inaccessiblePlayerId, authorizedUserId));
+
+        // assert
+        verify(playerDAO).doesEntityExist(any());
+        verify(playerDAO).doesEntityBelongToUser(any(), any());
+        verify(playerDAO, never()).deleteEntity(any());
+        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
 
     /**
@@ -468,22 +578,17 @@ public class PlayerServiceTest {
     @Test
     public void deletePlayerWhenUserDoesNotHaveAccessToPlayer() {
         // setup
-        UUID playerId = UUID.randomUUID();
-        Player existingPlayerData = PlayerDataProvider.PlayerBuilder.builder()
-                .isExistingPlayer(true)
-                .withId(playerId)
-                .withMetadata()
-                .withAbility()
-                .withRoles()
-                .withAttributes()
-                .build();
-        when(playerDAO.getEntity(eq(playerId))).thenReturn(existingPlayerData);
+        UUID inaccessiblePlayerId = UUID.randomUUID();
+        when(playerDAO.doesEntityExist(eq(inaccessiblePlayerId))).thenReturn(true);
+        when(playerDAO.doesEntityBelongToUser(eq(inaccessiblePlayerId), eq(authorizedUserId))).thenReturn(false);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> playerService.deletePlayer(playerId, clubId -> false));
+                () -> playerService.deletePlayer(inaccessiblePlayerId, authorizedUserId));
 
         // assert
+        verify(playerDAO).doesEntityExist(any());
+        verify(playerDAO).doesEntityBelongToUser(any(), any());
         verify(playerDAO, never()).deleteEntity(any());
         assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
     }
