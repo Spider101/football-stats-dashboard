@@ -6,5 +6,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IBoardObjectiveEntityDAO extends IEntityDAO<BoardObjective> {
+    boolean doesEntityBelongToUser(UUID entityId, UUID userId);
     List<BoardObjective> getBoardObjectivesForClub(UUID clubId);
 }

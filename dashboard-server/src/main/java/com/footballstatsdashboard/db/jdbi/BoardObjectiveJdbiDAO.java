@@ -9,7 +9,9 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
@@ -45,6 +47,13 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
     }
 
     @Override
+    public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        return this.boardObjectivesDAO.findUserIdAssociatedWithBoardObjective(entityId.toString())
+                .map(userIdAssociatedWithBoardObjective -> userIdAssociatedWithBoardObjective.equals(userId.toString()))
+                .orElseThrow(NoResultException::new);
+    }
+
+    @Override
     public List<BoardObjective> getBoardObjectivesForClub(UUID clubId) {
         List<BoardObjective> boardObjectives = this.boardObjectivesDAO.findByClubId(clubId.toString());
         if (boardObjectives == null) {
@@ -71,6 +80,12 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
 
         @SqlQuery("SELECT * FROM boardObjectives WHERE id = :id")
         BoardObjective findById(@Bind("id") String boardObjectiveId);
+
+        @SqlQuery(
+                "SELECT c.userId FROM boardObjectives bo LEFT JOIN club c ON bo.clubId = c.id" +
+                        "WHERE bo.id = :boardObjectiveId"
+        )
+        Optional<String> findUserIdAssociatedWithBoardObjective(@Bind("boardObjectiveId") String boardObjectiveId);
 
         @SqlQuery("SELECT * FROM boardObjectives WHERE clubId = :clubId")
         List<BoardObjective> findByClubId(@Bind("clubId") String clubId);
