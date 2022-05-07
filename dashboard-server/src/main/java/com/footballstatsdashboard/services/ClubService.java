@@ -39,8 +39,13 @@ public class ClubService {
 
     // TODO: 1/22/2022 add some tests for this
     public boolean doesClubBelongToUser(UUID clubId, UUID authorizedUserId) {
-        Club club = fetchClubData(clubId);
-        return authorizedUserId.equals(club.getUserId());
+        try {
+            return this.clubDAO.doesEntityBelongToUser(clubId, authorizedUserId);
+        } catch (NoResultException noResultException) {
+            String errorMessage = String.format("No club entity found for ID: %s", clubId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
     }
 
     public Club getClub(UUID clubId, UUID authorizedUserId) {
@@ -137,20 +142,14 @@ public class ClubService {
     }
 
     public void deleteClub(UUID clubId, UUID authorizedUserId) {
-        try {
-            // ensure user has access to the club that is being requested to be deleted
-            if (!this.clubDAO.doesEntityBelongToUser(clubId, authorizedUserId)) {
-                LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
-                    clubId, authorizedUserId);
-                throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
-            }
-
-            this.clubDAO.deleteEntity(clubId);
-        } catch (EntityNotFoundException | NoResultException persistenceException) {
-            LOGGER.error("Cannot delete club with ID: {} that does not exist", clubId);
-            throw new ServiceException(HttpStatus.NOT_FOUND_404,
-                    String.format("No club entity found for ID: %s", clubId));
+        // ensure user has access to the club that is being requested to be deleted
+        if (!doesClubBelongToUser(clubId, authorizedUserId)) {
+            LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
+                clubId, authorizedUserId);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
         }
+
+        this.clubDAO.deleteEntity(clubId);
     }
 
     public List<ClubSummary> getClubSummariesByUserId(UUID userId) {
