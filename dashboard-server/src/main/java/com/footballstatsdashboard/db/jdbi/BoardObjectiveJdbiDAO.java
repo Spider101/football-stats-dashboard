@@ -9,7 +9,9 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
@@ -27,11 +29,8 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
 
     @Override
     public BoardObjective getEntity(UUID entityId) throws EntityNotFoundException {
-        BoardObjective boardObjective = this.boardObjectivesDAO.findById(entityId.toString());
-        if (boardObjective == null) {
-            throw new EntityNotFoundException();
-        }
-        return boardObjective;
+        return this.boardObjectivesDAO.findById(entityId.toString())
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -42,6 +41,20 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
     @Override
     public void deleteEntity(UUID entityId) throws EntityNotFoundException {
         this.boardObjectivesDAO.delete(entityId.toString());
+    }
+
+    @Override
+    public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        return this.boardObjectivesDAO.findUserIdAssociatedWithBoardObjective(entityId.toString())
+                .map(userIdAssociatedWithBoardObjective -> userIdAssociatedWithBoardObjective.equals(userId.toString()))
+                .orElseThrow(NoResultException::new);
+    }
+
+    @Override
+    public boolean doesEntityBelongToClub(UUID entityId, UUID clubId) {
+        return this.boardObjectivesDAO.findClubIdAssociatedWithBoardObjective(entityId.toString())
+                .map(clubIdAssociatedWithBoardObjective -> clubIdAssociatedWithBoardObjective.equals(clubId.toString()))
+                .orElseThrow(NoResultException::new);
     }
 
     @Override
@@ -70,7 +83,16 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
         void insert(@BindPojo BoardObjective boardObjective);
 
         @SqlQuery("SELECT * FROM boardObjectives WHERE id = :id")
-        BoardObjective findById(@Bind("id") String boardObjectiveId);
+        Optional<BoardObjective> findById(@Bind("id") String boardObjectiveId);
+
+        @SqlQuery(
+                "SELECT c.userId FROM boardObjectives bo LEFT JOIN club c ON bo.clubId = c.id" +
+                        " WHERE bo.id = :boardObjectiveId"
+        )
+        Optional<String> findUserIdAssociatedWithBoardObjective(@Bind("boardObjectiveId") String boardObjectiveId);
+
+        @SqlQuery("SELECT clubId FROM boardObjectives WHERE id = :id ")
+        Optional<String> findClubIdAssociatedWithBoardObjective(@Bind("id") String boardObjectiveId);
 
         @SqlQuery("SELECT * FROM boardObjectives WHERE clubId = :clubId")
         List<BoardObjective> findByClubId(@Bind("clubId") String clubId);

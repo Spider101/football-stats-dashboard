@@ -21,9 +21,11 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,7 @@ public class ClubJdbiDAO implements IClubEntityDAO {
         this.expenditureHistoryDAO.createTable();
     }
 
+    @Override
     public void insertEntity(Club entity) {
         this.clubDAO.insert(entity);
 
@@ -58,11 +61,59 @@ public class ClubJdbiDAO implements IClubEntityDAO {
                 entity.getId().toString(), createdAt);
     }
 
+    @Override
     public Club getEntity(UUID entityId) throws EntityNotFoundException {
-        Club baseClubEntity = this.clubDAO.findById(entityId.toString());
-        if (baseClubEntity == null) {
+        return this.clubDAO.findById(entityId.toString())
+                .map(this::buildClubEntity)
+                .orElseThrow(EntityNotFoundException::new);
+    }
+
+    @Override
+    public void updateEntity(UUID existingEntityId, Club updatedEntity) {
+        this.clubDAO.update(existingEntityId.toString(), updatedEntity);
+
+        // income and expenditure are updated separately; not part of the club entity update logic.
+        Instant createdAt = Instant.now();
+        this.managerFundsHistoryDAO.insert(UUID.randomUUID().toString(), updatedEntity.getManagerFunds().getCurrent(),
+                existingEntityId.toString(), createdAt);
+    }
+
+    @Override
+    public void deleteEntity(UUID entityId) throws EntityNotFoundException {
+        this.managerFundsHistoryDAO.delete(entityId.toString());
+        this.incomeHistoryDAO.delete(entityId.toString());
+        this.expenditureHistoryDAO.delete(entityId.toString());
+        this.clubDAO.delete(entityId.toString());
+    }
+
+    @Override
+    public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        return this.clubDAO.findUserIdAssociatedWithClub(entityId.toString())
+                .map(userIdAssociatedWithClub -> userIdAssociatedWithClub.equals(userId.toString()))
+                .orElseThrow(NoResultException::new);
+    }
+
+    public List<ClubSummary> getClubSummariesForUser(UUID userId) {
+        return this.clubDAO.findClubsByUserId(userId.toString());
+    }
+
+    public List<SquadPlayer> getPlayersInClub(UUID clubId) {
+        List<SquadPlayer> baseSquadPlayerEntities = this.clubDAO.getPlayersForClub(clubId.toString());
+        if (baseSquadPlayerEntities == null) {
             throw new EntityNotFoundException();
         }
+        return baseSquadPlayerEntities.stream()
+                .map(squadPlayer -> {
+                    List<Float> recentForm = this.clubDAO.getRecentFormForPlayer(squadPlayer.getPlayerId().toString());
+                    return ImmutableSquadPlayer.builder()
+                            .from(squadPlayer)
+                            .recentForm(recentForm)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    private ImmutableClub buildClubEntity(Club baseClubEntity) {
         List<BigDecimal> managerFundsHistory =
                 this.managerFundsHistoryDAO.getManagerFundsHistoryForClub(baseClubEntity.getId().toString());
         List<BigDecimal> incomeHistory =
@@ -89,42 +140,6 @@ public class ClubJdbiDAO implements IClubEntityDAO {
                 .build();
     }
 
-    public void updateEntity(UUID existingEntityId, Club updatedEntity) {
-        this.clubDAO.update(existingEntityId.toString(), updatedEntity);
-
-        // income and expenditure are updated separately; not part of the club entity update logic.
-        Instant createdAt = Instant.now();
-        this.managerFundsHistoryDAO.insert(UUID.randomUUID().toString(), updatedEntity.getManagerFunds().getCurrent(),
-                existingEntityId.toString(), createdAt);
-    }
-
-    public void deleteEntity(UUID entityId) throws EntityNotFoundException {
-        this.managerFundsHistoryDAO.delete(entityId.toString());
-        this.incomeHistoryDAO.delete(entityId.toString());
-        this.expenditureHistoryDAO.delete(entityId.toString());
-        this.clubDAO.delete(entityId.toString());
-    }
-
-    public List<ClubSummary> getClubSummariesForUser(UUID userId) {
-        return this.clubDAO.findClubsByUserId(userId.toString());
-    }
-
-    public List<SquadPlayer> getPlayersInClub(UUID clubId) {
-        List<SquadPlayer> baseSquadPlayerEntities = this.clubDAO.getPlayersForClub(clubId.toString());
-        if (baseSquadPlayerEntities == null) {
-            throw new EntityNotFoundException();
-        }
-        return baseSquadPlayerEntities.stream()
-                .map(squadPlayer -> {
-                    List<Float> recentForm = this.clubDAO.getRecentFormForPlayer(squadPlayer.getPlayerId().toString());
-                    return ImmutableSquadPlayer.builder()
-                            .from(squadPlayer)
-                            .recentForm(recentForm)
-                            .build();
-                })
-                .collect(Collectors.toList());
-    }
-
     private interface IClubDAO {
 
         @SqlUpdate(
@@ -146,10 +161,13 @@ public class ClubJdbiDAO implements IClubEntityDAO {
         @SqlQuery("SELECT TOP 1 c.id, name, logo, transferBudget, wageBudget, managerFunds AS managerFunds_current," +
                 " userId, createdDate, lastModifiedDate, createdBy" +
                 " FROM club c LEFT JOIN managerFundsHistory mfh ON c.id = mfh.clubId WHERE c.id = :id")
-        Club findById(@Bind("id") String clubId);
+        Optional<Club> findById(@Bind("id") String clubId);
 
         @SqlQuery("SELECT id AS clubId, name, createdDate FROM club WHERE userId = :userId")
         List<ClubSummary> findClubsByUserId(@Bind("userId") String userId);
+
+        @SqlQuery("SELECT userId FROM club WHERE id = :clubId")
+        Optional<String> findUserIdAssociatedWithClub(@Bind("clubId") String clubId);
 
         @SqlQuery(
                 "SELECT p.id, pm.name, pm.country, pm.countryLogo as countryFlag," +

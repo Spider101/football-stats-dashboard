@@ -131,14 +131,15 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.createClub(any(), any(), anyString())).thenReturn(createdClub);
+        when(clubService.createClub(eq(incomingClub), eq(userPrincipal.getId()), eq(userPrincipal.getEmail())))
+                .thenReturn(createdClub);
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClub, uriInfo);
 
         // assert
-        verify(clubService).createClub(eq(incomingClub), eq(userPrincipal.getId()), eq(userPrincipal.getEmail()));
+        verify(clubService).createClub(any(), any(), anyString());
         assertEquals(HttpStatus.CREATED_201, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
 
@@ -186,7 +187,6 @@ public class ClubResourceTest {
                 .withIncome()
                 .withExpenditure()
                 .build();
-        when(clubService.getClub(any(), any())).thenReturn(existingClub);
 
         BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
         BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
@@ -208,7 +208,8 @@ public class ClubResourceTest {
                 .withUpdatedWageBudget(updatedWageBudget)
                 .withUpdatedManagerFunds(totalFunds)
                 .build();
-        when(clubService.updateClub(any(), any(), any())).thenReturn(updatedClub);
+        when(clubService.updateClub(eq(incomingClub), eq(existingClubId), eq(userPrincipal.getId())))
+                .thenReturn(updatedClub);
 
         when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
@@ -216,8 +217,7 @@ public class ClubResourceTest {
         Response clubResponse = clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
 
         // assert
-        verify(clubService).getClub(eq(existingClubId), any());
-        verify(clubService).updateClub(eq(incomingClub), eq(existingClub), eq(existingClubId));
+        verify(clubService).updateClub(any(), any(), any());
 
         assertEquals(HttpStatus.OK_200, clubResponse.getStatus());
         assertNotNull(clubResponse.getEntity());
@@ -268,7 +268,6 @@ public class ClubResourceTest {
 
         // assert
         verify(fileUploadService).doesFileExist(anyString());
-        verify(clubService, never()).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
         assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
@@ -293,52 +292,8 @@ public class ClubResourceTest {
 
         // assert
         verify(fileUploadService, never()).doesFileExist(anyString());
-        verify(clubService, never()).getClub(any(), any());
         verify(clubService, never()).updateClub(any(), any(), any());
         assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
-    }
-
-    /**
-     * given that the request contains a club that does not belong to the current user, tests that the club data is not
-     * updated and a service exception is thrown instead
-     */
-    @Test
-    public void updateClubWhenClubDoesNotBelongToUser() {
-        // setup
-        UUID existingClubId = UUID.randomUUID();
-        Club existingClub = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(true)
-                .existingUserId(userPrincipal.getId())
-                .withId(existingClubId)
-                .withIncome()
-                .withExpenditure()
-                .build();
-        when(clubService.getClub(eq(existingClubId), eq(userPrincipal.getId())))
-                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
-
-        BigDecimal updatedWageBudget = existingClub.getWageBudget().add(new BigDecimal("100"));
-        BigDecimal updatedTransferBudget = existingClub.getTransferBudget().add(new BigDecimal("100"));
-        BigDecimal totalFunds = updatedTransferBudget.add(updatedWageBudget);
-        Club incomingClubBase = ClubDataProvider.ClubBuilder.builder()
-                .isExisting(false)
-                .withId(existingClubId)
-                .build();
-        Club incomingClub = ClubDataProvider.ModifiedClubBuilder.builder()
-                .from(incomingClubBase)
-                .withUpdatedTransferBudget(updatedTransferBudget)
-                .withUpdatedWageBudget(updatedWageBudget)
-                .withUpdatedManagerFunds(totalFunds)
-                .build();
-
-        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
-
-        // execute
-        assertThrows(ServiceException.class,
-                () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
-
-        // assert
-        verify(clubService).getClub(any(), any());
-        verify(clubService, never()).updateClub(any(), any(), any());
     }
 
     /**
@@ -367,13 +322,13 @@ public class ClubResourceTest {
         UUID userId = userPrincipal.getId();
         // TODO: 04/03/22 update data provider to include club logo file key when ready
         List<ClubSummary> mockClubData = ClubDataProvider.getAllClubSummariesForUser(userId);
-        when(clubService.getClubSummariesByUserId(any())).thenReturn(mockClubData);
+        when(clubService.getClubSummariesByUserId(eq(userId))).thenReturn(mockClubData);
 
         // execute
         Response response = clubResource.getClubsByUserId(userPrincipal);
 
         // assert
-        verify(clubService).getClubSummariesByUserId(eq(userId));
+        verify(clubService).getClubSummariesByUserId(any());
         assertNotNull(response);
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());
@@ -410,7 +365,7 @@ public class ClubResourceTest {
         Response response = clubResource.getSquadPlayers(clubId);
 
         // assert
-        verify(clubService).getSquadPlayers(eq(clubId));
+        verify(clubService).getSquadPlayers(any());
         assertNotNull(response);
         assertEquals(HttpStatus.OK_200, response.getStatus());
         assertNotNull(response.getEntity());

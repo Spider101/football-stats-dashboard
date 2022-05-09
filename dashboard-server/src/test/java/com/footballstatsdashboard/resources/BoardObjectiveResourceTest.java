@@ -6,7 +6,6 @@ import com.footballstatsdashboard.BoardObjectiveDataProvider;
 import com.footballstatsdashboard.api.model.ImmutableUser;
 import com.footballstatsdashboard.api.model.User;
 import com.footballstatsdashboard.api.model.club.BoardObjective;
-import com.footballstatsdashboard.api.model.club.ImmutableBoardObjective;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.BoardObjectiveService;
 import com.footballstatsdashboard.services.ClubService;
@@ -30,6 +29,7 @@ import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -86,7 +86,7 @@ public class BoardObjectiveResourceTest {
                 .withExistingId(boardObjectiveId)
                 .withClubId(clubId)
                 .build();
-        when(boardObjectiveService.getBoardObjective(eq(boardObjectiveId), eq(clubId)))
+        when(boardObjectiveService.getBoardObjective(eq(boardObjectiveId), eq(clubId), eq(userPrincipal.getId())))
                 .thenReturn(existingBoardObjective);
 
         // execute
@@ -94,8 +94,7 @@ public class BoardObjectiveResourceTest {
                 boardObjectiveId);
 
         // assert
-        verify(clubService).getClub(any(), any());
-        verify(boardObjectiveService).getBoardObjective(any(), any());
+        verify(boardObjectiveService).getBoardObjective(any(), any(), any());
 
         assertNotNull(boardObjectiveResponse);
         assertEquals(HttpStatus.OK_200, boardObjectiveResponse.getStatus());
@@ -114,17 +113,18 @@ public class BoardObjectiveResourceTest {
     @Test
     public void getBoardObjectiveWhenClubDoesNotBelongToUser() {
         // setup
+        UUID boardObjectiveId = UUID.randomUUID();
         UUID invalidClubId = UUID.randomUUID();
-        when(clubService.getClub(eq(invalidClubId), eq(userPrincipal.getId())))
+        when(boardObjectiveService.getBoardObjective(eq(boardObjectiveId), eq(invalidClubId),
+                eq(userPrincipal.getId())))
                 .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
 
         // execute
         assertThrows(ServiceException.class,
-                () -> boardObjectiveResource.getBoardObjective(userPrincipal, invalidClubId, UUID.randomUUID()));
+                () -> boardObjectiveResource.getBoardObjective(userPrincipal, invalidClubId, boardObjectiveId));
 
         // assert
-        verify(clubService).getClub(any(), any());
-        verify(boardObjectiveService, never()).getBoardObjective(any(), any());
+        verify(boardObjectiveService).getBoardObjective(any(), any(), any());
     }
 
     /**
@@ -134,17 +134,18 @@ public class BoardObjectiveResourceTest {
     @Test
     public void getBoardObjectiveWhenClubDoesNotExist() {
         // setup
+        UUID boardObjectiveId = UUID.randomUUID();
         UUID nonExistentClubId = UUID.randomUUID();
-        when(clubService.getClub(eq(nonExistentClubId), eq(userPrincipal.getId())))
-                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
+        when(boardObjectiveService.getBoardObjective(eq(boardObjectiveId), eq(nonExistentClubId),
+                eq(userPrincipal.getId())))
+                .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "No club found for the board objective!"));
 
         // execute
         assertThrows(ServiceException.class,
-                () -> boardObjectiveResource.getBoardObjective(userPrincipal, nonExistentClubId, UUID.randomUUID()));
+                () -> boardObjectiveResource.getBoardObjective(userPrincipal, nonExistentClubId, boardObjectiveId));
 
         // assert
-        verify(clubService).getClub(any(), any());
-        verify(boardObjectiveService, never()).getBoardObjective(any(), any());
+        verify(boardObjectiveService).getBoardObjective(any(), any(), any());
     }
 
     /**
@@ -154,19 +155,23 @@ public class BoardObjectiveResourceTest {
     public void createBoardObjectivePersistsBoardObjectiveData() {
         // setup
         UUID clubId = UUID.randomUUID();
-        BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
-        BoardObjective createdBoardObjective = ImmutableBoardObjective.builder()
+        BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
+                .withClubId(clubId)
+                .build();
+        BoardObjective createdBoardObjective = BoardObjectiveDataProvider.ModifiedBoardObjectiveBuilder.builder()
                 .from(incomingBoardObjective)
-                .clubId(clubId)
                 .build();
         when(boardObjectiveService.createBoardObjective(eq(incomingBoardObjective), eq(clubId),
                 eq(userPrincipal.getEmail()))).thenReturn(createdBoardObjective);
+
+        when(clubService.doesClubBelongToUser(eq(clubId), eq(userPrincipal.getId()))).thenReturn(true);
 
         // execute
         Response boardObjectiveResponse = boardObjectiveResource.createBoardObjective(userPrincipal, clubId,
                 incomingBoardObjective, uriInfo);
 
         // assert
+        verify(clubService).doesClubBelongToUser(any(), any());
         verify(boardObjectiveService).createBoardObjective(any(), any(), anyString());
         assertEquals(HttpStatus.CREATED_201, boardObjectiveResponse.getStatus());
         assertNotNull(boardObjectiveResponse.getEntity());
@@ -189,9 +194,11 @@ public class BoardObjectiveResourceTest {
     public void createBoardObjectiveWhenClubForBoardObjectiveDoesNotExist() {
         // setup
         UUID nonExistentClubId = UUID.randomUUID();
-        when(clubService.getClub(eq(nonExistentClubId), eq(userPrincipal.getId())))
+        when(clubService.doesClubBelongToUser(eq(nonExistentClubId), eq(userPrincipal.getId())))
                 .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
-        BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
+        BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
+                .withClubId(nonExistentClubId)
+                .build();
 
         // execute
         assertThrows(ServiceException.class,
@@ -199,7 +206,7 @@ public class BoardObjectiveResourceTest {
                         incomingBoardObjective, uriInfo));
 
         // assert
-        verify(clubService).getClub(any(), any());
+        verify(clubService).doesClubBelongToUser(any(), any());
         verify(boardObjectiveService, never()).createBoardObjective(any(), any(), anyString());
     }
 
@@ -211,9 +218,10 @@ public class BoardObjectiveResourceTest {
     public void createBoardObjectiveWhenClubForBoardObjectiveIsNotAccessible() {
         // setup
         UUID inaccessibleClubId = UUID.randomUUID();
-        when(clubService.getClub(eq(inaccessibleClubId), eq(userPrincipal.getId())))
-                .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
-        BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
+        when(clubService.doesClubBelongToUser(eq(inaccessibleClubId), eq(userPrincipal.getId()))).thenReturn(false);
+        BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
+                .withClubId(inaccessibleClubId)
+                .build();
 
         // execute
         assertThrows(ServiceException.class,
@@ -221,7 +229,7 @@ public class BoardObjectiveResourceTest {
                         incomingBoardObjective, uriInfo));
 
         // assert
-        verify(clubService).getClub(any(), any());
+        verify(clubService).doesClubBelongToUser(any(), any());
         verify(boardObjectiveService, never()).createBoardObjective(any(), any(), anyString());
     }
 
@@ -235,6 +243,7 @@ public class BoardObjectiveResourceTest {
         UUID existingBoardObjectiveId = UUID.randomUUID();
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
                 .withExistingId(existingBoardObjectiveId)
+                .withClubId(existingClubId)
                 .build();
         BoardObjective updatedBoardObjectiveBase = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
                 .withExistingId(existingBoardObjectiveId)
@@ -245,15 +254,15 @@ public class BoardObjectiveResourceTest {
                 .isForUpdatedEntity(true)
                 .build();
         when(boardObjectiveService.updateBoardObjective(eq(existingBoardObjectiveId), eq(existingClubId),
-                eq(incomingBoardObjective))).thenReturn(updatedBoardObjective);
+                eq(userPrincipal.getId()), eq(incomingBoardObjective)))
+                .thenReturn(updatedBoardObjective);
 
         // execute
         Response boardObjectiveResponse = boardObjectiveResource.updateBoardObjective(userPrincipal, existingClubId,
                 existingBoardObjectiveId, incomingBoardObjective);
 
         // assert
-        verify(clubService).getClub(any(), any());
-        verify(boardObjectiveService).updateBoardObjective(any(), any(), any());
+        verify(boardObjectiveService).updateBoardObjective(any(), any(), any(), any());
 
         assertNotNull(boardObjectiveResponse);
         assertEquals(HttpStatus.OK_200, boardObjectiveResponse.getStatus());
@@ -280,11 +289,14 @@ public class BoardObjectiveResourceTest {
         // setup
         UUID existingBoardObjectiveId = UUID.randomUUID();
         UUID inaccessibleClubId = UUID.randomUUID();
-        when(clubService.getClub(eq(inaccessibleClubId), eq(userPrincipal.getId())))
-                .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
                 .withExistingId(existingBoardObjectiveId)
+                .withClubId(inaccessibleClubId)
                 .build();
+
+        when(boardObjectiveService.updateBoardObjective(eq(existingBoardObjectiveId), eq(inaccessibleClubId),
+                eq(userPrincipal.getId()), eq(incomingBoardObjective)))
+                .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"));
 
         // execute
         assertThrows(ServiceException.class,
@@ -292,8 +304,7 @@ public class BoardObjectiveResourceTest {
                         existingBoardObjectiveId, incomingBoardObjective));
 
         // assert
-        verify(clubService).getClub(any(), any());
-        verify(boardObjectiveService, never()).updateBoardObjective(any(), any(), any());
+        verify(boardObjectiveService).updateBoardObjective(any(), any(), any(), any());
     }
 
     /**
@@ -305,21 +316,21 @@ public class BoardObjectiveResourceTest {
         // setup
         UUID boardObjectiveId = UUID.randomUUID();
         UUID nonExistentClubId = UUID.randomUUID();
-        when(clubService.getClub(eq(nonExistentClubId), eq(userPrincipal.getId())))
-                .thenThrow(new ServiceException(HttpStatus.NOT_FOUND_404, "No club found!"));
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
                 .withExistingId(boardObjectiveId)
+                .withClubId(nonExistentClubId)
                 .build();
 
+        when(boardObjectiveService.updateBoardObjective(eq(boardObjectiveId), eq(nonExistentClubId),
+                eq(userPrincipal.getId()), eq(incomingBoardObjective)))
+                .thenThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "No club for board objective found!"));
         // execute
         assertThrows(ServiceException.class,
                 () -> boardObjectiveResource.updateBoardObjective(userPrincipal, nonExistentClubId, boardObjectiveId,
                         incomingBoardObjective));
 
         // assert
-        verify(clubService).getClub(any(), any());
-        verify(boardObjectiveService, never()).getBoardObjective(any(), any());
-        verify(boardObjectiveService, never()).updateBoardObjective(any(), any(), any());
+        verify(boardObjectiveService).updateBoardObjective(any(), any(), any(), any());
     }
 
     /**
@@ -330,16 +341,18 @@ public class BoardObjectiveResourceTest {
     public void updatedBoardObjectiveWhenBoardObjectiveIdDoesNotMatchExisting() {
         // setup
         UUID existingBoardObjectiveId = UUID.randomUUID();
-        BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder().build();
+        UUID clubId = UUID.randomUUID();
+        BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
+                .withClubId(clubId)
+                .build();
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> boardObjectiveResource.updateBoardObjective(userPrincipal, UUID.randomUUID(),
+                () -> boardObjectiveResource.updateBoardObjective(userPrincipal, clubId,
                         existingBoardObjectiveId, incomingBoardObjective));
 
         // assert
-        verify(clubService, never()).getClub(any(), any());
-        verify(boardObjectiveService, never()).updateBoardObjective(any(), any(), any());
+        verify(boardObjectiveService, never()).updateBoardObjective(any(), any(), any(), any());
         assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
     }
 
@@ -352,14 +365,13 @@ public class BoardObjectiveResourceTest {
         // setup
         UUID clubId = UUID.randomUUID();
         UUID boardObjectiveId = UUID.randomUUID();
-        when(clubService.doesClubBelongToUser(eq(clubId), eq(userPrincipal.getId()))).thenReturn(true);
 
         // execute
         Response boardObjectiveResponse = boardObjectiveResource.deleteBoardObjective(userPrincipal, clubId,
                 boardObjectiveId);
 
         // assert
-        verify(boardObjectiveService).deleteBoardObjective(eq(boardObjectiveId), eq(clubId));
+        verify(boardObjectiveService).deleteBoardObjective(eq(boardObjectiveId), eq(clubId), eq(userPrincipal.getId()));
         assertNotNull(boardObjectiveResponse);
         assertEquals(HttpStatus.NO_CONTENT_204, boardObjectiveResponse.getStatus());
     }
@@ -369,20 +381,21 @@ public class BoardObjectiveResourceTest {
      * board objective, no board objective data is removed and a service exception is thrown instead
      */
     @Test
-    public void deleteBoardObjectiveWhenBoardObjectiveDoesNotBelongToUser() {
+    public void deleteBoardObjectiveWhenClubDoesNotBelongToUser() {
         // setup
+        UUID boardObjectiveId = UUID.randomUUID();
         UUID inaccessibleClubId = UUID.randomUUID();
-        when(clubService.doesClubBelongToUser(eq(inaccessibleClubId), eq(userPrincipal.getId()))).thenReturn(false);
+        doThrow(new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to club!"))
+                .when(boardObjectiveService).deleteBoardObjective(eq(boardObjectiveId), eq(inaccessibleClubId),
+                        eq(userPrincipal.getId()));
 
         // execute
-        ServiceException serviceException = assertThrows(ServiceException.class,
+        assertThrows(ServiceException.class,
                 () -> boardObjectiveResource.deleteBoardObjective(userPrincipal, inaccessibleClubId,
-                        UUID.randomUUID()));
+                        boardObjectiveId));
 
         // assert
-        verify(clubService).doesClubBelongToUser(any(), any());
-        verify(boardObjectiveService, never()).deleteBoardObjective(any(), any());
-        assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
+        verify(boardObjectiveService).deleteBoardObjective(any(), any(), any());
     }
 
     /**

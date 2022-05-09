@@ -39,12 +39,14 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
         this.bucketName = bucketName;
     }
 
+    @Override
     public void insertEntity(Club entity) {
         ResourceKey key = new ResourceKey(entity.getId());
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         this.bucket.defaultCollection().insert(documentKey, entity);
     }
 
+    @Override
     public Club getEntity(UUID entityId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
@@ -56,12 +58,14 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
         }
     }
 
+    @Override
     public void updateEntity(UUID existingEntityId, Club updatedEntity) {
         ResourceKey key = new ResourceKey(existingEntityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         this.bucket.defaultCollection().replace(documentKey, updatedEntity);
     }
 
+    @Override
     public void deleteEntity(UUID entityId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
@@ -72,6 +76,13 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
         }
     }
 
+    @Override
+    public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        // TODO: 02/05/22 implement this when couchbase server is ready
+        return false;
+    }
+
+    @Override
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
         // TODO: 04/03/22 grab the club logo file key from the club document as well
         String query = "Select club.id as clubId, club.name, club.createdDate from $bucketName club" +
@@ -85,6 +96,7 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
         return queryResult.rowsAs(ClubSummary.class);
     }
 
+    @Override
     public List<SquadPlayer> getPlayersInClub(UUID clubId) {
         String query = "Select player.metadata.name, player.metadata.country, player.id," +
                 " player.metadata.countryLogo as countryFlag, player.ability.`current` as currentAbility," +
