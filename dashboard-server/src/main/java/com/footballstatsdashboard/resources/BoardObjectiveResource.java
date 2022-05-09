@@ -96,15 +96,22 @@ public class BoardObjectiveResource {
             LOGGER.info("updateBoardObjective() request for board objective with ID: {}", boardObjectiveId);
         }
 
-        // verify that board objective id in the incoming request matches with the id in the existing data
-        // the board objective ID in the path param can be considered a proxy for the corresponding entity
-        // stored in the database (assuming it exists)
-        if (!boardObjectiveId.equals(incomingBoardObjective.getId())) {
+        /*
+        verify that board objective id in the incoming request matches with the id in the existing data the board
+        objective ID in the path param can be considered a proxy for the corresponding entity stored in the database
+        (assuming it exists)
+        also match the club ID in the incoming request against the clubId in the path param
+         */
+        if (!boardObjectiveId.equals(incomingBoardObjective.getId())
+                || !clubId.equals(incomingBoardObjective.getClubId())) {
             String errorMessage = String.format(
-                    "Incoming board objective ID: %s does not match ID of existing board objective entity: %s.",
-                    incomingBoardObjective.getId(), boardObjectiveId);
+                    "Incoming board objective ID: %s does not match ID of existing board objective: %s or the club ID" +
+                            " (%s) in the incoming request does not match the club ID in the request url (%s)",
+                    incomingBoardObjective.getId(), boardObjectiveId, incomingBoardObjective.getClubId(), clubId
+            );
             LOGGER.error(errorMessage);
-            throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
+            throw new ServiceException(HttpStatus.CONFLICT_409, "Board objective ID or club ID on incoming data does" +
+                    " not match board objective ID or club ID in existing data");
         }
 
         BoardObjective updatedBoardObjective = boardObjectiveService.updateBoardObjective(boardObjectiveId, clubId,
