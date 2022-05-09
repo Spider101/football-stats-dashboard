@@ -99,7 +99,7 @@ public class PlayerResource {
             throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
         }
 
-        Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, playerId, playerId);
+        Player updatedPlayer = this.playerService.updatePlayer(incomingPlayer, playerId, user.getId());
         return Response.ok(updatedPlayer).build();
     }
 
