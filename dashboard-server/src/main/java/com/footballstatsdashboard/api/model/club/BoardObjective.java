@@ -51,7 +51,6 @@ public interface BoardObjective {
      * ID of the club the objective belongs to
      */
     @Valid
-    @InternalField
     UUID getClubId();
 
     // TODO: 12/05/21 update all local date times to zoned date times to involve timezones as well
