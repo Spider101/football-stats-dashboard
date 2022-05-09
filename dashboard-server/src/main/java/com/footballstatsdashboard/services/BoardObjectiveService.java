@@ -26,10 +26,10 @@ public class BoardObjectiveService {
         try {
             // verify that the board objective being fetched belongs to the club in the request
             if (!this.boardObjectiveDAO.doesEntityBelongToClub(boardObjectiveId, clubId)) {
-                LOGGER.error("Cannot fetch board objective (ID: {}) as it does not belong to club (ID: {})",
-                        boardObjectiveId, clubId);
-                throw new ServiceException(HttpStatus.CONFLICT_409,
-                        "Board objective does not belong to the club in the request!");
+                String errorMessage = String.format("Club ID in the request: %s does not match club ID stored in" +
+                        " the existing board objective entity (ID: %s)", clubId, boardObjectiveId);
+                LOGGER.error(errorMessage);
+                throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
             }
         } catch (NoResultException noResultException) {
             String errorMessage = String.format("No board objective entity found for ID: %s", boardObjectiveId);
@@ -87,10 +87,10 @@ public class BoardObjectiveService {
         try {
             // verify that the board objective being deleted belongs to the club in the request
             if (!this.boardObjectiveDAO.doesEntityBelongToClub(boardObjectiveId, clubId)) {
-                LOGGER.error("Cannot delete board objective (ID: {}) as it does not belong to club (ID: {})",
-                        boardObjectiveId, clubId);
-                throw new ServiceException(HttpStatus.CONFLICT_409,
-                        "Board objective does not belong to the club in the request!");
+                String errorMessage = String.format("Club ID in the request: %s does not match club ID stored in" +
+                        " the existing board objective entity (ID: %s)", clubId, boardObjectiveId);
+                LOGGER.error(errorMessage);
+                throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
             }
         } catch (NoResultException noResultException) {
             String errorMessage = String.format("No board objective entity found for ID: %s", boardObjectiveId);
