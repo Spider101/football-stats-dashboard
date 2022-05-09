@@ -29,11 +29,8 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
 
     @Override
     public BoardObjective getEntity(UUID entityId) throws EntityNotFoundException {
-        BoardObjective boardObjective = this.boardObjectivesDAO.findById(entityId.toString());
-        if (boardObjective == null) {
-            throw new EntityNotFoundException();
-        }
-        return boardObjective;
+        return this.boardObjectivesDAO.findById(entityId.toString())
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     @Override
@@ -86,11 +83,11 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
         void insert(@BindPojo BoardObjective boardObjective);
 
         @SqlQuery("SELECT * FROM boardObjectives WHERE id = :id")
-        BoardObjective findById(@Bind("id") String boardObjectiveId);
+        Optional<BoardObjective> findById(@Bind("id") String boardObjectiveId);
 
         @SqlQuery(
                 "SELECT c.userId FROM boardObjectives bo LEFT JOIN club c ON bo.clubId = c.id" +
-                        "WHERE bo.id = :boardObjectiveId"
+                        " WHERE bo.id = :boardObjectiveId"
         )
         Optional<String> findUserIdAssociatedWithBoardObjective(@Bind("boardObjectiveId") String boardObjectiveId);
 
