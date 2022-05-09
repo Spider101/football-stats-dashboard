@@ -54,6 +54,13 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
     }
 
     @Override
+    public boolean doesEntityBelongToClub(UUID entityId, UUID clubId) {
+        return this.boardObjectivesDAO.findClubIdAssociatedWithBoardObjective(entityId.toString())
+                .map(clubIdAssociatedWithBoardObjective -> clubIdAssociatedWithBoardObjective.equals(clubId.toString()))
+                .orElseThrow(NoResultException::new);
+    }
+
+    @Override
     public List<BoardObjective> getBoardObjectivesForClub(UUID clubId) {
         List<BoardObjective> boardObjectives = this.boardObjectivesDAO.findByClubId(clubId.toString());
         if (boardObjectives == null) {
@@ -86,6 +93,9 @@ public class BoardObjectiveJdbiDAO implements IBoardObjectiveEntityDAO {
                         "WHERE bo.id = :boardObjectiveId"
         )
         Optional<String> findUserIdAssociatedWithBoardObjective(@Bind("boardObjectiveId") String boardObjectiveId);
+
+        @SqlQuery("SELECT clubId FROM boardObjectives WHERE id = :id ")
+        Optional<String> findClubIdAssociatedWithBoardObjective(@Bind("id") String boardObjectiveId);
 
         @SqlQuery("SELECT * FROM boardObjectives WHERE clubId = :clubId")
         List<BoardObjective> findByClubId(@Bind("clubId") String clubId);
