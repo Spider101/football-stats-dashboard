@@ -57,12 +57,7 @@ public class BoardObjectiveResource {
             LOGGER.info("getBoardObjective() request for board objective with ID: {}", boardObjectiveId);
         }
 
-        // TODO: 13/04/22 move the entity existence check to DAO layer so we don't have to fetch the entire entity just
-        //  to check that it exists. Also add a belongs to check after splitting it since it is encapsulated inside the
-        //  getClub call at the moment
-        this.clubService.getClub(clubId, user.getId());
-
-        BoardObjective boardObjective = boardObjectiveService.getBoardObjective(boardObjectiveId, clubId);
+        BoardObjective boardObjective = boardObjectiveService.getBoardObjective(boardObjectiveId, clubId, user.getId());
         return Response.ok(boardObjective).build();
     }
 
@@ -112,13 +107,8 @@ public class BoardObjectiveResource {
             throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
         }
 
-        // TODO: 13/04/22 move the entity existence check to DAO layer so we don't have to fetch the entire entity just
-        //  to check that it exists. Also add a belongs to check after splitting it since it is encapsulated inside the
-        //  getClub call at the moment
-        this.clubService.getClub(clubId, user.getId());
-
         BoardObjective updatedBoardObjective = boardObjectiveService.updateBoardObjective(boardObjectiveId, clubId,
-                incomingBoardObjective);
+                user.getId(), incomingBoardObjective);
         return Response.ok().entity(updatedBoardObjective).build();
     }
 
@@ -133,14 +123,7 @@ public class BoardObjectiveResource {
             LOGGER.info("deleteBoardObjective() request for board objective with ID: {}", boardObjectiveId);
         }
 
-        if (!this.clubService.doesClubBelongToUser(clubId, user.getId())) {
-            String errorMessage = String.format("User making request for board objective (ID: %s) does not have" +
-                    " access to associated club (ID: %s)", boardObjectiveId, clubId);
-            LOGGER.error(errorMessage);
-            throw new ServiceException(HttpStatus.FORBIDDEN_403, errorMessage);
-        }
-
-        this.boardObjectiveService.deleteBoardObjective(boardObjectiveId, clubId);
+        this.boardObjectiveService.deleteBoardObjective(boardObjectiveId, clubId, user.getId());
         return Response.noContent().build();
     }
 
