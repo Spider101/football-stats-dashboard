@@ -8,7 +8,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityNotFoundException;
+import javax.persistence.NoResultException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -22,26 +22,36 @@ public class BoardObjectiveService {
         this.boardObjectiveDAO = boardObjectiveDAO;
     }
 
-    public BoardObjective getBoardObjective(UUID boardObjectiveId, UUID clubId) {
-        BoardObjective existingBoardObjective;
-
+    public BoardObjective getBoardObjective(UUID boardObjectiveId, UUID clubId, UUID authorizedUserId) {
         try {
-            existingBoardObjective = this.boardObjectiveDAO.getEntity(boardObjectiveId);
-        } catch (EntityNotFoundException entityNotFoundException) {
+            // verify that the board objective being fetched belongs to the club in the request
+            if (!this.boardObjectiveDAO.doesEntityBelongToClub(boardObjectiveId, clubId)) {
+                LOGGER.error("Cannot fetch board objective (ID: {}) as it does not belong to club (ID: {})",
+                        boardObjectiveId, clubId);
+                throw new ServiceException(HttpStatus.CONFLICT_409,
+                        "Board objective does not belong to the club in the request!");
+            }
+        } catch (NoResultException noResultException) {
             String errorMessage = String.format("No board objective entity found for ID: %s", boardObjectiveId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
 
-        // assert that the board objective belongs to the club
-        if (!existingBoardObjective.getClubId().equals(clubId)) {
-            String errorMessage = String.format("Board objective with ID: %s does not belong to club with ID: %s",
-                    existingBoardObjective.getId(), clubId);
-            LOGGER.error(errorMessage);
-            throw new ServiceException(HttpStatus.FORBIDDEN_403, errorMessage);
+        try {
+            // verify that the current user has access to the board objective they are trying to fetch
+            if (!this.boardObjectiveDAO.doesEntityBelongToUser(boardObjectiveId, authorizedUserId)) {
+                LOGGER.error("Cannot fetch board objective with ID: {} that does not belong to user making request",
+                        boardObjectiveId);
+                throw new ServiceException(HttpStatus.FORBIDDEN_403,
+                        "User does not have access to this board objective!");
+            }
+        } catch (NoResultException noResultException) {
+            LOGGER.error("Cannot fetch board objective with ID: {} because the associated club does not exist!",
+                    boardObjectiveId);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this board objective!");
         }
 
-        return existingBoardObjective;
+        return this.boardObjectiveDAO.getEntity(boardObjectiveId);
     }
 
     public BoardObjective createBoardObjective(BoardObjective incomingBoardObjective, UUID clubId, String createdBy) {
@@ -57,8 +67,10 @@ public class BoardObjectiveService {
     }
 
     public BoardObjective updateBoardObjective(UUID existingBoardObjectiveId, UUID clubId,
-                                                BoardObjective incomingBoardObjective) {
-        BoardObjective existingBoardObjective = this.getBoardObjective(existingBoardObjectiveId, clubId);
+                                                UUID authorizedUserId, BoardObjective incomingBoardObjective) {
+        BoardObjective existingBoardObjective =
+                this.getBoardObjective(existingBoardObjectiveId, clubId, authorizedUserId);
+
         BoardObjective updatedBoardObjective = ImmutableBoardObjective.builder()
                 .from(existingBoardObjective)
                 .title(incomingBoardObjective.getTitle())
@@ -71,16 +83,36 @@ public class BoardObjectiveService {
         return updatedBoardObjective;
     }
 
-    public void deleteBoardObjective(UUID boardObjectiveId, UUID clubId) {
-        BoardObjective existingBoardObjective = this.getBoardObjective(boardObjectiveId, clubId);
-
+    public void deleteBoardObjective(UUID boardObjectiveId, UUID clubId, UUID authorizedUserId) {
         try {
-            this.boardObjectiveDAO.deleteEntity(boardObjectiveId);
-        } catch (EntityNotFoundException entityNotFoundException) {
+            // verify that the board objective being deleted belongs to the club in the request
+            if (!this.boardObjectiveDAO.doesEntityBelongToClub(boardObjectiveId, clubId)) {
+                LOGGER.error("Cannot delete board objective (ID: {}) as it does not belong to club (ID: {})",
+                        boardObjectiveId, clubId);
+                throw new ServiceException(HttpStatus.CONFLICT_409,
+                        "Board objective does not belong to the club in the request!");
+            }
+        } catch (NoResultException noResultException) {
             String errorMessage = String.format("No board objective entity found for ID: %s", boardObjectiveId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
         }
+
+        try {
+            // verify that the current user has access to the board objective they are trying to delete
+            if (!this.boardObjectiveDAO.doesEntityBelongToUser(boardObjectiveId, authorizedUserId)) {
+                LOGGER.error("Cannot delete board objective with ID: {} that does not belong to user making request",
+                        boardObjectiveId);
+                throw new ServiceException(HttpStatus.FORBIDDEN_403,
+                        "User does not have access to this board objective!");
+            }
+        } catch (NoResultException noResultException) {
+            LOGGER.error("Cannot delete board objective with ID: {} because the associated club does not exist!",
+                    boardObjectiveId);
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this board objective!");
+        }
+
+        this.boardObjectiveDAO.deleteEntity(boardObjectiveId);
     }
 
     public List<BoardObjective> getAllBoardObjectivesForClub(UUID clubId) {
