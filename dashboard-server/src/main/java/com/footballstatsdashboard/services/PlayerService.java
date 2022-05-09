@@ -211,7 +211,7 @@ public class PlayerService {
         try {
             // verify that the current user has access to the player they are trying to delete
             if (!this.playerDAO.doesEntityBelongToUser(playerId, authorizedUserId)) {
-                LOGGER.error("Player with ID: {} does not belong to user making request", playerId);
+                LOGGER.error("Player with ID: {} that does not belong to user making request", playerId);
                 throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this player!");
             }
         } catch (NoResultException noResultException) {

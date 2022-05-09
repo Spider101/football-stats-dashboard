@@ -51,7 +51,7 @@ public class ClubService {
     public Club getClub(UUID clubId, UUID authorizedUserId) {
         Club club = fetchClubData(clubId);
 
-        // validate that the user has access to the club data being fetched
+        // ensure that the user has access to the club data being fetched
         if (!authorizedUserId.equals(club.getUserId())) {
             LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
                     clubId, authorizedUserId);
@@ -143,7 +143,7 @@ public class ClubService {
 
     public void deleteClub(UUID clubId, UUID authorizedUserId) {
         // ensure user has access to the club that is being requested to be deleted
-        if (!doesClubBelongToUser(clubId, authorizedUserId)) {
+        if (!this.doesClubBelongToUser(clubId, authorizedUserId)) {
             LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
                 clubId, authorizedUserId);
             throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
