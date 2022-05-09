@@ -72,10 +72,23 @@ public class BoardObjectiveResource {
             LOGGER.info("createBoardObjective() request.");
         }
 
-        // TODO: 13/04/22 move the entity existence check to DAO layer so we don't have to fetch the entire entity just
-        //  to check that it exists. Also add a belongs to check after splitting it since it is encapsulated inside the
-        //  getClub call at the moment
-        this.clubService.getClub(clubId, user.getId());
+        // match the club ID in the incoming request against the clubId in the path param
+        if (!clubId.equals(incomingBoardObjective.getClubId())) {
+            String errorMessage = String.format(
+                    "The club ID (%s) in the incoming request does not match the club ID in the request url (%s)",
+                    incomingBoardObjective.getClubId(), clubId
+            );
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.CONFLICT_409,
+                    "Club ID on incoming data does not match club ID in existing data");
+        }
+
+        // ensure user has access to the club for which the board objective is to be created
+        if (!this.clubService.doesClubBelongToUser(clubId, user.getId())) {
+            LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
+                    clubId, user.getId());
+            throw new ServiceException(HttpStatus.FORBIDDEN_403, "User does not have access to this club!");
+        }
 
         BoardObjective newBoardObjective = boardObjectiveService.createBoardObjective(incomingBoardObjective, clubId,
                 user.getEmail());
