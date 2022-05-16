@@ -73,7 +73,7 @@ public class FileStorageService implements IFileStorageService {
 
     public boolean doesFileExist(String fileKey) {
         // sanitize file key to remove any malicious characters like '../' to change directories
-        String sanitizedFileKey = fileKey.replaceAll("[^0-9_a-zA-Z\\-\\s](?!jpg|jpeg|png)", "");
+        String sanitizedFileKey = fileKey.replaceAll("[^\\d_a-zA-Z\\-\\s](?!jpg|jpeg|png)", "");
         return Files.exists(this.uploadPath.resolve(sanitizedFileKey));
     }
 
