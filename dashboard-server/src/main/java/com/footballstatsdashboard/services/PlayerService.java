@@ -87,7 +87,7 @@ public class PlayerService {
         Metadata newPlayerMetadata = ImmutableMetadata.builder()
                 .from(incomingPlayer.getMetadata())
                 .club(clubDataForNewPlayer.getName())
-                .clubLogo("") // TODO: add club logo field here after updating club entity to include it
+                .clubLogo(clubDataForNewPlayer.getLogo())
                 .countryLogo(countryLogo)
                 .build();
 
