@@ -84,8 +84,7 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
 
     @Override
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
-        // TODO: 04/03/22 grab the club logo file key from the club document as well
-        String query = "Select club.id as clubId, club.name, club.createdDate from $bucketName club" +
+        String query = "Select club.id as clubId, club.name, club.logo, club.createdDate from $bucketName club" +
                 " where club.type = 'Club' and club.userId = $userId";
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create()

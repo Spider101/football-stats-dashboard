@@ -163,7 +163,7 @@ public class ClubJdbiDAO implements IClubEntityDAO {
                 " FROM club c LEFT JOIN managerFundsHistory mfh ON c.id = mfh.clubId WHERE c.id = :id")
         Optional<Club> findById(@Bind("id") String clubId);
 
-        @SqlQuery("SELECT id AS clubId, name, createdDate FROM club WHERE userId = :userId")
+        @SqlQuery("SELECT id AS clubId, name, logo, createdDate FROM club WHERE userId = :userId")
         List<ClubSummary> findClubsByUserId(@Bind("userId") String userId);
 
         @SqlQuery("SELECT userId FROM club WHERE id = :clubId")
