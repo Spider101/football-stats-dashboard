@@ -22,13 +22,13 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 
-public class FileUploadServiceTest {
+public class FileStorageServiceTest {
     private static final Path PATH_TO_RESOURCES_DIR =  Paths.get(System.getProperty("user.dir"),
             "src", "test", "resources");
     private static final Path PATH_TO_UPLOAD_DIR = PATH_TO_RESOURCES_DIR.resolve("uploads");
     private static final int BYTES_IN_MEGABYTE = 1024;
 
-    private FileUploadService fileUploadService;
+    private FileStorageService fileUploadService;
 
     @Before
     public void initialize() {
@@ -39,7 +39,7 @@ public class FileUploadServiceTest {
         fileUploadConfiguration.setMaxSizeInBytes((long) (BYTES_IN_MEGABYTE * BYTES_IN_MEGABYTE));
         fileUploadConfiguration.setUploadPath(Paths.get("src", "test", "resources", "uploads").toString());
 
-        fileUploadService = new FileUploadService(fileUploadConfiguration);
+        fileUploadService = new FileStorageService(fileUploadConfiguration);
         fileUploadService.initializeService();
     }
 

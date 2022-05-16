@@ -11,7 +11,7 @@ import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
-import com.footballstatsdashboard.services.FileUploadService;
+import com.footballstatsdashboard.services.FileStorageService;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
@@ -56,7 +56,7 @@ public class ClubResourceTest {
     private ClubService clubService;
 
     @Mock
-    private FileUploadService fileUploadService;
+    private FileStorageService fileUploadService;
 
     @Mock
     private UriInfo uriInfo;

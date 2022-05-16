@@ -1,6 +1,6 @@
 package com.footballstatsdashboard.resources;
 
-import com.footballstatsdashboard.services.FileUploadService;
+import com.footballstatsdashboard.services.FileStorageService;
 import com.google.common.collect.ImmutableMap;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -25,11 +25,11 @@ import static com.footballstatsdashboard.core.utils.Constants.FILE_UPLOAD_V1_BAS
 @Path(FILE_UPLOAD_V1_BASE_PATH)
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.MULTIPART_FORM_DATA)
-public class FileUploadResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadService.class);
-    private final FileUploadService fileUploadService;
+public class FileStorageResource {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
+    private final FileStorageService fileUploadService;
 
-    public FileUploadResource(FileUploadService fileUploadService) {
+    public FileStorageResource(FileStorageService fileUploadService) {
         this.fileUploadService = fileUploadService;
         this.fileUploadService.initializeService();
     }
@@ -51,6 +51,4 @@ public class FileUploadResource {
         URI location = uriInfo.getAbsolutePathBuilder().path(fileKey).build();
         return Response.created(location).entity(ImmutableMap.of("fileKey", fileKey)).build();
     }
-
-    // TODO: 04/03/22 add endpoint for downloading (streaming) image file from disk to client
 }

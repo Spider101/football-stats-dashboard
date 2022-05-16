@@ -14,13 +14,13 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FileUploadService implements IFileUploadService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadService.class);
+public class FileStorageService implements IFileStorageService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
 
     private Path uploadPath;
     private final FileUploadConfiguration fileUploadConfiguration;
 
-    public FileUploadService(FileUploadConfiguration fileUploadConfiguration) {
+    public FileStorageService(FileUploadConfiguration fileUploadConfiguration) {
         this.fileUploadConfiguration = fileUploadConfiguration;
     }
 
@@ -76,8 +76,6 @@ public class FileUploadService implements IFileUploadService {
         String sanitizedFileKey = fileKey.replaceAll("[^0-9_a-zA-Z\\-\\s](?!jpg|jpeg|png)", "");
         return Files.exists(this.uploadPath.resolve(sanitizedFileKey));
     }
-
-    // TODO: 04/03/22 add method for loading file input stream from disk to stream to client
 
     private Optional<String> getExtensionFromFileName(String filename) {
         return Optional.ofNullable(filename)

@@ -6,7 +6,7 @@ import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
-import com.footballstatsdashboard.services.IFileUploadService;
+import com.footballstatsdashboard.services.IFileStorageService;
 import io.dropwizard.auth.Auth;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -39,9 +39,9 @@ public class ClubResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
     private final ClubService clubService;
-    private final IFileUploadService fileUploadService;
+    private final IFileStorageService fileUploadService;
 
-    public ClubResource(ClubService clubService, IFileUploadService fileUploadService) {
+    public ClubResource(ClubService clubService, IFileStorageService fileUploadService) {
         this.clubService = clubService;
         this.fileUploadService = fileUploadService;
 

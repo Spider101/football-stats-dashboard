@@ -12,14 +12,14 @@ import com.footballstatsdashboard.health.FootballDashboardHealthCheck;
 import com.footballstatsdashboard.resources.BoardObjectiveResource;
 import com.footballstatsdashboard.resources.ClubResource;
 import com.footballstatsdashboard.resources.CountryFlagsLookupResource;
-import com.footballstatsdashboard.resources.FileUploadResource;
+import com.footballstatsdashboard.resources.FileStorageResource;
 import com.footballstatsdashboard.resources.MatchPerformanceResource;
 import com.footballstatsdashboard.resources.PlayerResource;
 import com.footballstatsdashboard.resources.UserResource;
 import com.footballstatsdashboard.services.BoardObjectiveService;
 import com.footballstatsdashboard.services.ClubService;
 import com.footballstatsdashboard.services.CountryFlagsLookupService;
-import com.footballstatsdashboard.services.FileUploadService;
+import com.footballstatsdashboard.services.FileStorageService;
 import com.footballstatsdashboard.services.PlayerService;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
@@ -69,7 +69,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         ClubService clubService = new ClubService(daoFactory.getClubEntityDAO());
         PlayerService playerService = new PlayerService(daoFactory.getPlayerEntityDAO());
         CountryFlagsLookupService countryFlagsLookupService = new CountryFlagsLookupService();
-        FileUploadService fileUploadService = new FileUploadService(configuration.getFileUploadConfiguration());
+        FileStorageService fileUploadService = new FileStorageService(configuration.getFileUploadConfiguration());
         BoardObjectiveService boardObjectiveService =
                 new BoardObjectiveService(daoFactory.getBoardObjectiveEntityDAO());
 
@@ -79,7 +79,7 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         environment.jersey().register(new ClubResource(clubService, fileUploadService));
         environment.jersey().register(new MatchPerformanceResource(daoFactory.getMatchPerformanceEntityDAO()));
         environment.jersey().register(new CountryFlagsLookupResource(countryFlagsLookupService));
-        environment.jersey().register(new FileUploadResource(fileUploadService));
+        environment.jersey().register(new FileStorageResource(fileUploadService));
         environment.jersey().register(new BoardObjectiveResource(boardObjectiveService, clubService));
 
         // Register OAuth authentication
