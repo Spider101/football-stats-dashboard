@@ -5,6 +5,11 @@ version: v1
 baseUri: https://localhost:8090/football-stats-dashboard/{version}
 mediaType: application/json
 
+types:
+  jpegImage:
+    type: file
+    fileTypes: ['image/jpeg']
+
 securitySchemes:
   access_token:
     description: Each request must include the api key in the headers
