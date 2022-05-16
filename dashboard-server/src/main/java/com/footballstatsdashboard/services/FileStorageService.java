@@ -77,6 +77,16 @@ public class FileStorageService implements IFileStorageService {
         return Files.exists(this.uploadPath.resolve(sanitizedFileKey));
     }
 
+    public InputStream loadFile(String fileKey) throws IOException {
+        if (!doesFileExist(fileKey)) {
+            String errorMessage = "No file found with key: " + fileKey;
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
+
+        return Files.newInputStream(this.uploadPath.resolve(fileKey));
+    }
+
     private Optional<String> getExtensionFromFileName(String filename) {
         return Optional.ofNullable(filename)
                 .filter(f -> f.contains("."))
