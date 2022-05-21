@@ -3,6 +3,7 @@ package com.footballstatsdashboard.services;
 import com.footballstatsdashboard.config.FileUploadConfiguration;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.google.common.collect.ImmutableList;
+import org.eclipse.jetty.http.HttpStatus;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,7 +18,10 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.UUID;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -30,6 +34,9 @@ public class FileStorageServiceTest {
 
     private FileStorageService fileUploadService;
 
+    /**
+     * set up test data before each test case is run
+     */
     @Before
     public void initialize() {
         MockitoAnnotations.openMocks(this);
@@ -43,6 +50,10 @@ public class FileStorageServiceTest {
         fileUploadService.initializeService();
     }
 
+    /**
+     * given a valid input stream from an image file, tests that the stream is persisted to disk and a file key
+     * referencing that is returned
+     */
     @Test
     public void storeFilePersistsImageFileInputStreamToDisk() throws IOException {
         // setup
@@ -63,34 +74,56 @@ public class FileStorageServiceTest {
         assertTrue(Files.exists(PATH_TO_UPLOAD_DIR.resolve(fileKey)));
     }
 
-    @Test(expected = ServiceException.class)
+    /**
+     * given an input stream for a text file, tests that the input stream is not persisted to disk and a service
+     * exception is thrown instead
+     */
+    @Test
     public void storeFileDoesNotPersistTextFileInputStream() throws IOException {
         // setup
         String textFileToUpload = "textFileToUpload.txt";
         long fileSizeInBytes = Files.size(PATH_TO_RESOURCES_DIR.resolve(textFileToUpload));
+        ServiceException serviceException = null;
 
         // execute
         try (InputStream fileStream = Files.newInputStream(PATH_TO_RESOURCES_DIR.resolve(textFileToUpload))) {
-            fileUploadService.storeFile(fileStream, textFileToUpload, "text/plain", fileSizeInBytes);
+            serviceException = assertThrows(ServiceException.class,
+                    () -> fileUploadService.storeFile(fileStream, textFileToUpload, "text/plain", fileSizeInBytes));
         } catch (IOException ioException) {
             fail("Failed to save file!");
         }
+
+        // assert
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
-    @Test(expected = ServiceException.class)
+    /**
+     * given an input stream for a text file, tests that the input stream is not persisted to disk and a service
+     * exception is thrown instead
+     */
+    @Test
     public void storeFileDoesNotPersistLargeImageFileInputStreamToDisk() throws IOException {
         // setup
         String largeImageFileToUpload = "largeImageFile.png";
         long fileSizeInBytes = Files.size(PATH_TO_RESOURCES_DIR.resolve(largeImageFileToUpload));
+        ServiceException serviceException = null;
 
         // execute
         try (InputStream fileStream = Files.newInputStream(PATH_TO_RESOURCES_DIR.resolve(largeImageFileToUpload))) {
-            fileUploadService.storeFile(fileStream, largeImageFileToUpload, "image/png", fileSizeInBytes);
+            serviceException = assertThrows(ServiceException.class,
+                    () -> fileUploadService.storeFile(fileStream, largeImageFileToUpload, "image/png",
+                            fileSizeInBytes));
         } catch (IOException ioException) {
             fail("Failed to save file!");
         }
+
+        // assert
+        assertEquals(HttpStatus.UNPROCESSABLE_ENTITY_422, serviceException.getResponseStatus());
     }
 
+    /**
+     * given a file key for a valid file stored on disk, tests that the method verifies that and returns true
+     */
     @Test
     public void doesFileExistReturnsTrueForAValidFileKey() throws IOException {
         // setup
@@ -107,8 +140,11 @@ public class FileStorageServiceTest {
         assertTrue(doesFileExist);
     }
 
+    /**
+     * given a file key for a non-existent file, tests that the method verifies that and returns false
+     */
     @Test
-    public void doesFileExistReturnsTrueForInvalidFileKey() {
+    public void doesFileExistReturnsFalseForInvalidFileKey() {
         // setup
         String imageFileName = "stockPhoto";
         String imageFileExtension = ".jpeg";
@@ -121,6 +157,52 @@ public class FileStorageServiceTest {
         assertFalse(doesFileExist);
     }
 
+    /**
+     * given a file key for a non-existent file, tests that no input stream corresponding to the file is returned and a
+     * service exception is thrown instead
+     */
+    @Test
+    public void loadFileWhenNoFileFoundForFileKey() {
+        // setup
+        String nonExistentFileKey = "nonExistentFile.png";
+
+        // execute
+        ServiceException serviceException = assertThrows(ServiceException.class,
+                () -> fileUploadService.loadFile(nonExistentFileKey));
+
+        // assert
+        assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
+    }
+
+    /**
+     * given a file key for a valid file stored on disk, tests that the file is loaded and the input stream
+     * corresponding to the file is returned
+     */
+    @Test
+    public void loadFileReturnsInputStreamForFileStoredOnDisk() throws IOException {
+        // setup
+        String imageFileName = "stockPhoto";
+        String imageFileToUpload = imageFileName + ".jpeg";
+        String fileKey = null;
+        long fileSizeInBytes = Files.size(PATH_TO_RESOURCES_DIR.resolve(imageFileToUpload));
+        try (InputStream fileStream = Files.newInputStream(PATH_TO_RESOURCES_DIR.resolve(imageFileToUpload))) {
+            fileKey = fileUploadService.storeFile(fileStream, imageFileToUpload, "image/png", fileSizeInBytes);
+        } catch (IOException ioException) {
+            fail("Failed to save file!");
+        }
+
+        // execute
+        InputStream loadedFileStream = fileUploadService.loadFile(fileKey);
+
+        // assert
+        assertNotNull(loadedFileStream);
+        assertEquals(fileSizeInBytes, loadedFileStream.available());
+    }
+
+    /**
+     * clean up work done at the end of the test suite's run involving removing all files creating as a result of
+     * running each individual test case
+     */
     @AfterClass
     public static void cleanUp() throws IOException {
         if (Files.exists(PATH_TO_UPLOAD_DIR)) {
