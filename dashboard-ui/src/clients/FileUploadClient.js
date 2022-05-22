@@ -1,4 +1,4 @@
-import makeRequestToEndpoint from './utils';
+import makeRequestToEndpoint, { getBaseUrl } from './utils';
 
 export const uploadImageFile = async (fileData) => {
     const formData = new FormData();
@@ -11,3 +11,5 @@ export const uploadImageFile = async (fileData) => {
         throw new Error(errorMessage);
     }
 };
+
+export const getImageDownloadURI = (fileKey) => `${getBaseUrl()}/file-storage/image/${fileKey}`;
