@@ -32,7 +32,7 @@ import static com.footballstatsdashboard.core.utils.Constants.FILE_STORAGE_V1_BA
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.MULTIPART_FORM_DATA)
 public class FileStorageResource {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageResource.class);
     private final IFileStorageService fileStorageService;
 
     public FileStorageResource(IFileStorageService fileStorageService) {
