@@ -11,6 +11,10 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import Button from '@material-ui/core/Button';
 import Divider from '@material-ui/core/Divider';
+import Avatar from '@material-ui/core/Avatar';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+
+import { getImageDownloadURI } from '../clients/FileUploadClient';
 
 const useStyles = makeStyles(theme => ({
     fab: {
@@ -37,6 +41,9 @@ export default function HomePageView({ clubSummaries, addClubWidget }) {
             {clubSummaries.map(clubSummary => {
                 return (
                     <ListItem key={clubSummary.clubId} divider>
+                        <ListItemAvatar>
+                            <Avatar src={`${getImageDownloadURI(clubSummary.logo)}`} />
+                        </ListItemAvatar>
                         <ListItemText
                             primary={clubSummary.name}
                             primaryTypographyProps={{ variant: 'h5' }}
