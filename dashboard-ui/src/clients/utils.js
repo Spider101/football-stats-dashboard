@@ -16,3 +16,5 @@ export default async function makeRequestToEndpoint(endpointFragment, method, he
     }
     return await fetch(`${baseUrl}/${endpointFragment}`, options);
 }
+
+export const getBaseUrl = () => baseUrl;
