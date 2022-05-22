@@ -14,7 +14,7 @@ import Divider from '@material-ui/core/Divider';
 import Avatar from '@material-ui/core/Avatar';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 
-import { getImageDownloadURI } from '../clients/FileUploadClient';
+import { getImageDownloadURI } from '../clients/FileStorageClient';
 
 const useStyles = makeStyles(theme => ({
     fab: {
