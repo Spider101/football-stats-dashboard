@@ -244,6 +244,7 @@ public final class ClubDataProvider {
             return ImmutableClubSummary.builder()
                     .clubId(existingClub.getId())
                     .name(existingClub.getName())
+                    .logo(existingClub.getLogo())
                     .createdDate(Objects.requireNonNull(existingClub.getCreatedDate()))
                     .build();
         }).collect(Collectors.toList());
