@@ -41,8 +41,8 @@ export default function ClubPageView({ club }) {
 const BoardObjectivesContainer = () => {
     const { clubId } = useParams();
 
-    const { addNewBoardObjectiveAction } = useAddNewBoardObjective(clubId);
-    const { isLoading, data: boardObjectiveForClubData } = useBoardObjectivesForClubData();
+    const { addNewBoardObjectiveAction } = useAddNewBoardObjective();
+    const { isLoading, data: boardObjectiveForClubData } = useBoardObjectivesForClubData(clubId);
 
     if (isLoading) {
         return <StyledLoadingCircle />;
