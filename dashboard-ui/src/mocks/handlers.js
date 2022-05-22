@@ -129,7 +129,7 @@ export const getFileUploadHandlers = (baseUrl = '*') => {
                 ctx.json({ fileKey: 'sample file.png' })
             );
         }),
-        rest.get(`${baseUrl}/upload/image/*`, async (req, res, ctx) => {
+        rest.get(`${baseUrl}/file-storage/image/*`, async (req, res, ctx) => {
             const imageBuffer = await fetch(dummyImage).then(res => res.arrayBuffer());
             return res(
                 ctx.status(200),
