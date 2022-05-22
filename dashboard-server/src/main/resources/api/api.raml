@@ -5,6 +5,11 @@ version: v1
 baseUri: https://localhost:8090/football-stats-dashboard/{version}
 mediaType: application/json
 
+types:
+  jpegImage:
+    type: file
+    fileTypes: ['image/jpeg']
+
 securitySchemes:
   access_token:
     description: Each request must include the api key in the headers
@@ -461,22 +466,32 @@ securitySchemes:
           application/json:
             example: !include examples/countryFlagsMetadata.json
 
-/upload/image:
-  post:
-    description: uploads an image file to the server
-    securedBy: [access_token]
-    body:
-      multipart/form-data:
-        properties:
-          image:
-            description: The image file to be upload
-            required: true
-            type: file
-    responses:
-      201:
-        description: image is successfully uploaded
-        body:
-          application/json:
-            example: !include examples/image-upload-response.json
-      422:
-        description: unprocessable entity when the file extension or size does not match the config values
+/file-storage:
+  /image/upload:
+    post:
+      description: uploads an image file to the server
+      securedBy: [access_token]
+      body:
+        multipart/form-data:
+          properties:
+            image:
+              description: The image file to be upload
+              required: true
+              type: file
+      responses:
+        201:
+          description: image is successfully uploaded
+          body:
+            application/json:
+              example: !include examples/image-upload-response.json
+        422:
+          description: unprocessable entity when the file extension or size does not match the config values
+  /image/{fileKey}:
+    get:
+      description: fetches an images file from the server
+      securedBy: [access_token]
+      responses:
+        200:
+          body:
+            image/jpeg:
+              type: jpegImage

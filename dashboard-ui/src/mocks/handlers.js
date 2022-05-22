@@ -3,6 +3,8 @@ import { rest } from 'msw';
 import { AUTH_DATA_LS_KEY } from '../constants';
 import { countryFlagMetadata } from '../stories/utils/storyDataGenerators';
 
+import dummyImage from './dummyImage.jpg';
+
 const mockAuthData = {
     id: 'fakeAuthToken',
     userId: 'fakeUserId'
@@ -33,6 +35,7 @@ export const getUserHandlers = (baseUrl = '*', userIdFragment = ':userId', isFor
 export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
     const dummyClub = {
         id: 'd7b2772f-699b-408b-bead-bb21e7761115',
+        logo: 'fake_club_logo.jpeg',
         name: 'Chelsea F.C',
         transferBudget: 5000000,
         wageBudget: 300000,
@@ -42,7 +45,12 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
     };
 
     const clubSummaries = [];
-    clubSummaries.push({ clubId: dummyClub.id, name: dummyClub.name, createdDate: dummyClub.createdDate });
+    clubSummaries.push({
+        clubId: dummyClub.id,
+        name: dummyClub.name,
+        logo: dummyClub.logo,
+        createdDate: dummyClub.createdDate
+    });
 
     return [
         rest.get(`${baseUrl}/club/all`, (req, res, ctx) => {
@@ -53,7 +61,12 @@ export const getClubHandlers = (baseUrl = '*', clubIdFragment = ':clubId') => {
         }),
         rest.post(`${baseUrl}/club`, (req, res, ctx) => {
             const newClub = { id: 'new-club-id', createdDate: '2022-04-28', ...req.body };
-            clubSummaries.push({ id: newClub.id, name: newClub.name, createdDate: newClub.createdDate });
+            clubSummaries.push({
+                id: newClub.id,
+                name: newClub.name,
+                logo: newClub.logo,
+                createdDate: newClub.createdDate
+            });
             return res(ctx.status(201), ctx.json(newClub));
         }),
         rest.get(`${baseUrl}/club/${clubIdFragment}/squadPlayers`, (req, res, ctx) => {
@@ -110,10 +123,19 @@ export const getLookupDataHandlers = (baseUrl = '*') => {
 
 export const getFileUploadHandlers = (baseUrl = '*') => {
     return [
-        rest.post(`${baseUrl}/upload/image`, (req, res, ctx) => {
+        rest.post(`${baseUrl}/file-storage/image/upload`, (req, res, ctx) => {
             return res(
                 ctx.status(201),
                 ctx.json({ fileKey: 'sample file.png' })
+            );
+        }),
+        rest.get(`${baseUrl}/upload/image/*`, async (req, res, ctx) => {
+            const imageBuffer = await fetch(dummyImage).then(res => res.arrayBuffer());
+            return res(
+                ctx.status(200),
+                ctx.set('Content-Type', 'image/jpeg'),
+                ctx.set('Content-Length', imageBuffer.byteLength.toString()),
+                ctx.body(imageBuffer)
             );
         })
     ];

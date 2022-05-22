@@ -11,7 +11,7 @@ import com.footballstatsdashboard.api.model.club.ImmutableSquadPlayer;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
-import com.footballstatsdashboard.services.FileUploadService;
+import com.footballstatsdashboard.services.IFileStorageService;
 import com.google.common.collect.ImmutableList;
 import io.dropwizard.jackson.Jackson;
 import org.eclipse.jetty.http.HttpStatus;
@@ -56,7 +56,7 @@ public class ClubResourceTest {
     private ClubService clubService;
 
     @Mock
-    private FileUploadService fileUploadService;
+    private IFileStorageService fileStorageService;
 
     @Mock
     private UriInfo uriInfo;
@@ -79,8 +79,8 @@ public class ClubResourceTest {
                 .lastName("")
                 .build();
 
-        clubResource = new ClubResource(clubService, fileUploadService);
-        verify(fileUploadService).initializeService();
+        clubResource = new ClubResource(clubService, fileStorageService);
+        verify(fileStorageService).initializeService();
     }
 
     /**
@@ -133,7 +133,7 @@ public class ClubResourceTest {
                 .build();
         when(clubService.createClub(eq(incomingClub), eq(userPrincipal.getId()), eq(userPrincipal.getEmail())))
                 .thenReturn(createdClub);
-        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
+        when(fileStorageService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
         Response clubResponse = clubResource.createClub(userPrincipal, incomingClub, uriInfo);
@@ -161,14 +161,14 @@ public class ClubResourceTest {
                 .withCustomClubLogo("../../maliciousFileKey.png")
                 .withExpenditure()
                 .build();
-        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
+        when(fileStorageService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubResource.createClub(userPrincipal, incomingClub, uriInfo));
 
         // assert
-        verify(fileUploadService).doesFileExist(anyString());
+        verify(fileStorageService).doesFileExist(anyString());
         verify(clubService, never()).createClub(any(), any(), anyString());
         assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
@@ -211,7 +211,7 @@ public class ClubResourceTest {
         when(clubService.updateClub(eq(incomingClub), eq(existingClubId), eq(userPrincipal.getId())))
                 .thenReturn(updatedClub);
 
-        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
+        when(fileStorageService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(true);
 
         // execute
         Response clubResponse = clubResource.updateClub(userPrincipal, existingClubId, incomingClub);
@@ -260,14 +260,14 @@ public class ClubResourceTest {
                 .withUpdatedWageBudget(updatedWageBudget)
                 .withUpdatedManagerFunds(totalFunds)
                 .build();
-        when(fileUploadService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
+        when(fileStorageService.doesFileExist(eq(incomingClub.getLogo()))).thenReturn(false);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
 
         // assert
-        verify(fileUploadService).doesFileExist(anyString());
+        verify(fileStorageService).doesFileExist(anyString());
         verify(clubService, never()).updateClub(any(), any(), any());
         assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }
@@ -291,7 +291,7 @@ public class ClubResourceTest {
                 () -> clubResource.updateClub(userPrincipal, existingClubId, incomingClub));
 
         // assert
-        verify(fileUploadService, never()).doesFileExist(anyString());
+        verify(fileStorageService, never()).doesFileExist(anyString());
         verify(clubService, never()).updateClub(any(), any(), any());
         assertEquals(HttpStatus.CONFLICT_409, serviceException.getResponseStatus());
     }

@@ -14,13 +14,13 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
-public class FileUploadService implements IFileUploadService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(FileUploadService.class);
+public class FileStorageService implements IFileStorageService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
 
     private Path uploadPath;
     private final FileUploadConfiguration fileUploadConfiguration;
 
-    public FileUploadService(FileUploadConfiguration fileUploadConfiguration) {
+    public FileStorageService(FileUploadConfiguration fileUploadConfiguration) {
         this.fileUploadConfiguration = fileUploadConfiguration;
     }
 
@@ -73,11 +73,19 @@ public class FileUploadService implements IFileUploadService {
 
     public boolean doesFileExist(String fileKey) {
         // sanitize file key to remove any malicious characters like '../' to change directories
-        String sanitizedFileKey = fileKey.replaceAll("[^0-9_a-zA-Z\\-\\s](?!jpg|jpeg|png)", "");
+        String sanitizedFileKey = fileKey.replaceAll("[^\\d_a-zA-Z\\-\\s](?!jpg|jpeg|png)", "");
         return Files.exists(this.uploadPath.resolve(sanitizedFileKey));
     }
 
-    // TODO: 04/03/22 add method for loading file input stream from disk to stream to client
+    public InputStream loadFile(String fileKey) throws IOException {
+        if (!doesFileExist(fileKey)) {
+            String errorMessage = "No file found with key: " + fileKey;
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
+
+        return Files.newInputStream(this.uploadPath.resolve(fileKey));
+    }
 
     private Optional<String> getExtensionFromFileName(String filename) {
         return Optional.ofNullable(filename)

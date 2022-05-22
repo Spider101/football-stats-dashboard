@@ -6,7 +6,7 @@ import com.footballstatsdashboard.api.model.club.ClubSummary;
 import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.core.exceptions.ServiceException;
 import com.footballstatsdashboard.services.ClubService;
-import com.footballstatsdashboard.services.IFileUploadService;
+import com.footballstatsdashboard.services.IFileStorageService;
 import io.dropwizard.auth.Auth;
 import org.eclipse.jetty.http.HttpStatus;
 import org.slf4j.Logger;
@@ -39,13 +39,13 @@ public class ClubResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClubResource.class);
 
     private final ClubService clubService;
-    private final IFileUploadService fileUploadService;
+    private final IFileStorageService fileStorageService;
 
-    public ClubResource(ClubService clubService, IFileUploadService fileUploadService) {
+    public ClubResource(ClubService clubService, IFileStorageService fileStorageService) {
         this.clubService = clubService;
-        this.fileUploadService = fileUploadService;
+        this.fileStorageService = fileStorageService;
 
-        this.fileUploadService.initializeService();
+        this.fileStorageService.initializeService();
     }
 
     @GET
@@ -73,7 +73,7 @@ public class ClubResource {
         }
 
         // TODO: 26/04/22 change this to a 422 - invalid club logo file key; update tests
-        if (!this.fileUploadService.doesFileExist(incomingClub.getLogo())) {
+        if (!this.fileStorageService.doesFileExist(incomingClub.getLogo())) {
             String errorMessage = "No file found for club logo image with key: " + incomingClub.getLogo();
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
@@ -108,7 +108,7 @@ public class ClubResource {
         }
 
         // TODO: 26/04/22 change this to a 422 - invalid club logo file key; update tests
-        if (!this.fileUploadService.doesFileExist(incomingClub.getLogo())) {
+        if (!this.fileStorageService.doesFileExist(incomingClub.getLogo())) {
             String errorMessage = "No file found for club logo image with key: " + incomingClub.getLogo();
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);

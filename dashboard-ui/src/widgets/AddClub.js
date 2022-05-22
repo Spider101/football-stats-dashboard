@@ -14,7 +14,7 @@ import useForm from '../hooks/useForm';
 import useFileUpload from '../hooks/useFileUpload';
 
 import { formSubmission } from '../constants';
-import { uploadImageFile } from '../clients/FileUploadClient';
+import { uploadImageFile } from '../clients/FileStorageClient';
 
 export default function AddClub({ addClubAction }) {
     const {

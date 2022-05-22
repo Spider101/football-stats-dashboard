@@ -22,12 +22,17 @@ public interface ClubSummary {
      */
     @Valid UUID getClubId();
 
-    // TODO: 04/03/22 add club logo property here
     /**
      * club name
      */
     @Valid
     String getName();
+
+    /**
+     * club logo file key
+     */
+    @Valid
+    String getLogo();
 
     // TODO: 1/6/2022 update all local date times to zoned date times to involve timezones as well
     /**

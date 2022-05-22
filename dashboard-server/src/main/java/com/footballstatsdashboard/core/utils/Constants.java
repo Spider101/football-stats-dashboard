@@ -31,7 +31,10 @@ public final class Constants {
     public static final String MATCH_PERFORMANCE_LOOKUP_PATH = "/lookup" + PLAYER_ID_PATH;
 
     public static final String COUNTRY_FLAG_LOOKUP_V1_BASE_PATH = API_V1_BASE_PATH + "/lookup/countryFlags";
-    public static final String FILE_UPLOAD_V1_BASE_PATH = API_V1_BASE_PATH + "/upload";
+
+    public static final String FILE_STORAGE_V1_BASE_PATH = API_V1_BASE_PATH + "/file-storage";
+    public static final String FILE_KEY = "fileKey";
+    public static final String FILE_KEY_PATH = "/{" + FILE_KEY + "}";
 
     public static final String BOARD_OBJECTIVE_V1_BASE_PATH = CLUB_V1_BASE_PATH + CLUB_ID_PATH + "/board-objective";
     public static final String BOARD_OBJECTIVE_ID = "boardObjectiveId";
