@@ -69,17 +69,17 @@ public class FootballDashboardApplication extends Application<FootballDashboardC
         ClubService clubService = new ClubService(daoFactory.getClubEntityDAO());
         PlayerService playerService = new PlayerService(daoFactory.getPlayerEntityDAO());
         CountryFlagsLookupService countryFlagsLookupService = new CountryFlagsLookupService();
-        FileStorageService fileUploadService = new FileStorageService(configuration.getFileUploadConfiguration());
+        FileStorageService fileStorageService = new FileStorageService(configuration.getFileUploadConfiguration());
         BoardObjectiveService boardObjectiveService =
                 new BoardObjectiveService(daoFactory.getBoardObjectiveEntityDAO());
 
         // setup resources
         environment.jersey().register(new UserResource(userEntityDAO, daoFactory.getAuthTokenEntityDAO()));
         environment.jersey().register(new PlayerResource(playerService, clubService));
-        environment.jersey().register(new ClubResource(clubService, fileUploadService));
+        environment.jersey().register(new ClubResource(clubService, fileStorageService));
         environment.jersey().register(new MatchPerformanceResource(daoFactory.getMatchPerformanceEntityDAO()));
         environment.jersey().register(new CountryFlagsLookupResource(countryFlagsLookupService));
-        environment.jersey().register(new FileStorageResource(fileUploadService));
+        environment.jersey().register(new FileStorageResource(fileStorageService));
         environment.jersey().register(new BoardObjectiveResource(boardObjectiveService, clubService));
 
         // Register OAuth authentication

@@ -32,7 +32,7 @@ public class FileStorageServiceTest {
     private static final Path PATH_TO_UPLOAD_DIR = PATH_TO_RESOURCES_DIR.resolve("uploads");
     private static final int BYTES_IN_MEGABYTE = 1024;
 
-    private FileStorageService fileUploadService;
+    private FileStorageService fileStorageService;
 
     /**
      * set up test data before each test case is run
@@ -46,8 +46,8 @@ public class FileStorageServiceTest {
         fileUploadConfiguration.setMaxSizeInBytes((long) (BYTES_IN_MEGABYTE * BYTES_IN_MEGABYTE));
         fileUploadConfiguration.setUploadPath(Paths.get("src", "test", "resources", "uploads").toString());
 
-        fileUploadService = new FileStorageService(fileUploadConfiguration);
-        fileUploadService.initializeService();
+        fileStorageService = new FileStorageService(fileUploadConfiguration);
+        fileStorageService.initializeService();
     }
 
     /**
@@ -64,7 +64,7 @@ public class FileStorageServiceTest {
 
         // execute
         try (InputStream fileStream = Files.newInputStream(PATH_TO_RESOURCES_DIR.resolve(imageFileToUpload))) {
-            fileKey = fileUploadService.storeFile(fileStream, imageFileToUpload, "image/jpeg", fileSizeInBytes);
+            fileKey = fileStorageService.storeFile(fileStream, imageFileToUpload, "image/jpeg", fileSizeInBytes);
         } catch (IOException ioException) {
             fail("Failed to save file!");
         }
@@ -88,7 +88,7 @@ public class FileStorageServiceTest {
         // execute
         try (InputStream fileStream = Files.newInputStream(PATH_TO_RESOURCES_DIR.resolve(textFileToUpload))) {
             serviceException = assertThrows(ServiceException.class,
-                    () -> fileUploadService.storeFile(fileStream, textFileToUpload, "text/plain", fileSizeInBytes));
+                    () -> fileStorageService.storeFile(fileStream, textFileToUpload, "text/plain", fileSizeInBytes));
         } catch (IOException ioException) {
             fail("Failed to save file!");
         }
@@ -111,7 +111,7 @@ public class FileStorageServiceTest {
         // execute
         try (InputStream fileStream = Files.newInputStream(PATH_TO_RESOURCES_DIR.resolve(largeImageFileToUpload))) {
             serviceException = assertThrows(ServiceException.class,
-                    () -> fileUploadService.storeFile(fileStream, largeImageFileToUpload, "image/png",
+                    () -> fileStorageService.storeFile(fileStream, largeImageFileToUpload, "image/png",
                             fileSizeInBytes));
         } catch (IOException ioException) {
             fail("Failed to save file!");
@@ -134,7 +134,7 @@ public class FileStorageServiceTest {
                 PATH_TO_UPLOAD_DIR.resolve(fileKey));
 
         // execute
-        boolean doesFileExist = fileUploadService.doesFileExist(fileKey);
+        boolean doesFileExist = fileStorageService.doesFileExist(fileKey);
 
         // assert
         assertTrue(doesFileExist);
@@ -151,7 +151,7 @@ public class FileStorageServiceTest {
         String maliciousFileKey = "../" + imageFileName + imageFileExtension;
 
         // execute
-        boolean doesFileExist = fileUploadService.doesFileExist(maliciousFileKey);
+        boolean doesFileExist = fileStorageService.doesFileExist(maliciousFileKey);
 
         // assert
         assertFalse(doesFileExist);
@@ -168,7 +168,7 @@ public class FileStorageServiceTest {
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
-                () -> fileUploadService.loadFile(nonExistentFileKey));
+                () -> fileStorageService.loadFile(nonExistentFileKey));
 
         // assert
         assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
@@ -186,13 +186,13 @@ public class FileStorageServiceTest {
         String fileKey = null;
         long fileSizeInBytes = Files.size(PATH_TO_RESOURCES_DIR.resolve(imageFileToUpload));
         try (InputStream fileStream = Files.newInputStream(PATH_TO_RESOURCES_DIR.resolve(imageFileToUpload))) {
-            fileKey = fileUploadService.storeFile(fileStream, imageFileToUpload, "image/png", fileSizeInBytes);
+            fileKey = fileStorageService.storeFile(fileStream, imageFileToUpload, "image/png", fileSizeInBytes);
         } catch (IOException ioException) {
             fail("Failed to save file!");
         }
 
         // execute
-        InputStream loadedFileStream = fileUploadService.loadFile(fileKey);
+        InputStream loadedFileStream = fileStorageService.loadFile(fileKey);
 
         // assert
         assertNotNull(loadedFileStream);

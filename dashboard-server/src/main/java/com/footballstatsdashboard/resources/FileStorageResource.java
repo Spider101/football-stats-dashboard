@@ -33,11 +33,11 @@ import static com.footballstatsdashboard.core.utils.Constants.FILE_STORAGE_V1_BA
 @Consumes(MediaType.MULTIPART_FORM_DATA)
 public class FileStorageResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
-    private final FileStorageService fileUploadService;
+    private final FileStorageService fileStorageService;
 
-    public FileStorageResource(FileStorageService fileUploadService) {
-        this.fileUploadService = fileUploadService;
-        this.fileUploadService.initializeService();
+    public FileStorageResource(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
+        this.fileStorageService.initializeService();
     }
 
     @POST
@@ -51,7 +51,7 @@ public class FileStorageResource {
             LOGGER.info("uploadImage() request");
         }
 
-        String fileKey = this.fileUploadService.storeFile(imageFileStream, imageFileMetadata.getFileName(),
+        String fileKey = this.fileStorageService.storeFile(imageFileStream, imageFileMetadata.getFileName(),
                 imageFileBody.getMediaType().toString(), imageFileMetadata.getSize());
 
         URI location = uriInfo.getAbsolutePathBuilder().path(fileKey).build();
@@ -67,7 +67,7 @@ public class FileStorageResource {
             LOGGER.info("downloadImage() request for file key: {}", fileKey);
         }
 
-        InputStream fileInputStream = this.fileUploadService.loadFile(fileKey);
+        InputStream fileInputStream = this.fileStorageService.loadFile(fileKey);
         return Response.ok(new BufferedInputStream(fileInputStream))
                 .header("Content-Disposition", "attachment; filename=" + fileKey)
                 .build();
