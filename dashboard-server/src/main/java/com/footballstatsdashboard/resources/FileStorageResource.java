@@ -1,6 +1,6 @@
 package com.footballstatsdashboard.resources;
 
-import com.footballstatsdashboard.services.FileStorageService;
+import com.footballstatsdashboard.services.IFileStorageService;
 import com.google.common.collect.ImmutableMap;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -33,9 +33,9 @@ import static com.footballstatsdashboard.core.utils.Constants.FILE_STORAGE_V1_BA
 @Consumes(MediaType.MULTIPART_FORM_DATA)
 public class FileStorageResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
-    private final FileStorageService fileStorageService;
+    private final IFileStorageService fileStorageService;
 
-    public FileStorageResource(FileStorageService fileStorageService) {
+    public FileStorageResource(IFileStorageService fileStorageService) {
         this.fileStorageService = fileStorageService;
         this.fileStorageService.initializeService();
     }
