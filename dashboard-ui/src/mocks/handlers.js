@@ -3,6 +3,8 @@ import { rest } from 'msw';
 import { AUTH_DATA_LS_KEY } from '../constants';
 import { countryFlagMetadata } from '../stories/utils/storyDataGenerators';
 
+import dummyImage from './dummyImage.jpg';
+
 const mockAuthData = {
     id: 'fakeAuthToken',
     userId: 'fakeUserId'
@@ -125,6 +127,15 @@ export const getFileUploadHandlers = (baseUrl = '*') => {
             return res(
                 ctx.status(201),
                 ctx.json({ fileKey: 'sample file.png' })
+            );
+        }),
+        rest.get(`${baseUrl}/upload/image/*`, async (req, res, ctx) => {
+            const imageBuffer = await fetch(dummyImage).then(res => res.arrayBuffer());
+            return res(
+                ctx.status(200),
+                ctx.set('Content-Type', 'image/jpeg'),
+                ctx.set('Content-Length', imageBuffer.byteLength.toString()),
+                ctx.body(imageBuffer)
             );
         })
     ];
