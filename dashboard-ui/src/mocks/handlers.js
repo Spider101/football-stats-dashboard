@@ -230,7 +230,7 @@ const squadPlayers = [
     {
         name: dummyPlayer.metadata.name,
         country: dummyPlayer.metadata.country,
-        countryFlag: dummyPlayer.metadata.countryFlagUrl,
+        countryFlag: dummyPlayer.metadata.countryLogo,
         role: dummyPlayer.roles[0].name,
         currentAbility: dummyPlayer.ability.current,
         recentForm: [],
