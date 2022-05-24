@@ -10,21 +10,47 @@ const GROWTH_INDICATOR_LIST = ['up', 'flat', 'down'];
 const NUM_MONTHS = 6;
 
 export const countryFlagMetadata = [
-    { id: faker.datatype.uuid(), name: 'France', countryCode: 'fr', countryFlagUrl: 'https://flagcdn.com/w40/fr.png' },
-    { id: faker.datatype.uuid(), name: 'Germany', countryCode: 'fr', countryFlagUrl: 'https://flagcdn.com/w40/de.png' },
-    { id: faker.datatype.uuid(), name: 'Spain', countryCode: 'fr', countryFlagUrl: 'https://flagcdn.com/w40/es.png' },
-    { id: faker.datatype.uuid(), name: 'Italy', countryCode: 'fr', countryFlagUrl: 'https://flagcdn.com/w40/it.png' },
     {
         id: faker.datatype.uuid(),
-        name: 'England',
+        countryName: 'France',
+        countryCode: 'fr',
+        countryFlagUrl: 'https://flagcdn.com/w40/fr.png'
+    },
+    {
+        id: faker.datatype.uuid(),
+        countryName: 'Germany',
+        countryCode: 'fr',
+        countryFlagUrl: 'https://flagcdn.com/w40/de.png'
+    },
+    {
+        id: faker.datatype.uuid(),
+        countryName: 'Spain',
+        countryCode: 'fr',
+        countryFlagUrl: 'https://flagcdn.com/w40/es.png'
+    },
+    {
+        id: faker.datatype.uuid(),
+        countryName: 'Italy',
+        countryCode: 'fr',
+        countryFlagUrl: 'https://flagcdn.com/w40/it.png'
+    },
+    {
+        id: faker.datatype.uuid(),
+        countryName: 'England',
         countryCode: 'gb-eng',
         countryFlagUrl: 'https://flagcdn.com/w40/gb-eng.png'
     },
     {
         id: faker.datatype.uuid(),
-        name: 'Netherlands',
+        countryName: 'Netherlands',
         countryCode: 'nl',
         countryFlagUrl: 'https://flagcdn.com/w40/nl.png'
+    },
+    {
+        id: faker.datatype.uuid(),
+        countryName: 'Norway',
+        countryCode: 'nr',
+        countryFlagUrl: 'https://flagcdn.com/w40/no.png'
     }
 ];
 
