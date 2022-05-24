@@ -10,15 +10,229 @@ const mockAuthData = {
     userId: 'fakeUserId'
 };
 
-const { dummyPlayer, countryFlagUrl, currentAbility } = getDummyPlayer();
+const dummyPlayer = {
+    id: 'fd4ba2dc-d6bf-49c0-92cf-d6165e6c2b9e',
+    metadata: {
+        name: 'Sander Gard Bolin Berge',
+        country: 'Norway',
+        club: 'Boehm, Braun and Stokes',
+        countryLogo: 'https://flagcdn.com/w40/no.png',
+        age: 23
+    },
+    roles: [
+        {
+            name: 'defensive central midfielder',
+            associatedAttributes: [
+                'interceptions',
+                'defensive awareness',
+                'aggression',
+                'stamina',
+                'stand tackle',
+                'slide tackle'
+            ]
+        },
+        {
+            name: 'central midfielder',
+            associatedAttributes: ['long passing', 'vision', 'short passing']
+        }
+    ],
+    ability: {
+        current: 11,
+        history: [11]
+    },
+    attributes: [
+        {
+            name: 'freekickAccuracy',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 2,
+            history: [2]
+        },
+        {
+            name: 'penalties',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 9,
+            history: [9]
+        },
+        {
+            name: 'headingAccuracy',
+            category: 'Technical',
+            group: 'Aerial',
+            value: 3,
+            history: [3]
+        },
+        {
+            name: 'crossing',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 1,
+            history: [1]
+        },
+        {
+            name: 'shortPassing',
+            category: 'Technical',
+            group: 'Vision',
+            value: 16,
+            history: [16]
+        },
+        {
+            name: 'longPassing',
+            category: 'Technical',
+            group: 'Vision',
+            value: 19,
+            history: [19]
+        },
+        {
+            name: 'longShots',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 16,
+            history: [16]
+        },
+        {
+            name: 'finishing',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 2,
+            history: [2]
+        },
+        {
+            name: 'volleys',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 18,
+            history: [18]
+        },
+        {
+            name: 'ballControl',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 9,
+            history: [9]
+        },
+        {
+            name: 'standingTackle',
+            category: 'Technical',
+            group: 'Defending',
+            value: 8,
+            history: [8]
+        },
+        {
+            name: 'slidingTackle',
+            category: 'Technical',
+            group: 'Defending',
+            value: 3,
+            history: [3]
+        },
+        {
+            name: 'dribbling',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 7,
+            history: [7]
+        },
+        {
+            name: 'curve',
+            category: 'Technical',
+            group: 'Attacking',
+            value: 19,
+            history: [19]
+        },
+        {
+            name: 'stamina',
+            category: 'Physical',
+            group: 'Defending',
+            value: 19,
+            history: [19]
+        },
+        {
+            name: 'jumping',
+            category: 'Physical',
+            group: 'Aerial',
+            value: 14,
+            history: [14]
+        },
+        {
+            name: 'strength',
+            category: 'Physical',
+            group: 'Defending',
+            value: 17,
+            history: [17]
+        },
+        {
+            name: 'sprintSpeed',
+            category: 'Physical',
+            group: 'Speed',
+            value: 8,
+            history: [8]
+        },
+        {
+            name: 'acceleration',
+            category: 'Physical',
+            group: 'Speed',
+            value: 5,
+            history: [5]
+        },
+        {
+            name: 'agility',
+            category: 'Physical',
+            group: 'Speed',
+            value: 17,
+            history: [17]
+        },
+        {
+            name: 'balance',
+            category: 'Physical',
+            group: 'Speed',
+            value: 12,
+            history: [12]
+        },
+        {
+            name: 'aggression',
+            category: 'Mental',
+            group: 'Attacking',
+            value: 0,
+            history: [0]
+        },
+        {
+            name: 'vision',
+            category: 'Mental',
+            group: 'Vision',
+            value: 19,
+            history: [19]
+        },
+        {
+            name: 'composure',
+            category: 'Mental',
+            group: 'Attacking',
+            value: 10,
+            history: [10]
+        },
+        {
+            name: 'defensiveAwareness',
+            category: 'Mental',
+            group: 'Defending',
+            value: 11,
+            history: [11]
+        },
+        {
+            name: 'attackingPosition',
+            category: 'Mental',
+            group: 'Attacking',
+            value: 14,
+            history: [14]
+        }
+    ]
+};
 
 const squadPlayers = [
     {
         name: dummyPlayer.metadata.name,
         country: dummyPlayer.metadata.country,
-        countryFlag: countryFlagUrl,
+        countryFlag: dummyPlayer.metadata.countryFlagUrl,
         role: dummyPlayer.roles[0].name,
-        currentAbility,
+        currentAbility: dummyPlayer.ability.current,
         recentForm: [],
         playerId: dummyPlayer.id
     }
@@ -164,228 +378,3 @@ export const getFileUploadHandlers = (baseUrl = '*') => {
         })
     ];
 };
-
-function getDummyPlayer() {
-    const dummyPlayer = {
-        id: 'fd4ba2dc-d6bf-49c0-92cf-d6165e6c2b9e',
-        metadata: {
-            name: 'Sander Gard Bolin Berge',
-            country: 'Norway',
-            club: 'Boehm, Braun and Stokes',
-            countryLogo: 'https://flagcdn.com/w40/no.png',
-            age: 23
-        },
-        roles: [
-            {
-                name: 'defensive central midfielder',
-                associatedAttributes: [
-                    'interceptions',
-                    'defensive awareness',
-                    'aggression',
-                    'stamina',
-                    'stand tackle',
-                    'slide tackle'
-                ]
-            },
-            {
-                name: 'central midfielder',
-                associatedAttributes: ['long passing', 'vision', 'short passing']
-            }
-        ],
-        ability: {
-            current: 11,
-            history: [11]
-        },
-        attributes: [
-            {
-                name: 'freekickAccuracy',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 2,
-                history: [2]
-            },
-            {
-                name: 'penalties',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 9,
-                history: [9]
-            },
-            {
-                name: 'headingAccuracy',
-                category: 'Technical',
-                group: 'Aerial',
-                value: 3,
-                history: [3]
-            },
-            {
-                name: 'crossing',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 1,
-                history: [1]
-            },
-            {
-                name: 'shortPassing',
-                category: 'Technical',
-                group: 'Vision',
-                value: 16,
-                history: [16]
-            },
-            {
-                name: 'longPassing',
-                category: 'Technical',
-                group: 'Vision',
-                value: 19,
-                history: [19]
-            },
-            {
-                name: 'longShots',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 16,
-                history: [16]
-            },
-            {
-                name: 'finishing',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 2,
-                history: [2]
-            },
-            {
-                name: 'volleys',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 18,
-                history: [18]
-            },
-            {
-                name: 'ballControl',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 9,
-                history: [9]
-            },
-            {
-                name: 'standingTackle',
-                category: 'Technical',
-                group: 'Defending',
-                value: 8,
-                history: [8]
-            },
-            {
-                name: 'slidingTackle',
-                category: 'Technical',
-                group: 'Defending',
-                value: 3,
-                history: [3]
-            },
-            {
-                name: 'dribbling',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 7,
-                history: [7]
-            },
-            {
-                name: 'curve',
-                category: 'Technical',
-                group: 'Attacking',
-                value: 19,
-                history: [19]
-            },
-            {
-                name: 'stamina',
-                category: 'Physical',
-                group: 'Defending',
-                value: 19,
-                history: [19]
-            },
-            {
-                name: 'jumping',
-                category: 'Physical',
-                group: 'Aerial',
-                value: 14,
-                history: [14]
-            },
-            {
-                name: 'strength',
-                category: 'Physical',
-                group: 'Defending',
-                value: 17,
-                history: [17]
-            },
-            {
-                name: 'sprintSpeed',
-                category: 'Physical',
-                group: 'Speed',
-                value: 8,
-                history: [8]
-            },
-            {
-                name: 'acceleration',
-                category: 'Physical',
-                group: 'Speed',
-                value: 5,
-                history: [5]
-            },
-            {
-                name: 'agility',
-                category: 'Physical',
-                group: 'Speed',
-                value: 17,
-                history: [17]
-            },
-            {
-                name: 'balance',
-                category: 'Physical',
-                group: 'Speed',
-                value: 12,
-                history: [12]
-            },
-            {
-                name: 'aggression',
-                category: 'Mental',
-                group: 'Attacking',
-                value: 0,
-                history: [0]
-            },
-            {
-                name: 'vision',
-                category: 'Mental',
-                group: 'Vision',
-                value: 19,
-                history: [19]
-            },
-            {
-                name: 'composure',
-                category: 'Mental',
-                group: 'Attacking',
-                value: 10,
-                history: [10]
-            },
-            {
-                name: 'defensiveAwareness',
-                category: 'Mental',
-                group: 'Defending',
-                value: 11,
-                history: [11]
-            },
-            {
-                name: 'attackingPosition',
-                category: 'Mental',
-                group: 'Attacking',
-                value: 14,
-                history: [14]
-            }
-        ]
-    };
-
-    const currentAbility =
-        dummyPlayer.attributes.reduce((sum, attribute) => sum + attribute.value) / dummyPlayer.attributes.length;
-    const countryFlagUrl = countryFlagMetadata.find(
-        metadata => metadata.countryName === dummyPlayer.metadata.country
-    ).countryFlagUrl;
-    return { _dummyPlayer: dummyPlayer, countryFlagUrl, currentAbility };
-}
