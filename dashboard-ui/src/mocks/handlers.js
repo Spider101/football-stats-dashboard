@@ -10,17 +10,17 @@ const mockAuthData = {
     userId: 'fakeUserId'
 };
 
-const { _dummyPlayer, countryFlagUrl, currentAbility } = getDummyPlayer();
+const { dummyPlayer, countryFlagUrl, currentAbility } = getDummyPlayer();
 
 const squadPlayers = [
     {
-        name: _dummyPlayer.metadata.name,
-        country: _dummyPlayer.metadata.country,
+        name: dummyPlayer.metadata.name,
+        country: dummyPlayer.metadata.country,
         countryFlag: countryFlagUrl,
-        role: _dummyPlayer.roles[0].name,
+        role: dummyPlayer.roles[0].name,
         currentAbility,
         recentForm: [],
-        playerId: _dummyPlayer.id
+        playerId: dummyPlayer.id
     }
 ];
 
@@ -134,7 +134,7 @@ export const getPlayerHandlers = (baseUrl = '*') => {
         rest.get(`${baseUrl}/players/*`, (req, res, ctx) => {
             return res(
                 ctx.status(200),
-                ctx.json(_dummyPlayer)
+                ctx.json(dummyPlayer)
             );
         })
     ];
@@ -166,7 +166,7 @@ export const getFileUploadHandlers = (baseUrl = '*') => {
 };
 
 function getDummyPlayer() {
-    const _dummyPlayer = {
+    const dummyPlayer = {
         id: 'fd4ba2dc-d6bf-49c0-92cf-d6165e6c2b9e',
         metadata: {
             name: 'Sander Gard Bolin Berge',
@@ -383,9 +383,9 @@ function getDummyPlayer() {
     };
 
     const currentAbility =
-        _dummyPlayer.attributes.reduce((sum, attribute) => sum + attribute.value) / _dummyPlayer.attributes.length;
+        dummyPlayer.attributes.reduce((sum, attribute) => sum + attribute.value) / dummyPlayer.attributes.length;
     const countryFlagUrl = countryFlagMetadata.find(
-        metadata => metadata.countryName === _dummyPlayer.metadata.country
+        metadata => metadata.countryName === dummyPlayer.metadata.country
     ).countryFlagUrl;
-    return { _dummyPlayer, countryFlagUrl, currentAbility };
+    return { _dummyPlayer: dummyPlayer, countryFlagUrl, currentAbility };
 }
