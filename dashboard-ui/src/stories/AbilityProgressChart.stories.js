@@ -21,8 +21,14 @@ export default {
     }
 };
 
-export const Default = (args) => <AbilityProgressChart { ...args } />;
+const Template = args => <AbilityProgressChart { ...args } />;
 
-Default.args = {
+export const MultipleDataPoints = Template.bind({});
+MultipleDataPoints.args = {
     abilityData: getPlayerAbilityData()
+};
+
+export const SingleDataPoint = Template.bind({});
+SingleDataPoint.args = {
+    abilityData: getPlayerAbilityData(1)
 };
