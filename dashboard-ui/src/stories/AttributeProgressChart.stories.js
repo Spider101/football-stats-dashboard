@@ -23,7 +23,12 @@ export default {
 };
 
 const Template = args => <AttributeProgressChart { ...args } />;
-export const Default = Template.bind({});
-Default.args = {
+export const MultipleDataPoints = Template.bind({});
+MultipleDataPoints.args = {
     attributeData: getPlayerProgressionData(10, MAX_ATTR_VALUE)
+};
+
+export const SingleDataPoint = Template.bind({});
+SingleDataPoint.args = {
+    attributeData: getPlayerProgressionData(10, MAX_ATTR_VALUE, 1)
 };

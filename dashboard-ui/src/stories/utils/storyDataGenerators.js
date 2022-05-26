@@ -197,16 +197,16 @@ export const getPlayerData = (attributeNamesList, hasHistory = false) => {
     };
 };
 
-export const getPlayerProgressionData = (numAttributes, maxValue) => {
+export const getPlayerProgressionData = (numAttributes, maxValue, numMonths = NUM_MONTHS) => {
     return [ ...Array(numAttributes) ].map(() => ({
         name: faker.hacker.noun(),
-        history: [...Array(NUM_MONTHS)].map(() => faker.datatype.number(maxValue))
+        history: [...Array(numMonths)].map(() => faker.datatype.number(maxValue))
     }));
 };
 
-export const getPlayerAbilityData = () => ({
+export const getPlayerAbilityData = (numMonths = NUM_MONTHS) => ({
     name: 'Player Ability',
-    history: [...Array(NUM_MONTHS)].map(() => faker.datatype.number(MAX_OVERALL_VALUE))
+    history: [...Array(numMonths)].map(() => faker.datatype.number(MAX_OVERALL_VALUE))
 });
 
 export const getCardWithChartData = (dataKeys, numDataPoints, maxValue) =>
