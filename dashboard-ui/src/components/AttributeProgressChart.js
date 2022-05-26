@@ -21,6 +21,7 @@ export default function AttributeProgressChart({ attributeData }) {
     const attributeNames = attributeData.map(attribute => attribute.name);
     const chartData = transformAttributeData(attributeData);
     const { getPaletteColor } = buildChartPalette();
+
     return (
         <ResponsiveContainer height={500} width='100%'>
             <LineChart data={chartData}>
@@ -33,7 +34,7 @@ export default function AttributeProgressChart({ attributeData }) {
                         isAnimationActive={attributeNames.length <= CHART_ANIMATION_THRESHOLD}
                     />
                 ))}
-                <XAxis axisLine={false} tickFormatter={number => MONTHS[number]} tickLine={false} />
+                <XAxis axisLine={false} tickFormatter={number => MONTHS[number]} tickLine={false} domain={['0', '11']}/>
                 <YAxis axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomToolTip />} />
                 <Legend />

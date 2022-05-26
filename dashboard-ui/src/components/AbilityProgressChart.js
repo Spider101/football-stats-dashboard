@@ -12,12 +12,18 @@ export default function AbilityProgressChart({ abilityData }) {
     const theme = useTheme();
 
     const chartData = transformAbilityData(abilityData.history);
+
     return (
         <ResponsiveContainer width='100%' height={500}>
             <BarChart data={chartData} barSize={50}>
-                <XAxis axisLine={false} tickLine={false} tickFormatter={number => MONTHS[number]}/>
+                <XAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={number => MONTHS[number]}
+                    domain={['0', '11']}
+                />
                 <YAxis axisLine={false} tickLine={false} />
-                <Tooltip content={<CustomToolTip />}/>
+                <Tooltip content={<CustomToolTip />} cursor={false}/>
                 <CartesianGrid vertical={false} opacity={0.5} />
                 <Bar dataKey='playerAbility' fill={theme.palette.primary.main}/>
             </BarChart>
