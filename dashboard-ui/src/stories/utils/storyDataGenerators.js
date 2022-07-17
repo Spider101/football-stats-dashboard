@@ -156,7 +156,6 @@ export const getAttrGroupData = (numGroups) => (
 
 export const getPlayerMetadata = () => ({
     name: faker.name.findName(),
-    dateOfBirth: faker.date.past().toJSON(),
     club: faker.company.companyName(),
     country: faker.address.country(),
     photo: `${faker.image.people()}?random=${faker.datatype.number(20)}`,
