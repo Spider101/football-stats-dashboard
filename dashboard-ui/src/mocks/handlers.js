@@ -17,6 +17,7 @@ const dummyPlayer = {
         country: 'Norway',
         club: 'Boehm, Braun and Stokes',
         countryLogo: 'https://flagcdn.com/w40/no.png',
+        clubLogo: 'fake_player_club_logo.jpeg',
         age: 23
     },
     roles: [

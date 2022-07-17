@@ -7,6 +7,7 @@ import CardContent from '@material-ui/core/CardContent';
 import Avatar from '@material-ui/core/Avatar';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { getImageDownloadURI } from '../clients/FileStorageClient';
 
 const useStyles = makeStyles({
     root: {
@@ -26,38 +27,35 @@ const useStyles = makeStyles({
         width: 25
     },
     media: {
-        minWidth: 151,
+        minWidth: 151
     }
 });
 
-const renderPlayerDOB = (dob, age) => `${dob.slice(0, 10).split`-`.join`/`} (${age} years old)`;
+const renderPlayerDOB = age => `${age} years old`;
 
-export default function PlayerBioCard({  name, club, clubLogo, dateOfBirth, age, country, countryLogo, photo }) {
+export default function PlayerBioCard({ name, club, clubLogo, age, country, countryLogo, photo }) {
     const classes = useStyles();
 
     return (
         <Card className={classes.root}>
-            <CardMedia
-                className={classes.media}
-                image={ photo }
-            />
+            <CardMedia className={classes.media} image={photo} />
             <CardContent className={classes.content}>
-                <Typography component="h5" variant="h5">
-                    { name }
+                <Typography component='h5' variant='h5'>
+                    {name}
                 </Typography>
-                <div className={ classes.avatarGroup }>
-                    <Avatar className={classes.logo} src={ clubLogo } />
-                    <Typography variant="subtitle1" color="textSecondary">
-                        {  club }
+                <div className={classes.avatarGroup}>
+                    <Avatar className={classes.logo} src={`${getImageDownloadURI(clubLogo)}`} />
+                    <Typography variant='subtitle1' color='textSecondary'>
+                        {club}
                     </Typography>
                 </div>
-                <Typography variant="subtitle1" color="textSecondary">
-                    { renderPlayerDOB(dateOfBirth, age) }
+                <Typography variant='subtitle1' color='textSecondary'>
+                    {renderPlayerDOB(age)}
                 </Typography>
-                <div className={ classes.avatarGroup }>
-                    <Avatar className={classes.logo} src={ countryLogo } />
-                    <Typography variant="subtitle1" color="textSecondary">
-                        {  country }
+                <div className={classes.avatarGroup}>
+                    <Avatar className={classes.logo} src={countryLogo} />
+                    <Typography variant='subtitle1' color='textSecondary'>
+                        {country}
                     </Typography>
                 </div>
             </CardContent>
@@ -69,9 +67,8 @@ PlayerBioCard.propTypes = {
     name: PropTypes.string,
     club: PropTypes.string,
     clubLogo: PropTypes.string,
-    dateOfBirth: PropTypes.string,
     age: PropTypes.number,
-    country:  PropTypes.string,
+    country: PropTypes.string,
     countryLogo: PropTypes.string,
     photo: PropTypes.string
 };
