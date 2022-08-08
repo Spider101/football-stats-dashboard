@@ -10,10 +10,12 @@ import { playerAttributes } from '../constants';
 
 it('renders single player view successfully', () => {
     // setup
-    const { basePlayer: { playerMetadata } } = SinglePlayerView.args;
+    const {
+        basePlayer: { playerMetadata }
+    } = SinglePlayerView.args;
 
     // execute
-    render(<SinglePlayerView {...SinglePlayerView.args}/>);
+    render(<SinglePlayerView {...SinglePlayerView.args} />);
     const images = screen.getAllByRole('img');
     const chartTabs = screen.getAllByRole('tab');
     const chartTabNames = chartTabs.map(chartTab => chartTab.textContent.trim());
@@ -26,6 +28,7 @@ it('renders single player view successfully', () => {
     // two avatar images for club and country logo
     expect(images.length).toBe(2);
     expect(images.some(image => image.src === playerMetadata.countryLogo)).toBeTruthy();
+    // clubLogo is a filekey so the image src would contain it instead of a hard equals
     expect(images.some(image => image.src.includes(playerMetadata.clubLogo))).toBeTruthy();
 
     expect(chartTabs.length).toBe(2);
@@ -37,10 +40,12 @@ it('renders single player view successfully', () => {
 
 it('renders player comparison view successfully', () => {
     // setup
-    const { comparedPlayer: { playerMetadata } } = PlayerComparisonView.args;
+    const {
+        comparedPlayer: { playerMetadata }
+    } = PlayerComparisonView.args;
 
     // execute
-    render(<PlayerComparisonView {...PlayerComparisonView.args}/>);
+    render(<PlayerComparisonView {...PlayerComparisonView.args} />);
     const images = screen.getAllByRole('img');
 
     // assert
@@ -52,6 +57,7 @@ it('renders player comparison view successfully', () => {
     expect(images.length).toBe(4);
     // already asserted that the base player's logos are present so just assert the compared player's data here
     expect(images.some(image => image.src === playerMetadata.countryLogo)).toBeTruthy();
+    // clubLogo is a filekey so the image src would contain it instead of a hard equals
     expect(images.some(image => image.src.includes(playerMetadata.clubLogo))).toBeTruthy();
 
     // player filter is replaced by the bio card of the player being compared
