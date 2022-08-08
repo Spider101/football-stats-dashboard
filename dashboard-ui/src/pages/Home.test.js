@@ -14,7 +14,7 @@ it('should render view with club data fetched from backend', async () => {
                 <AuthContextProvider>
                     <Home />
                 </AuthContextProvider>
-            )}
+            )},
         </MemoryRouter>
     );
 
