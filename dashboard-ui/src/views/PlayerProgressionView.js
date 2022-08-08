@@ -10,7 +10,7 @@ import { transformIntoTabularData } from '../utils';
 
 const getGrowthIndicator = history => {
     const value = history[history.length - 1];
-    const penultimateValue = history[history.length - 2];
+    const penultimateValue = history.length === 1 ? value : history[history.length - 2];
     if (value > penultimateValue) {
         return 'up';
     } else if (value < penultimateValue) {

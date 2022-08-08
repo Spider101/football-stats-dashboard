@@ -13,7 +13,7 @@ import PlayerComparisonView from '../views/PlayerComparisonView';
 import FilterControl from '../components/FilterControl';
 import StyledLoadingCircle from '../components/StyledLoadingCircle';
 
-import useSquadHub from '../hooks/useSquadHubData';
+import useSquadHubData from '../hooks/useSquadHubData';
 import usePlayerData from '../hooks/usePlayerData';
 import usePlayerPerfData from '../hooks/usePlayerPerfData';
 import { queryKeys } from '../constants';
@@ -124,17 +124,24 @@ const PlayerPerformanceContainer = ({ playerId }) => {
 const PlayerComparisonContainer = ({ playerId }) => {
     const [comparedPlayerId, setCurrentPlayerId] = useState(-1);
 
-    const handlePlayerChange = (event) => {
+    const handlePlayerChange = event => {
         setCurrentPlayerId(event.target.value);
     };
 
-    const squadDataQuery = useSquadHub();
+    const squadDataQuery = useSquadHubData();
+
+    // fetch the data for the current player (from cache or server) to be passed into the player comparison view
+    const basePlayerDataQuery = usePlayerData(queryKeys.PLAYER_DATA, playerId);
+
+    // fetch the data for the player to be compared against
+    const { data: comparedPlayer } = usePlayerData(queryKeys.COMPARED_PLAYER_DATA, comparedPlayerId);
 
     if (squadDataQuery.isLoading || basePlayerDataQuery.isLoading) {
         return <StyledLoadingCircle />;
     }
 
-    const squadPlayers = squadDataQuery.data.filter(d => d.playerId !== playerId)
+    const squadPlayers = squadDataQuery.data
+        .filter(d => d.playerId !== playerId)
         .map(d => ({ id: d.playerId, text: d.name }));
 
     const filterControlProps = {
@@ -145,20 +152,15 @@ const PlayerComparisonContainer = ({ playerId }) => {
         inputLabelText: 'players',
         helperText: 'Choose player to compare against'
     };
-    const filterControl = <FilterControl { ...filterControlProps } />;
+    const filterControl = <FilterControl {...filterControlProps} />;
 
-    // fetch the data for the player to be compared against
-    const { data: comparedPlayer } = usePlayerData(queryKeys.COMPARED_PLAYER_DATA, comparedPlayerId);
-
-    // fetch the data for the current player (from cache or server) to be passed into the player comparison view
-    const basePlayerDataQuery = usePlayerData(queryKeys.PLAYER_DATA, playerId);
     const playerComparisonViewData = {
         basePlayer: basePlayerDataQuery.data,
         comparedPlayer,
         filterControl
     };
 
-    return <PlayerComparisonView { ...playerComparisonViewData } />;
+    return <PlayerComparisonView {...playerComparisonViewData} />;
 };
 
 PlayerProgressionContainer.propTypes = {

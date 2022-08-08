@@ -159,7 +159,7 @@ export const getPlayerMetadata = () => ({
     club: faker.company.companyName(),
     country: faker.address.country(),
     photo: `${faker.image.people()}?random=${faker.datatype.number(20)}`,
-    clubLogo: `${faker.image.abstract()}?random=${faker.datatype.number(20)}`,
+    clubLogo: faker.system.fileName(),
     countryLogo: `${faker.image.avatar()}?random=${faker.datatype.number(20)}`,
     age:  faker.datatype.number({ min: 16, max: 35 })
 });
