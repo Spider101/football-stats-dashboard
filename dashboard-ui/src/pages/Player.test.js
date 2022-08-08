@@ -58,7 +58,6 @@ it('should render player comparison view when navigating to /compare page', asyn
     userEvent.click(playerComparisonLink);
     const chartTabs = await screen.findAllByRole('tab');
     const chartTabNames = chartTabs.map(chartTab => chartTab.textContent.trim());
-    userEvent.click(screen.getByRole('button', { name: 'Players' }));
 
     // assert
     expect(playerComparisonLink.className).toContain('selectedPage');
