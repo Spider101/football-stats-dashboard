@@ -26,7 +26,7 @@ it('renders single player view successfully', () => {
     // two avatar images for club and country logo
     expect(images.length).toBe(2);
     expect(images.some(image => image.src === playerMetadata.countryLogo)).toBeTruthy();
-    expect(images.some(image => image.src === playerMetadata.clubLogo)).toBeTruthy();
+    expect(images.some(image => image.src.includes(playerMetadata.clubLogo))).toBeTruthy();
 
     expect(chartTabs.length).toBe(2);
     expect(chartTabNames.sort()).toEqual(['Overview', 'Attributes'].sort());
@@ -50,8 +50,9 @@ it('renders player comparison view successfully', () => {
 
     // 4 avatar images (2 each for compared and base player) for club and country logo
     expect(images.length).toBe(4);
+    // already asserted that the base player's logos are present so just assert the compared player's data here
     expect(images.some(image => image.src === playerMetadata.countryLogo)).toBeTruthy();
-    expect(images.some(image => image.src === playerMetadata.clubLogo)).toBeTruthy();
+    expect(images.some(image => image.src.includes(playerMetadata.clubLogo))).toBeTruthy();
 
     // player filter is replaced by the bio card of the player being compared
     // so verify the filter is not present anymore

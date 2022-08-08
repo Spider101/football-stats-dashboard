@@ -28,7 +28,8 @@ it('renders successfully', () => {
     // two avatar images for club and country logo
     expect(images.length).toBe(2);
     expect(images.some(image => image.src === playerMetadata.countryLogo)).toBeTruthy();
-    expect(images.some(image => image.src === playerMetadata.clubLogo)).toBeTruthy();
+    // clubLogo is a filekey so the image src would contain it instead of a hard equals
+    expect(images.some(image => image.src.includes(playerMetadata.clubLogo))).toBeTruthy();
 
     expect(attributeTableColumnNames.length).toBe(3);
     expect(attributeTableColumnNames.sort()).toEqual(playerAttributes.CATEGORIES.sort());
