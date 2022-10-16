@@ -78,8 +78,8 @@ public class DAOFactory {
 
     public IUserEntityDAO getUserEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new UserCouchbaseDAO(new UserKeyProvider(), this.couchbaseCluster, this.couchbaseBucket,
-                    this.couchbaseBucket.name());
+            return new UserCouchbaseDAO(new UserKeyProvider(), () -> this.clusterContainer.getCluster(),
+                    () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new UserJdbiDAO(this.jdbi);
         }
@@ -87,8 +87,8 @@ public class DAOFactory {
 
     public IAuthTokenEntityDAO getAuthTokenEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new AuthTokenCouchbaseDAO(new AuthTokenKeyProvider(), this.couchbaseCluster, this.couchbaseBucket,
-                    this.couchbaseBucket.name());
+            return new AuthTokenCouchbaseDAO(new AuthTokenKeyProvider(), () -> this.clusterContainer.getCluster(),
+                    () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new AuthTokenJdbiDAO(this.jdbi);
         }
@@ -96,8 +96,8 @@ public class DAOFactory {
 
     public IClubEntityDAO getClubEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new ClubCouchbaseDAO(new ClubKeyProvider(), this.couchbaseCluster, this.couchbaseBucket,
-                    this.couchbaseBucket.name());
+            return new ClubCouchbaseDAO(new ClubKeyProvider(), () -> this.clusterContainer.getCluster(),
+                    () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new ClubJdbiDAO(jdbi);
         }
@@ -105,7 +105,8 @@ public class DAOFactory {
 
     public IPlayerEntityDAO getPlayerEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new PlayerCouchbaseDAO(new PlayerKeyProvider(), this.couchbaseBucket);
+            return new PlayerCouchbaseDAO(new PlayerKeyProvider(), () -> this.clusterContainer.getCluster(),
+                    () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new PlayerJdbiDAO(jdbi);
         }
@@ -113,8 +114,8 @@ public class DAOFactory {
 
     public IMatchPerformanceEntityDAO getMatchPerformanceEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new MatchPerformanceCouchbaseDAO(new MatchPerformanceKeyProvider(), this.couchbaseCluster,
-                    this.couchbaseBucket, this.couchbaseBucket.name());
+            return new MatchPerformanceCouchbaseDAO(new MatchPerformanceKeyProvider(),
+                    () -> this.clusterContainer.getCluster(), () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new MatchPerformanceJdbiDAO(jdbi);
         }
