@@ -64,27 +64,17 @@ public class AuthTokenCouchbaseDAO extends CouchbaseDAO implements IAuthTokenEnt
     }
 
     public Optional<AuthToken> getAuthTokenForUser(UUID userId) {
-        String query = String.format("SELECT *, META(authToken).cas AS cas FROM `%s` AS authToken " +
-                "WHERE userId = $userId", this.getCouchbaseBucket().name());
+        String query = String.format("SELECT authToken.* FROM `%s` AS authToken WHERE userId = $userId",
+                this.getCouchbaseBucket().name());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("userId", userId.toString())
         );
 
         QueryResult queryResult = this.getCouchbaseCluster().query(query, queryOptions);
-        // TODO: 18/03/22 figure out why we can't directly convert the query result to auth token
         List<AuthToken> authTokens = queryResult.rowsAs(AuthToken.class);
         if (authTokens.size() == 1) {
             return Optional.of(authTokens.get(0));
         }
-//        List<JsonObject> authTokenEntities = queryResult.rowsAsObject();
-//
-//        if (authTokenEntities.size() == 1) {
-//            JsonObject authTokenEntity = authTokenEntities.iterator().next();
-//            Map<String, Object> authTokenMap = authTokenEntity.getObject("authToken").toMap();
-//            AuthToken authToken = objectMapper.convertValue(authTokenMap, AuthToken.class);
-//
-//            return Optional.of(authToken);
-//        }
 
         // TODO: 02/05/21 figure out how to handle query result returning more than one auth token for a given user id
         return Optional.empty();
