@@ -1,7 +1,5 @@
 package com.footballstatsdashboard.db;
 
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
 import com.footballstatsdashboard.FootballDashboardConfiguration;
 import com.footballstatsdashboard.api.model.AuthToken;
 import com.footballstatsdashboard.api.model.Club;
@@ -45,9 +43,8 @@ import static com.footballstatsdashboard.core.utils.Constants.APPLICATION_NAME;
 public class DAOFactory {
     private final FootballDashboardConfiguration configuration;
     private final Environment environment;
-
-    private Cluster couchbaseCluster;
-    private Bucket couchbaseBucket;
+    private CouchbaseClientManager.ClusterContainer clusterContainer;
+    private CouchbaseClientManager.BucketContainer bucketContainer;
     private Jdbi jdbi;
 
     public DAOFactory(FootballDashboardConfiguration configuration, Environment environment) {
@@ -67,8 +64,8 @@ public class DAOFactory {
             String clusterName = clusterConfig.entrySet().iterator().next().getKey();
             String bucketName = clusterConfig.get(clusterName).getBuckets().iterator().next();
 
-            this.couchbaseCluster = couchbaseClientManager.getClusterContainer(clusterName).getCluster();
-            this.couchbaseBucket = couchbaseClientManager.getBucketContainer(clusterName, bucketName).getBucket();
+            this.clusterContainer = couchbaseClientManager.getClusterContainer(clusterName);
+            this.bucketContainer = couchbaseClientManager.getBucketContainer(clusterName, bucketName);
         } else {
             JdbiFactory factory = new JdbiFactory();
             this.jdbi = factory.build(this.environment, this.configuration.getDatabase(), "h2");
