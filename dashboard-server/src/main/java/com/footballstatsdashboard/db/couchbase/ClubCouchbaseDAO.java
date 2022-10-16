@@ -81,12 +81,10 @@ public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
 
     @Override
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
-        String query = "Select club.id as clubId, club.name, club.logo, club.createdDate from $bucketName club" +
-                " where club.type = 'Club' and club.userId = $userId";
+        String query = String.format("SELECT club.id AS clubId, club.name, club.logo, club.createdDate FROM `%s` club" +
+                " WHERE club.type = 'Club' AND club.userId = $userId", this.getCouchbaseBucket().name());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
-                JsonObject.create()
-                        .put("bucketName", this.getCouchbaseBucket().name())
-                        .put("userId", userId.toString())
+                JsonObject.create().put("userId", userId.toString())
         );
         QueryResult queryResult = this.getCouchbaseCluster().query(query, queryOptions);
         return queryResult.rowsAs(ClubSummary.class);
@@ -94,17 +92,16 @@ public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
 
     @Override
     public List<SquadPlayer> getPlayersInClub(UUID clubId) {
-        String query = "Select player.metadata.name, player.metadata.country, player.id," +
-                " player.metadata.countryLogo as countryFlag, player.ability.`current` as currentAbility," +
-                " player.roles, matchPerformance.matchRating.history as matchRatingHistory" +
-                " from $bucketName player left join $bucketName matchPerformance" +
-                "on player.id = matchPerformance.playerId" +
-                " where player.type = 'Player' and player.clubId = $clubId";
+        String query = String.format("SELECT player.metadata.name, player.metadata.country, player.id," +
+                " player.metadata.countryLogo AS countryFlag, player.ability.`current` AS currentAbility," +
+                " player.roles, matchPerformance.matchRating.history AS matchRatingHistory" +
+                " FROM `%s` player LEFT JOIN `%s` matchPerformance" +
+                " ON player.id = matchPerformance.playerId" +
+                " WHERE player.type = 'Player' AND player.clubId = $clubId",
+                this.getCouchbaseBucket().name(), this.getCouchbaseBucket().name());
 
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
-                JsonObject.create()
-                        .put("clubId", clubId.toString())
-                        .put("bucketName", this.getCouchbaseBucket().name())
+                JsonObject.create().put("clubId", clubId.toString())
         );
         QueryResult queryResult = this.getCouchbaseCluster().query(query, queryOptions);
         List<JsonObject> resultRows = queryResult.rowsAsObject();

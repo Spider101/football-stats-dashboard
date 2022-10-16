@@ -63,12 +63,11 @@ public class MatchPerformanceCouchbaseDAO extends CouchbaseDAO implements IMatch
     }
 
     public List<MatchPerformance> getMatchPerformanceOfPlayerInCompetition(UUID playerId, UUID competitionId) {
-        String query = "Select matchPerformance.* from $bucketName matchPerformance" +
-                " where playerId = $playerId and competitionId = $competitionId";
+        String query = String.format("SELECT matchPerformance.* FROM `%s` matchPerformance" +
+                " WHERE playerId = $playerId AND competitionId = $competitionId", this.getCouchbaseBucket().name());
 
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create()
-                        .put("bucketName", this.getCouchbaseBucket().name())
                         .put("playerId", playerId.toString())
                         .put("competitionId", competitionId.toString())
         );

@@ -64,12 +64,10 @@ public class AuthTokenCouchbaseDAO extends CouchbaseDAO implements IAuthTokenEnt
     }
 
     public Optional<AuthToken> getAuthTokenForUser(UUID userId) {
-        String query = "SELECT *, META(authToken).cas AS cas FROM $bucketName AS authToken " +
-                "where userId = $userId";
+        String query = String.format("SELECT *, META(authToken).cas AS cas FROM `%s` AS authToken " +
+                "WHERE userId = $userId", this.getCouchbaseBucket().name());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
-                JsonObject.create()
-                        .put("bucketName", this.getCouchbaseBucket().name())
-                        .put("userId", userId.toString())
+                JsonObject.create().put("userId", userId.toString())
         );
 
         QueryResult queryResult = this.getCouchbaseCluster().query(query, queryOptions);

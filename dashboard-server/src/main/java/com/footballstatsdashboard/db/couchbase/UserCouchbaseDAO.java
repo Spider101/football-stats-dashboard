@@ -64,11 +64,10 @@ public class UserCouchbaseDAO extends CouchbaseDAO implements IUserEntityDAO {
     }
 
     public List<User> getExistingUsers(String firstName, String lastName, String emailAddress) {
-        String query = "SELECT b.* FROM $bucketName AS b WHERE firstName = $firstName AND lastName = $lastName"
-                + "AND email = $email";
+        String query = String.format("SELECT b.* FROM `%s` AS b WHERE firstName = $firstName AND lastName = $lastName"
+                + " AND email = $email", this.getCouchbaseBucket().name());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create()
-                        .put("bucketName", this.getCouchbaseBucket().name())
                         .put("firstName", firstName)
                         .put("lastName", lastName)
                         .put("email", emailAddress)
@@ -78,11 +77,10 @@ public class UserCouchbaseDAO extends CouchbaseDAO implements IUserEntityDAO {
     }
 
     public Optional<User> getUserByEmailAddress(String emailAddress) {
-        String query = "SELECT b.* FROM $bucketName AS b WHERE email = $email";
+        String query = String.format("SELECT b.* FROM `%s` AS b WHERE email = $email",
+                this.getCouchbaseBucket().name());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
-                JsonObject.create()
-                        .put("bucketName", this.getCouchbaseBucket().name())
-                        .put("email", emailAddress)
+                JsonObject.create().put("email", emailAddress)
         );
 
         QueryResult queryResult = this.getCouchbaseCluster().query(query, queryOptions);
