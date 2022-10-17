@@ -1,7 +1,5 @@
 package com.footballstatsdashboard.db;
 
-import com.couchbase.client.java.Bucket;
-import com.couchbase.client.java.Cluster;
 import com.footballstatsdashboard.FootballDashboardConfiguration;
 import com.footballstatsdashboard.api.model.AuthToken;
 import com.footballstatsdashboard.api.model.Club;
@@ -45,9 +43,8 @@ import static com.footballstatsdashboard.core.utils.Constants.APPLICATION_NAME;
 public class DAOFactory {
     private final FootballDashboardConfiguration configuration;
     private final Environment environment;
-
-    private Cluster couchbaseCluster;
-    private Bucket couchbaseBucket;
+    private CouchbaseClientManager.ClusterContainer clusterContainer;
+    private CouchbaseClientManager.BucketContainer bucketContainer;
     private Jdbi jdbi;
 
     public DAOFactory(FootballDashboardConfiguration configuration, Environment environment) {
@@ -67,8 +64,8 @@ public class DAOFactory {
             String clusterName = clusterConfig.entrySet().iterator().next().getKey();
             String bucketName = clusterConfig.get(clusterName).getBuckets().iterator().next();
 
-            this.couchbaseCluster = couchbaseClientManager.getClusterContainer(clusterName).getCluster();
-            this.couchbaseBucket = couchbaseClientManager.getBucketContainer(clusterName, bucketName).getBucket();
+            this.clusterContainer = couchbaseClientManager.getClusterContainer(clusterName);
+            this.bucketContainer = couchbaseClientManager.getBucketContainer(clusterName, bucketName);
         } else {
             JdbiFactory factory = new JdbiFactory();
             this.jdbi = factory.build(this.environment, this.configuration.getDatabase(), "h2");
@@ -81,8 +78,8 @@ public class DAOFactory {
 
     public IUserEntityDAO getUserEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new UserCouchbaseDAO(new UserKeyProvider(), this.couchbaseCluster, this.couchbaseBucket,
-                    this.couchbaseBucket.name());
+            return new UserCouchbaseDAO(new UserKeyProvider(), () -> this.clusterContainer.getCluster(),
+                    () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new UserJdbiDAO(this.jdbi);
         }
@@ -90,8 +87,8 @@ public class DAOFactory {
 
     public IAuthTokenEntityDAO getAuthTokenEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new AuthTokenCouchbaseDAO(new AuthTokenKeyProvider(), this.couchbaseCluster, this.couchbaseBucket,
-                    this.couchbaseBucket.name());
+            return new AuthTokenCouchbaseDAO(new AuthTokenKeyProvider(), () -> this.clusterContainer.getCluster(),
+                    () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new AuthTokenJdbiDAO(this.jdbi);
         }
@@ -99,8 +96,8 @@ public class DAOFactory {
 
     public IClubEntityDAO getClubEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new ClubCouchbaseDAO(new ClubKeyProvider(), this.couchbaseCluster, this.couchbaseBucket,
-                    this.couchbaseBucket.name());
+            return new ClubCouchbaseDAO(new ClubKeyProvider(), () -> this.clusterContainer.getCluster(),
+                    () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new ClubJdbiDAO(jdbi);
         }
@@ -108,7 +105,8 @@ public class DAOFactory {
 
     public IPlayerEntityDAO getPlayerEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new PlayerCouchbaseDAO(new PlayerKeyProvider(), this.couchbaseBucket);
+            return new PlayerCouchbaseDAO(new PlayerKeyProvider(), () -> this.clusterContainer.getCluster(),
+                    () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new PlayerJdbiDAO(jdbi);
         }
@@ -116,8 +114,8 @@ public class DAOFactory {
 
     public IMatchPerformanceEntityDAO getMatchPerformanceEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            return new MatchPerformanceCouchbaseDAO(new MatchPerformanceKeyProvider(), this.couchbaseCluster,
-                    this.couchbaseBucket, this.couchbaseBucket.name());
+            return new MatchPerformanceCouchbaseDAO(new MatchPerformanceKeyProvider(),
+                    () -> this.clusterContainer.getCluster(), () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new MatchPerformanceJdbiDAO(jdbi);
         }

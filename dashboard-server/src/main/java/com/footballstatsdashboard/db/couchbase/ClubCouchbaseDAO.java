@@ -15,35 +15,32 @@ import com.footballstatsdashboard.api.model.club.SquadPlayer;
 import com.footballstatsdashboard.db.IClubEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
 import com.footballstatsdashboard.db.key.ResourceKey;
+import io.dropwizard.setup.Environment;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class ClubCouchbaseDAO implements IClubEntityDAO {
+public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
     private final CouchbaseKeyProvider<ResourceKey> keyProvider;
-    private final Cluster cluster;
-    private final Bucket bucket;
-    private final String bucketName;
     private static final int MATCH_LIMIT_FOR_FORM = 5;
 
     public ClubCouchbaseDAO(CouchbaseKeyProvider<ResourceKey> keyProvider,
-                            Cluster couchbaseCluster, Bucket couchbaseBucket,
-                            String bucketName) {
-
+                            Supplier<Cluster> clusterSupplier,
+                            Supplier<Bucket> bucketSupplier,
+                            Environment environment) {
+        super(clusterSupplier, bucketSupplier, environment);
         this.keyProvider = keyProvider;
-        this.cluster = couchbaseCluster;
-        this.bucket = couchbaseBucket;
-        this.bucketName = bucketName;
     }
 
     @Override
     public void insertEntity(Club entity) {
         ResourceKey key = new ResourceKey(entity.getId());
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        this.bucket.defaultCollection().insert(documentKey, entity);
+        this.getCouchbaseBucket().defaultCollection().insert(documentKey, entity);
     }
 
     @Override
@@ -51,7 +48,7 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         try {
-            GetResult result = this.bucket.defaultCollection().get(documentKey);
+            GetResult result = this.getCouchbaseBucket().defaultCollection().get(documentKey);
             return result.contentAs(Club.class);
         } catch (DocumentNotFoundException documentNotFoundException) {
             throw new EntityNotFoundException(documentNotFoundException.getMessage());
@@ -62,7 +59,7 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
     public void updateEntity(UUID existingEntityId, Club updatedEntity) {
         ResourceKey key = new ResourceKey(existingEntityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        this.bucket.defaultCollection().replace(documentKey, updatedEntity);
+        this.getCouchbaseBucket().defaultCollection().replace(documentKey, updatedEntity);
     }
 
     @Override
@@ -70,7 +67,7 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
         try {
-            this.bucket.defaultCollection().remove(documentKey);
+            this.getCouchbaseBucket().defaultCollection().remove(documentKey);
         } catch (DocumentNotFoundException documentNotFoundException) {
             throw new EntityNotFoundException(documentNotFoundException.getMessage());
         }
@@ -84,32 +81,29 @@ public class ClubCouchbaseDAO implements IClubEntityDAO {
 
     @Override
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
-        String query = "Select club.id as clubId, club.name, club.logo, club.createdDate from $bucketName club" +
-                " where club.type = 'Club' and club.userId = $userId";
+        String query = String.format("SELECT club.id AS clubId, club.name, club.logo, club.createdDate FROM `%s` club" +
+                " WHERE club.type = 'Club' AND club.userId = $userId", this.getCouchbaseBucket().name());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
-                JsonObject.create()
-                        .put("bucketName", this.bucketName)
-                        .put("userId", userId.toString())
+                JsonObject.create().put("userId", userId.toString())
         );
-        QueryResult queryResult = this.cluster.query(query, queryOptions);
+        QueryResult queryResult = this.getCouchbaseCluster().query(query, queryOptions);
         return queryResult.rowsAs(ClubSummary.class);
     }
 
     @Override
     public List<SquadPlayer> getPlayersInClub(UUID clubId) {
-        String query = "Select player.metadata.name, player.metadata.country, player.id," +
-                " player.metadata.countryLogo as countryFlag, player.ability.`current` as currentAbility," +
-                " player.roles, matchPerformance.matchRating.history as matchRatingHistory" +
-                " from $bucketName player left join $bucketName matchPerformance" +
-                "on player.id = matchPerformance.playerId" +
-                " where player.type = 'Player' and player.clubId = $clubId";
+        String query = String.format("SELECT player.metadata.name, player.metadata.country, player.id," +
+                " player.metadata.countryLogo AS countryFlag, player.ability.`current` AS currentAbility," +
+                " player.roles, matchPerformance.matchRating.history AS matchRatingHistory" +
+                " FROM `%s` player LEFT JOIN `%s` matchPerformance" +
+                " ON player.id = matchPerformance.playerId" +
+                " WHERE player.type = 'Player' AND player.clubId = $clubId",
+                this.getCouchbaseBucket().name(), this.getCouchbaseBucket().name());
 
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
-                JsonObject.create()
-                        .put("clubId", clubId.toString())
-                        .put("bucketName", this.bucketName)
+                JsonObject.create().put("clubId", clubId.toString())
         );
-        QueryResult queryResult = this.cluster.query(query, queryOptions);
+        QueryResult queryResult = this.getCouchbaseCluster().query(query, queryOptions);
         List<JsonObject> resultRows = queryResult.rowsAsObject();
 
         return resultRows.stream().map(row -> {
