@@ -5,6 +5,7 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.kv.ExistsResult;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.LookupInResult;
 import com.couchbase.client.java.query.QueryOptions;
@@ -81,15 +82,31 @@ public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
     public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        LookupInResult lookupInResult = this.getCouchbaseBucket().defaultCollection()
-                .lookupIn(documentKey, Collections.singletonList(get("userId")));
+        LookupInResult lookupInResult;
+
+        try {
+            lookupInResult = this.getCouchbaseBucket().defaultCollection()
+                    .lookupIn(documentKey, Collections.singletonList(get("userId")));
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            throw new EntityNotFoundException(documentNotFoundException.getMessage());
+        }
+
         UUID userIdAssociatedWithClub = lookupInResult.contentAs(0, UUID.class);
         return userIdAssociatedWithClub.equals(userId);
     }
 
     @Override
+    public boolean doesEntityExist(UUID entityId) {
+        ResourceKey key = new ResourceKey(entityId);
+        String documentKey = this.keyProvider.getCouchbaseKey(key);
+        ExistsResult result = this.getCouchbaseBucket().defaultCollection().exists(documentKey);
+        return result.exists();
+    }
+
+    @Override
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
-        String query = String.format("SELECT club.id AS clubId, club.name, club.logo, club.createdDate FROM `%s` club" +
+        String query = String.format("SELECT club.id AS clubId, club.name, club.logo, club.createdDate" +
+                " FROM `%s` AS club" +
                 " WHERE club.type = 'Club' AND club.userId = $userId", this.getCouchbaseBucket().name());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("userId", userId.toString())
