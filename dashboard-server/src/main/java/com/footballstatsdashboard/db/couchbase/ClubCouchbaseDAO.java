@@ -5,6 +5,7 @@ import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.kv.ExistsResult;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.kv.LookupInResult;
 import com.couchbase.client.java.query.QueryOptions;
@@ -89,7 +90,10 @@ public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
 
     @Override
     public boolean doesEntityExist(UUID entityId) {
-        return false;
+        ResourceKey key = new ResourceKey(entityId);
+        String documentKey = this.keyProvider.getCouchbaseKey(key);
+        ExistsResult result = this.getCouchbaseBucket().defaultCollection().exists(documentKey);
+        return result.exists();
     }
 
     @Override

@@ -96,7 +96,7 @@ public class ClubJdbiDAO implements IClubEntityDAO {
 
     @Override
     public boolean doesEntityExist(UUID entityId) {
-        return false;
+        return this.clubDAO.findById(entityId.toString()).isPresent();
     }
 
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
