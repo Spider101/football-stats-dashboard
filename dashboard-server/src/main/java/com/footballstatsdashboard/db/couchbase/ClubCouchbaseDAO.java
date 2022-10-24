@@ -6,6 +6,7 @@ import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonArray;
 import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
+import com.couchbase.client.java.kv.LookupInResult;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
 import com.footballstatsdashboard.api.model.Club;
@@ -19,10 +20,13 @@ import io.dropwizard.setup.Environment;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import static com.couchbase.client.java.kv.LookupInSpec.get;
 
 public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
     private final CouchbaseKeyProvider<ResourceKey> keyProvider;
@@ -75,8 +79,12 @@ public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
 
     @Override
     public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
-        // TODO: 02/05/22 implement this when couchbase server is ready
-        return false;
+        ResourceKey key = new ResourceKey(entityId);
+        String documentKey = this.keyProvider.getCouchbaseKey(key);
+        LookupInResult lookupInResult = this.getCouchbaseBucket().defaultCollection()
+                .lookupIn(documentKey, Collections.singletonList(get("userId")));
+        UUID userIdAssociatedWithClub = lookupInResult.contentAs(0, UUID.class);
+        return userIdAssociatedWithClub.equals(userId);
     }
 
     @Override

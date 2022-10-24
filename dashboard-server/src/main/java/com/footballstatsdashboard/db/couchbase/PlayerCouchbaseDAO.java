@@ -3,7 +3,10 @@ package com.footballstatsdashboard.db.couchbase;
 import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
+import com.couchbase.client.java.json.JsonObject;
 import com.couchbase.client.java.kv.GetResult;
+import com.couchbase.client.java.query.QueryOptions;
+import com.couchbase.client.java.query.QueryResult;
 import com.footballstatsdashboard.api.model.Player;
 import com.footballstatsdashboard.db.IPlayerEntityDAO;
 import com.footballstatsdashboard.db.key.CouchbaseKeyProvider;
@@ -11,6 +14,7 @@ import com.footballstatsdashboard.db.key.ResourceKey;
 import io.dropwizard.setup.Environment;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -60,7 +64,24 @@ public class PlayerCouchbaseDAO extends CouchbaseDAO implements IPlayerEntityDAO
 
     @Override
     public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
-        // TODO: 02/05/22 implement this when the couchbase server is ready
+        String bucketName = this.getCouchbaseBucket().name();
+        String query = String.format("SELECT club.userId FROM `%s` AS player JOIN `%s` AS club" +
+                        " ON player.clubId = club.id" +
+                        " WHERE club.type = 'Club' AND player.id = $playerId", bucketName, bucketName);
+
+        QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
+                JsonObject.create().put("playerId", entityId.toString())
+        );
+        QueryResult queryResult = this.getCouchbaseCluster().query(query, queryOptions);
+        List<JsonObject> resultRows = queryResult.rowsAsObject();
+
+        if (resultRows.size() == 1) {
+            UUID userIdAssociatedWithPlayer = UUID.fromString(resultRows.get(0).getString("userId"));
+            return userIdAssociatedWithPlayer.equals(userId);
+        }
+
+        // TODO: 30/04/21 figure out a way to handle query result having more than one userId
+        //  (bad state; should not happen)
         return false;
     }
 
