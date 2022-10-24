@@ -88,6 +88,11 @@ public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
     }
 
     @Override
+    public boolean doesEntityExist(UUID entityId) {
+        return false;
+    }
+
+    @Override
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
         String query = String.format("SELECT club.id AS clubId, club.name, club.logo, club.createdDate FROM `%s` club" +
                 " WHERE club.type = 'Club' AND club.userId = $userId", this.getCouchbaseBucket().name());

@@ -11,4 +11,5 @@ public interface IClubEntityDAO extends IEntityDAO<Club> {
     List<ClubSummary> getClubSummariesForUser(UUID userId);
     List<SquadPlayer> getPlayersInClub(UUID clubId);
     boolean doesEntityBelongToUser(UUID entityId, UUID userId);
+    boolean doesEntityExist(UUID entityId);
 }
