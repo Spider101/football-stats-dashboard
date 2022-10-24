@@ -634,14 +634,14 @@ public class ClubServiceTest {
     }
 
     /**
-     * given an invalid club id, tests that the NoResultException thrown by the DAO layer is handled and
+     * given an invalid club id, tests that the EntityNotFoundException thrown by the DAO layer is handled and
      * ServiceException is thrown instead
      */
     @Test
     public void deleteClubWhenClubDataDoesNotExist() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.doesEntityBelongToUser(eq(invalidClubId), eq(userId))).thenThrow(NoResultException.class);
+        when(clubDAO.doesEntityBelongToUser(eq(invalidClubId), eq(userId))).thenThrow(EntityNotFoundException.class);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,

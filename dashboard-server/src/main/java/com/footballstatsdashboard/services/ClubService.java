@@ -41,7 +41,7 @@ public class ClubService {
     public boolean doesClubBelongToUser(UUID clubId, UUID authorizedUserId) {
         try {
             return this.clubDAO.doesEntityBelongToUser(clubId, authorizedUserId);
-        } catch (NoResultException noResultException) {
+        } catch (EntityNotFoundException entityNotFoundException) {
             String errorMessage = String.format("No club entity found for ID: %s", clubId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);

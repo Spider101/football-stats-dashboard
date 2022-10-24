@@ -88,9 +88,11 @@ public class ClubJdbiDAO implements IClubEntityDAO {
 
     @Override
     public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        // since this is a simple look-up, inability to fetch the userId is only possible if the entity doesn't exist
+        // hence the EntityNotFoundException instead of the NoResultException
         return this.clubDAO.findUserIdAssociatedWithClub(entityId.toString())
                 .map(userIdAssociatedWithClub -> userIdAssociatedWithClub.equals(userId.toString()))
-                .orElseThrow(NoResultException::new);
+                .orElseThrow(EntityNotFoundException::new);
     }
 
     public List<ClubSummary> getClubSummariesForUser(UUID userId) {
