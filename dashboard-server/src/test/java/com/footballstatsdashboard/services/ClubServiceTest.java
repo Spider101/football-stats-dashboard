@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -603,12 +602,14 @@ public class ClubServiceTest {
     public void deleteClubRemovesClubData() {
         // setup
         UUID clubId = UUID.randomUUID();
+        when(clubDAO.doesEntityExist(eq(clubId))).thenReturn(true);
         when(clubDAO.doesEntityBelongToUser(eq(clubId), eq(userId))).thenReturn(true);
 
         // execute
         clubService.deleteClub(clubId, userId);
 
         // assert
+        verify(clubDAO).doesEntityExist(any());
         verify(clubDAO).doesEntityBelongToUser(any(), any());
         verify(clubDAO).deleteEntity(eq(clubId));
     }
@@ -621,6 +622,7 @@ public class ClubServiceTest {
     public void deleteClubWhenClubDoesNotBelongToUser() {
         // setup
         UUID existingClubId = UUID.randomUUID();
+        when(clubDAO.doesEntityExist(eq(existingClubId))).thenReturn(true);
         when(clubDAO.doesEntityBelongToUser(eq(existingClubId), eq(userId))).thenReturn(false);
 
         // execute
@@ -628,6 +630,7 @@ public class ClubServiceTest {
                 () -> clubService.deleteClub(existingClubId, userId));
 
         // assert
+        verify(clubDAO).doesEntityExist(any());
         verify(clubDAO).doesEntityBelongToUser(any(), any());
         verify(clubDAO, never()).deleteEntity(any());
         assertEquals(HttpStatus.FORBIDDEN_403, serviceException.getResponseStatus());
@@ -641,14 +644,15 @@ public class ClubServiceTest {
     public void deleteClubWhenClubDataDoesNotExist() {
         // setup
         UUID invalidClubId = UUID.randomUUID();
-        when(clubDAO.doesEntityBelongToUser(eq(invalidClubId), eq(userId))).thenThrow(EntityNotFoundException.class);
+        when(clubDAO.doesEntityExist(eq(invalidClubId))).thenReturn(false);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
                 () -> clubService.deleteClub(invalidClubId, userId));
 
         // assert
-        verify(clubDAO).doesEntityBelongToUser(any(), any());
+        verify(clubDAO).doesEntityExist(any());
+        verify(clubDAO, never()).doesEntityBelongToUser(any(), any());
         verify(clubDAO, never()).deleteEntity(any());
         assertEquals(HttpStatus.NOT_FOUND_404, serviceException.getResponseStatus());
     }

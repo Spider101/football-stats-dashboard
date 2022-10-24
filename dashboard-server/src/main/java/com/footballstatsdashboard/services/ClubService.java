@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityNotFoundException;
-import javax.persistence.NoResultException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -142,6 +141,12 @@ public class ClubService {
     }
 
     public void deleteClub(UUID clubId, UUID authorizedUserId) {
+        if (!this.clubDAO.doesEntityExist(clubId)) {
+            String errorMessage = String.format("No club entity found for ID: %s", clubId);
+            LOGGER.error(errorMessage);
+            throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
+        }
+
         // ensure user has access to the club that is being requested to be deleted
         if (!this.doesClubBelongToUser(clubId, authorizedUserId)) {
             LOGGER.error("Club with ID: {} does not belong to user making request (ID: {})",
