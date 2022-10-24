@@ -82,8 +82,15 @@ public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
     public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
         ResourceKey key = new ResourceKey(entityId);
         String documentKey = this.keyProvider.getCouchbaseKey(key);
-        LookupInResult lookupInResult = this.getCouchbaseBucket().defaultCollection()
-                .lookupIn(documentKey, Collections.singletonList(get("userId")));
+        LookupInResult lookupInResult;
+
+        try {
+            lookupInResult = this.getCouchbaseBucket().defaultCollection()
+                    .lookupIn(documentKey, Collections.singletonList(get("userId")));
+        } catch (DocumentNotFoundException documentNotFoundException) {
+            throw new EntityNotFoundException(documentNotFoundException.getMessage());
+        }
+
         UUID userIdAssociatedWithClub = lookupInResult.contentAs(0, UUID.class);
         return userIdAssociatedWithClub.equals(userId);
     }
