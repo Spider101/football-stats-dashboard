@@ -64,10 +64,10 @@ public class PlayerCouchbaseDAO extends CouchbaseDAO implements IPlayerEntityDAO
 
     @Override
     public boolean doesEntityBelongToUser(UUID entityId, UUID userId) {
+        String bucketName = this.getCouchbaseBucket().name();
         String query = String.format("SELECT club.userId FROM `%s` AS player JOIN `%s` AS club" +
                         " ON player.clubId = club.id" +
-                        " WHERE club.type = 'Club' AND player.id = $playerId",
-                this.getCouchbaseBucket().name(), this.getCouchbaseBucket().name());
+                        " WHERE club.type = 'Club' AND player.id = $playerId", bucketName, bucketName);
 
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("playerId", entityId.toString())
