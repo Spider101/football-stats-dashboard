@@ -4,6 +4,7 @@ import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.json.JsonObject;
+import com.couchbase.client.java.kv.ExistsResult;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.query.QueryOptions;
 import com.couchbase.client.java.query.QueryResult;
@@ -87,7 +88,9 @@ public class PlayerCouchbaseDAO extends CouchbaseDAO implements IPlayerEntityDAO
 
     @Override
     public boolean doesEntityExist(UUID entityId) {
-        // TODO: 06/05/22 implement this when the couchbase server is ready
-        return false;
+        ResourceKey key = new ResourceKey(entityId);
+        String documentKey = this.keyProvider.getCouchbaseKey(key);
+        ExistsResult result = this.getCouchbaseBucket().defaultCollection().exists(documentKey);
+        return result.exists();
     }
 }
