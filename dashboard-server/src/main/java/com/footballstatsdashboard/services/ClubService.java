@@ -36,7 +36,6 @@ public class ClubService {
         this.clubDAO = clubDAO;
     }
 
-    // TODO: 1/22/2022 add some tests for this
     public boolean doesClubBelongToUser(UUID clubId, UUID authorizedUserId) {
         try {
             return this.clubDAO.doesEntityBelongToUser(clubId, authorizedUserId);
