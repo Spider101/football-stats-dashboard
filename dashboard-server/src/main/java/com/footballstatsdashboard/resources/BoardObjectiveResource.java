@@ -110,7 +110,7 @@ public class BoardObjectiveResource {
         }
 
         /*
-        verify that board objective id in the incoming request matches with the id in the existing data the board
+        verify that board objective id in the incoming request matches with the id in the existing data. The board
         objective ID in the path param can be considered a proxy for the corresponding entity stored in the database
         (assuming it exists)
         also match the club ID in the incoming request against the clubId in the path param
