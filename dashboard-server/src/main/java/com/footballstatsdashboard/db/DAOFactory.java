@@ -16,6 +16,7 @@ import com.footballstatsdashboard.api.model.player.Metadata;
 import com.footballstatsdashboard.client.couchbase.CouchbaseClientManager;
 import com.footballstatsdashboard.client.couchbase.config.ClusterConfiguration;
 import com.footballstatsdashboard.db.couchbase.AuthTokenCouchbaseDAO;
+import com.footballstatsdashboard.db.couchbase.BoardObjectiveCouchbaseDAO;
 import com.footballstatsdashboard.db.couchbase.ClubCouchbaseDAO;
 import com.footballstatsdashboard.db.couchbase.MatchPerformanceCouchbaseDAO;
 import com.footballstatsdashboard.db.couchbase.PlayerCouchbaseDAO;
@@ -27,6 +28,7 @@ import com.footballstatsdashboard.db.jdbi.MatchPerformanceJdbiDAO;
 import com.footballstatsdashboard.db.jdbi.PlayerJdbiDAO;
 import com.footballstatsdashboard.db.jdbi.UserJdbiDAO;
 import com.footballstatsdashboard.db.key.AuthTokenKeyProvider;
+import com.footballstatsdashboard.db.key.BoardObjectiveKeyProvider;
 import com.footballstatsdashboard.db.key.ClubKeyProvider;
 import com.footballstatsdashboard.db.key.MatchPerformanceKeyProvider;
 import com.footballstatsdashboard.db.key.PlayerKeyProvider;
@@ -123,8 +125,8 @@ public class DAOFactory {
 
     public IBoardObjectiveEntityDAO getBoardObjectiveEntityDAO() {
         if (this.configuration.isShouldStartCouchbaseServer()) {
-            // TODO: 16/04/22 initialize the couchbase implementation for the board objective entity DAO when ready
-            return null;
+            return new BoardObjectiveCouchbaseDAO(new BoardObjectiveKeyProvider(),
+                    () -> this.clusterContainer.getCluster(), () -> this.bucketContainer.getBucket(), this.environment);
         } else {
             return new BoardObjectiveJdbiDAO(jdbi);
         }
