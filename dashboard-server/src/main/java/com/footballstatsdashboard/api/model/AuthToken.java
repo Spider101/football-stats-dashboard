@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.InstantSerializer;
 import com.footballstatsdashboard.api.deserializers.CustomInstantDeserializer;
+import com.footballstatsdashboard.core.utils.InternalField;
 import org.immutables.value.Value;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.Instant;
@@ -42,4 +44,11 @@ public interface AuthToken {
     @JsonDeserialize(using = CustomInstantDeserializer.class)
     @JsonSerialize(using = InstantSerializer.class)
     Instant getLastAccessUTC();
+
+    @Nullable
+    @InternalField
+    @Value.Default
+    default String getType() {
+        return "AuthToken";
+    }
 }
