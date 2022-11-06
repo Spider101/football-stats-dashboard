@@ -64,7 +64,8 @@ public class AuthTokenCouchbaseDAO extends CouchbaseDAO implements IAuthTokenEnt
     }
 
     public Optional<AuthToken> getAuthTokenForUser(UUID userId) {
-        String query = String.format("SELECT authToken.* FROM `%s` AS authToken WHERE userId = $userId",
+        String query = String.format("SELECT authToken.* FROM `%s` AS authToken" +
+                        " WHERE authToken.type = 'AuthToken' AND authToken.userId = $userId",
                 this.getCouchbaseBucket().name());
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("userId", userId.toString())
