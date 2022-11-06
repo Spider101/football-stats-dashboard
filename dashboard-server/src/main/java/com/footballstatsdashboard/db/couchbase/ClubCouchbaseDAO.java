@@ -117,13 +117,14 @@ public class ClubCouchbaseDAO extends CouchbaseDAO implements IClubEntityDAO {
 
     @Override
     public List<SquadPlayer> getPlayersInClub(UUID clubId) {
+        String bucketName = this.getCouchbaseBucket().name();
         String query = String.format("SELECT player.metadata.name, player.metadata.country, player.id," +
                 " player.metadata.countryLogo AS countryFlag, player.ability.`current` AS currentAbility," +
                 " player.roles, matchPerformance.matchRating.history AS matchRatingHistory" +
                 " FROM `%s` player LEFT JOIN `%s` matchPerformance" +
                 " ON player.id = matchPerformance.playerId" +
-                " WHERE player.type = 'Player' AND player.clubId = $clubId",
-                this.getCouchbaseBucket().name(), this.getCouchbaseBucket().name());
+                " WHERE player.type = 'Player' AND matchPerformance.type = 'MatchPerformance'" +
+                " AND player.clubId = $clubId", bucketName, bucketName);
 
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("clubId", clubId.toString())
