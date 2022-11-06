@@ -32,7 +32,7 @@ public class BoardObjectiveService {
                 LOGGER.error(errorMessage);
                 throw new ServiceException(HttpStatus.CONFLICT_409, errorMessage);
             }
-        } catch (NoResultException noResultException) {
+        } catch (EntityNotFoundException entityNotFoundException) {
             String errorMessage = String.format("No board objective entity found for ID: %s", boardObjectiveId);
             LOGGER.error(errorMessage);
             throw new ServiceException(HttpStatus.NOT_FOUND_404, errorMessage);
