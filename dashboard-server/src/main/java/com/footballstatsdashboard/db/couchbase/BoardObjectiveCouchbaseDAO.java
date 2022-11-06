@@ -74,7 +74,8 @@ public class BoardObjectiveCouchbaseDAO extends CouchbaseDAO implements IBoardOb
         String bucketName = this.getCouchbaseBucket().name();
         String query = String.format("SELECT club.userId FROM `%s` AS boardObjective JOIN `%s` AS club" +
                 " ON boardObjective.clubId = club.id" +
-                " WHERE club.type = 'Club' AND boardObjective.id = $boardObjectiveId", bucketName, bucketName);
+                " WHERE boardObjective.type = 'BoardObjective' AND club.type = 'Club'" +
+                " AND boardObjective.id = $boardObjectiveId", bucketName, bucketName);
 
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("boardObjectiveId", entityId.toString())

@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import javax.persistence.EntityNotFoundException;
 import javax.persistence.NoResultException;
 import java.util.List;
 import java.util.Objects;
@@ -82,7 +83,7 @@ public class BoardObjectiveServiceTest {
         UUID nonExistentBoardObjectiveId = UUID.randomUUID();
         UUID clubId = UUID.randomUUID();
         when(boardObjectiveDAO.doesEntityBelongToClub(eq(nonExistentBoardObjectiveId), eq(clubId)))
-                .thenThrow(NoResultException.class);
+                .thenThrow(EntityNotFoundException.class);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,
@@ -259,7 +260,7 @@ public class BoardObjectiveServiceTest {
         UUID nonExistentBoardObjectiveId = UUID.randomUUID();
         UUID clubId = UUID.randomUUID();
         when(boardObjectiveDAO.doesEntityBelongToClub(eq(nonExistentBoardObjectiveId), eq(clubId)))
-                .thenThrow(NoResultException.class);
+                .thenThrow(EntityNotFoundException.class);
 
         BoardObjective incomingBoardObjective = BoardObjectiveDataProvider.BoardObjectiveBuilder.builder()
                 .withClubId(clubId)
@@ -407,7 +408,7 @@ public class BoardObjectiveServiceTest {
         UUID nonExistentBoardObjectiveId = UUID.randomUUID();
         UUID clubId = UUID.randomUUID();
         when(boardObjectiveDAO.doesEntityBelongToClub(eq(nonExistentBoardObjectiveId), eq(clubId)))
-                .thenThrow(NoResultException.class);
+                .thenThrow(EntityNotFoundException.class);
 
         // execute
         ServiceException serviceException = assertThrows(ServiceException.class,

@@ -68,7 +68,8 @@ public class PlayerCouchbaseDAO extends CouchbaseDAO implements IPlayerEntityDAO
         String bucketName = this.getCouchbaseBucket().name();
         String query = String.format("SELECT club.userId FROM `%s` AS player JOIN `%s` AS club" +
                         " ON player.clubId = club.id" +
-                        " WHERE club.type = 'Club' AND player.id = $playerId", bucketName, bucketName);
+                        " WHERE player.type = 'Player' AND club.type = 'Club' AND player.id = $playerId",
+                bucketName, bucketName);
 
         QueryOptions queryOptions = QueryOptions.queryOptions().parameters(
                 JsonObject.create().put("playerId", entityId.toString())
